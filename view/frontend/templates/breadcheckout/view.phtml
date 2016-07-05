@@ -1,0 +1,238 @@
+<?php /* @var $this Bread_BreadCheckout_Block_Product_View */ ?>
+<?php  echo $this->getBeforeHtml(); ?>
+<div id="bread-btn-cntnr">
+    <div id='bread-checkout-btn' title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
+        <span>
+            <span><?php echo $this->helper('breadcheckout')->__('Bread Checkout'); ?></span>
+        </span>
+    </div>
+    <div class='button-prevent'
+         id='button-prevent'>
+        <span class="buy_error_tip override_tip">&nbsp;</span>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var noHintValidation = function (name, elm, useTitle) {
+        var v       = Validation.get(name);
+        var prop    = '__advice' + name.camelize();
+        try {
+            if (Validation.isVisible(elm) && !v.test($F(elm), elm)) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (e) {
+            throw(e)
+        }
+    };
+
+    document.configureButton = function (items) {
+        var address             = <?php echo $this->getShippingAddressData(); ?>;
+        var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
+        var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
+        var buttonCss           = '<?php echo $this->getButtonDesign(); ?>';
+
+        var breadConfig = {
+            buttonId: 'bread-checkout-btn',
+            asLowAs: <?php echo $this->getAsLowAs(); ?>,
+            items: items,
+            discounts: <?php echo $this->getDiscountDataJson(); ?>,
+            allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
+
+            done: function (err, tx_token) {
+                if (tx_token !== undefined) {
+                    var i = document.createElement('input');
+                    i.type = 'hidden';
+                    i.name = 'token';
+                    i.value = tx_token;
+                    var f = document.createElement('form');
+                    f.action = '<?php echo $this->getValidateOrderUrl(); ?>';
+                    f.method = 'POST';
+                    f.appendChild(i);
+                    document.body.appendChild(f);
+                    f.submit();
+                }
+
+                return;
+            },
+
+            /**
+             * Calculate tax value callback
+             *
+             * @param shippingAddress
+             * @param callback
+             */
+            calculateTax: function (shippingAddress, callback) {
+                shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
+                shippingAddress.additional_data                 = <?php echo  $this->helper('core')->jsonEncode($this->setAdditionalData()); ?>;
+                shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
+                shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
+                shippingAddress.main_product_id                 = document.productId;
+
+                new Ajax.Request('<?php echo $this->getTaxEstimationUrl(); ?>', {
+                    parameters: {shippingInfo: JSON.stringify(shippingAddress)},
+                    method: 'post',
+                    onSuccess: function (transport) {
+                        try {
+                            if (transport.responseText.isJSON()) {
+                                var response = transport.responseText.evalJSON();
+                                if (response.error) {
+                                    alert(response.message);
+                                } else {
+                                    callback(null, response.result);
+                                }
+                            }
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    }
+                });
+            },
+
+            /**
+             * Calculate shipping cost callback
+             *
+             * @param shippingAddress
+             * @param callback
+             */
+            calculateShipping: function (shippingAddress, callback) {
+                shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
+                shippingAddress.additional_data                 = <?php echo  $this->helper('core')->jsonEncode($this->setAdditionalData()); ?>;
+                shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
+                shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
+                shippingAddress.main_product_id                 = document.productId;
+
+                new Ajax.Request('<?php echo $this->getShippingAddressEstimationUrl(); ?>', {
+                    parameters: shippingAddress,
+                    method: 'post',
+                    onSuccess: function (transport) {
+                        try {
+                            if (transport.responseText.isJSON()) {
+                                var response = transport.responseText.evalJSON()
+                                if (response.error) {
+                                    alert(response.message);
+                                } else {
+                                    callback(null, response.result);
+                                }
+                            }
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    }
+                });
+            },
+
+            /**
+             * Add to cart call back used when allow checkout from product page = false
+             *
+             * @param callback
+             */
+            addToCart:  function(callback) {
+                document.getActualAddToCartForm().submit($('product_addtocart_form'));
+            }
+        };
+
+        if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
+            breadConfig.customCSS = buttonCss;
+        }
+
+        if (address !== false) {
+            breadConfig.shippingContact = address;
+        }
+
+        if (billingAddress !== false) {
+            breadConfig.billingContact = billingAddress;
+        }
+
+
+        if (buttonOnProduct === true) {
+            breadConfig.actAsLabel = false;
+        }
+
+        bread.checkout(breadConfig);
+    };
+
+<?php if( $this->getProduct() != null ): ?>
+
+    testIsValid = function() {
+        realValidation      = Validation.test;
+        Validation.test     = noHintValidation;
+        var o               = document.getElementById("button-prevent");
+        if (document.getActualAddToCartForm().validator.validate()) {
+            o.style.height      = "0px";
+            o.style.width       = "0px";
+        }
+        else {
+            o.style.height      = '100%';
+            o.style.width       = '100%';
+        }
+
+        Validation.test = realValidation;
+    }
+
+    document.getActualAddToCartForm = function() {
+        if (('undefined' != typeof productAddToCartFormOld) && productAddToCartFormOld) {
+            return productAddToCartFormOld;
+        }
+        else {
+            return productAddToCartForm;
+        }
+    };
+
+    document.resetPriceAndSku = function () {
+        testIsValid();
+
+        if (typeof(optionsPrice.productPrice) == 'undefined') {
+            document.configureButton(document.defaultItems);
+        }
+        else {
+            price = optionsPrice.productPrice;
+
+            if (typeof(optionsPrice.optionPrices.config) != 'undefined') {
+                price += optionsPrice.optionPrices.config.price;
+            }
+
+            for (key in optionsPrice.customPrices) {
+                if (optionsPrice.customPrices.hasOwnProperty(key)) {
+                    price += optionsPrice.customPrices[key].price;
+                }
+            }
+
+            sku = document.selectedSku + document.customOptions;
+            if (sku != document.previousSku || price != document.previousPrice) {
+                document.previousSku                    = sku;
+                document.previousPrice                  = price;
+                document.defaultItems[0]["sku"]         = document.previousSku;
+                document.defaultItems[0]["price"]       = document.previousPrice * 100;
+                document.configureButton(document.defaultItems);
+            }
+        }
+    };
+
+<?php endif; ?>
+
+    document.observe("dom:loaded", function () {
+        document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
+        document.previousPrice      = document.defaultItems[0]["price"];
+        document.previousSku        = document.defaultItems[0]["sku"];
+
+    <?php if ($this->getProduct() != null): ?>
+        document.customOptions = "";
+        document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
+        document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
+        document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
+        document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
+        var o = document.getElementById("button-prevent");
+        o.addEventListener('click', function (e) {
+            document.getActualAddToCartForm().validator.validate();
+        }, true);
+        document.resetPriceAndSku();
+    <?php else: ?>
+        document.configureButton(document.defaultItems);
+    <?php endif; ?>
+    });
+
+</script>

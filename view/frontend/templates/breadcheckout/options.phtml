@@ -1,0 +1,99 @@
+<?php
+/**
+ * 
+ * @author  Bread   @copyright  2016
+ * @author  Joel    @Mediotype
+ */
+?>
+
+<script type="text/javascript">
+    <?php $_options = Mage::helper('core')->decorateArray($this->getProduct()->getOptions()); ?>
+    <?php if (count($_options)): ?>
+
+    document.observe("dom:loaded", function () {
+        var calculatePrice = function () {
+            price = optionsPrice.productPrice;
+            for (key in optionsPrice.customPrices) {
+                if (optionsPrice.customPrices.hasOwnProperty(key)) {
+                    price += optionsPrice.customPrices[key].price;
+                }
+            }
+            return price;
+        };
+
+        Product.Options.prototype.oldReloadPrice = Product.Options.prototype.reloadPrice;
+        document.customOptions = document.getSkuForOptions();
+        Product.Options.prototype.reloadPrice = function () {
+            this.oldReloadPrice();
+            document.customOptions = document.getSkuForOptions();
+            document.resetPriceAndSku();
+        }
+    });
+
+    <?php $options_to_sku = array(); ?>
+    <?php foreach($_options as $_option): ?>
+    <?php echo $this->getOptionHtml($_option) ?>
+    <?php
+        $options_to_sku["{$_option->getId()}"] = array();
+        $optionValues = $_option->getValues();
+        if (count($optionValues) > 0) {
+            foreach ($_option->getValues() as $k => $v) {
+                $options_to_sku["{$_option->getId()}"]["{$v->getData('option_type_id')}"] = $v->getData('sku');
+            }
+        } else {
+            $options_to_sku["{$_option->getId()}"] = $_option->getData('sku');
+        }
+    ?>
+    <?php endforeach; ?>
+    document.options_to_sku = <?php echo json_encode($options_to_sku); ?>;
+
+    document.getSkuForOptions = function() {
+        var sku_suffix = '';
+        var skipIds = [];
+        $$('.product-custom-option').each(function(opt) {
+            var optionId = 0;
+            opt.name.sub(/[0-9]+/, function (match) {
+                optionId = parseInt(match[0], 10);
+            });
+            if (opConfig.config[optionId]) {
+                var configOptions = opConfig.config[optionId];
+                var curConfig = {price: 0};
+                if (opt.type == 'checkbox' || opt.type == 'radio') {
+                    if (opt.checked) {
+                        if (typeof configOptions[opt.getValue()] != 'undefined') {
+                            sku_suffix += '***' + document.options_to_sku[optionId][opt.getValue()];
+                        }
+                    }
+                } else if(opt.hasClassName('datetime-picker') && !skipIds.include(optionId)) {
+                    dateSelected = true;
+                    $$('.product-custom-option[id^="options_' + optionId + '"]').each(function (dt) {
+                        if (dt.getValue() == '') {
+                            dateSelected = false;
+                        }
+                    });
+                    if (dateSelected) {
+                        sku_suffix += '***' + document.options_to_sku[optionId];
+                        skipIds[optionId] = optionId;
+                    }
+                } else if (opt.type == 'select-one' || opt.type == 'select-multiple') {
+                    if ('options' in opt) {
+                        $A(opt.options).each(function (selectOption) {
+                            if ('selected' in selectOption && selectOption.selected) {
+                                if (typeof(configOptions[selectOption.value]) != 'undefined') {
+                                    sku_suffix += '***' + document.options_to_sku[optionId][selectOption.value];
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    if (opt.getValue().strip() != '') {
+                        sku_suffix += '***' + document.options_to_sku[optionId] + '===' + opt.getValue().strip();
+                    }
+                }
+            }
+        });
+
+        return sku_suffix;
+    };
+    <?php endif; ?>
+</script>

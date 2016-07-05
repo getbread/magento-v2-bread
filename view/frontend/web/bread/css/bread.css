@@ -1,0 +1,41 @@
+.buy_error_tip {
+    background-color: white;
+    color: black;
+    display: none;
+    position: relative;
+    width:80%;
+    top: -30px;
+    padding: 5px 7px;
+    font-size: 11px;
+    line-height: 16px;
+    text-decoration: none;
+    text-indent: 0;
+    text-align: center;
+    border: 2px solid #b00;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    z-index: 500
+}
+.buy_error_tip:after {
+    content: 'Please complete product configuration'
+}
+
+.button-prevent{
+    cursor: pointer;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 0px;
+    height: 0px;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 99999
+}
+
+#bread-btn-cntnr{
+    display: inline-block;
+    position: relative
+}
+
+.button-prevent:hover span.buy_error_tip {
+    display: block
+}

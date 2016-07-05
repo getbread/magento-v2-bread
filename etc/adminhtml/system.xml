@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <section id="payment">
+        <group id="breadcheckout" type="text" sortOrder="305" showInDefault="1" showInWebsite="1" showInStore="1" translate="label" module="breadcheckout">
+            <label>Bread Checkout</label>
+            <comment>
+                    
+                        <style>
+                            .bread-logo { width: 133px; height: 44px; display: block; background: url(/skin/frontend/base/default/bread/images/bread-logo.png) 0px 0 no-repeat; }
+                            .bread-brand { color: #fff; background-color: #0c5a7b; border:1px solid #ddd; padding: 10px; font-size: 125%; }
+                        </style>
+                        <div class="bread-brand">
+                            <span class="bread-logo"></span>
+                        Bread Payments by <a href="https://www.getbread.com/" target="_blank">getbread.com</a> - <b>Onsite Consumer Financing</b>.
+                        <br/> Developers API reference <a href="http://developers.getbread.com/" target="_blank">Bread Developer API Reference</a>
+                        </div>
+                    
+                    </comment>
+            <field id="active" translate="label">
+                <label>Enabled</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </field>
+            <field id="api_mode" translate="label">
+                <label>API MODE</label>
+                <source_model>breadcheckout/system_config_source_apiMode</source_model>
+            </field>
+            <field id="api_public_key" translate="label">
+                <label>API Public Key</label>
+            </field>
+            <field id="api_secret_key" translate="label">
+                <label>API Secret Key</label>
+                <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+            </field>
+            <field id="payment_action" translate="label">
+                <label>Payment Action</label>
+                <source_model>breadcheckout/system_config_source_paymentAction</source_model>
+            </field>
+            <field id="enabled_on_product_page" translate="label">
+                <label>Enabled on Product Details Page</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <depends>
+                    <active>1</active>
+                </depends>
+            </field>
+            <field id="enabled_on_cart_page" translate="label">
+                <label>Enabled on Cart Overview Page</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <depends>
+                    <active>1</active>
+                </depends>
+            </field>
+            <field id="as_low_as" translate="label">
+                <label>Show "as low as" pricing to not-logged-in users</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <depends>
+                    <active>1</active>
+                </depends>
+            </field>
+            <field id="display_as_payment_method" translate="label">
+                <label>Display as Payment Method on Checkout</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <depends>
+                    <active>1</active>
+                </depends>
+            </field>
+            <field id="use_default_button_size" translate="label">
+                <label>Use default button size</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <depends>
+                    <active>1</active>
+                </depends>
+            </field>
+            <field id="create_customer_account" translate="label">
+                <label>Auto-create customer account</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <depends>
+                    <active>1</active>
+                </depends>
+            </field>
+            <field id="login_customer_on_order" translate="label">
+                <label>Login Customer On Order From Pop Up</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <depends>
+                    <active>1</active>
+                </depends>
+            </field>
+            <field id="button_on_products" translate="label">
+                <label>Display as Button on Product Detail Pages When Logged In</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+            </field>
+            <field id="button_design" translate="label">
+                <label>Bread Button Design</label>
+                <comment>
+                                
+                                    <div>
+                                        <p>CSS that overrides the default button design styles.</p>
+                                    </div>
+                                
+                            </comment>
+            </field>
+            <field id="title" translate="label">
+                <label>Payment Method Title</label>
+                <comment>
+                                
+                                    <div>
+                                        <p>The Title for the payment method in checkout.</p>
+                                    </div>
+                                
+                            </comment>
+            </field>
+            <field id="incomplete_checkout_message" translate="label">
+                <label>Incomplete Bread Checkout error</label>
+                <comment>
+                                
+                                    <div>
+                                        <p>The message displayed during checkout if the Bread Financing process is selected as a payment method, but has not been completed by the Customer.</p>
+                                    </div>
+                                
+                            </comment>
+            </field>
+            <field id="allowcheckoutpdp" translate="label">
+                <label>Allow Checkout From Bread Pop Up On Product Page</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <comment>
+                                
+                                    <div>
+                                        <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
+                                        the user will only be presented with a button that allows them to return to your
+                                        site rather than straight through to checkout.  If there is an <code>addToCart</code>
+                                        callback specified, the button will call <code>addToCart</code> before returning to
+                                        your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
+                                        instead of just <strong>Continue Shopping</strong>.</p>
+                                    </div>
+                                
+                            </comment>
+            </field>
+            <field id="allowcheckoutcart" translate="label">
+                <label>Allow Checkout From Bread Pop Up On Cart Page</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <comment>
+                                
+                                    <div>
+                                        <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
+                                        the user will only be presented with a button that allows them to return to your
+                                        site rather than straight through to checkout.  If there is an <code>addToCart</code>
+                                        callback specified, the button will call <code>addToCart</code> before returning to
+                                        your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
+                                        instead of just <strong>Continue Shopping</strong>.</p>
+                                    </div>
+                                
+                            </comment>
+            </field>
+            <field id="log_enabled" translate="label">
+                <label>Enable Logging</label>
+                <source_model>adminhtml/system_config_source_yesno</source_model>
+                <comment>
+                                
+                                    <div>
+                                        <p>Enable Extra Logging.</p>
+                                    </div>
+                                
+                            </comment>
+            </field>
+        </group>
+    </section>
+</config>

@@ -1,0 +1,82 @@
+<?php /** */ ?>
+<script type="text/javascript">
+    document.Skus = {};
+
+    document.observe("dom:loaded", function () {
+        spConfig.updateButton = function()
+        {
+            var simpleProductId                 = spConfig.getIdOfSelectedProduct();
+            document.selectedSku                = document.baseProductSku + "///" + document.Skus[simpleProductId];
+            document.selectedSimpleProductId    = simpleProductId;
+            document.resetPriceAndSku();
+        };
+
+        if(spConfig.configureSubscribe != null) {
+            spConfig.configureSubscribe(function(element) {
+                spConfig.updateButton();
+            });
+        }
+        else {
+            spConfig.settings.each(function (element) {
+                Event.observe(element, 'change', this.updateButton.bind(this))
+            }.bind(spConfig));
+        }
+
+        <?php
+            $configurableProduct    = Mage::getModel('catalog/product_type_configurable')->setProduct($this->getProduct());
+            $usedChildrenProduct    = $configurableProduct->getUsedProductCollection()
+                    ->addAttributeToSelect('sku')
+                    ->addFilterByRequiredOptions();
+        ?>
+
+        spConfig.getIdOfSelectedProduct = function () {
+            var existingProducts = new Object();
+            for (var i = this.settings.length - 1; i >= 0; i--) {
+                var selected = this.settings[i].options[this.settings[i].selectedIndex];
+                if (selected.config) {
+                    for (var iproducts = 0; iproducts < selected.config.products.length; iproducts++) {
+                        var usedAsKey = selected.config.products[iproducts] + "";
+                        if (existingProducts[usedAsKey] == undefined) {
+                            existingProducts[usedAsKey] = 1;
+                        }
+                        else {
+                            existingProducts[usedAsKey] = existingProducts[usedAsKey] + 1;
+                        }
+                    }
+                }
+            }
+            for (var keyValue in existingProducts) {
+                for (var keyValueInner in existingProducts) {
+                    if (Number(existingProducts[keyValueInner]) < Number(existingProducts[keyValue])) {
+                        delete existingProducts[keyValueInner];
+                    }
+                }
+            }
+            var sizeOfExistingProducts = 0;
+            var currentSimpleProductId = "";
+            for (var keyValue in existingProducts) {
+                currentSimpleProductId = keyValue;
+                sizeOfExistingProducts = sizeOfExistingProducts + 1
+            }
+            if (sizeOfExistingProducts == 1) {
+                return currentSimpleProductId;
+            }
+            else {
+                return null;
+            }
+        };
+
+        <?php
+            $itemId         = array();
+            foreach($usedChildrenProduct as $simple_product){
+                $itemId[]   = array($simple_product->getId() => $simple_product->getSku());
+            }
+
+            foreach($itemId as $val){
+                foreach($val as $k => $v){
+                    echo 'document.Skus['.$k.'] = "'.$v.'";'. "\n";
+                }
+            };
+         ?>
+    });
+</script>

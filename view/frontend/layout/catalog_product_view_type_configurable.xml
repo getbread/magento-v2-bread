@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <body>
+        <referenceContainer name="product.info.configurable.extra">
+            <block template="Bread_BreadCheckout::breadcheckout/configurable.phtml" class="Bread\BreadCheckout\Block\Product\View" name="breadcheckout.checkout.configurable"/>
+        </referenceContainer>
+    </body>
+</page>

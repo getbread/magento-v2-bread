@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <head>
+        <css src="Bread_BreadCheckout::bread/css/bread.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Bread\BreadCheckout\Block\Js" as="breadcheckout.prod.js" name="breadcheckout.prod.js"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.extrahint">
+            <block template="Bread_BreadCheckout::breadcheckout/view.phtml" class="Bread\BreadCheckout\Block\Product\View" as="breadcheckout.prod.view" name="breadcheckout.prod.view"/>
+        </referenceContainer>
+        <referenceBlock name="product.info.options.wrapper">
+            <block template="Bread_BreadCheckout::breadcheckout/options.phtml" class="Bread\BreadCheckout\Block\Product\View" name="breadcheckout.checkout.options"/>
+        </referenceBlock>
+    </body>
+</page>
