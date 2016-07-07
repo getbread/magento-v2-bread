@@ -3,11 +3,13 @@
  * 
  * @author  Bread   @copyright  2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
-?>
 
+/** @var $this Bread\BreadCheckout\Block\Product\View\Options */
+?>
 <script type="text/javascript">
-    <?php $_options = Mage::helper('core')->decorateArray($this->getProduct()->getOptions()); ?>
+    <?php $_options = $this->decorateArray($this->getProduct()->getOptions()); ?>
     <?php if (count($_options)): ?>
 
     document.observe("dom:loaded", function () {
@@ -45,7 +47,7 @@
         }
     ?>
     <?php endforeach; ?>
-    document.options_to_sku = <?php echo json_encode($options_to_sku); ?>;
+    document.options_to_sku = <?php echo $this->jsonHelper->jsonEncode($options_to_sku); ?>;
 
     document.getSkuForOptions = function() {
         var sku_suffix = '';

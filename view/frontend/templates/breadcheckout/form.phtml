@@ -1,9 +1,9 @@
-<?php /* @var $this Bread_BreadCheckout_Block_Payment_Form */ ?>
+<?php /* @var $this Bread\BreadCheckout\Block\Payment\Form */ ?>
 
 <ul class="form-list" id="payment_form_<?php echo $this->getMethodCode(); ?>" style="display:none">
-    <div  id='bread-checkout-btn' title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?> >
+    <div id='bread-checkout-btn' title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?> >
         <span>
-            <span><?php echo Mage::helper('breadcheckout')->__('Bread Checkout'); ?></span>
+            <span><?php echo __('Bread Checkout'); ?></span>
         </span>
     </div>
     <input id="bread_transaction_id" name="bread_transaction_id" type="hidden" value="<?php echo $this->getBreadTransactionId(); ?>" class="validate-bread"/>

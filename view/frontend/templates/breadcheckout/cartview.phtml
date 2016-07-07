@@ -1,9 +1,9 @@
-<?php /* @var $this Bread_BreadCheckout_Block_Checkout_Overview */ ?>
+<?php /* @var $this Bread\BreadCheckout\Block\Checkout\Overview */ ?>
 <?php  echo $this->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr">
     <div id='bread-checkout-btn' title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
         <span>
-            <span><?php echo $this->helper('breadcheckout')->__('Bread Checkout'); ?></span>
+            <span><?php echo __('Bread Checkout'); ?></span>
         </span>
     </div>
     <div class='button-prevent'
@@ -65,7 +65,7 @@
              */
             calculateTax: function (shippingAddress, callback) {
                 shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                shippingAddress.additional_data                 = <?php echo  $this->helper('core')->jsonEncode($this->setAdditionalData()); ?>;
+                shippingAddress.additional_data                 = <?php echo  $this->jsonHelper->jsonEncode($this->setAdditionalData()); ?>;
                 shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                 shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                 shippingAddress.main_product_id                 = document.productId;
@@ -99,7 +99,7 @@
              */
             calculateShipping: function (shippingAddress, callback) {
                 shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                shippingAddress.additional_data                 = <?php echo  $this->helper('core')->jsonEncode($this->setAdditionalData()); ?>;
+                shippingAddress.additional_data                 = <?php echo  $this->jsonHelper->jsonEncode($this->setAdditionalData()); ?>;
                 shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                 shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                 shippingAddress.main_product_id                 = document.productId;

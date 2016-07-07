@@ -1,4 +1,4 @@
-<?php /** */ ?>
+<?php /** @var $this Bread\BreadCheckout\Block\Product\View */ ?>
 <script type="text/javascript">
     document.Skus = {};
 
@@ -21,14 +21,7 @@
                 Event.observe(element, 'change', this.updateButton.bind(this))
             }.bind(spConfig));
         }
-
-        <?php
-            $configurableProduct    = Mage::getModel('catalog/product_type_configurable')->setProduct($this->getProduct());
-            $usedChildrenProduct    = $configurableProduct->getUsedProductCollection()
-                    ->addAttributeToSelect('sku')
-                    ->addFilterByRequiredOptions();
-        ?>
-
+        
         spConfig.getIdOfSelectedProduct = function () {
             var existingProducts = new Object();
             for (var i = this.settings.length - 1; i >= 0; i--) {
@@ -67,16 +60,13 @@
         };
 
         <?php
-            $itemId         = array();
-            foreach($usedChildrenProduct as $simple_product){
-                $itemId[]   = array($simple_product->getId() => $simple_product->getSku());
-            }
+            $itemIds = $this->getChildProductIds($this->getProduct());
 
-            foreach($itemId as $val){
-                foreach($val as $k => $v){
-                    echo 'document.Skus['.$k.'] = "'.$v.'";'. "\n";
+            if (!empty($itemIds)) {
+                foreach ($itemIds as $val) {
+                    foreach ($val as $k => $v) echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
                 }
-            };
+            }
          ?>
     });
 </script>

@@ -4,21 +4,27 @@
  *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Block;
 
-class  extends \Magento\Framework\View\Element\Text
+class Js extends \Magento\Framework\View\Element\Text
 {
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helper;
+
     public function __construct(
         \Magento\Framework\View\Element\Context $context,
+        \Bread\BreadCheckout\Helper\Data $helper,
         array $data = []
     ) {
+        $this->helper = $helper;
+
         parent::__construct(
             $context,
             $data
         );
     }
-
 
     /**
      * Inject integration if module is active
@@ -54,7 +60,7 @@ class  extends \Magento\Framework\View\Element\Text
      */
     protected function isActive()
     {
-        return (bool) $this->helper('breadcheckout')->isActive();
+        return (bool) $this->helper->isActive();
     }
 
     /**
@@ -64,7 +70,7 @@ class  extends \Magento\Framework\View\Element\Text
      */
     protected function getPublicApiKey()
     {
-        return $this->helper('breadcheckout')->getApiPublicKey();
+        return $this->helper->getApiPublicKey();
     }
 
     /**
@@ -74,7 +80,7 @@ class  extends \Magento\Framework\View\Element\Text
      */
     protected function getJsLibLocation()
     {
-        return $this->helper('breadcheckout')->getJsLibLocation();
+        return $this->helper->getJsLibLocation();
     }
 
 }

@@ -4,21 +4,42 @@
  *
  * @copyright   Bread   2016
  * @author      Joel    @Mediotype
+ * @author      Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Block\Checkout;
 
-class  extends \Magento\Framework\View\Element\Template
+class Overview extends \Magento\Framework\View\Element\Template
 {
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helper;
+
+    /** @var \Bread\BreadCheckout\Helper\Quote */
+    protected $quoteHelper;
+
+    /** @var \Bread\BreadCheckout\Helper\Customer */
+    protected $customerHelper;
+
+    /** @var \Magento\Framework\Json\Helper\Data */
+    protected $jsonHelper;
+
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
+        \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
         array $data = []
     ) {
+        $this->helper = $helper;
+        $this->quoteHelper = $quoteHelper;
+        $this->customerHelper = $customerHelper;
+        $this->jsonHelper = $jsonHelper;
+
         parent::__construct(
             $context,
             $data
         );
     }
-
 
     /**
      * Set Block Extra In Construct Flow
@@ -26,8 +47,7 @@ class  extends \Magento\Framework\View\Element\Template
     protected function _construct()
     {
         parent::_construct();
-
-        $this->setAdditionalData(array());
+        $this->setAdditionalData([]);
     }
 
     /**
@@ -37,9 +57,8 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getDiscountDataJson()
     {
-        $discountData   = $this->helper('breadcheckout/Quote')->getDiscountData();
-
-        return $this->helper('core')->jsonEncode($discountData);
+        $discountData   = $this->quoteHelper->getDiscountData();
+        return $this->jsonHelper->jsonEncode($discountData);
     }
 
     /**
@@ -49,9 +68,8 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getProductDataJson()
     {
-        $itemsData      = $this->helper('breadcheckout/Quote')->getCartOverviewItemsData();
-
-        return $this->helper('core')->jsonEncode($itemsData);
+        $itemsData      = $this->quoteHelper->getCartOverviewItemsData();
+        return $this->jsonHelper->jsonEncode($itemsData);
     }
 
     /**
@@ -61,7 +79,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     protected function _toHtml()
     {
-        if( $this->helper('breadcheckout')->isEnabledOnCOP() ) {
+        if( $this->helper->isEnabledOnCOP() ) {
             return parent::_toHtml();
         }
 
@@ -75,7 +93,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getBlockCode()
     {
-        return (string) Mage::helper('breadcheckout')->getBlockCodeCheckoutOverview();
+        return (string) $this->helper->getBlockCodeCheckoutOverview();
     }
 
     /**
@@ -85,7 +103,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getShippingAddressEstimationUrl()
     {
-        return $this->helper('breadcheckout')->getShippingEstimateUrl();
+        return $this->helper->getShippingEstimateUrl();
     }
 
     /**
@@ -95,7 +113,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getTaxEstimationUrl()
     {
-        return $this->helper('breadcheckout')->getTaxEstimateUrl();
+        return $this->helper->getTaxEstimateUrl();
     }
 
     /**
@@ -105,7 +123,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getValidateOrderUrl()
     {
-        return $this->helper('breadcheckout')->getValidateOrderURL();
+        return $this->helper->getValidateOrderURL();
     }
 
     /**
@@ -115,7 +133,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getShippingAddressData()
     {
-        return $this->helper('breadcheckout/Customer')->getShippingAddressData();
+        return $this->customerHelper->getShippingAddressData();
     }
 
     /**
@@ -125,7 +143,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getBillingAddressData()
     {
-        return $this->helper('breadcheckout/Customer')->getBillingAddressData();
+        return $this->customerHelper->getBillingAddressData();
     }
 
     /**
@@ -135,7 +153,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     protected function getAsLowAs()
     {
-        return ( $this->helper('breadcheckout')->isAsLowAs() ) ? 'true' : 'false';
+        return ( $this->helper->isAsLowAs() ) ? 'true' : 'false';
     }
 
     /**
@@ -145,7 +163,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getButtonDesign()
     {
-        return $this->helper('breadcheckout')->getButtonDesign();
+        return $this->helper->getButtonDesign();
     }
 
     /**
@@ -155,7 +173,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getAllowCheckout()
     {
-        return ($this->helper('breadcheckout')->getAllowCheckoutCP()) ? 'true' : 'false';
+        return ($this->helper->getAllowCheckoutCP()) ? 'true' : 'false';
     }
 
 }

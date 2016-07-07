@@ -4,12 +4,12 @@
  *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Block\Payment;
 
-class  extends \Magento\Payment\Block\Info
+class Info extends \Magento\Payment\Block\Info
 {
-
     /**
      * @var \Magento\Framework\DataObjectFactory
      */
@@ -36,12 +36,7 @@ class  extends \Magento\Payment\Block\Info
         $transport = $this->dataObjectFactory->create();
         $transport = parent::_prepareSpecificInformation($transport);
 
-        $transport->addData(
-            array(
-                Mage::helper('breadcheckout')->__('Financing Tx Id') => $info->getTransactionId()
-            )
-        );
-
+        $transport->addData( [__('Financing Tx Id') => $info->getTransactionId()] );
         return $transport;
     }
 

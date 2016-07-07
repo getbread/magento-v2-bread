@@ -4,39 +4,59 @@
  *
  * @copyright   Bread   2016
  * @author      Joel    @Mediotype
+ * @author      Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Block\Product;
 
-class  extends \Magento\Framework\View\Element\Template
+class View extends \Magento\Framework\View\Element\Template
 {
-
     protected $_product;
 
-    /**
-     * @var \Magento\Framework\Registry
-     */
+    /** @var \Magento\Framework\Registry */
     protected $registry;
+
+    /** @var Magento\Framework\Json\Helper\Data */
+    protected $jsonHelper;
+
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helper;
+
+    /** @var \Bread\BreadCheckout\Helper\Catalog */
+    protected $catalogHelper;
+
+    /** @var \Bread\BreadCheckout\Helper\Customer */
+    protected $customerHelper;
+
+    /** @var \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory */
+    protected $configurableProductFactory;
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Framework\Registry $registry,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
+        \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory
         array $data = []
     ) {
         $this->registry = $registry;
+        $this->jsonHelper = $jsonHelper;
+        $this->helper = $helper;
+        $this->catalogHelper = $catalogHelper;
+        $this->customerHelper = $customerHelper;
+        $this->configurableProductFactory = $configurableProductFactory;
+
         parent::__construct(
             $context,
             $data
         );
     }
 
-
     protected function _construct()
     {
         $this->setBlockCode($this->getBlockCode());
-        $this->setAdditionalData(array(
-            'product_id'    => $this->getProduct()->getId()
-        ));
-
+        $this->setAdditionalData( ['product_id'    => $this->getProduct()->getId()] );
         parent::_construct();
     }
 
@@ -62,11 +82,9 @@ class  extends \Magento\Framework\View\Element\Template
     public function getProductDataJson()
     {
         $product    = $this->getProduct();
-        $data       = array(
-                        $this->helper('breadcheckout/catalog')->getProductDataArray($product, null)
-                    );
+        $data       = [$this->catalogHelper->getProductDataArray($product, null)];
 
-        return $this->helper('core')->jsonEncode($data);
+        return $this->jsonHelper->jsonEncode($data);
     }
 
     /**
@@ -77,7 +95,7 @@ class  extends \Magento\Framework\View\Element\Template
     public function getDiscountDataJson()
     {
         $result     = array();
-        return $this->helper('core')->jsonEncode($result);
+        return $this->jsonHelper->jsonEncode($result);
     }
 
     /**
@@ -87,7 +105,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getShippingAddressData()
     {
-        return $this->helper('breadcheckout/Customer')->getShippingAddressData();
+        return $this->customerHelper->getShippingAddressData();
     }
 
     /**
@@ -97,7 +115,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getBillingAddressData()
     {
-        return $this->helper('breadcheckout/Customer')->getBillingAddressData();
+        return $this->customerHelper->getBillingAddressData();
     }
 
     /**
@@ -107,7 +125,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     protected function getAsLowAs()
     {
-        return ( $this->helper('breadcheckout')->isAsLowAs() ) ? 'true' : 'false';
+        return ( $this->helper->isAsLowAs() ) ? 'true' : 'false';
     }
 
     /**
@@ -117,7 +135,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     protected function _toHtml()
     {
-        if( $this->helper('breadcheckout')->isEnabledOnPDP() ) {
+        if( $this->helper->isEnabledOnPDP() ) {
             return parent::_toHtml();
         }
 
@@ -131,7 +149,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getShippingAddressEstimationUrl()
     {
-        return $this->helper('breadcheckout')->getShippingEstimateUrl();
+        return $this->helper->getShippingEstimateUrl();
     }
 
     /**
@@ -141,7 +159,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getTaxEstimationUrl()
     {
-        return $this->helper('breadcheckout')->getTaxEstimateUrl();
+        return $this->helper->getTaxEstimateUrl();
     }
 
     /**
@@ -151,7 +169,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getValidateOrderUrl()
     {
-        return $this->helper('breadcheckout')->getValidateOrderURL();
+        return $this->helper->getValidateOrderURL();
     }
 
     /**
@@ -161,7 +179,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getButtonDesign()
     {
-        return $this->helper('breadcheckout')->getButtonDesign();
+        return $this->helper->getButtonDesign();
     }
 
     /**
@@ -171,7 +189,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getIsButtonOnProduct()
     {
-        return ( $this->helper('breadcheckout')->isButtonOnProducts() ) ? 'true' : 'false';
+        return ( $this->helper->isButtonOnProducts() ) ? 'true' : 'false';
     }
 
     /**
@@ -181,7 +199,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getIsDefaultSize()
     {
-        return (string) $this->helper('breadcheckout/Catalog')->getDefaultButtonSizeHtml();
+        return (string) $this->catalogHelper->getDefaultButtonSizeHtml();
     }
 
     /**
@@ -191,7 +209,7 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getAllowCheckout()
     {
-        return ($this->helper('breadcheckout')->getAllowCheckoutPDP()) ? 'true' : 'false';
+        return ($this->helper->getAllowCheckoutPDP()) ? 'true' : 'false';
     }
 
     /**
@@ -201,7 +219,28 @@ class  extends \Magento\Framework\View\Element\Template
      */
     public function getBlockCode()
     {
-        return (string) $this->helper('breadcheckout')->getBlockCodeProductView();
+        return (string) $this->helper->getBlockCodeProductView();
+    }
+
+    /**
+     * Get product IDs from related products collection
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @return array
+     */
+    public function getChildProductIds(\Magento\Catalog\Model\Product $product)
+    {
+        $configurableProduct    = $this->configurableProductFactory->create()->setProduct($product);
+        $usedChildrenProduct    = $configurableProduct->getUsedProductCollection()
+            ->addAttributeToSelect('sku')
+            ->addFilterByRequiredOptions();
+
+        $itemIds         = [];
+        foreach($usedChildrenProduct as $simpleProduct){
+            $itemIds[]   = [ $simpleProduct->getId() => $simpleProduct->getSku() ];
+        }
+
+        return $itemIds;
     }
     
 }

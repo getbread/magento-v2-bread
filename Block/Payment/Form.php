@@ -4,35 +4,56 @@
  *
  * @copyright   Bread   2016
  * @author      Joel    @Mediotype
- * Class Bread_BreadCheckout_Block_Payment_Form
+ * @author      Miranda @Mediotype
+ * Class Bread\BreadCheckout\Block\Payment\Form
  */
-namespace ;
+namespace Bread\BreadCheckout\Block\Payment;
 
-class  extends \Magento\Payment\Block\Form
+class Form extends \Magento\Payment\Block\Form
 {
-    protected $_quote;
+    /** @var $_quote \Magento\Sales\Model\Quote */
+    protected $quote;
 
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
 
-    /**
-     * @var \Magento\Backend\Model\UrlInterfaceFactory
-     */
+    /** @var \Magento\Backend\Model\UrlInterfaceFactory */
     protected $backendUrlInterfaceFactory;
 
-    /** @var $_quote Mage_Sales_Model_Quote */
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helper;
+
+    /** @var \Bread\BreadCheckout\Helper\Quote */
+    protected $quoteHelper;
+
+    /** @var \Bread\BreadCheckout\Helper\Catalog */
+    protected $catalogHelper;
+
+    /** @var \Magento\Framework\Json\Helper\Data */
+    protected $jsonHelper;
+
+    /** @var \Magento\Framework\View\Context */
+    protected $viewContext;
 
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Backend\Model\UrlInterfaceFactory $backendUrlInterfaceFactory
+        \Magento\Backend\Model\UrlInterfaceFactory $backendUrlInterfaceFactory,
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
+        \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Framework\View\Context $viewContext
     )
     {
         $this->storeManager = $storeManager;
         $this->backendUrlInterfaceFactory = $backendUrlInterfaceFactory;
-        parent::__construct();
+        $this->helper = $helper;
+        $this->quoteHelper = $quoteHelper;
+        $this->catalogHelper = $catalogHelper;
+        $this->jsonHelper = $jsonHelper;
+        $this->viewContext = $viewContext;
         $this->setTemplate('breadcheckout/form.phtml');
+        parent::__construct();
     }
 
     /**
@@ -42,15 +63,15 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getShippingAddressData()
     {
-        $shippingAddress    = $this->_getQuote()->getShippingAddress();
+        $shippingAddress    = $this->getQuote()->getShippingAddress();
 
         if( is_null($shippingAddress->getStreet(-1)) ){
             return 'false';
         }
 
-        $breadAddressData   = $this->helper('breadcheckout/Quote')->getFormattedShippingAddressData($shippingAddress);
+        $breadAddressData   = $this->quoteHelper->getFormattedShippingAddressData($shippingAddress);
 
-        return $this->helper('core')->jsonEncode($breadAddressData);
+        return $this->jsonHelper->jsonEncode($breadAddressData);
     }
 
     /**
@@ -60,15 +81,15 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getBillingAddressData()
     {
-        $billingAddress     = $this->_getQuote()->getBillingAddress();
+        $billingAddress     = $this->getQuote()->getBillingAddress();
 
         if(is_null($billingAddress->getStreet(-1))){
             return 'false';
         }
 
-        $breadAddressData   = $this->helper('breadcheckout/Quote')->getFormattedBillingAddressData($billingAddress);
+        $breadAddressData   = $this->quoteHelper->getFormattedBillingAddressData($billingAddress);
 
-        return $this->helper('core')->jsonEncode($breadAddressData);
+        return $this->jsonHelper->jsonEncode($breadAddressData);
     }
 
     /**
@@ -78,7 +99,7 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getTaxValue()
     {
-        return $this->helper('breadcheckout/Quote')->getTaxValue();
+        return $this->quoteHelper->getTaxValue();
     }
 
     /**
@@ -88,7 +109,7 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getGrandTotal()
     {
-        return $this->helper('breadcheckout/Quote')->getGrandTotal();
+        return $this->quoteHelper->getGrandTotal();
     }
 
     /**
@@ -98,9 +119,9 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getDiscountDataJson()
     {
-        $discountData   = $this->helper('breadcheckout/Quote')->getDiscountData();
+        $discountData   = $this->quoteHelper->getDiscountData();
 
-        return $this->helper('core')->jsonEncode($discountData);
+        return $this->jsonHelper->jsonEncode($discountData);
     }
 
     /**
@@ -110,9 +131,9 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getItemsData()
     {
-        $itemsData      = $this->helper('breadcheckout/Quote')->getQuoteItemsData();
+        $itemsData      = $this->quoteHelper->getQuoteItemsData();
 
-        return $this->helper('core')->jsonEncode($itemsData);
+        return $this->jsonHelper->jsonEncode($itemsData);
     }
 
     /**
@@ -122,15 +143,14 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getShippingOptions()
     {
-        $shippingAddress        = $this->_getQuote()->getShippingAddress();
+        $shippingAddress        = $this->getQuote()->getShippingAddress();
 
         if(!$shippingAddress->getShippingMethod()){
             return 'false';
         }
 
-        $data   = $this->helper('breadcheckout/quote')->getFormattedShippingOptionsData($shippingAddress);
-
-        return $this->helper('core')->jsonEncode($data);
+        $data   = $this->quoteHelper->getFormattedShippingOptionsData($shippingAddress);
+        return $this->jsonHelper->jsonEncode($data);
     }
 
     /**
@@ -140,7 +160,7 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getIncompleteCheckoutMessage()
     {
-        return $this->helper('breadcheckout')->getIncompleteCheckoutMsg();
+        return $this->helper->getIncompleteCheckoutMsg();
     }
 
     /**
@@ -151,12 +171,12 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getContextUrl($route)
     {
-        $isSecure = Mage::app()->getFrontController()->getRequest()->isSecure();
+        $isSecure = $this->viewContext->getFrontController()->getRequest()->isSecure();
         if ($this->storeManager->getStore()->isAdmin()) {
-            $adminUrl = $this->backendUrlInterfaceFactory->create()->getUrl($route, array('_secure'=>true));
+            $adminUrl = $this->backendUrlInterfaceFactory->create()->getUrl($route, ['_secure'=>true]);
             return substr($adminUrl, 0, strpos($adminUrl, 'index/key'));
         } else {
-            return $this->getUrl($route, array('_secure'=>true));
+            return $this->getUrl($route, ['_secure'=>true]);
         }
     }
 
@@ -167,8 +187,7 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getIsDefaultSize()
     {
-        return $this->helper('breadcheckout/Catalog')->getDefaultButtonSizeHtml();
-
+        return $this->catalogHelper->getDefaultButtonSizeHtml();
     }
 
     /**
@@ -178,7 +197,7 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getPaymentUrl()
     {
-        return $this->helper('breadcheckout')->getPaymentUrl();
+        return $this->helper->getPaymentUrl();
     }
 
     /**
@@ -188,7 +207,7 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getBreadTransactionId()
     {
-        return $this->_getQuote()->getBreadTransactionId();
+        return $this->getQuote()->getBreadTransactionId();
     }
 
     /**
@@ -198,7 +217,7 @@ class  extends \Magento\Payment\Block\Form
      */
     public function getButtonDesign()
     {
-        return $this->helper('breadcheckout')->getButtonDesign();
+        return $this->helper->getButtonDesign();
     }
 
     /**
@@ -208,7 +227,7 @@ class  extends \Magento\Payment\Block\Form
      */
     protected function getAsLowAs()
     {
-        return ( $this->helper('breadcheckout')->isAsLowAs() ) ? 'true' : 'false';
+        return ( $this->helper->isAsLowAs() ) ? 'true' : 'false';
     }
 
     /**
@@ -216,13 +235,12 @@ class  extends \Magento\Payment\Block\Form
      *
      * @return \Magento\Quote\Model\Quote
      */
-    protected function _getQuote()
+    protected function getQuote()
     {
-        if ($this->_quote == null) {
-                $this->_quote       = $this->helper('breadcheckout/Quote')->getSessionQuote();
+        if ($this->quote == null) {
+                $this->quote       = $this->quoteHelper->getSessionQuote();
         }
-
-        return $this->_quote;
+        return $this->quote;
     }
 
 }
