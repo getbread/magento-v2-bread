@@ -4,12 +4,12 @@
  *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-
     const API_SANDBOX_URI                           = "https://api-sandbox.getbread.com/";
     const API_LIVE_URI                              = "https://api.getbread.com/";
 
@@ -20,7 +20,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_VALIDATE_ORDER                        = "bread/Bread/validateOrder";
     const URL_SHIPPING_ESTIMATE                     = "bread/Bread/shippingEstimation";
     const URL_TAX_ESTIMATE                          = "bread/Bread/taxEstimation";
-    const URL_ADMIN_VALIDAT_PAYMENT                 = "bread/validatePaymentMethod";
+    const URL_ADMIN_VALIDATE_PAYMENT                 = "bread/validatePaymentMethod";
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
     const XML_CONFIG_LOG_ENABLED                    = 'payment/breadcheckout/log_enabled';
@@ -46,34 +46,40 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
 
+    /** @var \Magento\Framework\View\Context */
+    protected $viewContext;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $scopeConfig;
+
+    /** @var \Magento\Framework\Encryption\Encryptor */
+    protected $encryptor;
 
     /**
      * @var \Magento\Framework\UrlInterfaceFactory
      */
     protected $urlInterfaceFactory;
 
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var \Psr\Log\LoggerInterface */
     protected $logger;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\View\Context $viewContext,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Psr\Log\LoggerInterface $logger
     ) {
+        $this->viewContext = $viewContext;
         $this->scopeConfig = $scopeConfig;
+        $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
@@ -91,7 +97,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isActive($store = null)
     {
-        return (bool) Mage::getStoreConfigFlag(self::XML_CONFIG_MODULE_ACTIVE, $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_MODULE_ACTIVE, $store);
     }
 
     /**
@@ -102,7 +108,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function logEnabled($store = null)
     {
-        return (bool) Mage::getStoreConfigFlag(self::XML_CONFIG_LOG_ENABLED, $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_LOG_ENABLED, $store);
     }
 
     /**
@@ -113,7 +119,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getApiPublicKey($store = null)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store);
     }
 
     /**
@@ -124,7 +130,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getApiSecretKey($store = null)
     {
-        return (string) Mage::helper('core')->decrypt($this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store));
+        return (string) $this->encryptor->decrypt(
+            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store));
     }
 
     /**
@@ -135,7 +142,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getJsLibLocation($store = null)
     {
-        if(Mage::getStoreConfigFlag(self::XML_CONFIG_API_MODE, $store)){
+        if($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)){
             return self::JS_LIVE_URI;
         } else {
             return self::JS_SANDBOX_URI;
@@ -150,7 +157,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getTransactionApiUrl($store = null)
     {
-        if(Mage::getStoreConfigFlag(self::XML_CONFIG_API_MODE, $store)){
+        if($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)){
             return self::API_LIVE_URI;
         } else {
             return self::API_SANDBOX_URI;
@@ -164,8 +171,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getPaymentUrl()
     {
-        $isSecure = Mage::app()->getFrontController()->getRequest()->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_PAYMENT,array('_secure'=>$isSecure));
+        $isSecure = $this->viewContext->getFrontController()->getRequest()->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_PAYMENT,['_secure'=>$isSecure]);
     }
 
     /**
@@ -175,8 +182,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getValidateOrderURL()
     {
-        $isSecure = Mage::app()->getFrontController()->getRequest()->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_ORDER,array('_secure'=>$isSecure));
+        $isSecure = $this->viewContext->getFrontController()->getRequest()->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_ORDER,['_secure'=>$isSecure]);
     }
 
     /**
@@ -185,8 +192,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getShippingEstimateUrl()
     {
-        $isSecure = Mage::app()->getFrontController()->getRequest()->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_ESTIMATE,array('_secure'=>$isSecure));
+        $isSecure = $this->viewContext->getFrontController()->getRequest()->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_ESTIMATE,['_secure'=>$isSecure]);
     }
 
     /**
@@ -196,7 +203,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getTaxEstimateUrl()
     {
-        $isSecure = Mage::app()->getFrontController()->getRequest()->isSecure();
+        $isSecure = $this->viewContext->getFrontController()->getRequest()->isSecure();
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_TAX_ESTIMATE,array('_secure'=>true));
     }
 
@@ -207,7 +214,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAdminFormUrlPath()
     {
-        return self::URL_ADMIN_VALIDAT_PAYMENT;
+        return self::URL_ADMIN_VALIDATE_PAYMENT;
     }
 
     /**
@@ -218,7 +225,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getPaymentAction($store = null)
     {
-        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_PAYMENT_ACTION, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store);
+        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_PAYMENT_ACTION, $store);
     }
 
     /**
@@ -229,7 +236,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getPaymentMethodTitle($store = null)
     {
-        return (string) $this->__($this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_TITLE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE), $store);
+        return (string) $this->__($this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_TITLE, $store));
     }
 
     /**
@@ -240,7 +247,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isAutoCreateCustomerAccountEnabled($store = null)
     {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_CREATE_CUSTOMER, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_CREATE_CUSTOMER, $store));
     }
 
     /**
@@ -251,7 +258,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isLoginAfterPopUpOrder($store = null)
     {
-        return (bool) ($this->isAction($store) && $this->scopeConfig->getValue(self::XML_CONFIG_LOGIN_CUSTOMER, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_LOGIN_CUSTOMER, $store));
     }
 
     /**
@@ -262,20 +269,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isButtonOnProducts($store = null)
     {
-        return (bool) Mage::getStoreConfigFlag(self::XML_CONFIG_BUTTON_ON_PRODUCTS, $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_ON_PRODUCTS, $store);
     }
 
     /**
-     *
+     * Is customer logged in and has a non US default billing address?
      *
      * @param null $store
      * @return bool
      */
     public function isEnabledOnPDP($store = null)
     {
-        //Is customer logged in and has a non US default billing address?
-
-        return (bool) ($this->isActive($store) && Mage::getStoreConfigFlag(self::XML_CONFIG_ACTIVE_ON_PDP, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_PDP, $store));
     }
 
     /**
@@ -286,9 +291,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isEnabledOnCOP($store = null)
     {
-        //Is customer logged in and has a non US default billing address?
-
-        return (bool) ($this->isActive($store) && Mage::getStoreConfigFlag(self::XML_CONFIG_ACTIVE_ON_CART_VIEW, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_CART_VIEW, $store));
     }
 
     /**
@@ -299,7 +302,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isPaymentMethodAtCheckout($store = null)
     {
-        return (bool) ($this->isActive($store) && Mage::getStoreConfigFlag(self::XML_CONFIG_ENABLE_AS_PAYMENT_METHOD, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_AS_PAYMENT_METHOD, $store));
     }
 
     /**
@@ -310,7 +313,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isAsLowAs($store = null)
     {
-        return (bool) ($this->isActive($store) && Mage::getStoreConfigFlag(self::XML_CONFIG_AS_LOW_AS, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_AS_LOW_AS, $store));
     }
 
     /**
@@ -321,7 +324,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllowCheckoutPDP($store = null)
     {
-        return (bool) ($this->isActive($store) && Mage::getStoreConfigFlag(self::XML_CONFIG_ALLOW_CHECKOUT_PDP, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_PDP, $store));
     }
 
     /**
@@ -332,7 +335,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllowCheckoutCP($store = null)
     {
-        return (bool) ($this->isActive($store) && Mage::getStoreConfigFlag(self::XML_CONFIG_ALLOW_CHECKOUT_CART, $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_CART, $store));
     }
 
     /**
@@ -363,7 +366,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getButtonDesign($store = null)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_DESIGN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_DESIGN, $store);
     }
 
     /**
@@ -374,7 +377,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function useDefaultButtonSize($store = null)
     {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_DEFAULT_BUTTON_SIZE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store));
+        return (bool) ($this->isActive($store) &&
+                       $this->scopeConfig->getValue(self::XML_CONFIG_DEFAULT_BUTTON_SIZE, $store));
     }
 
     /**
@@ -385,7 +389,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getIncompleteCheckoutMsg($store = null)
     {
-        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INCOMPLETE_MSG, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store);
+        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INCOMPLETE_MSG, $store);
     }
 
     /**
@@ -394,7 +398,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null $store
      * @return string
      */
-    public function getDefaultCountry($store = null)
+    public function getDefaultCountry()
     {
         return 'US';
     }
@@ -409,9 +413,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (bool) $this->storeManager->getStore()->isAdmin();
     }
 
-    public function log($data, $logFile = 'bread-payment.log'){
+    public function log($data, $context = 'Bread\BreadCheckout'){
         if( $this->logEnabled() ) {
-            $this->logger->log(null, $data);
+            $this->logger->debug($data, [$context]);
         }
     }
 }

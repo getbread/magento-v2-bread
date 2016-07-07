@@ -4,48 +4,49 @@
  *
  * @copyright   Bread   copyright   2016
  * @author      Joel    @Mediotype
+ * @author      Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Helper;
 
-class  extends Bread_BreadCheckout_Helper_Data{
+class Customer extends Data
+{
+    /** @var \Magento\Customer\Model\SessionFactory */
+    protected $customerSessionFactory;
 
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
+    /** @var \Magento\Customer\Model\CustomerFactory */
+    protected $customerFactory;
 
-    /**
-     * @var \Magento\Customer\Model\CustomerFactory
-     */
-    protected $customerCustomerFactory;
-
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
 
-    /**
-     * @var \Magento\Customer\Model\AddressFactory
-     */
+    /** @var \Magento\Customer\Model\AddressFactory */
     protected $customerAddressFactory;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var \Psr\Log\LoggerInterface */
     protected $logger;
 
+    /** @var Bread\BreadCheckout\Helper */
+    protected $helper;
+
+    /** @var Magento\Framework\Json\Helper\Data */
+    protected $jsonHelper;
+
     public function __construct(
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Customer\Model\CustomerFactory $customerCustomerFactory,
+        \Magento\Customer\Model\SessionFactory $customerSessionFactory,
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
-        \Psr\Log\LoggerInterface $logger
+        \Psr\Log\LoggerInterface $logger,
+        Bread\BreadCheckout\Helper $helper,
+        Magento\Framework\Json\Helper\Data $jsonHelper
     ) {
-        $this->customerSession = $customerSession;
-        $this->customerCustomerFactory = $customerCustomerFactory;
+        $this->customerSessionFactory = $customerSessionFactory;
+        $this->customerFactory = $customerFactory;
         $this->storeManager = $storeManager;
         $this->customerAddressFactory = $customerAddressFactory;
         $this->logger = $logger;
+        $this->helper = $helper;
+        $this->jsonHelper = $jsonHelper;
     }
     /**
      * Pass Back Bread Formatted Default Customer Address If It Exists
@@ -67,7 +68,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
             return array();
         }
 
-        $primaryData        = array(
+        $primaryData        = [
             'fullName'      => $defaultShippingAddress->getName(),
             'address'       => $defaultShippingAddress->getStreet1() . ($defaultShippingAddress->getStreet2() == '' ? '' : (' ' . $defaultShippingAddress->getStreet2())),
             'address2'      => $defaultShippingAddress->getStreet3() . ($defaultShippingAddress->getStreet4() == '' ? '' : (' ' . $defaultShippingAddress->getStreet4())),
@@ -76,7 +77,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
             'zip'           => $defaultShippingAddress->getPostcode(),
             'email'         => $customer->getEmail(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $defaultShippingAddress->getTelephone()), -10)
-        );
+        ];
 
         return $primaryData;
     }
@@ -92,16 +93,16 @@ class  extends Bread_BreadCheckout_Helper_Data{
         $customer                   = $session->getCustomer();
 
         if( empty($customer) ) {
-            return array();
+            return [];
         }
 
         $defaultBillingAddress     = $customer->getPrimaryBillingAddress();
 
         if( empty($defaultBillingAddress) ) {
-            return array();
+            return [];
         }
 
-        $primaryData        = array(
+        $primaryData        = [
             'fullName'      => $defaultBillingAddress->getName(),
             'address'       => $defaultBillingAddress->getStreet1() . ($defaultBillingAddress->getStreet2() == '' ? '' : (' ' . $defaultBillingAddress->getStreet2())),
             'address2'      => $defaultBillingAddress->getStreet3() . ($defaultBillingAddress->getStreet4() == '' ? '' : (' ' . $defaultBillingAddress->getStreet4())),
@@ -110,7 +111,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
             'zip'           => $defaultBillingAddress->getPostcode(),
             'email'         => $customer->getEmail(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $defaultBillingAddress->getTelephone()), -10)
-        );
+        ];
 
         return $primaryData;
     }
@@ -126,7 +127,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
      */
     public function createCustomer($quote, $billingContact, $shippingContact)
     {
-        $session    = $this->customerSession;
+        $session    = $this->customerSessionFactory;
         if ($session->isLoggedIn()) {
             return $session->getCustomer();
         }
@@ -138,8 +139,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
             return;
         }
 
-        $customer   = $this->customerCustomerFactory->create();
-
+        $customer   = $this->customerFactory->create();
         $email      = $quote->getCustomerEmail();
 
         $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
@@ -169,7 +169,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
             $customer->save();
             $customer->setConfirmation(null);
 
-            $this->customerSession->loginById($customer->getId());
+            $this->customerSessionFactory->loginById($customer->getId());
             $quote->setCustomerId($customer->getId());
             $quote->setCustomer($customer);
 
@@ -189,9 +189,9 @@ class  extends Bread_BreadCheckout_Helper_Data{
             if($isNewCustomer) {
                 $customer->sendNewAccountEmail();
             }
-        } catch (Exception $ex) {
-            Mage::helper('breadcheckout')->log('Exception While Logging In Customer', 'bread-exception.log');
-            $this->logger->critical($ex);
+        } catch (Exception $e) {
+            $this->helper->log('Exception While Logging In Customer');
+            $this->logger->critical($e);
         }
 
         return $customer;
@@ -213,8 +213,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
         }
 
         $primaryAddressData     = $this->getFormattedDefaultShippingAddress();
-
-        return Mage::helper('core')->jsonEncode($primaryAddressData);
+        return $this->jsonHelper->jsonEncode($primaryAddressData);
     }
 
     /**
@@ -233,8 +232,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
         }
 
         $primaryAddressData     = $this->getFormattedDefaultBillingAddress();
-
-        return Mage::helper('core')->jsonEncode($primaryAddressData);
+        return $this->jsonHelper->jsonEncode($primaryAddressData);
     }
 
 
@@ -269,7 +267,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
      */
     protected function getCustomerSession()
     {
-        return Mage::getSingleton('customer/session');
+        return $this->customerSessionFactory->create();
     }
 
 }

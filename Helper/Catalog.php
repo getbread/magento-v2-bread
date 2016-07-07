@@ -4,15 +4,13 @@
  *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Helper;
 
-class  extends Bread_BreadCheckout_Helper_Data
+class Catalog extends Data
 {
-
-    /**
-     * @var \Magento\Catalog\Helper\Image
-     */
+    /** @var \Magento\Catalog\Helper\Image */
     protected $catalogImageHelper;
 
     public function __construct(
@@ -20,6 +18,7 @@ class  extends Bread_BreadCheckout_Helper_Data
     ) {
         $this->catalogImageHelper = $catalogImageHelper;
     }
+
     /**
      * Get html param string for default button size based on configuration
      *
@@ -43,7 +42,10 @@ class  extends Bread_BreadCheckout_Helper_Data
      * @param null $lineItemPrice
      * @return array
      */
-    public function getProductDataArray(\Magento\Catalog\Model\Product $product, \Magento\Catalog\Model\Product $baseProduct = null, $qty = 1, $lineItemPrice = null)
+    public function getProductDataArray(\Magento\Catalog\Model\Product $product,
+                                        \Magento\Catalog\Model\Product $baseProduct = null,
+                                        $qty = 1,
+                                        $lineItemPrice = null)
     {
         $theProduct     = ($baseProduct == null) ? $product : $baseProduct;
         $skuString      = $this->getSkuString($product, $theProduct);
@@ -66,13 +68,14 @@ class  extends Bread_BreadCheckout_Helper_Data
     }
 
     /**
-     * Return Product SKU Or Formated SKUs for Products With Options
+     * Return Product SKU Or Formatted SKUs for Products With Options
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param \Magento\Catalog\Model\Product $theProduct
      * @return string
      */
-    protected function getSkuString(\Magento\Catalog\Model\Product $product, \Magento\Catalog\Model\Product $theProduct)
+    protected function getSkuString(\Magento\Catalog\Model\Product $product,
+                                    \Magento\Catalog\Model\Product $theProduct)
     {
         $selectedOptions    = $theProduct->getTypeInstance(true)->getOrderOptions($theProduct);
 

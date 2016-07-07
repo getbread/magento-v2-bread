@@ -4,6 +4,7 @@
  *
  * @author  Bread   copyright 2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Adminhtml\Validate;
 
@@ -31,6 +32,7 @@ class PaymentMethod extends \Magento\Backend\App\Action
     protected $helper;
 
     public function __construct(
+        \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\Session\Quote $backendSessionQuote,
@@ -46,6 +48,7 @@ class PaymentMethod extends \Magento\Backend\App\Action
         $this->resultJsonFactory = $resultJsonFactory;
         $this->logger = $logger;
         $this->helper = $helper;
+        parent::__construct($context);
     }
 
     public function execute()

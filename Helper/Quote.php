@@ -4,35 +4,36 @@
  *
  * @author      Bread   copyright   2016
  * @author      Joel    @Mediotype
+ * @author      Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Helper;
 
-class  extends Bread_BreadCheckout_Helper_Data{
+class Quote extends Data {
 
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
 
-    /**
-     * @var \Magento\Backend\Model\Session\Quote
-     */
+    /** @var \Magento\Backend\Model\Session\Quote */
     protected $backendSessionQuote;
 
-    /**
-     * @var \Magento\Checkout\Model\Cart
-     */
+    /** @var \Magento\Checkout\Model\Cart */
     protected $checkoutCart;
+
+    /** @var Bread\BreadCheckout\Helper\Catalog */
+    protected $helperCatalog;
 
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\Session\Quote $backendSessionQuote,
-        \Magento\Checkout\Model\Cart $checkoutCart
+        \Magento\Checkout\Model\Cart $checkoutCart,
+        Bread\BreadCheckout\Helper\Catalog $helperCatalog
     ) {
         $this->storeManager = $storeManager;
         $this->backendSessionQuote = $backendSessionQuote;
         $this->checkoutCart = $checkoutCart;
+        $this->helperCatalog = $helperCatalog;
     }
+
     /**
      * Get Grand Total From Quote
      *
@@ -85,7 +86,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
     }
 
     /**
-     * Get Quote Irems Data in JSON Format for cart overview
+     * Get Quote Items Data in JSON Format for cart overview
      *
      * @return array
      */
@@ -111,7 +112,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
                 $discount   = null;
             }
 
-            $itemsData[]   = Mage::helper('breadcheckout/Catalog')->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $discount);
+            $itemsData[]   = $this->helperCatalog->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $discount);
         }
 
         return $itemsData;
@@ -143,7 +144,7 @@ class  extends Bread_BreadCheckout_Helper_Data{
                 $thisProduct            = $item->getOptionByCode('simple_product')->getProduct();
             }
 
-            $itemsData[]       = Mage::helper('breadcheckout/Catalog')->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $price);
+            $itemsData[]       = $this->helperCatalog->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $price);
         }
 
         return $itemsData;
@@ -195,13 +196,9 @@ class  extends Bread_BreadCheckout_Helper_Data{
 
     public function getFormattedShippingOptionsData(\Magento\Quote\Model\Quote\Address $shippingAddress)
     {
-        $data         = array();
-        $data[]       = array(
-            'type'   => $shippingAddress->getShippingDescription(),
-            'typeId' => $shippingAddress->getShippingMethod(),
-            'cost'   => $shippingAddress->getShippingAmount() * 100,
-        );
-
+        $data       = ['type'   => $shippingAddress->getShippingDescription(),
+                       'typeId' => $shippingAddress->getShippingMethod(),
+                       'cost'   => $shippingAddress->getShippingAmount() * 100];
         return $data;
     }
 
