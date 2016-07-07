@@ -4,15 +4,34 @@
  *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Model\Payment\Api;
 
-class 
+class Client extends \Magento\Framework\Model\AbstractModel
 {
     const STATUS_AUTHORIZED     = 'AUTHORIZED';
     const STATUS_SETTLED        = 'SETTLED';
     const STATUS_PENDING        = 'PENDING';
     const STATUS_CANCELED       = 'CANCELED';
+
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helper;
+
+    /** @var \Magento\Framework\Json\Helper\Data */
+    protected $jsonHelper;
+
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Magento\Framework\Json\Helper\Data $jsonHelper
+    )
+    {
+        $this->helper = $helper;
+        $this->jsonHelper = $jsonHelper;
+        parent::__construct($context, $registry);
+    }
 
     /**
      * Call API Cancel Method
@@ -37,8 +56,8 @@ class
         $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
 
         if( $result->status != self::STATUS_CANCELED ){
-            Mage::helper('breadcheckout')->log(array("ERROR"=>"Transaction cancel failed", "RESULT"=>$result), 'bread-exception.log');
-            throw new \Magento\Framework\Exception\LocalizedException(Mage::helper('breadcheckout')->__('Transaction cancel failed (current transaction status :' . $result->status . ')'));
+            $this->helper->log( ["ERROR"=>"Transaction cancel failed", "RESULT"=>$result] );
+            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Transaction cancel failed (current transaction status :' . $result->status . ')'));
         }
 
         return $result;
@@ -67,15 +86,15 @@ class
 
         if ( $result->status != self::STATUS_AUTHORIZED )
         {
-            Mage::helper('breadcheckout')->log(array("ERROR"=>"AUTHORIZATION FAILED", "RESULT"=>$result), 'bread-exception.log');
-            throw new \Magento\Framework\Exception\LocalizedException(Mage::helper('breadcheckout')->__('Transaction authorize failed (current transaction status :' . $result->status . ')'));
+            $this->helper->log(array("ERROR"=>"AUTHORIZATION FAILED", "RESULT"=>$result), 'bread-exception.log');
+            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Transaction authorize failed (current transaction status :' . $result->status . ')'));
         }
 
         $breadAmount = $result->total;
         if ( (int)$breadAmount != (int)$amount )
         {
-            Mage::helper('breadcheckout')->log(array("ERROR"=>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH", "BREAD AMOUNT"=>(int)$breadAmount ,"QUOTE AMOUNT"=>(int)$amount , "RESULT"=>$result), 'bread-exception.log');
-            throw new \Magento\Framework\Exception\LocalizedException(Mage::helper('breadcheckout')->__('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount));
+            $this->helper->log(array("ERROR"=>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH", "BREAD AMOUNT"=>(int)$breadAmount ,"QUOTE AMOUNT"=>(int)$amount , "RESULT"=>$result), 'bread-exception.log');
+            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount));
         }
 
         return $result;
@@ -93,7 +112,7 @@ class
     {
         $result = $this->call(
             $this->getTransactionInfoUrl($breadTransactionId),
-            array('merchantOrderId' => $merchantOrderId),
+            ['merchantOrderId' => $merchantOrderId],
             \Zend_Http_Client::PUT);
 
         return $result;
@@ -111,10 +130,10 @@ class
     {
         $result = $this->call(
             $this->getUpdateTransactionUrl($breadTransactionId),
-            array('type' => 'settle'));
+            ['type' => 'settle']);
 
         if ( $result->status != self::STATUS_SETTLED ) {
-            throw new \Magento\Framework\Exception\LocalizedException(Mage::helper('breadcheckout')->__('Transaction settle failed (current transaction status :' . $result->status . ')'));
+            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Transaction settle failed (current transaction status :' . $result->status . ')'));
         }
 
         return $result;
@@ -129,9 +148,9 @@ class
      * @return mixed
      * @throws \Exception
      */
-    public function refund($breadTransactionId, $amount = 0, $lineItems = array())
+    public function refund($breadTransactionId, $amount = 0, $lineItems = [])
     {
-        $data = array('type'   => 'refund');
+        $data = ['type' => 'refund'];
 
         if ( !$amount == 0 ) {
             $data['amount'] = $amount;
@@ -155,7 +174,7 @@ class
     {
         return $this->call(
             $this->getTransactionInfoUrl($breadTransactionId),
-            array(),
+            [],
             \Zend_Http_Client::GET);
     }
 
@@ -170,8 +189,8 @@ class
      */
     protected function call($url, array $data, $method = \Zend_Http_Client::POST)
     {
-        $username   = Mage::helper('breadcheckout')->getApiPublicKey();
-        $password   = Mage::helper('breadcheckout')->getApiSecretKey();
+        $username   = $this->helper->getApiPublicKey();
+        $password   = $this->helper->getApiSecretKey();
 
         try {
             $curl = curl_init($url);
@@ -181,12 +200,12 @@ class
 
             if ($method == \Zend_Http_Client::POST) {
                 curl_setopt($curl, CURLOPT_POST, 1);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, Mage::helper('core')->jsonEncode($data));
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
 
             if ($method == \Zend_Http_Client::PUT) {
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-                curl_setopt($curl, CURLOPT_POSTFIELDS, Mage::helper('core')->jsonEncode($data));
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
 
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
@@ -194,16 +213,14 @@ class
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             if( $status != 200 ) {
-                throw new \Magento\Framework\Exception\LocalizedException(Mage::helper('breadcheckout')->__('Call to Bread API failed.  Error: '. $result));
+                throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Call to Bread API failed.  Error: '. $result));
             }
-        } catch (Exception $e){
-            Mage::helper('breadcheckout')->log( array(
-                    "USER"      => $username,
-                    "PASSWORD"  => $password,
-                    "URL"       => $url,
-                    "DATA"      => $data,
-                    "RESULT"    => $result,
-                ), 'bread-exception.log');
+        } catch (\Exception $e){
+            $this->helper->log( ["USER"      => $username,
+                                 "PASSWORD"  => $password,
+                                 "URL"       => $url,
+                                 "DATA"      => $data,
+                                 "RESULT"    => $result] );
 
             curl_close($curl);
             throw $e;
@@ -211,19 +228,17 @@ class
 
         curl_close($curl);
 
-        Mage::helper('breadcheckout')->log(array(
-                "USER"      => $username,
-                "PASSWORD"  => $password,
-                "URL"       => $url,
-                "DATA"      => $data,
-                "RESULT"    => $result,
-            ));
+        $this->helper->log( ["USER"      => $username,
+                             "PASSWORD"  => $password,
+                             "URL"       => $url,
+                             "DATA"      => $data,
+                             "RESULT"    => $result] );
 
         if(!$this->isJson($result)){
-            throw new \Magento\Framework\Exception\LocalizedException(Mage::helper('breadcheckout')->__('API Response Is Not Valid JSON.  Result: ' . $result));
+            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('API Response Is Not Valid JSON.  Result: ' . $result));
         }
 
-        return json_decode($result);
+        return $this->jsonHelper->jsonDecode($result);
     }
 
     /**
@@ -234,7 +249,7 @@ class
      */
     protected function getTransactionInfoUrl($transactionId)
     {
-        $baseUrl = Mage::helper('breadcheckout')->getTransactionApiUrl();
+        $baseUrl = $this->helper->getTransactionApiUrl();
         return join('/', array(trim($baseUrl, '/'), 'transactions', trim($transactionId, '/')));
     }
 
@@ -245,7 +260,7 @@ class
      */
     protected function getUpdateTransactionUrl($transactionId)
     {
-        $baseUrl = Mage::helper('breadcheckout')->getTransactionApiUrl();
+        $baseUrl = $this->helper->getTransactionApiUrl();
         return join('/', array(trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/')));
     }
 
@@ -257,7 +272,11 @@ class
      */
     protected function isJson($string)
     {
-        json_decode($string);
-        return (json_last_error() == JSON_ERROR_NONE);
+        try {
+            $this->jsonHelper->jsonDecode($string);
+        } catch (\Zend_Json_Exception $e) {
+            return false;
+        }
+        return true;
     }
 }

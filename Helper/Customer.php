@@ -37,8 +37,8 @@ class Customer extends Data
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
         \Psr\Log\LoggerInterface $logger,
-        Bread\BreadCheckout\Helper $helper,
-        Magento\Framework\Json\Helper\Data $jsonHelper
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Magento\Framework\Json\Helper\Data $jsonHelper
     ) {
         $this->customerSessionFactory = $customerSessionFactory;
         $this->customerFactory = $customerFactory;

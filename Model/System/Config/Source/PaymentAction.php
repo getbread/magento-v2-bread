@@ -4,22 +4,19 @@
  *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Model\System\Config\Source;
 
-class 
+class PaymentAction extends \Magento\Framework\Model\AbstractModel
 {
     public function toOptionArray()
     {
-        return array(
-            array(
-                'value' => \Magento\Payment\Model\Method\AbstractMethod::ACTION_AUTHORIZE,
-                'label' => Mage::helper('breadcheckout')->__('Authorize')
-            ),
-            array(
-                'value' => \Magento\Payment\Model\Method\AbstractMethod::ACTION_AUTHORIZE_CAPTURE,
-                'label' => Mage::helper('breadcheckout')->__('Authorize & Capture')
-            ),
-        );
+        return [
+            [   'value' => \Magento\Payment\Model\Method\AbstractMethod::ACTION_AUTHORIZE,
+                'label' => __('Authorize') ],
+            [   'value' => \Magento\Payment\Model\Method\AbstractMethod::ACTION_AUTHORIZE_CAPTURE,
+                'label' => __('Authorize & Capture') ],
+        ];
     }
 }

@@ -26,7 +26,7 @@ class Quote extends Data {
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\Session\Quote $backendSessionQuote,
         \Magento\Checkout\Model\Cart $checkoutCart,
-        Bread\BreadCheckout\Helper\Catalog $helperCatalog
+        \Bread\BreadCheckout\Helper\Catalog $helperCatalog
     ) {
         $this->storeManager = $storeManager;
         $this->backendSessionQuote = $backendSessionQuote;
@@ -106,13 +106,7 @@ class Quote extends Data {
                 $thisProduct    = $item->getOptionByCode('simple_product')->getProduct();
             }
 
-            if(isset($totals['discount']) && $totals['discount']->getValue()) {
-                $discount   = round($totals['discount']->getValue());
-            } else {
-                $discount   = null;
-            }
-
-            $itemsData[]   = $this->helperCatalog->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $discount);
+            $itemsData[]   = $this->helperCatalog->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), null);
         }
 
         return $itemsData;

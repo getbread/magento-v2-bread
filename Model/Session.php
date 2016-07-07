@@ -3,9 +3,9 @@
  *
  * @author  Bread   copyright   2016
  */
-namespace ;
+namespace Bread\BreadCheckout\Model;
 
-class  extends \Magento\Checkout\Model\Session
+class Session extends \Magento\Checkout\Model\Session
 {
     /**
      * Init namespace

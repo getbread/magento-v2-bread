@@ -4,10 +4,12 @@
  *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
+ * @author  Miranda @Mediotype
  */
-namespace ;
+namespace Bread\BreadCheckout\Model\System\Config\Source;
 
-class  {
+class ApiMode extends \Magento\Framework\Model\AbstractModel
+{
 
     /**
      * Options getter
@@ -16,10 +18,10 @@ class  {
      */
     public function toOptionArray()
     {
-        return array(
-            array('value' => 1, 'label'=>__('Live')),
-            array('value' => 0, 'label'=>__('Sandbox')),
-        );
+        return [
+            ['value' => 1, 'label'=>__('Live')],
+            ['value' => 0, 'label'=>__('Sandbox')],
+        ];
     }
 
     /**
@@ -29,10 +31,10 @@ class  {
      */
     public function toArray()
     {
-        return array(
+        return [
             0 => __('Sandbox'),
             1 => __('Live'),
-        );
+        ];
     }
 
 }
