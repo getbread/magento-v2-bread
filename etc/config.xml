@@ -4,7 +4,7 @@
         <payment>
             <breadcheckout>
                 <active>0</active>
-                <model>breadcheckout/payment_method_bread</model>
+                <model>Bread\BreadCheckout\Model\Payment\Method\Bread</model>
                 <sort_order>25</sort_order>
                 <order_status>processing</order_status>
                 <title>Pay Over Time</title>

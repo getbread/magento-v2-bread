@@ -14,10 +14,16 @@ class Options extends \Magento\Catalog\Block\Product\View\Options
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Framework\Pricing\Helper\Data $pricingHelper,
+        \Magento\Catalog\Helper\Data $catalogData,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\Catalog\Model\Product\Option $option,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
+        \Magento\Framework\Json\Helper\Data $jsonHelper = null,
         array $data = []
     ) {
         $this->jsonHelper = $jsonHelper;
-        parent::__construct($context, $data);
+        parent::__construct($context, $pricingHelper, $catalogData, $jsonEncoder, $option, $registry, $arrayUtils, $data);
     }
 }

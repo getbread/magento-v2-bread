@@ -37,7 +37,7 @@ class View extends \Magento\Framework\View\Element\Template
         \Bread\BreadCheckout\Helper\Data $helper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
-        \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory
+        \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
         array $data = []
     ) {
         $this->registry = $registry;
@@ -123,9 +123,9 @@ class View extends \Magento\Framework\View\Element\Template
      *
      * @return string
      */
-    protected function getAsLowAs()
+    public function getAsLowAs()
     {
-        return ( $this->helper->isAsLowAs() ) ? 'true' : 'false';
+        return ($this->helper->isAsLowAs()) ? 'true' : 'false';
     }
 
     /**
@@ -241,6 +241,10 @@ class View extends \Magento\Framework\View\Element\Template
         }
 
         return $itemIds;
+    }
+
+    public function jsonEncode($data) {
+        return $this->jsonHelper->jsonEncode($data);
     }
     
 }

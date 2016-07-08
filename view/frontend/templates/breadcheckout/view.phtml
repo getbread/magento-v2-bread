@@ -1,13 +1,12 @@
 <?php /* @var $this Bread\BreadCheckout\Block\Product\View */ ?>
 <?php  echo $this->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr">
-    <div id='bread-checkout-btn' title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
+    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
         <span>
             <span><?php echo __('Bread Checkout'); ?></span>
         </span>
     </div>
-    <div class='button-prevent'
-         id='button-prevent'>
+    <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip">&nbsp;</span>
     </div>
 </div>
@@ -23,7 +22,7 @@
                 return true;
             }
         } catch (e) {
-            throw(e)
+            throw(e);
         }
     };
 
@@ -65,7 +64,7 @@
              */
             calculateTax: function (shippingAddress, callback) {
                 shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                shippingAddress.additional_data                 = <?php echo  $this->helper('core')->jsonEncode($this->setAdditionalData()); ?>;
+                shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
                 shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                 shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                 shippingAddress.main_product_id                 = document.productId;
@@ -99,7 +98,7 @@
              */
             calculateShipping: function (shippingAddress, callback) {
                 shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                shippingAddress.additional_data                 = <?php echo  $this->helper('core')->jsonEncode($this->setAdditionalData()); ?>;
+                shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
                 shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                 shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                 shippingAddress.main_product_id                 = document.productId;
@@ -213,26 +212,26 @@
     };
 
 <?php endif; ?>
+    require(['jquery'], function($){
+        $(document).ready(function () {
+            document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
+            document.previousPrice      = document.defaultItems[0]["price"];
+            document.previousSku        = document.defaultItems[0]["sku"];
 
-    document.observe("dom:loaded", function () {
-        document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
-        document.previousPrice      = document.defaultItems[0]["price"];
-        document.previousSku        = document.defaultItems[0]["sku"];
-
-    <?php if ($this->getProduct() != null): ?>
-        document.customOptions = "";
-        document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
-        document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
-        document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
-        document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
-        var o = document.getElementById("button-prevent");
-        o.addEventListener('click', function (e) {
-            document.getActualAddToCartForm().validator.validate();
-        }, true);
-        document.resetPriceAndSku();
-    <?php else: ?>
-        document.configureButton(document.defaultItems);
-    <?php endif; ?>
+        <?php if ($this->getProduct() != null): ?>
+            document.customOptions = "";
+            document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
+            document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
+            document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
+            document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
+            var o = document.getElementById("button-prevent");
+            o.addEventListener('click', function (e) {
+                document.getActualAddToCartForm().validator.validate();
+            }, true);
+            document.resetPriceAndSku();
+        <?php else: ?>
+            document.configureButton(document.defaultItems);
+        <?php endif; ?>
+        });
     });
-
 </script>

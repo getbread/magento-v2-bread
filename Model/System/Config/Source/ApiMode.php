@@ -8,7 +8,7 @@
  */
 namespace Bread\BreadCheckout\Model\System\Config\Source;
 
-class ApiMode extends \Magento\Framework\Model\AbstractModel
+class ApiMode implements \Magento\Framework\Option\ArrayInterface
 {
 
     /**

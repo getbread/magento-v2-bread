@@ -4,6 +4,8 @@
         <section id="payment">
             <group id="breadcheckout" type="text" sortOrder="305" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                 <label>Bread Checkout</label>
+                <fieldset_css>complex</fieldset_css>
+                <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>
                 <comment>
                     <![CDATA[
                             <style>
@@ -34,7 +36,7 @@
                 </field>
                 <field id="payment_action" type="select" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>
-                    <source_model>Bread\BreadCheckout\System\Config\Source\PaymentAction</source_model>
+                    <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
                 </field>
                 <field id="sort_order" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
@@ -94,13 +96,13 @@
                     <label>Display as Button on Product Detail Pages When Logged In</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="button_design" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="button_design" type="textarea" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Bread Button Design</label>
                     <comment>
                         <![CDATA[
-                                        <div>
-                                            <p>CSS that overrides the default button design styles.</p>
-                                        </div>
+                                <div>
+                                    <p>CSS that overrides the default button design styles.</p>
+                                </div>
                         ]]>
                                 </comment>
                 </field>
@@ -108,9 +110,9 @@
                     <label>Payment Method Title</label>
                     <comment>
                         <![CDATA[
-                                        <div>
-                                            <p>The Title for the payment method in checkout.</p>
-                                        </div>
+                                <div>
+                                    <p>The Title for the payment method in checkout.</p>
+                                </div>
                         ]]>
                                 </comment>
                 </field>
@@ -118,10 +120,9 @@
                     <label>Incomplete Bread Checkout error</label>
                     <comment>
                         <![CDATA[
-
-                                        <div>
-                                            <p>The message displayed during checkout if the Bread Financing process is selected as a payment method, but has not been completed by the Customer.</p>
-                                        </div>
+                                <div>
+                                    <p>The message displayed during checkout if the Bread Financing process is selected as a payment method, but has not been completed by the Customer.</p>
+                                </div>
                         ]]>
                     </comment>
                 </field>
@@ -130,14 +131,14 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         <![CDATA[
-                                        <div>
-                                            <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
-                                            the user will only be presented with a button that allows them to return to your
-                                            site rather than straight through to checkout.  If there is an <code>addToCart</code>
-                                            callback specified, the button will call <code>addToCart</code> before returning to
-                                            your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
-                                            instead of just <strong>Continue Shopping</strong>.</p>
-                                        </div>
+                                <div>
+                                    <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
+                                    the user will only be presented with a button that allows them to return to your
+                                    site rather than straight through to checkout.  If there is an <code>addToCart</code>
+                                    callback specified, the button will call <code>addToCart</code> before returning to
+                                    your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
+                                    instead of just <strong>Continue Shopping</strong>.</p>
+                                </div>
                          ]]>
                     </comment>
                 </field>
@@ -146,14 +147,14 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         <![CDATA[
-                                        <div>
-                                            <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
-                                            the user will only be presented with a button that allows them to return to your
-                                            site rather than straight through to checkout.  If there is an <code>addToCart</code>
-                                            callback specified, the button will call <code>addToCart</code> before returning to
-                                            your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
-                                            instead of just <strong>Continue Shopping</strong>.</p>
-                                        </div>
+                                <div>
+                                    <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
+                                    the user will only be presented with a button that allows them to return to your
+                                    site rather than straight through to checkout.  If there is an <code>addToCart</code>
+                                    callback specified, the button will call <code>addToCart</code> before returning to
+                                    your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
+                                    instead of just <strong>Continue Shopping</strong>.</p>
+                                </div>
                         ]]>
                                 </comment>
                 </field>
@@ -162,9 +163,9 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         <![CDATA[
-                                        <div>
-                                            <p>Enable Extra Logging.</p>
-                                        </div>
+                                <div>
+                                    <p>Enable Extra Logging.</p>
+                                </div>
                         ]]>
                     </comment>
                 </field>

@@ -14,9 +14,18 @@ class Catalog extends Data
     protected $catalogImageHelper;
 
     public function __construct(
-        \Magento\Catalog\Helper\Image $catalogImageHelper
+        \Magento\Framework\App\Helper\Context $helperContext,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Catalog\Helper\Image $catalogImageHelper,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\Encryption\Encryptor $encryptor,
+        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->catalogImageHelper = $catalogImageHelper;
+        parent::__construct($helperContext, $context, $request, $scopeConfig, $encryptor, $urlInterfaceFactory, $storeManager, $logger);
     }
 
     /**
@@ -130,7 +139,7 @@ class Catalog extends Data
         }
 
         try {
-            return (string) $this->catalogImageHelper->init($product, 'thumbnail');
+            return (string) $this->catalogImageHelper->init($product, 'thumbnail')->getUrl();
         } catch (Exception $e) {
             return null;
         }
