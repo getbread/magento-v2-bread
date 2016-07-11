@@ -23,7 +23,14 @@ class Quote extends Data {
     protected $helperCatalog;
 
     public function __construct(
+        \Magento\Framework\App\Helper\Context $helperContext,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\Encryption\Encryptor $encryptor,
+        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Psr\Log\LoggerInterface $logger,
         \Magento\Backend\Model\Session\Quote $backendSessionQuote,
         \Magento\Checkout\Model\Cart $checkoutCart,
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog
@@ -32,6 +39,16 @@ class Quote extends Data {
         $this->backendSessionQuote = $backendSessionQuote;
         $this->checkoutCart = $checkoutCart;
         $this->helperCatalog = $helperCatalog;
+        parent::__construct(
+            $helperContext,
+            $context,
+            $request,
+            $scopeConfig,
+            $encryptor,
+            $urlInterfaceFactory,
+            $storeManager,
+            $logger
+        );
     }
 
     /**
@@ -203,7 +220,7 @@ class Quote extends Data {
      */
     public function getSessionQuote()
     {
-        if ($this->storeManager->getStore()->isAdmin()) {
+        if ($this->isInAdmin()) {
             return $this->backendSessionQuote->getQuote();
         }
 

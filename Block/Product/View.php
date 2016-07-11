@@ -30,6 +30,9 @@ class View extends \Magento\Framework\View\Element\Template
     /** @var \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory */
     protected $configurableProductFactory;
 
+    /** @var \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory */
+    protected $configurableBlockFactory;
+
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Framework\Registry $registry,
@@ -38,6 +41,7 @@ class View extends \Magento\Framework\View\Element\Template
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
+        \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
         array $data = []
     ) {
         $this->registry = $registry;
@@ -46,6 +50,7 @@ class View extends \Magento\Framework\View\Element\Template
         $this->catalogHelper = $catalogHelper;
         $this->customerHelper = $customerHelper;
         $this->configurableProductFactory = $configurableProductFactory;
+        $this->configurableBlockFactory = $configurableBlockFactory;
 
         parent::__construct(
             $context,
@@ -53,10 +58,12 @@ class View extends \Magento\Framework\View\Element\Template
         );
     }
 
-    protected function _construct()
+    protected function _construct($bypass = false)
     {
-        $this->setBlockCode($this->getBlockCode());
-        $this->setAdditionalData( ['product_id'    => $this->getProduct()->getId()] );
+        if (!$bypass) {
+            $this->setBlockCode($this->getBlockCode());
+            $this->setAdditionalData(['product_id' => $this->getProduct()->getId()]);
+        }
         parent::_construct();
     }
 
@@ -84,7 +91,7 @@ class View extends \Magento\Framework\View\Element\Template
         $product    = $this->getProduct();
         $data       = [$this->catalogHelper->getProductDataArray($product, null)];
 
-        return $this->jsonHelper->jsonEncode($data);
+        return $this->jsonEncode($data);
     }
 
     /**
@@ -95,7 +102,7 @@ class View extends \Magento\Framework\View\Element\Template
     public function getDiscountDataJson()
     {
         $result     = array();
-        return $this->jsonHelper->jsonEncode($result);
+        return $this->jsonEncode($result);
     }
 
     /**
@@ -230,8 +237,8 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getChildProductIds(\Magento\Catalog\Model\Product $product)
     {
-        $configurableProduct    = $this->configurableProductFactory->create()->setProduct($product);
-        $usedChildrenProduct    = $configurableProduct->getUsedProductCollection()
+        $configurableProduct    = $this->configurableProductFactory->create();
+        $usedChildrenProduct    = $configurableProduct->getUsedProductCollection($product)
             ->addAttributeToSelect('sku')
             ->addFilterByRequiredOptions();
 
@@ -241,6 +248,11 @@ class View extends \Magento\Framework\View\Element\Template
         }
 
         return $itemIds;
+    }
+
+    public function getJsonConfig()
+    {
+        return $this->configurableBlockFactory->create()->getJsonConfig();
     }
 
     public function jsonEncode($data) {

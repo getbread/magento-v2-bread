@@ -16,11 +16,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const JS_SANDBOX_URI                            = "https://checkout-sandbox.getbread.com/bread.js";
     const JS_LIVE_URI                               = "https://checkout.getbread.com/bread.js";
 
-    const URL_VALIDATE_PAYMENT                      = "bread/Bread/validatePaymentMethod";
-    const URL_VALIDATE_ORDER                        = "bread/Bread/validateOrder";
-    const URL_SHIPPING_ESTIMATE                     = "bread/Bread/shippingEstimation";
-    const URL_TAX_ESTIMATE                          = "bread/Bread/taxEstimation";
-    const URL_ADMIN_VALIDATE_PAYMENT                 = "bread/validatePaymentMethod";
+    const URL_VALIDATE_PAYMENT                      = "bread/checkout/validate/paymentMethod";
+    const URL_VALIDATE_ORDER                        = "bread/checkout/validate/order";
+    const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimate/shipping";
+    const URL_TAX_ESTIMATE                          = "bread/checkout/estimate/tax";
+    const URL_ADMIN_VALIDATE_PAYMENT                 = "breadadmin/validate/paymentMethod";
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
     const XML_CONFIG_LOG_ENABLED                    = 'payment/breadcheckout/log_enabled';
@@ -71,19 +71,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\App\Request\Http $request,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Psr\Log\LoggerInterface $logger
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->context = $context;
         $this->request = $request;
-        $this->scopeConfig = $scopeConfig;
+        $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
         $this->storeManager = $storeManager;
-        $this->logger = $logger;
+        $this->logger = $helperContext->getLogger();
         parent::__construct(
             $helperContext
         );

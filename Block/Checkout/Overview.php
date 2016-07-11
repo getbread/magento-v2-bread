@@ -8,7 +8,7 @@
  */
 namespace Bread\BreadCheckout\Block\Checkout;
 
-class Overview extends \Magento\Framework\View\Element\Template
+class Overview extends \Bread\BreadCheckout\Block\Product\View
 {
     /** @var \Bread\BreadCheckout\Helper\Data */
     protected $helper;
@@ -24,10 +24,14 @@ class Overview extends \Magento\Framework\View\Element\Template
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
-        \Bread\BreadCheckout\Helper\Data $helper,
-        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
-        \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Magento\Framework\Registry $registry,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
+        \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
+        \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         array $data = []
     ) {
         $this->helper = $helper;
@@ -37,6 +41,13 @@ class Overview extends \Magento\Framework\View\Element\Template
 
         parent::__construct(
             $context,
+            $registry,
+            $jsonHelper,
+            $helper,
+            $catalogHelper,
+            $customerHelper,
+            $configurableProductFactory,
+            $configurableBlockFactory,
             $data
         );
     }
@@ -44,10 +55,12 @@ class Overview extends \Magento\Framework\View\Element\Template
     /**
      * Set Block Extra In Construct Flow
      */
-    protected function _construct()
+    protected function _construct($bypass = false)
     {
-        parent::_construct();
-        $this->setAdditionalData([]);
+        parent::_construct(true);
+        if (!$bypass) {
+            $this->setAdditionalData([]);
+        }
     }
 
     /**
@@ -58,7 +71,7 @@ class Overview extends \Magento\Framework\View\Element\Template
     public function getDiscountDataJson()
     {
         $discountData   = $this->quoteHelper->getDiscountData();
-        return $this->jsonHelper->jsonEncode($discountData);
+        return $this->jsonEncode($discountData);
     }
 
     /**
@@ -69,7 +82,7 @@ class Overview extends \Magento\Framework\View\Element\Template
     public function getProductDataJson()
     {
         $itemsData      = $this->quoteHelper->getCartOverviewItemsData();
-        return $this->jsonHelper->jsonEncode($itemsData);
+        return $this->jsonEncode($itemsData);
     }
 
     /**
@@ -94,76 +107,6 @@ class Overview extends \Magento\Framework\View\Element\Template
     public function getBlockCode()
     {
         return (string) $this->helper->getBlockCodeCheckoutOverview();
-    }
-
-    /**
-     * Get Shipping Estimate Url
-     *
-     * @return string
-     */
-    public function getShippingAddressEstimationUrl()
-    {
-        return $this->helper->getShippingEstimateUrl();
-    }
-
-    /**
-     * Get Tax Estimate URL
-     *
-     * @return string
-     */
-    public function getTaxEstimationUrl()
-    {
-        return $this->helper->getTaxEstimateUrl();
-    }
-
-    /**
-     * Get Validate Order URL
-     *
-     * @return string
-     */
-    public function getValidateOrderUrl()
-    {
-        return $this->helper->getValidateOrderURL();
-    }
-
-    /**
-     * Get Default Customer Shipping Address If It Exists
-     *
-     * @return string
-     */
-    public function getShippingAddressData()
-    {
-        return $this->customerHelper->getShippingAddressData();
-    }
-
-    /**
-     * Get Billing Address Default Data
-     *
-     * @return string
-     */
-    public function getBillingAddressData()
-    {
-        return $this->customerHelper->getBillingAddressData();
-    }
-
-    /**
-     * Get As Low As Option Value
-     *
-     * @return string
-     */
-    protected function getAsLowAs()
-    {
-        return ( $this->helper->isAsLowAs() ) ? 'true' : 'false';
-    }
-
-    /**
-     * Get Extra Button Design CSS
-     *
-     * @return mixed
-     */
-    public function getButtonDesign()
-    {
-        return $this->helper->getButtonDesign();
     }
 
     /**

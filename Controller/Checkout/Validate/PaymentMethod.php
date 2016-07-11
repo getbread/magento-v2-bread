@@ -37,6 +37,8 @@ class PaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
      */
     public function execute()
     {
+        die('testing validate payment method controller');
+
         try {
             $token = $this->getRequest()->getParam('token');
             if ($token) {

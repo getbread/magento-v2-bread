@@ -46,6 +46,9 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
     /** @var \Magento\Directory\Model\RegionFactory */
     protected $regionFactory;
 
+    /** @var \Magento\Store\Model\StoreManagerInterface */
+    protected $storeManager;
+
     /** @var \Bread\BreadCheckout\Helper\Data */
     protected $helper;
 
@@ -59,13 +62,12 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
         \Bread\BreadCheckout\Model\Session $breadCheckoutSession,
         \Magento\Checkout\Model\CartFactory $checkoutCartFactory,
         \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Magento\Directory\Model\RegionFactory $regionFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper
     )
@@ -75,13 +77,14 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
         $this->breadCheckoutSession = $breadCheckoutSession;
         $this->checkoutCartFactory = $checkoutCartFactory;
         $this->logger = $logger;
-        $this->messageManager = $messageManager;
-        $this->resultRedirectFactory = $resultRedirectFactory;
+        $this->messageManager = $context->getMessageManager();
+        $this->resultRedirectFactory = $context->getResultRedirectFactory();
         $this->quoteFactory = $quoteFactory;
         $this->customerSession = $customerSession;
         $this->quoteManagement = $quoteManagement;
         $this->catalogProductFactory = $catalogProductFactory;
         $this->regionFactory = $regionFactory;
+        $this->storeManager = $storeManager;
         $this->helper = $helper;
         $this->customerHelper = $customerHelper;
         parent::__construct($context);
@@ -122,7 +125,7 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
 
         $quote  = $this->quoteFactory->create(); /** @var $quote \Magento\Quote\Model\Quote */
 
-        $storeId    = Mage::app()->getstore()->getId();
+        $storeId    = $this->storeManager->getStore()->getId();
         $quote->setStoreId($storeId);
 
         if ($this->customerSession->isLoggedIn()) {
@@ -180,7 +183,7 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $order = $this->quoteManagement->submit();
         } catch (\Exception $e) {
-            $this->helper->log(["ERROR SUBMITTING QUOTE IN PROCESS ORDER"=>$e->getMessage()]), 'bread-exception.log');
+            $this->helper->log(["ERROR SUBMITTING QUOTE IN PROCESS ORDER"=>$e->getMessage()]);
             $this->logger->critical($e);
             throw $e;
         }

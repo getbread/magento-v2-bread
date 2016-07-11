@@ -178,11 +178,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $requestCode    = $data['block_key'];
 
         switch ($requestCode) {
-            case $this->helper::BLOCK_CODE_CHECKOUT_OVERVIEW :
+            case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW :
                 $quote      = $this->cart->getQuote();
                 break;
 
-            case $this->helper::BLOCK_CODE_PRODUCT_VIEW :
+            case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW :
                 $quote                  = $this->quoteFactory->create();
                 $selectedProductId      = $data['selected_simple_product_id'];
                 $mainProductId          = $data['main_product_id'];

@@ -82,11 +82,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Fetch Payment Info
      *
-     * @param \Magento\Payment\Model\Info $payment
+     * @param \Magento\Payment\Model\InfoInterface $payment
      * @param string                  $transactionId
      * @return mixed
      */
-    public function fetchTransactionInfo(\Magento\Payment\Model\Info $payment, $transactionId)
+    public function fetchTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
     {
         return $this->apiClient->getInfo($transactionId);
     }
@@ -107,7 +107,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
         if (!$this->canUseForCountry($billingCountry)) {
             $this->helper->log("ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY". $billingCountry);
-            throw new \Magento\Framework\Exception\LocalizedException(>__('This financing program is available to US residents, please click the finance button and complete the application in order to complete your purchase with the financing payment method.'));
+            throw new \Magento\Framework\Exception\LocalizedException(__('This financing program is available to US residents, please click the finance button and complete the application in order to complete your purchase with the financing payment method.'));
         }
 
         if ($paymentInfo instanceof \Magento\Sales\Model\Order\Payment) {
@@ -127,10 +127,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Process Cancel Payment
      *
-     * @param \Magento\Framework\DataObject $payment
+     * @param \Magento\Payment\Model\InfoInterface $payment
      * @return $this
      */
-    public function cancel(\Magento\Framework\DataObject $payment)
+    public function cancel(\Magento\Payment\Model\InfoInterface $payment)
     {
         return $this->void($payment);
     }
@@ -138,11 +138,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Process Void Payment
      *
-     * @param \Magento\Framework\DataObject $payment
+     * @param \Magento\Payment\Model\InfoInterface $payment
      * @return \Bread\BreadCheckout\Model\Payment\Method\Bread
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function void(\Magento\Framework\DataObject $payment)
+    public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
         if (!$this->canVoid($payment)) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Void action is not available.'));
@@ -154,12 +154,12 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Process Authorize Payment
      *
-     * @param \Magento\Framework\DataObject $payment
+     * @param \Magento\Payment\Model\InfoInterface $payment
      * @param float         $amount
      * @return \Bread\BreadCheckout\Model\Payment\Method\Bread
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function authorize(\Magento\Framework\DataObject $payment, $amount)
+    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         if (!$this->canAuthorize()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Authorize action is not available.'));
@@ -195,7 +195,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @return $this
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function capture(\Magento\Framework\DataObject $payment, $amount)
+    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Capture action is not available.'));
@@ -239,7 +239,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @return \Bread\BreadCheckout\Model\Payment\Method\Bread
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function refund(\Magento\Framework\DataObject $payment, $amount)
+    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         if (!$this->canRefund()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Refund action is not available.'));
@@ -255,7 +255,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @param $amount
      * @param $requestType
      */
-    protected function _place($payment, $amount, $requestType)
+    protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType)
     {
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
@@ -351,16 +351,17 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Is the 'breadcheckout' payment method available
      *
-     * @param null $quote
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      *
      * @return bool
      */
-    public function isAvailable($quote = null)
+    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        $this->logger->debug($quote->getBreadTransactionId());
-        if( !$quote->getBreadTransactionId() ){
+        if( is_null($quote) || !$quote->getBreadTransactionId() ){
             return true;
         }
+
+        $this->logger->debug($quote->getBreadTransactionId());
 
         if( !parent::isAvailable($quote) ){
             return false;

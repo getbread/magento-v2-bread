@@ -32,7 +32,7 @@ class PaymentMethod extends \Magento\Backend\App\Action
     protected $helper;
 
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
+        \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\Session\Quote $backendSessionQuote,

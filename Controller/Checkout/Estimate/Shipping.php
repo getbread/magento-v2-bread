@@ -25,13 +25,12 @@ class Shipping extends \Bread\BreadCheckout\Controller\Checkout
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Psr\Log\LoggerInterface $logger,
         \Bread\BreadCheckout\Helper\Data $helper
     )
     {
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->messageManager = $messageManager;
+        $this->messageManager = $context->getMessageManager();
         $this->logger = $logger;
         $this->helper = $helper;
         parent::__construct($context);

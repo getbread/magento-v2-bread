@@ -18,14 +18,12 @@ class Catalog extends Data
         \Magento\Framework\Model\Context $context,
         \Magento\Catalog\Helper\Image $catalogImageHelper,
         \Magento\Framework\App\Request\Http $request,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Psr\Log\LoggerInterface $logger
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->catalogImageHelper = $catalogImageHelper;
-        parent::__construct($helperContext, $context, $request, $scopeConfig, $encryptor, $urlInterfaceFactory, $storeManager, $logger);
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
     }
 
     /**
