@@ -6,9 +6,9 @@
  * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
  */
-namespace Bread\BreadCheckout\Controller\Adminhtml\Validate;
+namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-class PaymentMethod extends \Magento\Backend\App\Action
+class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
     protected $paymentApiClient;

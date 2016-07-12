@@ -6,12 +6,12 @@
  * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
  */
-namespace Bread\BreadCheckout\Controller\Checkout\Estimate;
+namespace Bread\BreadCheckout\Controller\Checkout;
 
-class Tax extends \Bread\BreadCheckout\Controller\Checkout
+class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Magento\Framework\Controller\Result\JsonFactory  */
-    protected $resultJsonFactory;
+    /** @var \Magento\Framework\Controller\ResultFactory  */
+    protected $resultFactory;
 
     /** @var \Psr\Log\LoggerInterface */
     protected $logger;
@@ -21,15 +21,26 @@ class Tax extends \Bread\BreadCheckout\Controller\Checkout
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        \Magento\Checkout\Model\Cart $cart,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
         \Bread\BreadCheckout\Helper\Data $helper
     )
     {
-        $this->resultJsonFactory = $resultJsonFactory;
+        $this->resultFactory = $context->getResultFactory();
         $this->logger = $logger;
         $this->helper = $helper;
-        parent::__construct($context);
+        parent::__construct($context,
+            $catalogResourceModelProductFactory,
+            $dataObjectFactory,
+            $cart,
+            $quoteFactory,
+            $catalogProductFactory,
+            $logger,
+            $helper);
     }
 
     public function execute()
@@ -46,6 +57,6 @@ class Tax extends \Bread\BreadCheckout\Controller\Checkout
             $response = ['error' => 1,
                          'text'  => 'Internal error'];
         }
-        return $this->resultJsonFactory->create()->setData(['result' => $response]);
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $response]);
     }
 }

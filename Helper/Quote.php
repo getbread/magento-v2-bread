@@ -26,11 +26,9 @@ class Quote extends Data {
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\App\Request\Http $request,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Psr\Log\LoggerInterface $logger,
         \Magento\Backend\Model\Session\Quote $backendSessionQuote,
         \Magento\Checkout\Model\Cart $checkoutCart,
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog
@@ -43,11 +41,9 @@ class Quote extends Data {
             $helperContext,
             $context,
             $request,
-            $scopeConfig,
             $encryptor,
             $urlInterfaceFactory,
-            $storeManager,
-            $logger
+            $storeManager
         );
     }
 
@@ -91,11 +87,10 @@ class Quote extends Data {
     {
         $quote      = $this->getSessionQuote();
         $totals     = $quote->getTotals();
-        $discountData     = array();
+        $discountData     = [];
         if( isset($totals['discount']) && $totals['discount']->getValue() ) {
-            $discount   = array(
-                'amount'        => $totals['discount']->getValue() * -100.0,
-                'description'   => $totals['discount']->getTitle());
+            $discount   = ['amount'        => $totals['discount']->getValue() * -100.0,
+                           'description'   => $totals['discount']->getTitle()];
             $discountData[]   = $discount;
         }
 
@@ -110,8 +105,8 @@ class Quote extends Data {
     public function getCartOverviewItemsData()
     {
         $quote      = $this->getSessionQuote();
+        $itemsData  = [];
 
-        $itemsData     = array();
         foreach ($quote->getAllVisibleItems() as $item) {
             $baseProduct            = $item->getProduct();
             $simpleProductItem      = $item->getOptionByCode('simple_product');
@@ -139,10 +134,10 @@ class Quote extends Data {
         $quote      = $this->getSessionQuote();
 
         if($quote->hasItems() == false){
-            return array();
+            return [];
         }
 
-        $itemsData     = array();
+        $itemsData     = [];
         foreach ($quote->getAllVisibleItems() as $item) {
             $price                  = $item->getPrice();
             $baseProduct            = $item->getProduct();
@@ -169,9 +164,9 @@ class Quote extends Data {
      */
     public function getFormattedBillingAddressData(\Magento\Quote\Model\Quote\Address $billingAddress)
     {
-        $data     = array(
-            'address'       => $billingAddress->getStreet1() . ($billingAddress->getStreet2() == '' ? '' : (' ' . $billingAddress->getStreet2())),
-            'address2'      => $billingAddress->getStreet3() . ($billingAddress->getStreet4() == '' ? '' : (' ' . $billingAddress->getStreet4())),
+        $data     = [
+            'address'       => $billingAddress->getStreetLine(1) . ($billingAddress->getStreetLine(2) == '' ? '' : (' ' . $billingAddress->getStreetLine(2))),
+            'address2'      => $billingAddress->getStreetLine(3) . ($billingAddress->getStreetLine(4) == '' ? '' : (' ' . $billingAddress->getStreetLine(4))),
             'city'          => $billingAddress->getCity(),
             'state'         => $billingAddress->getRegionCode(),
             'zip'           => $billingAddress->getPostcode(),
@@ -179,7 +174,7 @@ class Quote extends Data {
             'email'         => $billingAddress->getEmail(),
             'firstName'     => $billingAddress->getFirstname(),
             'lastName'      => $billingAddress->getLastname(),
-        );
+        ];
 
         return $data;
     }
@@ -192,15 +187,15 @@ class Quote extends Data {
      */
     public function getFormattedShippingAddressData(\Magento\Quote\Model\Quote\Address $shippingAddress)
     {
-        $data     = array(
+        $data     = [
             'fullName'      => $shippingAddress->getName(),
-            'address'       => $shippingAddress->getStreet1() . ($shippingAddress->getStreet2() == '' ? '' : (' ' . $shippingAddress->getStreet2())),
-            'address2'      => $shippingAddress->getStreet3() . ($shippingAddress->getStreet4() == '' ? '' : (' ' . $shippingAddress->getStreet4())),
+            'address'       => $shippingAddress->getStreetLine(1) . ($shippingAddress->getStreetLine(2) == '' ? '' : (' ' . $shippingAddress->getStreetLine(2))),
+            'address2'      => $shippingAddress->getStreetLine(3) . ($shippingAddress->getStreetLine(4) == '' ? '' : (' ' . $shippingAddress->getStreetLine(4))),
             'city'          => $shippingAddress->getCity(),
             'state'         => $shippingAddress->getRegionCode(),
             'zip'           => $shippingAddress->getPostcode(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
-        );
+        ];
 
         return $data;
     }

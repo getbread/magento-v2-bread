@@ -79,10 +79,9 @@
                         url: '<?php echo $this->getTaxEstimationUrl(); ?>',
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
-                    }).done(function (transport) {
-                        console.log(transport);
+                    }).done(function (response) {
+                        console.log(response);
                         try {
-                            var response = $.parseJSON(transport.responseText);
                             if (typeof response == 'object') {
                                 if (response.error) {
                                     alert(response.message);
@@ -94,6 +93,8 @@
                         catch (e) {
                             console.log(e);
                         }
+                    }).fail(function (error) {
+                        console.log(error);
                     });
                 },
 
@@ -115,10 +116,9 @@
                         url: '<?php echo $this->getShippingAddressEstimationUrl(); ?>',
                         data: shippingAddress,
                         type: 'post'
-                    }).done(function (transport) {
-                        console.log(transport);
+                    }).done(function (response) {
+                        console.log(response);
                         try {
-                            var response = $.parseJSON(transport.responseText);
                             if (typeof response == 'object') {
                                 if (response.error) {
                                     alert(response.message);

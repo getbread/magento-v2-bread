@@ -6,9 +6,9 @@
  * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
  */
-namespace Bread\BreadCheckout\Controller\Checkout\Validate;
+namespace Bread\BreadCheckout\Controller\Checkout;
 
-class Order extends \Bread\BreadCheckout\Controller\Checkout
+class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
     protected $paymentApiClient;
@@ -30,9 +30,6 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
 
     /** @var \Magento\Framework\Controller\Result\RedirectFactory */
     protected $resultRedirectFactory;
-
-    /** @var \Magento\Quote\Model\QuoteFactory */
-    protected $quoteFactory;
 
     /** @var \Magento\Customer\Model\Session */
     protected $customerSession;
@@ -69,7 +66,10 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Bread\BreadCheckout\Helper\Data $helper,
-        \Bread\BreadCheckout\Helper\Customer $customerHelper
+        \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        \Magento\Checkout\Model\Cart $cart
     )
     {
         $this->paymentApiClient = $paymentApiClient;
@@ -79,7 +79,6 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
         $this->logger = $logger;
         $this->messageManager = $context->getMessageManager();
         $this->resultRedirectFactory = $context->getResultRedirectFactory();
-        $this->quoteFactory = $quoteFactory;
         $this->customerSession = $customerSession;
         $this->quoteManagement = $quoteManagement;
         $this->catalogProductFactory = $catalogProductFactory;
@@ -87,7 +86,14 @@ class Order extends \Bread\BreadCheckout\Controller\Checkout
         $this->storeManager = $storeManager;
         $this->helper = $helper;
         $this->customerHelper = $customerHelper;
-        parent::__construct($context);
+        parent::__construct($context,
+            $catalogResourceModelProductFactory,
+            $dataObjectFactory,
+            $cart,
+            $quoteFactory,
+            $catalogProductFactory,
+            $logger,
+            $helper);
     }
 
     public function execute()

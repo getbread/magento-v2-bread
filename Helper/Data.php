@@ -16,11 +16,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const JS_SANDBOX_URI                            = "https://checkout-sandbox.getbread.com/bread.js";
     const JS_LIVE_URI                               = "https://checkout.getbread.com/bread.js";
 
-    const URL_VALIDATE_PAYMENT                      = "bread/checkout/validate/paymentMethod";
-    const URL_VALIDATE_ORDER                        = "bread/checkout/validate/order";
-    const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimate/shipping";
-    const URL_TAX_ESTIMATE                          = "bread/checkout/estimate/tax";
-    const URL_ADMIN_VALIDATE_PAYMENT                 = "breadadmin/validate/paymentMethod";
+    const URL_VALIDATE_PAYMENT                      = "bread/checkout/validatepaymentmethod";
+    const URL_VALIDATE_ORDER                        = "bread/checkout/validateorder";
+    const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimateshipping";
+    const URL_TAX_ESTIMATE                          = "bread/checkout/estimatetax";
+    const URL_ADMIN_VALIDATE_PAYMENT                 = "breadadmin/bread/validatepaymentmethod";
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
     const XML_CONFIG_LOG_ENABLED                    = 'payment/breadcheckout/log_enabled';
@@ -414,6 +414,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function log($data, $context = 'Bread\BreadCheckout'){
         if( $this->logEnabled() ) {
+            if ( !is_string($data) ) {
+                $data = print_r($data, true);
+            }
             $this->logger->debug($data, [$context]);
         }
     }

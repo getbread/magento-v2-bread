@@ -16,9 +16,6 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Framework\DataObjectFactory */
     protected $dataObjectFactory;
 
-    /** @var \Magento\Framework\Controller\Result\JsonFactory */
-    protected $resultJsonFactory;
-
     /** @var \Magento\Checkout\Model\Cart */
     protected $cart;
 
@@ -34,26 +31,28 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /** @var \Bread\BreadCheckout\Helper\Data */
     protected $helper;
 
+    /** @var \Magento\Framework\Controller\ResultFactory */
+    protected $resultFactory;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory = null,
-        \Magento\Framework\DataObjectFactory $dataObjectFactory = null,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory = null,
-        \Magento\Checkout\Model\Cart $cart = null,
-        \Magento\Quote\Model\QuoteFactory $quoteFactory = null,
-        \Magento\Catalog\Model\ProductFactory $catalogProductFactory = null,
-        \Psr\Log\LoggerInterface $logger = null,
-        \Bread\BreadCheckout\Helper\Data $helper = null
+        \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        \Magento\Checkout\Model\Cart $cart,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
+        \Psr\Log\LoggerInterface $logger,
+        \Bread\BreadCheckout\Helper\Data $helper
     )
     {
         $this->catalogResourceModelProductFactory = $catalogResourceModelProductFactory;
         $this->dataObjectFactory = $dataObjectFactory;
-        $this->resultJsonFactory = $resultJsonFactory;
         $this->cart = $cart;
         $this->quoteFactory = $quoteFactory;
         $this->catalogProductFactory = $catalogProductFactory;
         $this->logger = $logger;
         $this->helper = $helper;
+        $this->resultFactory = $context->getResultFactory();
         parent::__construct($context);
     }
     
@@ -156,12 +155,12 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 $address->setShippingMethod($data['selectedShippingOption']['typeId']);
             }
 
-            $address->collectTotals();
+            $quote->collectTotals();
 
             return $address;
         } catch (\Exception $e) {
             $this->logger->critical($e);
-            return $this->resultJsonFactory->create()->setData([
+            return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
                 'result' => ['error' => 1,
                     'text'  => 'Internal error']]);
         }

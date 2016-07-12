@@ -16,37 +16,30 @@ class Customer extends Data
     /** @var \Magento\Customer\Model\CustomerFactory */
     protected $customerFactory;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
-
     /** @var \Magento\Customer\Model\AddressFactory */
     protected $customerAddressFactory;
-
-    /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
-
-    /** @var Bread\BreadCheckout\Helper */
-    protected $helper;
 
     /** @var Magento\Framework\Json\Helper\Data */
     protected $jsonHelper;
 
     public function __construct(
+        \Magento\Framework\App\Helper\Context $helperContext,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\Encryption\Encryptor $encryptor,
+        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\SessionFactory $customerSessionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
-        \Psr\Log\LoggerInterface $logger,
-        \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Framework\Json\Helper\Data $jsonHelper
     ) {
         $this->customerSessionFactory = $customerSessionFactory;
         $this->customerFactory = $customerFactory;
-        $this->storeManager = $storeManager;
         $this->customerAddressFactory = $customerAddressFactory;
-        $this->logger = $logger;
-        $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
     }
     /**
      * Pass Back Bread Formatted Default Customer Address If It Exists
@@ -190,7 +183,7 @@ class Customer extends Data
                 $customer->sendNewAccountEmail();
             }
         } catch (Exception $e) {
-            $this->helper->log('Exception While Logging In Customer');
+            $this->log('Exception While Logging In Customer');
             $this->logger->critical($e);
         }
 
