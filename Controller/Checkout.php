@@ -34,6 +34,12 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Framework\Controller\ResultFactory */
     protected $resultFactory;
 
+    /** @var \Magento\Quote\Model\Quote\TotalsCollector */
+    protected $totalsCollector;
+
+    /** @var \Magento\Quote\Api\CartRepositoryInterface */
+    protected $quoteRepository;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
@@ -42,7 +48,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
-        \Bread\BreadCheckout\Helper\Data $helper
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     )
     {
         $this->catalogResourceModelProductFactory = $catalogResourceModelProductFactory;
@@ -52,6 +60,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $this->catalogProductFactory = $catalogProductFactory;
         $this->logger = $logger;
         $this->helper = $helper;
+        $this->totalsCollector = $totalsCollector;
+        $this->quoteRepository = $quoteRepository;
         $this->resultFactory = $context->getResultFactory();
         parent::__construct($context);
     }
@@ -64,6 +74,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      * @param \Magento\Catalog\Model\Product   $baseProduct
      * @param array                            $customOptionPieces
      * @param int                              $quantity
+     * @return void
      */
     protected function addItemToQuote(\Magento\Quote\Model\Quote $quote,
                                       \Magento\Catalog\Model\Product $product,
@@ -79,7 +90,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         {
             /** @var $catalogResource \Magento\Catalog\Model\ResourceModel\ProductFactory */
             $catalogResource            = $this->catalogResourceModelProductFactory->create();
-            $options                    = array();
+            $options                    = [];
             $productAttributeOptions    = $baseProduct->getTypeInstance(true)->getConfigurableAttributesAsArray($baseProduct);
             foreach ($productAttributeOptions as $option){
                 $options[$option['attribute_id']]   =
@@ -91,7 +102,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
         $counter    = 0;
         if (count($customOptionPieces) > 1) {
-            $customOptionConfig     = array();
+            $customOptionConfig     = [];
             foreach ($customOptionPieces as $customOption) {
                 $counter++;
                 if ($counter == 1) continue;
@@ -155,7 +166,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 $address->setShippingMethod($data['selectedShippingOption']['typeId']);
             }
 
+            $this->totalsCollector->collectAddressTotals($quote, $address);
             $quote->collectTotals();
+            $this->quoteRepository->save($quote);
 
             return $address;
         } catch (\Exception $e) {
@@ -188,7 +201,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 $customOptionPieces     = explode('***', $data['selected_sku']);
                 $mainProduct            = $this->catalogProductFactory->create()->load($mainProductId);
                 $simpleProduct          = $this->catalogProductFactory->create()->load($selectedProductId);
-                $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, isset($item['quantity']) ? $item['quantity'] : 1);
+                $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1); // Qty always 1 when checking out from product view
                 break;
         }
 

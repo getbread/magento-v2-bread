@@ -68,7 +68,6 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
-                    console.log('calculateTax called');
                     shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
@@ -105,7 +104,6 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
-                    console.log('calculateShipping called');
                     shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
@@ -130,6 +128,8 @@
                         catch (e) {
                             console.log(e);
                         }
+                    }).fail(function (error) {
+                        console.log(error);
                     });
                 },
 

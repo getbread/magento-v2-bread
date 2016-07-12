@@ -2,75 +2,79 @@
 <script type="text/javascript">
     document.Skus = {};
 
-    require(['jquery'], function($) {
-        $(document).ready(function () {
-            spConfig = <?php echo $this->getJsonConfig(); ?>;
-            spConfig.updateButton = function () {
-                var simpleProductId = spConfig.getIdOfSelectedProduct();
-                document.selectedSku = document.baseProductSku + "///" + document.Skus[simpleProductId];
-                document.selectedSimpleProductId = simpleProductId;
-                document.resetPriceAndSku();
-            };
-
-            if (spConfig.configureSubscribe != null) {
-                spConfig.configureSubscribe(function (element) {
-                    spConfig.updateButton();
-                });
-            }
-            else {
-                spConfig.settings.each(function (element) {
-                    $(element).on('change', function() {
-                        this.updateButton.bind(this)
-                    });
-                }.bind(spConfig));
-            }
-
-            spConfig.getIdOfSelectedProduct = function () {
-                var existingProducts = new Object();
-                for (var i = this.settings.length - 1; i >= 0; i--) {
-                    var selected = this.settings[i].options[this.settings[i].selectedIndex];
-                    if (selected.config) {
-                        for (var iproducts = 0; iproducts < selected.config.products.length; iproducts++) {
-                            var usedAsKey = selected.config.products[iproducts] + "";
-                            if (existingProducts[usedAsKey] == undefined) {
-                                existingProducts[usedAsKey] = 1;
-                            }
-                            else {
-                                existingProducts[usedAsKey] = existingProducts[usedAsKey] + 1;
-                            }
-                        }
-                    }
-                }
-                for (var keyValue in existingProducts) {
-                    for (var keyValueInner in existingProducts) {
-                        if (Number(existingProducts[keyValueInner]) < Number(existingProducts[keyValue])) {
-                            delete existingProducts[keyValueInner];
-                        }
-                    }
-                }
-                var sizeOfExistingProducts = 0;
-                var currentSimpleProductId = "";
-                for (var keyValue in existingProducts) {
-                    currentSimpleProductId = keyValue;
-                    sizeOfExistingProducts = sizeOfExistingProducts + 1
-                }
-                if (sizeOfExistingProducts == 1) {
-                    return currentSimpleProductId;
-                }
-                else {
-                    return null;
-                }
-            };
-
-            <?php
-            $itemIds = $this->getChildProductIds($this->getProduct());
-
-            if (!empty($itemIds)) {
-                foreach ($itemIds as $val) {
-                    foreach ($val as $k => $v) echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
-                }
-            }
-            ?>
-        });
-    });
+//    require(['jquery'], function($) {
+//        $(document).ready(function () {
+//            spConfig = <?php //echo $this->getJsonConfig(); ?>//;
+//            spConfig.updateButton = function () {
+//                var simpleProductId = spConfig.getIdOfSelectedProduct();
+//                document.selectedSku = document.baseProductSku + "///" + document.Skus[simpleProductId];
+//                document.selectedSimpleProductId = simpleProductId;
+//                document.resetPriceAndSku();
+//            };
+//
+//            if (spConfig.configureSubscribe != null) {
+//                spConfig.configureSubscribe(function (element) {
+//                    spConfig.updateButton();
+//                });
+//            }
+//            else {
+//                $.each(spConfig.attributes, function (attr) {
+//                    $.each(attr.options, function (option) {
+//
+//                    });
+//
+//                    $(element).on('change', function() {
+//                        this.updateButton.bind(this)
+//                    });
+//                }.bind(spConfig));
+//            }
+//
+//            spConfig.getIdOfSelectedProduct = function () {
+//                var existingProducts = new Object();
+//                for (var i = this.settings.length - 1; i >= 0; i--) {
+//                    var selected = this.settings[i].options[this.settings[i].selectedIndex];
+//                    if (selected.config) {
+//                        for (var iproducts = 0; iproducts < selected.config.products.length; iproducts++) {
+//                            var usedAsKey = selected.config.products[iproducts] + "";
+//                            if (existingProducts[usedAsKey] == undefined) {
+//                                existingProducts[usedAsKey] = 1;
+//                            }
+//                            else {
+//                                existingProducts[usedAsKey] = existingProducts[usedAsKey] + 1;
+//                            }
+//                        }
+//                    }
+//                }
+//                for (var keyValue in existingProducts) {
+//                    for (var keyValueInner in existingProducts) {
+//                        if (Number(existingProducts[keyValueInner]) < Number(existingProducts[keyValue])) {
+//                            delete existingProducts[keyValueInner];
+//                        }
+//                    }
+//                }
+//                var sizeOfExistingProducts = 0;
+//                var currentSimpleProductId = "";
+//                for (var keyValue in existingProducts) {
+//                    currentSimpleProductId = keyValue;
+//                    sizeOfExistingProducts = sizeOfExistingProducts + 1
+//                }
+//                if (sizeOfExistingProducts == 1) {
+//                    return currentSimpleProductId;
+//                }
+//                else {
+//                    return null;
+//                }
+//            };
+//
+//            <?php
+//            $itemIds = $this->getChildProductIds($this->getProduct());
+//
+//            if (!empty($itemIds)) {
+//                foreach ($itemIds as $val) {
+//                    foreach ($val as $k => $v) echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
+//                }
+//            }
+//            ?>
+//        });
+//    });
 </script>

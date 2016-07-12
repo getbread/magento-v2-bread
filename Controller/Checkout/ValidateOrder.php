@@ -69,7 +69,9 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Magento\Checkout\Model\Cart $cart
+        \Magento\Checkout\Model\Cart $cart,
+        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     )
     {
         $this->paymentApiClient = $paymentApiClient;
@@ -93,7 +95,9 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $quoteFactory,
             $catalogProductFactory,
             $logger,
-            $helper);
+            $helper,
+            $totalsCollector,
+            $quoteRepository);
     }
 
     public function execute()

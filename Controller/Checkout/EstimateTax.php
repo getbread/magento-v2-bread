@@ -27,7 +27,9 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
-        \Bread\BreadCheckout\Helper\Data $helper
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     )
     {
         $this->resultFactory = $context->getResultFactory();
@@ -40,7 +42,9 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $quoteFactory,
             $catalogProductFactory,
             $logger,
-            $helper);
+            $helper,
+            $totalsCollector,
+            $quoteRepository);
     }
 
     public function execute()
@@ -49,7 +53,7 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
         $data       = json_decode($this->getRequest()->getParams()['shippingInfo'], true);
         try {
             $shippingAddress    = $this->getShippingAddressForQuote($data);
-            $result             = $shippingAddress->getTaxAmount();
+            $result             = $shippingAddress->getTaxAmount() * 100;
             $response           = $result;
         } catch (\Exception $e) {
             $this->helper->log("EXCEPTION IN TAX ESTIMATE ACTION", 'bread-exception.log');

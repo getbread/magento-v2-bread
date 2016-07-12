@@ -30,7 +30,9 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
-        \Bread\BreadCheckout\Helper\Data $helper
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     )
     {
         $this->resultFactory = $context->getResultFactory();
@@ -44,7 +46,9 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             $quoteFactory,
             $catalogProductFactory,
             $logger,
-            $helper);
+            $helper,
+            $totalsCollector,
+            $quoteRepository);
     }
 
     public function execute()
@@ -61,8 +65,6 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             $code       = [];
             foreach ($data as $method) {
                 foreach ($method as $rate) {
-                    $this->helper->log($rate->getData());
-
                     if (array_key_exists($rate->getCode(), $code)) {
                         continue;
                     }
