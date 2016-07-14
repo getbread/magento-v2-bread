@@ -17,7 +17,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     protected $dataObjectFactory;
 
     /** @var \Magento\Checkout\Model\Cart */
-    protected $cart;
+    protected $checkoutSession;
 
     /** @var \Magento\Quote\Model\QuoteFactory */
     protected $quoteFactory;
@@ -44,7 +44,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Magento\Checkout\Model\Cart $cart,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
@@ -55,7 +55,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     {
         $this->catalogResourceModelProductFactory = $catalogResourceModelProductFactory;
         $this->dataObjectFactory = $dataObjectFactory;
-        $this->cart = $cart;
+        $this->checkoutSession = $checkoutSession;
         $this->quoteFactory = $quoteFactory;
         $this->catalogProductFactory = $catalogProductFactory;
         $this->logger = $logger;
@@ -175,7 +175,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             $this->logger->critical($e);
             return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
                 'result' => ['error' => 1,
-                    'text'  => 'Internal error']]);
+                'text'  => 'Internal error']]);
         }
     }
 
@@ -191,7 +191,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
         switch ($requestCode) {
             case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW :
-                $quote      = $this->cart->getQuote();
+                $quote      = $this->checkoutSession->getQuote();
                 break;
 
             case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW :

@@ -69,7 +69,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Magento\Checkout\Model\Cart $cart,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     )
@@ -91,7 +91,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         parent::__construct($context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
-            $cart,
+            $checkoutSession,
             $quoteFactory,
             $catalogProductFactory,
             $logger,

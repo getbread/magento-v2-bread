@@ -26,7 +26,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Magento\Checkout\Model\Cart $cart,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
@@ -42,7 +42,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
         parent::__construct($context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
-            $cart,
+            $checkoutSession,
             $quoteFactory,
             $catalogProductFactory,
             $logger,
@@ -60,6 +60,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
                 throw new \Exception('Shipping address is not an instance of Magento\Quote\Model\Quote\Address');
             }
 
+            $address->collectShippingRates()->save();
             $data       = $address->getGroupedAllShippingRates();
             $methods    = [];
             $code       = [];

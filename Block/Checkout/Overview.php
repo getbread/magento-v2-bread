@@ -11,7 +11,7 @@ namespace Bread\BreadCheckout\Block\Checkout;
 class Overview extends \Bread\BreadCheckout\Block\Product\View
 {
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    protected $breadHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Quote */
     protected $quoteHelper;
@@ -23,18 +23,25 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     protected $jsonHelper;
 
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Data $breadHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
         \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
+        \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\ConfigurableProduct\Helper\Data $configurableHelper,
+        \Magento\Catalog\Helper\Product $catalogProductHelper,
+        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         array $data = []
     ) {
-        $this->helper = $helper;
+        $this->breadHelper = $breadHelper;
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;
         $this->jsonHelper = $jsonHelper;
@@ -43,11 +50,18 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
             $context,
             $registry,
             $jsonHelper,
-            $helper,
+            $breadHelper,
             $catalogHelper,
             $customerHelper,
             $configurableProductFactory,
             $configurableBlockFactory,
+            $arrayUtils,
+            $jsonEncoder,
+            $configurableHelper,
+            $catalogProductHelper,
+            $currentCustomer,
+            $priceCurrency,
+            $configurableAttributeData,
             $data
         );
     }
@@ -92,7 +106,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     protected function _toHtml()
     {
-        if( $this->helper->isEnabledOnCOP() ) {
+        if( $this->breadHelper->isEnabledOnCOP() ) {
             return parent::_toHtml();
         }
 
@@ -106,7 +120,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     public function getBlockCode()
     {
-        return (string) $this->helper->getBlockCodeCheckoutOverview();
+        return (string) $this->breadHelper->getBlockCodeCheckoutOverview();
     }
 
     /**
@@ -116,7 +130,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     public function getAllowCheckout()
     {
-        return ($this->helper->getAllowCheckoutCP()) ? 'true' : 'false';
+        return ($this->breadHelper->getAllowCheckoutCP()) ? 'true' : 'false';
     }
 
 }

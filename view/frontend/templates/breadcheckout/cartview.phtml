@@ -34,6 +34,7 @@
         document.configureButton = function (items) {
             var address             = <?php echo $this->getShippingAddressData(); ?>;
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
+            var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php echo $this->getButtonDesign(); ?>';
 
             var breadConfig = {
@@ -68,7 +69,6 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
-                    console.log('calculateTax called');
                     shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
@@ -79,10 +79,9 @@
                         url: '<?php echo $this->getTaxEstimationUrl(); ?>',
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
-                    }).done(function (transport) {
-                        console.log(transport);
+                    }).done(function (response) {
+                        console.log(response);
                         try {
-                            var response = $.parseJSON(transport.responseText);
                             if (typeof response == 'object') {
                                 if (response.error) {
                                     alert(response.message);
@@ -94,6 +93,8 @@
                         catch (e) {
                             console.log(e);
                         }
+                    }).fail(function (error) {
+                        console.log(error);
                     });
                 },
 
@@ -104,7 +105,6 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
-                    console.log('calculateShipping called');
                     shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
@@ -115,10 +115,9 @@
                         url: '<?php echo $this->getShippingAddressEstimationUrl(); ?>',
                         data: shippingAddress,
                         type: 'post'
-                    }).done(function (transport) {
-                        console.log(transport);
+                    }).done(function (response) {
+                        console.log(response);
                         try {
-                            var response = $.parseJSON(transport.responseText);
                             if (typeof response == 'object') {
                                 if (response.error) {
                                     alert(response.message);
@@ -130,6 +129,8 @@
                         catch (e) {
                             console.log(e);
                         }
+                    }).fail(function (error) {
+                        console.log(error);
                     });
                 }
             };
@@ -156,27 +157,7 @@
 
         <?php if( $this->getProduct() != null ): ?>
 
-        testIsValid = function() {
-            console.log('testIsValid called');
-            realValidation      = $('#product_addtocart_form').validate();
-            document.validationTest     = noHintValidation;
-            var o               = document.getElementById("button-prevent");
-            if ( realValidation.valid() ) {
-                o.style.height      = "0px";
-                o.style.width       = "0px";
-            }
-            else {
-                o.style.height      = '100%';
-                o.style.width       = '100%';
-            }
-
-            document.validationTest = realValidation;
-        };
-
         document.resetPriceAndSku = function () {
-            console.log('resetPriceAndSku called');
-            testIsValid();
-
             if ((typeof optionsPrice == 'undefined') ||
                 (typeof optionsPrice.productPrice == 'undefined')) {
                 document.configureButton(document.defaultItems);
@@ -218,7 +199,7 @@
             document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
             var o = document.getElementById("button-prevent");
             o.addEventListener('click', function (e) {
-                $('#product_addtocart_form').validate();
+                $('.form-cart').validate();
             }, true);
             document.resetPriceAndSku();
             <?php else: ?>

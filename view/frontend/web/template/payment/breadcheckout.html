@@ -1,0 +1,51 @@
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label class="label" data-bind="attr: {'for': getCode()}">
+            <!-- ko if: !getVisibleType() -->
+            <img data-bind="attr: {src: getAffirmLogoSrc(), alt: $t('Affirm payment')}" class="payment-icon affirm-payment-icon"/>
+            <span data-bind="html: getInfo()"></span>
+            <!-- /ko -->
+            <!-- ko if: getVisibleType() -->
+            <span data-bind="text: getTitle()"></span>
+            <!-- /ko -->
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="affirm-item">
+            <h3 class="affirm-info-head" data-bind="text: $t('How does Affirm work ?')"></h3>
+            <p class="affirm-info-description" data-bind="text: $t('Just enter your basic information and get a decision instantly.')"></p>
+            <p class="affirm-info-description" data-bind="text: $t('You will complete your payment on the Affirm website')"></p>
+        </div>
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <div id='bread-checkout-btn' title="Bread Checkout" class="button">
+                    <span>
+                        <span>Bread Checkout</span>
+                    </span>
+                </div>
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                        click: continueInAffirm,
+                        attr: {title: $t('Continue in Affirm')}
+                        css: {display: getProcessMode()}
+                        ">
+                    <span data-bind="i18n: 'Continue in Affirm'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

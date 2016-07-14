@@ -166,23 +166,6 @@
 
     <?php if( $this->getProduct() != null ): ?>
 
-        testIsValid = function() {
-            console.log('testIsValid called');
-            realValidation      = document.getActualAddToCartForm().validate();
-            document.validationTest     = noHintValidation;
-            var o               = document.getElementById("button-prevent");
-            if ( realValidation.valid() ) {
-                o.style.height      = "0px";
-                o.style.width       = "0px";
-            }
-            else {
-                o.style.height      = '100%';
-                o.style.width       = '100%';
-            }
-
-            document.validationTest = realValidation;
-        };
-
         document.getActualAddToCartForm = function() {
             console.log('getActualAddToCartForm called');
             if (('undefined' != typeof productAddToCartFormOld) && productAddToCartFormOld) {
@@ -194,9 +177,6 @@
         };
 
         document.resetPriceAndSku = function () {
-            console.log('resetPriceAndSku called');
-            testIsValid();
-
             if ((typeof optionsPrice == 'undefined') ||
                 (typeof optionsPrice.productPrice == 'undefined')) {
                 document.configureButton(document.defaultItems);

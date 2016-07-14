@@ -8,7 +8,7 @@
  */
 namespace Bread\BreadCheckout\Block\Product;
 
-class View extends \Magento\Framework\View\Element\Template
+class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable
 {
     protected $_product;
 
@@ -19,7 +19,7 @@ class View extends \Magento\Framework\View\Element\Template
     protected $jsonHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    protected $breadHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Catalog */
     protected $catalogHelper;
@@ -34,19 +34,26 @@ class View extends \Magento\Framework\View\Element\Template
     protected $configurableBlockFactory;
 
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Data $breadHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
         \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
+        \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\ConfigurableProduct\Helper\Data $configurableHelper,
+        \Magento\Catalog\Helper\Product $catalogProductHelper,
+        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         array $data = []
     ) {
         $this->registry = $registry;
         $this->jsonHelper = $jsonHelper;
-        $this->helper = $helper;
+        $this->breadHelper = $breadHelper;
         $this->catalogHelper = $catalogHelper;
         $this->customerHelper = $customerHelper;
         $this->configurableProductFactory = $configurableProductFactory;
@@ -54,6 +61,13 @@ class View extends \Magento\Framework\View\Element\Template
 
         parent::__construct(
             $context,
+            $arrayUtils,
+            $jsonEncoder,
+            $configurableHelper,
+            $catalogProductHelper,
+            $currentCustomer,
+            $priceCurrency,
+            $configurableAttributeData,
             $data
         );
     }
@@ -132,7 +146,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getAsLowAs()
     {
-        return ($this->helper->isAsLowAs()) ? 'true' : 'false';
+        return ($this->breadHelper->isAsLowAs()) ? 'true' : 'false';
     }
 
     /**
@@ -142,7 +156,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     protected function _toHtml()
     {
-        if( $this->helper->isEnabledOnPDP() ) {
+        if( $this->breadHelper->isEnabledOnPDP() ) {
             return parent::_toHtml();
         }
 
@@ -156,7 +170,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getShippingAddressEstimationUrl()
     {
-        return $this->helper->getShippingEstimateUrl();
+        return $this->breadHelper->getShippingEstimateUrl();
     }
 
     /**
@@ -166,7 +180,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getTaxEstimationUrl()
     {
-        return $this->helper->getTaxEstimateUrl();
+        return $this->breadHelper->getTaxEstimateUrl();
     }
 
     /**
@@ -176,7 +190,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getValidateOrderUrl()
     {
-        return $this->helper->getValidateOrderURL();
+        return $this->breadHelper->getValidateOrderURL();
     }
 
     /**
@@ -186,7 +200,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getButtonDesign()
     {
-        return $this->helper->getButtonDesign();
+        return $this->breadHelper->getButtonDesign();
     }
 
     /**
@@ -196,7 +210,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getIsButtonOnProduct()
     {
-        return ( $this->helper->isButtonOnProducts() ) ? 'true' : 'false';
+        return ( $this->breadHelper->isButtonOnProducts() ) ? 'true' : 'false';
     }
 
     /**
@@ -216,7 +230,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getAllowCheckout()
     {
-        return ($this->helper->getAllowCheckoutPDP()) ? 'true' : 'false';
+        return ($this->breadHelper->getAllowCheckoutPDP()) ? 'true' : 'false';
     }
 
     /**
@@ -226,7 +240,7 @@ class View extends \Magento\Framework\View\Element\Template
      */
     public function getBlockCode()
     {
-        return (string) $this->helper->getBlockCodeProductView();
+        return (string) $this->breadHelper->getBlockCodeProductView();
     }
 
     /**
@@ -248,11 +262,6 @@ class View extends \Magento\Framework\View\Element\Template
         }
 
         return $itemIds;
-    }
-
-    public function getJsonConfig()
-    {
-        return $this->configurableBlockFactory->create()->getJsonConfig();
     }
 
     public function jsonEncode($data) {
