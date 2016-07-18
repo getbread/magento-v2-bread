@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <referenceContainer name="after.body.start">
+            <block class="Bread\BreadCheckout\Block\Js" as="breadcheckout.prod.js" name="breadcheckout.prod.js"/>
+        </referenceContainer>
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
@@ -18,7 +21,7 @@
                                                             <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">
                                                                 <item name="breadcheckout" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">Bread_BreadCheckout/js/view/payment/breadcheckout.opc</item>
+                                                                    <item name="component" xsi:type="string">Bread_BreadCheckout/js/view/payment/breadcheckout</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="breadcheckout" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>

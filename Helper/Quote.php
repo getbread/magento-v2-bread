@@ -10,6 +10,9 @@ namespace Bread\BreadCheckout\Helper;
 
 class Quote extends Data {
 
+    /** @var \Magento\Sales\Model\Quote */
+    protected $quote = null;
+
     /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
 
@@ -125,9 +128,9 @@ class Quote extends Data {
     }
 
     /**
-     * Get Quote Items Data in JSON Format for checkout form
+     * Get Quote Items Data for checkout form
      *
-     * @return string JSON formatted String
+     * @return array
      */
     public function getQuoteItemsData()
     {
@@ -159,12 +162,17 @@ class Quote extends Data {
     /**
      * Get Bread Formatted Billing Address Data From Address Model
      *
-     * @param \Magento\Quote\Model\Quote\Address $billingAddress
      * @return array
      */
-    public function getFormattedBillingAddressData(\Magento\Quote\Model\Quote\Address $billingAddress)
+    public function getBillingAddressData()
     {
-        $data     = [
+        $billingAddress     = $this->getSessionQuote()->getBillingAddress();
+
+        if(is_null($billingAddress->getStreetLine(1))){
+            return false;
+        }
+
+        return [
             'address'       => $billingAddress->getStreetLine(1) . ($billingAddress->getStreetLine(2) == '' ? '' : (' ' . $billingAddress->getStreetLine(2))),
             'address2'      => $billingAddress->getStreetLine(3) . ($billingAddress->getStreetLine(4) == '' ? '' : (' ' . $billingAddress->getStreetLine(4))),
             'city'          => $billingAddress->getCity(),
@@ -175,19 +183,22 @@ class Quote extends Data {
             'firstName'     => $billingAddress->getFirstname(),
             'lastName'      => $billingAddress->getLastname(),
         ];
-
-        return $data;
     }
 
     /**
      * Get Bread Formatted Shipping Address Data From Address Model
      *
-     * @param \Magento\Quote\Model\Quote\Address $shippingAddress
      * @return array
      */
-    public function getFormattedShippingAddressData(\Magento\Quote\Model\Quote\Address $shippingAddress)
+    public function getShippingAddressData()
     {
-        $data     = [
+        $shippingAddress    = $this->getSessionQuote()->getShippingAddress();
+
+        if( is_null($shippingAddress->getStreetLine(1)) ){
+            return false;
+        }
+
+        return [
             'fullName'      => $shippingAddress->getName(),
             'address'       => $shippingAddress->getStreetLine(1) . ($shippingAddress->getStreetLine(2) == '' ? '' : (' ' . $shippingAddress->getStreetLine(2))),
             'address2'      => $shippingAddress->getStreetLine(3) . ($shippingAddress->getStreetLine(4) == '' ? '' : (' ' . $shippingAddress->getStreetLine(4))),
@@ -196,16 +207,24 @@ class Quote extends Data {
             'zip'           => $shippingAddress->getPostcode(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
         ];
-
-        return $data;
     }
 
-    public function getFormattedShippingOptionsData(\Magento\Quote\Model\Quote\Address $shippingAddress)
+    /**
+     * Get Bread Formatted Shipping Options Information
+     *
+     * @return string
+     */
+    public function getShippingOptions()
     {
-        $data       = ['type'   => $shippingAddress->getShippingDescription(),
-                       'typeId' => $shippingAddress->getShippingMethod(),
-                       'cost'   => $shippingAddress->getShippingAmount() * 100];
-        return $data;
+        $shippingAddress        = $this->getSessionQuote()->getShippingAddress();
+
+        if(!$shippingAddress->getShippingMethod()){
+            return 'false';
+        }
+
+        return ['type'   => $shippingAddress->getShippingDescription(),
+                'typeId' => $shippingAddress->getShippingMethod(),
+                'cost'   => $shippingAddress->getShippingAmount() * 100];
     }
 
     /**
@@ -215,11 +234,16 @@ class Quote extends Data {
      */
     public function getSessionQuote()
     {
-        if ($this->isInAdmin()) {
-            return $this->backendSessionQuote->getQuote();
+        if ($this->quote == null) {
+
+            if ($this->isInAdmin()) {
+                $this->quote = $this->backendSessionQuote->getQuote();
+            }
+
+            $this->quote = $this->checkoutCart->getQuote();
         }
 
-        return $this->checkoutCart->getQuote();
+        return $this->quote;
     }
 
 }
