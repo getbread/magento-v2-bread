@@ -20,7 +20,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_VALIDATE_ORDER                        = "bread/checkout/validateorder";
     const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimateshipping";
     const URL_TAX_ESTIMATE                          = "bread/checkout/estimatetax";
-    const URL_ADMIN_VALIDATE_PAYMENT                 = "breadadmin/bread/validatepaymentmethod";
+    const URL_CONFIG_DATA                           = "bread/checkout/configdata";
+    const URL_ADMIN_VALIDATE_PAYMENT                = "breadadmin/bread/validatepaymentmethod";
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
     const XML_CONFIG_LOG_ENABLED                    = 'payment/breadcheckout/log_enabled';
@@ -203,7 +204,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getTaxEstimateUrl()
     {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_TAX_ESTIMATE,array('_secure'=>true));
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_TAX_ESTIMATE, ['_secure'=>$isSecure]);
+    }
+
+    public function getConfigDataUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_CONFIG_DATA, ['_secure'=>$isSecure]);
     }
 
     /**

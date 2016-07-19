@@ -23,15 +23,24 @@ define(
                 return 'breadcheckout';
             },
 
+            /**
+             * Get if default button size enabled from config
+             */
             getDefaultSize: function() {
                 return window.checkoutConfig.payment.breadcheckout.defaultSize;
+            },
+
+            /**
+             * Transaction ID from Ui\ConfigProvider
+             */
+            getBreadTransactionId: function() {
+                return window.checkoutConfig.payment.breadcheckout.transactionId;
             },
 
             /**
              * Initialize the bread checkout button
              */
             initComplete: function() {
-                /** @see Bread\BreadCheckout\Model\Ui\ConfigProvider */
                 var data = window.checkoutConfig.payment.breadcheckout.breadConfig;
 
                 if (typeof bread != 'undefined') {

@@ -11,7 +11,7 @@ class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'breadcheckout';
 
-    /** @var \Bread\BreadCheckout\helper\Product\View */
+    /** @var \Bread\BreadCheckout\Helper\Quote */
     protected $helper;
 
     public function __construct(
@@ -33,15 +33,14 @@ class ConfigProvider implements ConfigProviderInterface
                     'active' => $this->helper->isPaymentMethodAtCheckout(),
                     'defaultSize' => $this->helper->useDefaultButtonSize(),
                     'buttonCss' => $this->helper->getButtonDesign(),
+                    'configDataUrl' => $this->helper->getConfigDataUrl(),
+                    'transactionId' => $this->helper->getBreadTransactionId(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'items' => $this->helper->getQuoteItemsData(),
                         'discounts' => $this->helper->getDiscountData(),
-                        'shippingOptions' => $this->helper->getShippingOptions(),
                         'grandTotal' => $this->helper->getGrandTotal(),
                         'asLowAs' => $this->helper->isAsLowAs(),
-                        'shippingContact' => $this->helper->getShippingAddressData(),
-                        'billingContact' => $this->helper->getBillingAddressData(),
                         'paymentUrl' => $this->helper->getPaymentUrl(),
                         'validateOrderUrl' => $this->helper->getValidateOrderURL(),
                         'additionalData' => '',

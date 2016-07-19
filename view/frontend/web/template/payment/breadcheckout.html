@@ -9,27 +9,25 @@
         </label>
     </div>
 
-    <div class="payment-method-content">
+    <div class="payment-method-content" data-bind="css: getCode()">
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!-- /ko -->
-        <div class="payment-method-billing-address">
-            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!-- /ko -->
-        </div>
         <div class="actions-toolbar">
-            <div class="primary">
-                <button id='bread-checkout-btn'
-                        title="Bread Checkout"
-                        class="button action primary checkout"
-                        type="submit"
-                        data-bind="attr: {'data-bread-default-size': getDefaultSize() }">
-                    <span>
-                        <span data-bind="text: $t('Bread Checkout')"></span>
-                    </span>
-                </button>
-            </div>
+            <button id='bread-checkout-btn'
+                    title="Bread Checkout"
+                    class="button action checkout"
+                    type="submit"
+                    data-bind="attr: {'data-bread-default-size': getDefaultSize() }">
+                <span>
+                    <span data-bind="text: $t('Bread Checkout')"></span>
+                </span>
+            </button>
+            <input id="bread_transaction_id"
+                   name="bread_transaction_id"
+                   type="hidden"
+                   class="validate-bread"
+                   data-bind="attr: {value: getBreadTransactionId() }" />
         </div>
     </div>
 </div>

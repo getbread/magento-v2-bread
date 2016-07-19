@@ -19,6 +19,9 @@ class Quote extends Data {
     /** @var \Magento\Backend\Model\Session\Quote */
     protected $backendSessionQuote;
 
+    /** @var \Magento\Checkout\Model\Session */
+    protected $checkoutSession;
+
     /** @var \Magento\Checkout\Model\Cart */
     protected $checkoutCart;
 
@@ -33,11 +36,13 @@ class Quote extends Data {
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Model\Session\Quote $backendSessionQuote,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Checkout\Model\Cart $checkoutCart,
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog
     ) {
         $this->storeManager = $storeManager;
         $this->backendSessionQuote = $backendSessionQuote;
+        $this->checkoutSession = $checkoutSession;
         $this->checkoutCart = $checkoutCart;
         $this->helperCatalog = $helperCatalog;
         parent::__construct(
@@ -228,6 +233,16 @@ class Quote extends Data {
     }
 
     /**
+     * Get stored bread transaction ID from quote
+     *
+     * @return string
+     */
+    public function getBreadTransactionId()
+    {
+        return $this->getSessionQuote()->getBreadTransactionId();
+    }
+
+    /**
      * Get Session Quote object for admin or frontend
      *
      * @return \Magento\Quote\Model\Quote
@@ -240,7 +255,7 @@ class Quote extends Data {
                 $this->quote = $this->backendSessionQuote->getQuote();
             }
 
-            $this->quote = $this->checkoutCart->getQuote();
+            $this->quote = $this->checkoutSession->getQuote();
         }
 
         return $this->quote;

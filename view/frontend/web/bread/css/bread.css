@@ -31,6 +31,12 @@
     z-index: 99999
 }
 
+.payment-method #bread-checkout-btn[data-bread-default-size="true"] {
+    width: 200px;
+    height: 50px;
+    padding: 0;
+}
+
 #bread-btn-cntnr{
     display: inline-block;
     position: relative

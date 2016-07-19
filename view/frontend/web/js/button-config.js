@@ -14,7 +14,6 @@ define(['jquery',
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
                 shippingContact: data.shippingContact,
-                billingContact: data.billingContact,
                 done: function (err, tx_token) {
                     console.log(err);
                     console.log(tx_token);
@@ -23,17 +22,15 @@ define(['jquery',
                             url: data.paymentUrl,
                             data: {token: tx_token},
                             type: 'post'
-                        }).done(function (transport) {
-                            console.log('success');
+                        }).done(function (response) {
+                            console.log(response);
                             try {
-                                if (transport.responseText.isJSON()) {
+                                if (response.isJSON()) {
                                     if (response.error) {
                                         alert(response.message);
                                     } else {
-                                        $('bread_transaction_id').value = tx_token;
-                                        var approved = "<span><strong>You have been approved for financing.<br/>" +
-                                            "Please continue with the checkout to complete your order.</strong></span>";
-                                        $('payment_form_breadcheckout').insert(approved);
+                                        $('#bread_transaction_id').value = tx_token;
+                                        $('#co-payment-form').submit();
                                     }
                                 }
                             } catch (e) {
@@ -44,6 +41,13 @@ define(['jquery',
                 }
             };
 
+            /**
+             * Optional params
+             */
+            if (typeof data.billingContact != 'undefined') {
+                breadConfig.billingContact = data.billingContact;
+            }
+
             var taxValue = parseInt(window.checkoutConfig.totalsData.tax_amount);
             if (taxValue >= 0) {
                 breadConfig.tax = taxValue * 100;
@@ -53,6 +57,9 @@ define(['jquery',
                 breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
+            /**
+             * Call the checkout method from bread.js
+             */
             bread.checkout(breadConfig);
         }
     };

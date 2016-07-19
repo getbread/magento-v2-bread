@@ -79,7 +79,6 @@
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
                     }).done(function (response) {
-                        console.log(response);
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
@@ -92,8 +91,6 @@
                         catch (e) {
                             console.log(e);
                         }
-                    }).fail(function (error) {
-                        console.log(error);
                     });
                 },
 
@@ -115,7 +112,6 @@
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
-                        console.log(response);
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
@@ -128,8 +124,6 @@
                         catch (e) {
                             console.log(e);
                         }
-                    }).fail(function (error) {
-                        console.log(error);
                     });
                 },
 
@@ -139,7 +133,6 @@
                  * @param callback
                  */
                 addToCart:  function(callback) {
-                    console.log('addToCart called');
                     document.getElementById('product_addtocart_form').submit();
                 }
             };
@@ -167,7 +160,6 @@
     <?php if( $this->getProduct() != null ): ?>
 
         document.getActualAddToCartForm = function() {
-            console.log('getActualAddToCartForm called');
             if (('undefined' != typeof productAddToCartFormOld) && productAddToCartFormOld) {
                 return productAddToCartFormOld;
             }
