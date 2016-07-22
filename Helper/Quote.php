@@ -173,7 +173,7 @@ class Quote extends Data {
     {
         $billingAddress     = $this->getSessionQuote()->getBillingAddress();
 
-        if(is_null($billingAddress->getStreetLine(1))){
+        if(!$billingAddress->getStreetLine(1)){
             return false;
         }
 
@@ -199,7 +199,7 @@ class Quote extends Data {
     {
         $shippingAddress    = $this->getSessionQuote()->getShippingAddress();
 
-        if( is_null($shippingAddress->getStreetLine(1)) ){
+        if(!$shippingAddress->getStreetLine(1)){
             return false;
         }
 

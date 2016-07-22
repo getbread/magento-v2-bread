@@ -13,7 +13,7 @@ define(['jquery',
                 customTotal: data.grandTotal,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
-                shippingContact: data.shippingContact,
+                
                 done: function (err, tx_token) {
                     console.log(err);
                     console.log(tx_token);
@@ -21,16 +21,22 @@ define(['jquery',
                         $.ajax({
                             url: data.paymentUrl,
                             data: {token: tx_token},
-                            type: 'post'
+                            type: 'post',
+                            beforeSend: function () {
+                                $('#bread_feedback').html("<span><strong>Please wait...</strong></span>");
+                            }
                         }).done(function (response) {
                             console.log(response);
                             try {
-                                if (response.isJSON()) {
+                                if (response !== null && typeof response === 'object') {
                                     if (response.error) {
                                         alert(response.message);
                                     } else {
-                                        $('#bread_transaction_id').value = tx_token;
-                                        $('#co-payment-form').submit();
+                                        $('#bread_transaction_id').val(tx_token);
+                                        var approved = "<span><strong>You have been approved for financing.<br/>"+
+                                            "Please continue with the checkout to complete your order.</strong></span>";
+                                        $('#bread_feedback').html(approved);
+                                        $('#bread-checkout-submit').removeAttr('disabled');
                                     }
                                 }
                             } catch (e) {
@@ -38,19 +44,72 @@ define(['jquery',
                             }
                         });
                     }
+                },
+
+                /**
+                 * Calculate tax value callback
+                 *
+                 * @param shippingAddress
+                 * @param callback
+                 */
+                calculateTax: function (shippingAddress, callback) {
+                    shippingAddress.block_key = window.checkoutConfig.payment.breadcheckout.breadConfig.blockCode;
+
+                    $.ajax({
+                        url: window.checkoutConfig.payment.breadcheckout.breadConfig.taxEstimationUrl,
+                        data: {shippingInfo: JSON.stringify(shippingAddress)},
+                        type: 'post'
+                    }).done(function (response) {
+                        try {
+                            if (typeof response == 'object') {
+                                if (response.error) {
+                                    alert(response.message);
+                                } else {
+                                    callback(null, response.result);
+                                }
+                            }
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    });
+                },
+
+                /**
+                 * Calculate shipping cost callback
+                 *
+                 * @param shippingAddress
+                 * @param callback
+                 */
+                calculateShipping: function (shippingAddress, callback) {
+                    shippingAddress.block_key = window.checkoutConfig.payment.breadcheckout.breadConfig.blockCode;
+
+                    $.ajax({
+                        url: window.checkoutConfig.payment.breadcheckout.breadConfig.shippingEstimationUrl,
+                        data: shippingAddress,
+                        type: 'post'
+                    }).done(function (response) {
+                        try {
+                            if (typeof response == 'object') {
+                                if (response.error) {
+                                    alert(response.message);
+                                } else {
+                                    callback(null, response.result);
+                                }
+                            }
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    });
                 }
             };
 
             /**
              * Optional params
              */
-            if (typeof data.billingContact != 'undefined') {
+            if (typeof data.billingContact !== 'undefined') {
                 breadConfig.billingContact = data.billingContact;
-            }
-
-            var taxValue = parseInt(window.checkoutConfig.totalsData.tax_amount);
-            if (taxValue >= 0) {
-                breadConfig.tax = taxValue * 100;
             }
 
             if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {

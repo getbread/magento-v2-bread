@@ -52,13 +52,13 @@ class Customer extends Data
         $customer                   = $session->getCustomer();
 
         if( empty($customer) ) {
-            return array();
+            return [];
         }
 
         $defaultShippingAddress     = $customer->getPrimaryShippingAddress();
 
         if( empty($defaultShippingAddress) ) {
-            return array();
+            return [];
         }
 
         $primaryData        = [

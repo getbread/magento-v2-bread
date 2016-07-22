@@ -28,6 +28,19 @@
                    type="hidden"
                    class="validate-bread"
                    data-bind="attr: {value: getBreadTransactionId() }" />
+            <div id="bread_feedback"></div>
+            <div class="primary">
+                <button data-role="review-save"
+                        type="submit"
+                        id="bread-checkout-submit"
+                        data-bind="
+                        attr: {title: $t('Place Order')},
+                        click: placeOrder"
+                        class="action primary checkout"
+                        disabled>
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
         </div>
     </div>
 </div>

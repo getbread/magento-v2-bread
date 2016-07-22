@@ -57,7 +57,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
         if( $result->status != self::STATUS_CANCELED ){
             $this->helper->log( ["ERROR"=>"Transaction cancel failed", "RESULT"=>$result] );
-            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Transaction cancel failed (current transaction status :' . $result->status . ')'));
+            throw new \Magento\Framework\Exception\LocalizedException(__('Transaction cancel failed (current transaction status :' . $result->status . ')'));
         }
 
         return $result;
@@ -84,17 +84,17 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $this->getUpdateTransactionUrl($breadTransactionId),
             $data_array);
 
-        if ( $result->status != self::STATUS_AUTHORIZED )
+        if ( $result['status'] != self::STATUS_AUTHORIZED )
         {
-            $this->helper->log(array("ERROR"=>"AUTHORIZATION FAILED", "RESULT"=>$result), 'bread-exception.log');
-            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Transaction authorize failed (current transaction status :' . $result->status . ')'));
+            $this->helper->log(array("ERROR"=>"AUTHORIZATION FAILED", "RESULT"=>$result));
+            throw new \Magento\Framework\Exception\LocalizedException(__('Transaction authorize failed (current transaction status :' . $result->status . ')'));
         }
 
-        $breadAmount = $result->total;
+        $breadAmount = $result['total'];
         if ( (int)$breadAmount != (int)$amount )
         {
-            $this->helper->log(array("ERROR"=>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH", "BREAD AMOUNT"=>(int)$breadAmount ,"QUOTE AMOUNT"=>(int)$amount , "RESULT"=>$result), 'bread-exception.log');
-            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount));
+            $this->helper->log(array("ERROR"=>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH", "BREAD AMOUNT"=>(int)$breadAmount ,"QUOTE AMOUNT"=>(int)$amount , "RESULT"=>$result));
+            throw new \Magento\Framework\Exception\LocalizedException(__('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount));
         }
 
         return $result;
@@ -132,8 +132,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $this->getUpdateTransactionUrl($breadTransactionId),
             ['type' => 'settle']);
 
-        if ( $result->status != self::STATUS_SETTLED ) {
-            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Transaction settle failed (current transaction status :' . $result->status . ')'));
+        if ( $result['status'] != self::STATUS_SETTLED ) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Transaction settle failed (current transaction status :' . $result['status'] . ')'));
         }
 
         return $result;
@@ -213,12 +213,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             if( $status != 200 ) {
-                throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('Call to Bread API failed.  Error: '. $result));
+                throw new \Exception(__('Call to Bread API failed.  Error: '. $result));
             }
         } catch (\Exception $e){
             $this->helper->log( ["USER"      => $username,
                                  "PASSWORD"  => $password,
                                  "URL"       => $url,
+                                 "STATUS"    => $status,
                                  "DATA"      => $data,
                                  "RESULT"    => $result] );
 
@@ -235,7 +236,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                              "RESULT"    => $result] );
 
         if(!$this->isJson($result)){
-            throw new \Magento\Framework\Exception\LocalizedException($this->helper->__('API Response Is Not Valid JSON.  Result: ' . $result));
+            throw new \Magento\Framework\Exception\LocalizedException(__('API Response Is Not Valid JSON.  Result: ' . $result));
         }
 
         return $this->jsonHelper->jsonDecode($result);
@@ -275,6 +276,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         try {
             $this->jsonHelper->jsonDecode($string);
         } catch (\Zend_Json_Exception $e) {
+            $this->helper->log($e->getMessage());
             return false;
         }
         return true;

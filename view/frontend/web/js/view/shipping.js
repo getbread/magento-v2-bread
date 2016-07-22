@@ -33,11 +33,10 @@ define(
              */
             updateConfigData: function(data) {
                 window.checkoutConfig.payment.breadcheckout.breadConfig.shippingContact = data.shippingContact;
-                window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact.email = checkout.getValidatedEmailValue();
-                window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = data.shippingOptions;
 
-                if (!$.isEmptyObject(data.billingContact)) {
+                if (data.billingContact !== false) {
                     window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact = data.billingContact;
+                    window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact.email = checkout.getValidatedEmailValue();
                 }
             }
         });

@@ -57,19 +57,65 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
             $token = $this->getRequest()->getParam('token');
             if ($token) {
                 $data = $this->paymentApiClient->getInfo($token);
-                if ($data->breadTransactionId) {
-                    $this->checkoutSession
-                        ->getQuote()
-                        ->setBreadTransactionId($token)
-                        ->save();
+                if ($data['breadTransactionId']) {
+                    $this->checkoutSession->setBreadTransactionId($token);
+                    $newData = $this->updateQuote($token);
                 }
             }
 
-            $result = true;
+            $result = $newData;
         } catch (\Exception $e) {
             $result = false;
         }
 
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $result]);
+    }
+
+    /**
+     * Update quote to reflect options selected in Bread checkout
+     */
+    protected function updateQuote($token)
+    {
+        $data = $this->paymentApiClient->getInfo($token);
+        $billingData = $this->getFormattedAddress($data['billingContact']);
+
+        $quote = $this->checkoutSession->getQuote();
+
+        $quote->getBillingAddress()->addData($billingData);
+
+        if (!$quote->getIsVirtual()) {
+            $shippingData = $this->getFormattedAddress($data['shippingContact']);
+            $quote->getShippingAddress()
+                ->addData($shippingData)
+                ->setShippingAmount($data['shippingCost'] / 100)
+                ->setShippingMethod($data['shippingMethodCode']);
+        }
+
+        $quote->collectTotals();
+        $this->quoteRepository->save($quote);
+
+        return $quote->getShippingAddress()->getStreetLine(1);
+    }
+
+    /**
+     * Get address in correct format to add to Address object
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function getFormattedAddress(array $data)
+    {
+        $name = explode(' ', trim($data['fullName']));
+        return [
+            'firstname' => $name[0],
+            'lastname' => $name[1],
+            'street' => $data['address'],
+            'city' => $data['city'],
+            'country_id' => 'US',
+            'region' => $data['state'],
+            'postcode' => $data['zip'],
+            'telephone' => $data['phone'],
+            'save_in_address_book' => 1
+        ];
     }
 }
