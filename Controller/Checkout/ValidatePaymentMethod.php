@@ -65,10 +65,12 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 
             $result = $newData;
         } catch (\Exception $e) {
-            $result = false;
+            $this->helper->log($e->getMessage());
+            $this->helper->log($e->getTraceAsString());
+            $result = ['error' => (string) __('Error: Unable to process transaction.')];
         }
 
-        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $result]);
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($result);
     }
 
     /**
@@ -85,16 +87,15 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 
         if (!$quote->getIsVirtual()) {
             $shippingData = $this->getFormattedAddress($data['shippingContact']);
-            $quote->getShippingAddress()
-                ->addData($shippingData)
-                ->setShippingAmount($data['shippingCost'] / 100)
-                ->setShippingMethod($data['shippingMethodCode']);
+            $quote->getShippingAddress()->addData($shippingData);
         }
 
         $quote->collectTotals();
         $this->quoteRepository->save($quote);
 
-        return $quote->getShippingAddress()->getStreetLine(1);
+        return ['billingAddress' => $quote->getBillingAddress()->getData(),
+            'shippingAddress' => $quote->getShippingAddress()->getData(),
+            'shippingMethod' => $data['shippingMethodCode']];
     }
 
     /**

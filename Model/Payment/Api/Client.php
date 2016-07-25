@@ -197,6 +197,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+            // TODO: REMOVE THE LINE BELOW
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
             if ($method == \Zend_Http_Client::POST) {
                 curl_setopt($curl, CURLOPT_POST, 1);
@@ -213,6 +215,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             if( $status != 200 ) {
+                $this->helper->log( curl_error($curl) );
                 throw new \Exception(__('Call to Bread API failed.  Error: '. $result));
             }
         } catch (\Exception $e){

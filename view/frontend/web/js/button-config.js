@@ -2,9 +2,9 @@
  * Configure payment data and init bread checkout
  */
 define(['jquery',
-    'Magento_Checkout/js/view/payment/default'], function($){
+    'Magento_Checkout/js/model/full-screen-loader'], function($, fullScreenLoader){
     return {
-        configure: function(data) {
+        configure: function(data, context) {
             var breadConfig = {
                 buttonId: data.buttonId,
                 items: data.items,
@@ -22,21 +22,18 @@ define(['jquery',
                             url: data.paymentUrl,
                             data: {token: tx_token},
                             type: 'post',
-                            beforeSend: function () {
-                                $('#bread_feedback').html("<span><strong>Please wait...</strong></span>");
+                            context: context,
+                            beforeSend: function() {
+                                fullScreenLoader.startLoader();
                             }
                         }).done(function (response) {
-                            console.log(response);
                             try {
                                 if (response !== null && typeof response === 'object') {
                                     if (response.error) {
-                                        alert(response.message);
+                                        console.log(response);
+                                        alert(response.error);
                                     } else {
-                                        $('#bread_transaction_id').val(tx_token);
-                                        var approved = "<span><strong>You have been approved for financing.<br/>"+
-                                            "Please continue with the checkout to complete your order.</strong></span>";
-                                        $('#bread_feedback').html(approved);
-                                        $('#bread-checkout-submit').removeAttr('disabled');
+                                        this.updateAddress(response, tx_token);
                                     }
                                 }
                             } catch (e) {
@@ -63,7 +60,7 @@ define(['jquery',
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
-                                    alert(response.message);
+                                    alert(response.error);
                                 } else {
                                     callback(null, response.result);
                                 }
@@ -87,13 +84,15 @@ define(['jquery',
                     $.ajax({
                         url: window.checkoutConfig.payment.breadcheckout.breadConfig.shippingEstimationUrl,
                         data: shippingAddress,
-                        type: 'post'
+                        type: 'post',
+                        context: context
                     }).done(function (response) {
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
-                                    alert(response.message);
+                                    alert(response.error);
                                 } else {
+                                    this.setShippingRates(response.result);
                                     callback(null, response.result);
                                 }
                             }
@@ -119,7 +118,17 @@ define(['jquery',
             /**
              * Call the checkout method from bread.js
              */
-            bread.checkout(breadConfig);
+            if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
+                bread.checkout(breadConfig);
+            } else {
+                fullScreenLoader.stopLoader();
+                $('#' + data.buttonId).hide();
+                $('#bread_transaction_id').val(window.checkoutConfig.payment.breadcheckout.transactionId);
+                var approved = "<span><strong>You have been approved for financing.<br/>"+
+                    "Please continue with the checkout to complete your order.</strong></span>";
+                $('#bread_feedback').html(approved);
+                $('#bread-checkout-submit').removeAttr('disabled');
+            }
         }
     };
 });

@@ -263,6 +263,30 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
+     * Order payment
+     *
+     * @param \Magento\Framework\DataObject|\Magento\Payment\Model\InfoInterface|Payment $payment
+     * @param float $amount
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
+        $transaction = $this->transactionBuilder->setPayment($payment)
+            ->setOrder($payment->getOrder())
+            ->setTransactionId($payment->getTransactionId())
+            ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_ORDER);
+
+        $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
+        if(array_key_exists('is_closed', $transactionAdditionalInfo)){
+            $transaction->setIsClosed( (bool) $transactionAdditionalInfo['is_closed'] );
+        }
+        if(array_key_exists('message', $transactionAdditionalInfo)){
+            $transaction->setMessage($transactionAdditionalInfo['message']);
+        }
+    }
+
+    /**
      * Process API Call Based on Request Type And Add Normalized Magento Transaction Data To Orders
      *
      * @param $payment
@@ -317,10 +341,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 break;
         }
 
-        $payment->setSkipTransactionCreation(true);
-
         return $result;
     }
+
+
 
     /**
      * Add payment transaction
@@ -337,32 +361,21 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                                        $transactionDetails = [], $message = null
     ) {
         try {
-            $this->helper->log('addTransaction called');
             $payment->resetTransactionAdditionalInfo();
 
             foreach ($transactionAdditionalInfo as $key => $value) {
                 $payment->setTransactionAdditionalInfo($key, $value);
             }
 
-            $transaction = $payment->addTransaction($transactionType, null, false);
-            //$transaction->setOrder($payment->getOrder());
-
-            if(array_key_exists('is_closed', $transactionAdditionalInfo)){
-                $transaction->setIsClosed( (bool) $transactionAdditionalInfo["is_closed"] );
-            }
+            $payment->setTransactionAdditionalInfo('message', $message);
 
             foreach ($transactionDetails as $key => $value) {
                 $payment->unsetData($key);
             }
 
             $payment->unsLastTransId();
-            $transaction->setMessage($message);
 
-            //$this->transactionRepository->save($transaction);
-            //$transaction->save();
-
-            $this->helper->log('end of addTransaction');
-            return $transaction;
+            return $payment;
         } catch (\Exception $e) {
             $this->helper->log($e->getMessage());
             $this->helper->log($e->getTraceAsString());

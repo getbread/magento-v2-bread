@@ -16,9 +16,12 @@ class Info extends \Magento\Payment\Block\Info
     protected $dataObjectFactory;
 
     public function __construct(
-        \Magento\Framework\DataObjectFactory $dataObjectFactory
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        $data = []
     ) {
         $this->dataObjectFactory = $dataObjectFactory;
+        parent::__construct($context, $data);
     }
     /**
      * Display Information For Admin View
@@ -35,8 +38,8 @@ class Info extends \Magento\Payment\Block\Info
         $info = $this->getInfo();
         $transport = $this->dataObjectFactory->create();
         $transport = parent::_prepareSpecificInformation($transport);
-
-        $transport->addData( [__('Financing Tx Id') => $info->getTransactionId()] );
+        $label = __('Financing Tx Id');
+        $transport->addData( [ (string)$label => $info->getTransactionId()] );
         return $transport;
     }
 
