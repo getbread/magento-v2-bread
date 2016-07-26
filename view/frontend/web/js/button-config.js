@@ -15,8 +15,6 @@ define(['jquery',
                 asLowAs: data.asLowAs,
                 
                 done: function (err, tx_token) {
-                    console.log(err);
-                    console.log(tx_token);
                     if (tx_token !== undefined) {
                         $.ajax({
                             url: data.paymentUrl,
@@ -33,7 +31,7 @@ define(['jquery',
                                         console.log(response);
                                         alert(response.error);
                                     } else {
-                                        this.updateAddress(response, tx_token);
+                                        this.updateAddresses(response, tx_token);
                                     }
                                 }
                             } catch (e) {

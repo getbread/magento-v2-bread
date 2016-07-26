@@ -29,7 +29,9 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
         \Psr\Log\LoggerInterface $logger,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Quote\Model\QuoteManagement $quoteManagement
     )
     {
         $this->resultFactory = $context->getResultFactory();
@@ -44,7 +46,9 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $logger,
             $helper,
             $totalsCollector,
-            $quoteRepository);
+            $quoteRepository,
+            $customerSession,
+            $quoteManagement);
     }
 
     public function execute()

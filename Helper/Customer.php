@@ -22,6 +22,9 @@ class Customer extends Data
     /** @var Magento\Framework\Json\Helper\Data */
     protected $jsonHelper;
 
+    /** @var \Magento\Framework\Math\Random */
+    protected $random;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -33,12 +36,14 @@ class Customer extends Data
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
-        \Magento\Framework\Json\Helper\Data $jsonHelper
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Framework\Math\Random $random
     ) {
         $this->customerSessionFactory = $customerSessionFactory;
         $this->customerFactory = $customerFactory;
         $this->customerAddressFactory = $customerAddressFactory;
         $this->jsonHelper = $jsonHelper;
+        $this->random = $random;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
     }
     /**
@@ -120,7 +125,7 @@ class Customer extends Data
      */
     public function createCustomer($quote, $billingContact, $shippingContact)
     {
-        $session    = $this->customerSessionFactory;
+        $session    = $this->customerSessionFactory->create();
         if ($session->isLoggedIn()) {
             return $session->getCustomer();
         }
@@ -132,7 +137,7 @@ class Customer extends Data
             return;
         }
 
-        $customer   = $this->customerFactory->create();
+        $customer   = $this->customerFactory->create(); /** @var \Magento\Customer\Model\CustomerFactory */
         $email      = $quote->getCustomerEmail();
 
         $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
@@ -147,7 +152,7 @@ class Customer extends Data
         if( !$customer->getId() ) {
             $isNewCustomer      = true;
             $customer->setEmail($email);
-            $customer->setPassword($customer->generatePassword(7));
+            $customer->setPassword($this->generatePassword(7));
             $billingAddress->setIsDefaultBilling('1');
             $billingAddress->setSaveInAddressBook('1');
             $shippingAddress->setIsDefaultShipping('1');
@@ -162,13 +167,11 @@ class Customer extends Data
             $customer->save();
             $customer->setConfirmation(null);
 
-            $this->customerSessionFactory->loginById($customer->getId());
+            $session->loginById($customer->getId());
             $quote->setCustomerId($customer->getId());
-            $quote->setCustomer($customer);
 
             if($isNewCustomer) {
                 $billingAddress->setCustomerId($customer->getId());
-                $billingAddress->setCustomer($customer);
                 $customer->addAddress($billingAddress);
                 $billingAddress->save();
                 $shippingAddress->setCustomerId($customer->getId());
@@ -182,7 +185,7 @@ class Customer extends Data
             if($isNewCustomer) {
                 $customer->sendNewAccountEmail();
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log('Exception While Logging In Customer');
             $this->logger->critical($e);
         }
@@ -261,6 +264,18 @@ class Customer extends Data
     protected function getCustomerSession()
     {
         return $this->customerSessionFactory->create();
+    }
+
+    /**
+     * Generate random password during automatic customer account creation
+     *
+     * @param $length int
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function generatePassword($length)
+    {
+        return $this->encryptor->getHash($this->random->getRandomString($length), true);
     }
 
 }

@@ -19,8 +19,8 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     /** @var \Bread\BreadCheckout\Model\Session */
     protected $breadCheckoutSession;
 
-    /** @var \Magento\Checkout\Model\CartFactory */
-    protected $checkoutCartFactory;
+    /** @var \Magento\Checkout\Helper\Cart */
+    protected $cartHelper;
 
     /** @var \Psr\Log\LoggerInterface */
     protected $logger;
@@ -52,12 +52,15 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     /** @var \Bread\BreadCheckout\Helper\Customer */
     protected $customerHelper;
 
+    /** @var \Magento\Sales\Model\Order\Email\Sender\OrderSender */
+    protected $orderSender;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Bread\BreadCheckout\Model\Session $breadCheckoutSession,
-        \Magento\Checkout\Model\CartFactory $checkoutCartFactory,
+        \Magento\Checkout\Helper\Cart $cartHelper,
         \Psr\Log\LoggerInterface $logger,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Customer\Model\Session $customerSession,
@@ -71,13 +74,14 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
     )
     {
         $this->paymentApiClient = $paymentApiClient;
         $this->checkoutSession = $checkoutSession;
         $this->breadCheckoutSession = $breadCheckoutSession;
-        $this->checkoutCartFactory = $checkoutCartFactory;
+        $this->cartHelper = $cartHelper;
         $this->logger = $logger;
         $this->messageManager = $context->getMessageManager();
         $this->resultRedirectFactory = $context->getResultRedirectFactory();
@@ -88,6 +92,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $this->storeManager = $storeManager;
         $this->helper = $helper;
         $this->customerHelper = $customerHelper;
+        $this->orderSender = $orderSender;
         parent::__construct($context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
@@ -97,7 +102,9 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $logger,
             $helper,
             $totalsCollector,
-            $quoteRepository);
+            $quoteRepository,
+            $customerSession,
+            $quoteManagement);
     }
 
     public function execute()
@@ -131,132 +138,108 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
      */
     protected function processOrder($data)
     {
-        $this->helper->log(["PROCESS ORDER DATA" => $data]);
-
-        $quote  = $this->quoteFactory->create(); /** @var $quote \Magento\Quote\Model\Quote */
-
-        $storeId    = $this->storeManager->getStore()->getId();
-        $quote->setStoreId($storeId);
-
-        if ($this->customerSession->isLoggedIn()) {
-            $customer   = $this->customerSession->getCustomer(); /** @var $customer \Magento\Customer\Api\Data\CustomerInterface */
-            $quote->assignCustomer($customer);
-        } else {
-            $quote->setCustomerEmail($data->billingContact->email);
-        }
-
-        $quote->setBreadTransactionId($data->breadTransactionId);
-        $this->processOrderItems($quote, $data->lineItems);
-
-        if (isset($data->discounts) && count($data->discounts) > 0){
-            $discountDescription = $data->discounts[0]->description;
-            $quote->setCouponCode(substr($discountDescription, 10, strlen($discountDescription) - 11));
-        }
-
-        $billingContact     = $this->processAddress($data->billingContact);
-        $shippingContact    = $this->processAddress($data->shippingContact);
-
-        if ($billingContact['city'] == null) {
-            $billingContact['city']         = $shippingContact['city'];
-            $billingContact['region_id']    = $shippingContact['region_id'];
-        }
-
-        $this->helper->log(["SHIPPING CONTACT"=>$shippingContact, "BILLING CONTACT"=>$billingContact]);
-
-        $billingAddress     = $quote->getBillingAddress()->addData($billingContact);
-        $shippingAddress    = $quote->getShippingAddress()->addData($shippingContact)->setCollectShippingRates(true);
-
-        if (!isset($data->shippingMethodCode)) {
-            $this->helper->log("Shipping Method Code Is Not Set On The Response");
-        }
-
-        $shippingAddress->setShippingMethod($data->shippingMethodCode);
-
-        if (!$quote->isVirtual() && $quote->getShippingAddress()) {
-            $quote->getShippingAddress()->setCollectShippingRates(true);
-        }
-
-        if ($quote->isVirtual()) {
-            $quote->getBillingAddress()->setPaymentMethod('breadcheckout');
-        } else {
-            $quote->getShippingAddress()->setPaymentMethod('breadcheckout');
-        }
-
-        $customer   = $this->customerHelper->createCustomer($quote, $billingContact, $shippingContact);
-
-        $quote->setTotalsCollectedFlag(false)->collectTotals()->save();
-
-        $quote->getPayment()->importData(['method' => 'breadcheckout']);
-        $quote->getPayment()->setTransactionId($data->breadTransactionId);
-        $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
-
         try {
-            $order = $this->quoteManagement->submit();
+            $this->helper->log(["PROCESS ORDER DATA" => $data]);
+
+            $quote = $this->checkoutSession->getQuote();
+            /** @var $quote \Magento\Quote\Model\Quote */
+
+            $storeId = $this->storeManager->getStore()->getId();
+            $quote->setStoreId($storeId);
+
+            if ($this->customerSession->isLoggedIn()) {
+                $customerId = $this->customerSession->getCustomerId();
+                $quote->setCustomerId($customerId);
+            } else {
+                $quote->setCustomerEmail($data['billingContact']['email']);
+            }
+
+            $this->checkoutSession->setBreadTransactionId($data['breadTransactionId']);
+
+            if (isset($data['discounts']) && count($data['discounts']) > 0) {
+                $discountDescription = $data['discounts'][0]['description'];
+                $quote->setCouponCode(substr($discountDescription, 10, strlen($discountDescription) - 11));
+            }
+
+            $billingContact = $this->processAddress($data['billingContact']);
+            $shippingContact = $this->processAddress($data['shippingContact']);
+
+            if (!isset($shippingContact['email'])) {
+                $shippingContact['email'] = $billingContact['email'];
+            }
+
+            if ($billingContact['city'] == null) {
+                $billingContact['city'] = $shippingContact['city'];
+                $billingContact['region_id'] = $shippingContact['region_id'];
+            }
+
+            $this->helper->log(["SHIPPING CONTACT" => $shippingContact, "BILLING CONTACT" => $billingContact]);
+
+            $billingAddress = $quote->getBillingAddress()->addData($billingContact);
+            $shippingAddress = $quote->getShippingAddress()->addData($shippingContact)->setCollectShippingRates(true);
+
+            if (!isset($data['shippingMethodCode'])) {
+                $this->helper->log("Shipping Method Code Is Not Set On The Response");
+            }
+
+            $shippingAddress->setShippingMethod($data['shippingMethodCode']);
+
+            if (!$quote->isVirtual() && $quote->getShippingAddress()) {
+                $quote->getShippingAddress()->setCollectShippingRates(true);
+            }
+
+            if (!$quote->getPayment()->getQuote()) {
+                $quote->getPayment()->setQuote($quote);
+            }
+            $quote->getPayment()->setMethod('breadcheckout');
+
+            $customer = $this->customerHelper->createCustomer($quote, $billingContact, $shippingContact);
+
+            $quote->setTotalsCollectedFlag(false)->collectTotals()->save();
+
+            $quote->getPayment()->importData(['method' => 'breadcheckout']);
+            $quote->getPayment()->setTransactionId($data['breadTransactionId']);
+            $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
+
+            try {
+                $this->quoteRepository->save($quote);
+                $order = $this->quoteManagement->submit($quote);
+                $this->helper->log("ORDER ID: " . $order->getId());
+                $this->helper->log("QUOTE ID: " . $quote->getId());
+            } catch (\Exception $e) {
+                $this->helper->log(["ERROR SUBMITTING QUOTE IN PROCESS ORDER" => $e->getMessage()]);
+                $this->logger->critical($e);
+                throw $e;
+            }
+
+            try {
+                $this->orderSender->send($order);
+            } catch (\Exception $e) {
+                $this->logger->critical($e);
+            }
+
+            $this->customerSession->setCustomerAsLoggedIn($customer);
+
+            $this->checkoutSession->setLastRealOrderId($order->getId())
+                ->setLastSuccessQuoteId($quote->getId())
+                ->setLastQuoteId($quote->getId())
+                ->setLastOrderId($order->getId())
+                ->setLastRealOrderId($order->getIncrementId())
+                ->setLastOrderStatus($order->getStatus())
+                ->setBreadItemAddedToQuote(false);
+
+            // Empty shopping cart
+            $cart = $this->cartHelper->getCart();
+            $cart->truncate()->save();
+            $cartItems = $cart->getItems();
+            foreach ($cartItems as $item) {
+                $quote->removeItem($item->getId())->save();
+            }
+
+            $this->helper->log("LAST SUCCESS QUOTE ID BEFORE REDIRECT: " . $this->checkoutSession->getLastSuccessQuoteId());
+            $this->_redirect('checkout/onepage/success');
         } catch (\Exception $e) {
-            $this->helper->log(["ERROR SUBMITTING QUOTE IN PROCESS ORDER"=>$e->getMessage()]);
             $this->logger->critical($e);
-            throw $e;
-        }
-
-        $this->breadCheckoutSession->setLastRealOrderId($order->getId());
-        $session    = $this->checkoutSession;
-        $session->setLastSuccessQuoteId($quote->getId());
-        $session->setLastQuoteId($quote->getId());
-        $session->setLastOrderId($order->getId());
-
-        try {
-            $order->sendNewOrderEmail();
-        } catch (\Exception $e) {
-            $this->logger->critical($e);
-        }
-
-        $cart   = $this->checkoutCartFactory->create();
-        $cart->truncate()->save();
-        $cart->init();
-
-        $cart       = $this->checkoutCartFactory->create();
-        $cartItems  = $cart->getItems();
-        foreach ($cartItems as $item) {
-            $quote->removeItem($item->getId())->save();
-        }
-
-        $this->customerHelper->loginCustomer($customer);
-
-        return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success');
-    }
-
-    /**
-     * Process Order Items
-     *
-     * @param \Magento\Quote\Model\Quote $quote
-     * @param array                      $data
-     */
-    protected function processOrderItems(\Magento\Quote\Model\Quote $quote, $data)
-    {
-        foreach ($data as $item) {
-            if (!$item->product->sku) continue;
-
-            $pieces         = explode('///', $item->product->sku);
-            $productCount   = 0;
-            $baseProduct    = null;
-            if (count($pieces) > 1)
-            {
-                $baseProduct    = $this->catalogProductFactory->create();
-                $baseProduct->load($baseProduct->getIdBySku($pieces[0]));
-                $productCount++;
-            }
-
-            $product                = $this->catalogProductFactory->create();
-            $customOptionPieces     = explode('***', $pieces[$productCount]);
-            $product->load($product->getIdBySku($customOptionPieces[0]));
-
-            if ($baseProduct == null){
-                $baseProduct    = $product;
-            }
-
-            if ($product->getId()) {
-                $this->addItemToQuote($quote, $product, $baseProduct, $customOptionPieces, isset($item->quantity) ? $item->quantity : 1);
-            }
         }
     }
 
@@ -269,32 +252,32 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     protected function processAddress($contactData)
     {
         $regionId   = null;
-        if( isset($contactData->state) ) {
+        if( isset($contactData['state']) ) {
             $region     = $this->regionFactory->create();      /** @var \Magento\Directory\Model\RegionFactory */
-            $region->loadByCode($contactData->state, $this->helper->getDefaultCountry());
+            $region->loadByCode($contactData['state'], $this->helper->getDefaultCountry());
             if ($region->getId()) {
                 $regionId   = $region->getId();
             }
         }
 
-        $fullName       = isset($contactData->fullName) ? explode(' ', $contactData->fullName) : '';
+        $fullName       = isset($contactData['fullName']) ? explode(' ', $contactData['fullName']) : '';
         $addressData    = [
-            'firstname'     => isset($contactData->firstName) ? $contactData->firstName : $fullName[0],
-            'lastname'      => isset($contactData->lastName) ? $contactData->lastName : (isset($fullName[1]) ? $fullName[1] : ''),
-            'street'        => $contactData->address . (isset($contactData->address2) ? (' ' .  $contactData->address2) : ''),
-            'city'          => $contactData->city,
-            'postcode'      => $contactData->zip,
-            'telephone'     => $contactData->phone,
+            'firstname'     => isset($contactData['firstName']) ? $contactData['firstName'] : $fullName[0],
+            'lastname'      => isset($contactData['lastName']) ? $contactData['lastName'] : (isset($fullName[1]) ? $fullName[1] : ''),
+            'street'        => $contactData['address'] . (isset($contactData['address2']) ? (' ' .  $contactData['address2']) : ''),
+            'city'          => $contactData['city'],
+            'postcode'      => $contactData['zip'],
+            'telephone'     => $contactData['phone'],
             'country_id'    => $this->helper->getDefaultCountry()
         ];
 
         if( null !== $regionId ) {
-            $addressData['region']      = $contactData->state;
+            $addressData['region']      = $contactData['state'];
             $addressData['region_id']   = $regionId;
         }
 
-        if( isset($contactData->email) ) {
-            $addressData['email']   = $contactData->email;
+        if( isset($contactData['email']) ) {
+            $addressData['email']   = $contactData['email'];
         }
 
         return $addressData;

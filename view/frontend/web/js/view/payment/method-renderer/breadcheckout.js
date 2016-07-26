@@ -14,7 +14,8 @@ define(
         'Magento_Checkout/js/model/shipping-service',
         'Magento_Checkout/js/action/select-shipping-method',
         'Magento_Checkout/js/action/create-shipping-address',
-        'Magento_Checkout/js/action/select-shipping-address'
+        'Magento_Checkout/js/action/select-shipping-address',
+        'Magento_Checkout/js/model/full-screen-loader'
     ],
     function (Component,
               $,
@@ -30,7 +31,8 @@ define(
               shippingService,
               selectShippingMethodAction,
               createShippingAddress,
-              selectShippingAddress) {
+              selectShippingAddress,
+              fullScreenLoader) {
         'use strict';
         return Component.extend({
             defaults: {
@@ -79,7 +81,7 @@ define(
              * Update shipping rates in case shipping address
              * changed in Bread checkout form
              *
-             * @param data
+             * @param data object
              */
             setShippingRates: function(data) {
                 var ratesData = {};
@@ -107,48 +109,35 @@ define(
             /**
              * Update billing & shipping address data in quote
              *
-             * @param data
+             * @param data object
+             * @param token string
              */
-            updateAddress: function(data, token) {
+            updateAddresses: function(data, token) {
                 /**
                  * Billing address
                  */
-                if (typeof data.billingAddress.street == 'string') {
-                    data.billingAddress.street = {
-                        0: data.billingAddress.street,
-                        1: ""
-                    };
-                }
-                data.billingAddress.save_in_address_book = ((customer.isLoggedIn() && !billingAddress.customerHasAddresses)) ? 1 : 0;
-                var newBillingAddress = createBillingAddress(data.billingAddress);
+                var billingAddressData = this.getAddressData(data.billingAddress);
+                var newBillingAddress = createBillingAddress(billingAddressData);
 
                 // New address must be selected as a billing address
                 selectBillingAddress(newBillingAddress);
                 checkoutData.setSelectedBillingAddress(newBillingAddress.getKey());
-                checkoutData.setNewCustomerBillingAddress(data.billingAddress);
+                checkoutData.setNewCustomerBillingAddress(billingAddressData);
 
                 /**
                  * Shipping address
                  */
-                if (typeof data.shippingAddress.street == 'string') {
-                    data.shippingAddress.street = {
-                        0: data.shippingAddress.street,
-                        1: ""
-                    };
-                }
-                data.shippingAddress.save_in_address_book = ((customer.isLoggedIn() && !billingAddress.customerHasAddresses)) ? 1 : 0;
-                var newShippingAddress = createShippingAddress(data.shippingAddress);
+                var shippingAddressData = this.getAddressData(data.shippingAddress);
+                var newShippingAddress = createShippingAddress(shippingAddressData);
 
                 // New address must be selected as a shipping address
                 selectShippingAddress(newShippingAddress);
                 checkoutData.setSelectedShippingAddress(newShippingAddress.getKey());
-                checkoutData.setNewCustomerShippingAddress(data.shippingAddress);
+                checkoutData.setNewCustomerShippingAddress(shippingAddressData);
 
                 /**
                  * Shipping method
                  */
-                console.log('selected shipping method: ' + data.shippingMethod);
-
                 var selectedRate;
                 $.each(window.checkoutConfig.shippingRates, function(i, rate) {
                    var shippingCode = rate.carrier_code + '_' + rate.method_code;
@@ -164,7 +153,30 @@ define(
                     defaultProcessor.saveShippingInformation().done(function() {
                         window.checkoutConfig.payment.breadcheckout.transactionId = token;
                     });
+                } else {
+                    fullScreenLoader.stopLoader();
+                    globalMessageList.addErrorMessage({
+                        message: 'Please select a shipping method in the Bread checkout window.'
+                    });
                 }
+            },
+
+            /**
+             * Format street and set whether to save in address book
+             *
+             * @param address object
+             * @return object
+             */
+            getAddressData: function(address) {
+                if (typeof address.street == 'string') {
+                    address.street = {
+                        0: address.street,
+                        1: ""
+                    };
+                }
+                address.save_in_address_book = ((customer.isLoggedIn() && !billingAddress.customerHasAddresses)) ? 1 : 0;
+
+                return address;
             }
 
         });

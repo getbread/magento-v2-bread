@@ -1,9 +1,8 @@
 <?php
 /**
- * Get Shipping Method Prices
+ * Get updated shipping, billing, and shipping option data
  *
  * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;

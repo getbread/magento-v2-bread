@@ -40,6 +40,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Quote\Api\CartRepositoryInterface */
     protected $quoteRepository;
 
+    protected $customerSession;
+    protected $quoteManagement;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
@@ -50,7 +53,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         \Psr\Log\LoggerInterface $logger,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Quote\Model\QuoteManagement $quoteManagement
     )
     {
         $this->catalogResourceModelProductFactory = $catalogResourceModelProductFactory;
@@ -62,6 +67,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $this->helper = $helper;
         $this->totalsCollector = $totalsCollector;
         $this->quoteRepository = $quoteRepository;
+        $this->customerSession = $customerSession;
+        $this->quoteManagement = $quoteManagement;
         $this->resultFactory = $context->getResultFactory();
         parent::__construct($context);
     }
@@ -74,7 +81,6 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      * @param \Magento\Catalog\Model\Product   $baseProduct
      * @param array                            $customOptionPieces
      * @param int                              $quantity
-     * @return void
      */
     protected function addItemToQuote(\Magento\Quote\Model\Quote $quote,
                                       \Magento\Catalog\Model\Product $product,
@@ -142,6 +148,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         }
 
         $quote->addProduct($baseProduct, $this->dataObjectFactory->create($buyInfo));
+
+        return $quote;
     }
 
     /**
@@ -170,6 +178,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             $quote->collectTotals();
             $this->quoteRepository->save($quote);
 
+            $items = $quote->getAllVisibleItems();
+            foreach ($items as $i => $item) {
+                $this->helper->log("ITEM " . $i . ": " . $item->getName());
+            }
+
             return $address;
         } catch (\Exception $e) {
             $this->logger->critical($e);
@@ -195,13 +208,28 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 break;
 
             case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW :
-                $quote                  = $this->quoteFactory->create();
-                $selectedProductId      = $data['selected_simple_product_id'];
-                $mainProductId          = $data['main_product_id'];
-                $customOptionPieces     = explode('***', $data['selected_sku']);
-                $mainProduct            = $this->catalogProductFactory->create()->load($mainProductId);
-                $simpleProduct          = $this->catalogProductFactory->create()->load($selectedProductId);
-                $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1); // Qty always 1 when checking out from product view
+                if ( !$this->checkoutSession->getQuoteId() ) {
+                    if ($this->customerSession->isLoggedIn()) {
+                        $quoteId = $this->quoteManagement->createEmptyCartForCustomer($this->customerSession->getCustomerId());
+                    } else {
+                        $quoteId = $this->quoteManagement->createEmptyCart();
+                    }
+                    $this->helper->log('Setting new quote ID: ' . $quoteId);
+                    $this->checkoutSession->setQuoteId($quoteId);
+                }
+
+                $quote = $this->checkoutSession->getQuote();
+
+                if (!$this->checkoutSession->getBreadItemAddedToQuote() || !$quote->getAllVisibleItems()) {
+                    $quote->removeAllItems(); // Reset items in quote
+                    $selectedProductId = $data['selected_simple_product_id'];
+                    $mainProductId = $data['main_product_id'];
+                    $customOptionPieces = explode('***', $data['selected_sku']);
+                    $mainProduct = $this->catalogProductFactory->create()->load($mainProductId);
+                    $simpleProduct = $this->catalogProductFactory->create()->load($selectedProductId);
+                    $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1); // Qty always 1 when checking out from product view
+                    $this->checkoutSession->setBreadItemAddedToQuote(true);
+                }
                 break;
         }
 

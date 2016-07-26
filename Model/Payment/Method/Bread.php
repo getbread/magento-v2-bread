@@ -395,7 +395,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             return true;
         }
 
-        $this->logger->debug($quote->getBreadTransactionId());
+        $this->helper->log($quote->getBreadTransactionId());
 
         if( !parent::isAvailable($quote) ){
             return false;
