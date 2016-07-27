@@ -299,7 +299,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             case self::ACTION_AUTHORIZE:
                     $result     = $this->apiClient->authorize($payment->getTransactionId(), (int)round($amount * 100), $payment->getOrder()->getIncrementId() );
                     $payment->setTransactionId($result['breadTransactionId']);
-                    $this->addTransaction($payment
+                    $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH
                         , $result['breadTransactionId']
                         , ['is_closed' => false, 'authorize_result' => $this->jsonHelper->jsonEncode($result)]
@@ -309,7 +309,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             case self::ACTION_CAPTURE:
                     $result     = $this->apiClient->settle($payment->getTransactionId());
                     $payment->setTransactionId($result['breadTransactionId']);
-                    $this->addTransaction($payment
+                    $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE
                         , $result['breadTransactionId']
                         , ['is_closed' => false, 'settle_result' => $this->jsonHelper->jsonEncode($result)]
@@ -319,7 +319,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             case self::ACTION_REFUND:
                     $result     = $this->apiClient->refund($payment->getTransactionId(), (int)round($amount * 100));
                     $payment->setTransactionId($result['breadTransactionId']);
-                    $this->addTransaction($payment
+                    $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND
                         , $result['breadTransactionId']
                         , ['is_closed' => false, 'refund_result' => $this->jsonHelper->jsonEncode($result)]
@@ -329,7 +329,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             case self::ACTION_VOID:
                 $result     = $this->apiClient->cancel(str_replace('-void','',$payment->getTransactionId()));
                     $payment->setTransactionId($result['breadTransactionId']);
-                    $this->addTransaction($payment
+                    $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID
                         , $result['breadTransactionId']
                         , ['is_closed' => true, 'cancel_result' => $this->jsonHelper->jsonEncode($result)]
@@ -347,7 +347,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
 
     /**
-     * Add payment transaction
+     * Add payment transaction info to payment object
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @param string $transactionId
@@ -355,8 +355,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @param array $breadTransactionId
      * @param array $transactionAdditionalInfo
      * @return null|\Magento\Sales\Model\Order\Payment\Transaction
+     * @throws \Exception
      */
-    protected function addTransaction(\Magento\Payment\Model\InfoInterface $payment, $transactionType,
+    protected function addTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionType,
                                        $breadTransactionId, $transactionAdditionalInfo = [],
                                        $transactionDetails = [], $message = null
     ) {
