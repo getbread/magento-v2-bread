@@ -1,6 +1,6 @@
 <?php
 /**
- * Add Token To Session Once Approved
+ * Add Token To Session Once Approved & Update Quote
  *
  * @author  Bread   copyright 2016
  * @author  Joel    @Mediotype
