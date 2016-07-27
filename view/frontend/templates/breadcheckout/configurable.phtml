@@ -5,23 +5,66 @@
 
     require(['jquery'], function($) {
         $(document).ready(function () {
-            $("#bread-checkout-btn").on('click', function() {
-                console.log('checkout btn clicked');
-               spConfig.getIdOfSelectedProduct();
+
+            $('#product_addtocart_form').on('click', function() {
+                spConfig.updateButton();
             });
 
-//            spConfig.updateButton = function () {
-//                var simpleProductId = spConfig.getIdOfSelectedProduct();
-//                document.selectedSku = document.baseProductSku + "///" + document.Skus[simpleProductId];
-//                document.selectedSimpleProductId = simpleProductId;
-//                document.resetPriceAndSku();
-//            };
-
-            spConfig.getIdOfSelectedProduct = function() {
-                $.each(this.attributes, function(id) {
-                    var $element = $("#product_addtocart_form [attribute-id='" + id + "']");
-                    console.log($element);
+            spConfig.updateButton = function() {
+                /**
+                 * Get values from hidden inputs
+                 */
+                var selectedOptions = {};
+                $('[name^="super_attribute"]').each(function() {
+                    var attributeId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+                    selectedOptions[attributeId] = $(this).val();
                 });
+
+                /**
+                 * Get product ID of configured product;
+                 * Reconfigure Bread button if all options in form selected
+                 */
+                var newProductId = spConfig.getIdOfSelectedProduct(selectedOptions);
+                if (newProductId !== null) {
+                    document.selectedSimpleProductId = newProductId;
+                    document.selectedSku = document.baseProductSku + "///" + document.Skus[document.selectedSimpleProductId];
+                    document.resetPriceAndSku(true);
+                }
+            };
+
+            spConfig.productIds = [];
+            spConfig.getIdOfSelectedProduct = function(selectedOptions) {
+                if ($.isEmptyObject(selectedOptions)) {
+                    return null;
+                }
+
+                $.each(this.attributes, function(attrId, attrVal) {
+                    var optionId = selectedOptions[attrId];
+
+                    $.each(attrVal.options, function(i, optionData) {
+                       if (optionData.id === optionId) {
+                           if (spConfig.productIds.length === 0) {
+                               spConfig.productIds = optionData.products;
+                           } else {
+                               var updatedProductIds = [];
+                               $.each(optionData.products, function(j, productId) {
+                                   if ($.inArray(productId, spConfig.productIds) !== -1) {
+                                       updatedProductIds.push(productId);
+                                   }
+                               });
+                               spConfig.productIds = updatedProductIds;
+                           }
+                           return false; // breaks $.each loop
+                       }
+                    });
+                });
+
+                if (this.productIds.length === 1) {
+                    return this.productIds[0];
+                } else {
+                    return null;
+                }
+
             };
 
             <?php

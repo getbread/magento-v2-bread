@@ -32,6 +32,7 @@
         };
 
         document.configureButton = function (items) {
+            console.log(items);
             var address             = <?php echo $this->getShippingAddressData(); ?>;
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
@@ -168,25 +169,14 @@
             }
         };
 
-        document.resetPriceAndSku = function () {
-            if ((typeof optionsPrice == 'undefined') ||
-                (typeof optionsPrice.productPrice == 'undefined')) {
+        document.resetPriceAndSku = function (configurable) {
+            if (!configurable) {
                 document.configureButton(document.defaultItems);
             }
             else {
-                price = optionsPrice.productPrice;
-
-                if (typeof(optionsPrice.optionPrices.config) != 'undefined') {
-                    price += optionsPrice.optionPrices.config.price;
-                }
-
-                for (key in optionsPrice.customPrices) {
-                    if (optionsPrice.customPrices.hasOwnProperty(key)) {
-                        price += optionsPrice.customPrices[key].price;
-                    }
-                }
-
+                price = spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount;
                 sku = document.selectedSku + document.customOptions;
+
                 if (sku != document.previousSku || price != document.previousPrice) {
                     document.previousSku                    = sku;
                     document.previousPrice                  = price;
@@ -212,7 +202,7 @@
             o.addEventListener('click', function (e) {
                 document.getActualAddToCartForm().validate();
             }, true);
-            document.resetPriceAndSku();
+            document.resetPriceAndSku(false);
         <?php else: ?>
             document.configureButton(document.defaultItems);
         <?php endif; ?>
