@@ -6,96 +6,120 @@
  * @author  Miranda @Mediotype
  */
 
-/** @var $this Bread\BreadCheckout\Block\Product\View\Options */
+/** @var $this Bread\BreadCheckout\Block\Product\View */
 ?>
 <script type="text/javascript">
     <?php $_options = $this->decorateArray($this->getProduct()->getOptions()); ?>
     <?php if (count($_options)): ?>
 
-    document.observe("dom:loaded", function () {
-        var calculatePrice = function () {
-            price = optionsPrice.productPrice;
-            for (key in optionsPrice.customPrices) {
-                if (optionsPrice.customPrices.hasOwnProperty(key)) {
-                    price += optionsPrice.customPrices[key].price;
-                }
-            }
-            return price;
-        };
-
-        Product.Options.prototype.oldReloadPrice = Product.Options.prototype.reloadPrice;
-        document.customOptions = document.getSkuForOptions();
-        Product.Options.prototype.reloadPrice = function () {
-            this.oldReloadPrice();
-            document.customOptions = document.getSkuForOptions();
-            document.resetPriceAndSku();
-        }
-    });
-
-    <?php $options_to_sku = array(); ?>
-    <?php foreach($_options as $_option): ?>
-    <?php echo $this->getOptionHtml($_option) ?>
-    <?php
-        $options_to_sku["{$_option->getId()}"] = array();
-        $optionValues = $_option->getValues();
-        if (count($optionValues) > 0) {
-            foreach ($_option->getValues() as $k => $v) {
-                $options_to_sku["{$_option->getId()}"]["{$v->getData('option_type_id')}"] = $v->getData('sku');
-            }
-        } else {
-            $options_to_sku["{$_option->getId()}"] = $_option->getData('sku');
-        }
-    ?>
-    <?php endforeach; ?>
-    document.options_to_sku = <?php echo $this->jsonHelper->jsonEncode($options_to_sku); ?>;
-
-    document.getSkuForOptions = function() {
-        var sku_suffix = '';
-        var skipIds = [];
-        $$('.product-custom-option').each(function(opt) {
-            var optionId = 0;
-            opt.name.sub(/[0-9]+/, function (match) {
-                optionId = parseInt(match[0], 10);
+    require(['jquery', 'jquery/validate'], function($) {
+        $('#product_addtocart_form').on('change', function() {
+            $(this).validate({
+                errorPlacement: function() {} // Hides default error labels
             });
-            if (opConfig.config[optionId]) {
-                var configOptions = opConfig.config[optionId];
-                var curConfig = {price: 0};
-                if (opt.type == 'checkbox' || opt.type == 'radio') {
-                    if (opt.checked) {
-                        if (typeof configOptions[opt.getValue()] != 'undefined') {
-                            sku_suffix += '***' + document.options_to_sku[optionId][opt.getValue()];
-                        }
-                    }
-                } else if(opt.hasClassName('datetime-picker') && !skipIds.include(optionId)) {
-                    dateSelected = true;
-                    $$('.product-custom-option[id^="options_' + optionId + '"]').each(function (dt) {
-                        if (dt.getValue() == '') {
-                            dateSelected = false;
-                        }
-                    });
-                    if (dateSelected) {
-                        sku_suffix += '***' + document.options_to_sku[optionId];
-                        skipIds[optionId] = optionId;
-                    }
-                } else if (opt.type == 'select-one' || opt.type == 'select-multiple') {
-                    if ('options' in opt) {
-                        $A(opt.options).each(function (selectOption) {
-                            if ('selected' in selectOption && selectOption.selected) {
-                                if (typeof(configOptions[selectOption.value]) != 'undefined') {
-                                    sku_suffix += '***' + document.options_to_sku[optionId][selectOption.value];
-                                }
-                            }
-                        });
-                    }
-                } else {
-                    if (opt.getValue().strip() != '') {
-                        sku_suffix += '***' + document.options_to_sku[optionId] + '===' + opt.getValue().strip();
-                    }
+
+            if ($(this).valid()) {
+                document.customOptions = document.getSkuForOptions();
+                $('.button-prevent').hide();
+                if (document.customOptions !== '') {
+                    document.resetPriceAndSku(true);
                 }
+            } else {
+                $('.button-prevent').show();
             }
         });
 
-        return sku_suffix;
-    };
+        <?php $optionsData = []; ?>
+        <?php foreach($_options as $_option): ?>
+            <?php echo $this->getOptionHtml($_option); ?>
+            <?php foreach ($_option->getValues() as $k => $v) {
+                    $optionsData[$_option->getId()][$k] = [
+                        'id' => $v->getOptionTypeId(),
+                        'sku' => $v->getSku(),
+                        'price' => (int) ($v->getPrice() * 100)
+                    ];
+                }
+            ?>
+        <?php endforeach; ?>
+        document.optionsData = <?php echo $this->jsonEncode($optionsData); ?>;
+
+        /**
+         * Returns SKU with custom options appended;
+         * has side effect of updating the product price
+         */
+        document.getSkuForOptions = function() {
+            var skuSuffix = '';
+            var skipIds = [];
+            var price = parseInt(document.basePrice);
+            
+            $('.product-custom-option').each(function() {
+                var optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+
+                if (document.optionsData[optionId]) {
+                    var configOptions = document.optionsData[optionId];
+                    var val = '';
+
+                    var elType = $(this).attr('type');
+                    if (typeof elType == 'undefined') {
+                        elType = $(this).prop('tagName');
+                    }
+
+                    switch (elType) {
+                        case 'checkbox':
+                        case 'radio':
+                            if ($(this).is(':checked')) {
+                                val = $(this).val();
+
+                                if (val) {
+                                    skuSuffix += '***' + configOptions[val].sku;
+                                    price += parseInt(configOptions[val].price);
+                                }
+                            }
+                            break;
+                        case 'SELECT':
+                        case 'select-one':
+                        case 'select-multiple':
+                            $(this).children().each(function() {
+                                if ($(this).is(':selected') && $(this).val()) {
+                                    val = $(this).val();
+
+                                    if (val) {
+                                        skuSuffix += '***' + configOptions[val].sku;
+                                        price += parseInt(configOptions[val].price);
+                                    }
+                                }
+                            });
+                            break;
+                        default:
+                            val = $(this).val();
+
+                            if ($(this).hasClass('datetime-picker') && !skipIds.hasOwnProperty(optionId)) {
+                                dateSelected = true;
+                                $('.product-custom-option[id^="options_' + optionId + '"]').each(function() {
+                                    if (val) {
+                                        dateSelected = false;
+                                    }
+                                });
+                                if (dateSelected) {
+                                    skuSuffix += '***' + optionId;
+                                    skipIds[optionId] = optionId;
+                                }
+                            } else if (val) {
+                                skuSuffix += '***' + optionId + '===' + val;
+                                price += parseInt(configOptions[val].price);
+                            }
+                    }
+                }
+            });
+
+            document.priceWithOptions = price;
+            return skuSuffix;
+        };
+
+        $(document).ready(function() {
+            document.basePrice = document.previousPrice;
+            document.customOptions = document.getSkuForOptions();
+        });
+    });
     <?php endif; ?>
 </script>

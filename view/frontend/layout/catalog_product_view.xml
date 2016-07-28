@@ -11,7 +11,7 @@
             <block template="Bread_BreadCheckout::breadcheckout/view.phtml" class="Bread\BreadCheckout\Block\Product\View" as="breadcheckout.prod.view" name="breadcheckout.prod.view"/>
         </referenceContainer>
         <referenceBlock name="product.info.options.wrapper">
-            <block template="Bread_BreadCheckout::breadcheckout/options.phtml" class="Bread\BreadCheckout\Block\Product\View\Options" name="breadcheckout.checkout.options"/>
+            <block template="Bread_BreadCheckout::breadcheckout/options.phtml" class="Bread\BreadCheckout\Block\Product\View" name="breadcheckout.checkout.options"/>
         </referenceBlock>
     </body>
 </page>

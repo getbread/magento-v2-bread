@@ -14,6 +14,7 @@
 <script type="text/javascript">
     require(['jquery'], function($){
         document.configureButton = function (items) {
+            console.log(items);
             var address             = <?php echo $this->getShippingAddressData(); ?>;
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
@@ -146,34 +147,39 @@
                 document.configureButton(document.defaultItems);
             }
             else {
-                price = spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount;
+                if (typeof spConfig != 'undefined') {
+                    price = spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100;
+                } else {
+                    price = document.priceWithOptions;
+                }
+
                 sku = document.selectedSku + document.customOptions;
 
                 if (sku != document.previousSku || price != document.previousPrice) {
                     document.previousSku                    = sku;
                     document.previousPrice                  = price;
                     document.defaultItems[0]["sku"]         = document.previousSku;
-                    document.defaultItems[0]["price"]       = document.previousPrice * 100;
+                    document.defaultItems[0]["price"]       = document.previousPrice;
                     document.configureButton(document.defaultItems);
                 }
             }
         };
 <?php endif; ?>
-        $(document).ready(function () {
-            document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
-            document.previousPrice      = document.defaultItems[0]["price"];
-            document.previousSku        = document.defaultItems[0]["sku"];
+        document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
+        document.previousPrice      = document.defaultItems[0]["price"];
+        document.previousSku        = document.defaultItems[0]["sku"];
 
-        <?php if ($this->getProduct() != null): ?>
-            document.customOptions = "";
-            document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
-            document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
-            document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
-            document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
-            document.resetPriceAndSku(false);
-        <?php else: ?>
-            document.configureButton(document.defaultItems);
-        <?php endif; ?>
+        $(document).ready(function () {
+            <?php if ($this->getProduct() != null): ?>
+                document.customOptions = "";
+                document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
+                document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
+                document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
+                document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
+                document.resetPriceAndSku(false);
+            <?php else: ?>
+                document.configureButton(document.defaultItems);
+            <?php endif; ?>
         });
     });
 </script>

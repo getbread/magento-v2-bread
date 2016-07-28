@@ -23,10 +23,11 @@
 .button-prevent{
     cursor: pointer;
     position: absolute;
+    display: none;
     left: 0px;
     top: 0px;
-    width: 0px;
-    height: 0px;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0);
     z-index: 99999
 }

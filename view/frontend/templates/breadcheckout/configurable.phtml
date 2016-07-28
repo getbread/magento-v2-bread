@@ -3,23 +3,20 @@
     document.Skus = {};
     spConfig = <?php echo $this->getJsonConfig(); ?>;
 
-    require(['jquery'], function($) {
+    require(['jquery', 'jquery/validate'], function($) {
         $(document).ready(function () {
 
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
              */
-            $('.button-prevent').css({
-                width: '100%',
-                height: '100%'
+            $('.button-prevent').show();
+
+            $('#product_addtocart_form').on('change', function() {
+                spConfig.updateButton(this);
             });
 
-            $('#product_addtocart_form').on('click', function() {
-                spConfig.updateButton();
-            });
-
-            spConfig.updateButton = function() {
+            spConfig.updateButton = function(form) {
                 /**
                  * Get values from hidden inputs
                  */
@@ -33,12 +30,21 @@
                  * Get product ID of configured product;
                  * Reconfigure Bread button if all options in form selected
                  */
-                var newProductId = spConfig.getIdOfSelectedProduct(selectedOptions);
-                if (newProductId !== null) { // Form is valid
+                $(form).validate({
+                    errorPlacement: function() {} // Hides default error labels
+                });
+
+                if ($(form).valid()) {
                     $('.button-prevent').hide();
-                    document.selectedSimpleProductId = newProductId;
-                    document.selectedSku = document.baseProductSku + "///" + document.Skus[document.selectedSimpleProductId];
-                    document.resetPriceAndSku(true);
+                    var newProductId = spConfig.getIdOfSelectedProduct(selectedOptions);
+                    if (newProductId !== null) {
+                        document.selectedSimpleProductId = newProductId;
+                        document.selectedSku = document.baseProductSku + "///" + document.Skus[document.selectedSimpleProductId];
+                        document.resetPriceAndSku(true);
+                    }
+                } else {
+                    $('.mage-error', form).hide(); // Hides Magento error labels
+                    $('.button-prevent').show();
                 }
             };
 
