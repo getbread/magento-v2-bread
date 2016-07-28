@@ -33,21 +33,12 @@
         });
 
         /**
-         * Generate the options data variable
+         * Retrieve custom options data
          */
-        <?php $optionsData = []; ?>
         <?php foreach($_options as $_option): ?>
             <?php echo $this->getOptionHtml($_option); ?>
-            <?php foreach ($_option->getValues() as $k => $v) {
-                    $optionsData[$_option->getId()][$k] = [
-                        'id' => $v->getOptionTypeId(),
-                        'sku' => $v->getSku(),
-                        'price' => (int) ($v->getPrice() * 100)
-                    ];
-                }
-            ?>
         <?php endforeach; ?>
-        document.optionsData = <?php echo $this->jsonEncode($optionsData); ?>;
+        document.optionsData = <?php echo $this->getCustomOptionsData($_options); ?>
 
         /**
          * Returns SKU with custom options appended;

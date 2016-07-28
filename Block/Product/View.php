@@ -264,6 +264,35 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         return $itemIds;
     }
 
+    /**
+     * Get SKU and price data for custom options on product
+     *
+     * @param $options
+     * @return string
+     */
+    public function getCustomOptionsData($options)
+    {
+        $optionsData = [];
+
+        foreach($options as $option) {
+            if ($option->getValues()) {
+                foreach ($option->getValues() as $k => $v) {
+                    $optionsData[$option->getId()][$k] = [
+                        'sku' => $v->getSku(),
+                        'price' => (int)($v->getPrice() * 100)
+                    ];
+                }
+            } else {
+                $optionsData[$option->getId()] = [
+                    'sku' => $option->getSku(),
+                    'price' => (int)($option->getPrice() * 100)
+                ];
+            }
+        }
+
+        return $this->jsonEncode($optionsData);
+    }
+
     public function jsonEncode($data) {
         return $this->jsonHelper->jsonEncode($data);
     }
