@@ -12,27 +12,8 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery',
-             'jquery/validate'], function($){
-        String.prototype.toCamelCase = function() {
-            return this.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
-                return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
-            }).replace(/\s+/g, '');
-        }
-
-        var noHintValidation = function (name, elm, useTitle) {
-            var v       = $(name);
-            var prop    = '__advice' + name.toCamelCase();
-            v.validate();
-            if ($(elm).is(':visible') && !v.valid()) {
-                return false;
-            } else {
-                return true;
-            }
-        };
-
+    require(['jquery'], function($){
         document.configureButton = function (items) {
-            console.log(items);
             var address             = <?php echo $this->getShippingAddressData(); ?>;
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
@@ -160,15 +141,6 @@
 
     <?php if( $this->getProduct() != null ): ?>
 
-        document.getActualAddToCartForm = function() {
-            if (('undefined' != typeof productAddToCartFormOld) && productAddToCartFormOld) {
-                return productAddToCartFormOld;
-            }
-            else {
-                return $('#product_addtocart_form');
-            }
-        };
-
         document.resetPriceAndSku = function (configurable) {
             if (!configurable) {
                 document.configureButton(document.defaultItems);
@@ -198,10 +170,6 @@
             document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
             document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
             document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
-            var o = document.getElementById("button-prevent");
-            o.addEventListener('click', function (e) {
-                document.getActualAddToCartForm().validate();
-            }, true);
             document.resetPriceAndSku(false);
         <?php else: ?>
             document.configureButton(document.defaultItems);
