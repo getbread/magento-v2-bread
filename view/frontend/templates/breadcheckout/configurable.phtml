@@ -27,8 +27,7 @@
                 });
 
                 /**
-                 * Get product ID of configured product;
-                 * Reconfigure Bread button if all options in form selected
+                 * Validate add to cart form
                  */
                 $(form).validate({
                     errorPlacement: function() {} // Hides default error labels
@@ -38,6 +37,7 @@
                     $('.button-prevent').hide();
                     var newProductId = spConfig.getIdOfSelectedProduct(selectedOptions);
                     if (newProductId !== null) {
+                        /** Reconfigure Bread button if we narrowed it down to 1 product */
                         document.selectedSimpleProductId = newProductId;
                         document.selectedSku = document.baseProductSku + "///" + document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
@@ -49,6 +49,13 @@
             };
 
             spConfig.productIds = [];
+
+            /**
+             * Get product ID for selected attributes
+             *
+             * @param object selectedOptions
+             * @returns mixed
+             */
             spConfig.getIdOfSelectedProduct = function(selectedOptions) {
                 if ($.isEmptyObject(selectedOptions)) {
                     return null;

@@ -22,6 +22,13 @@ class ConfigData extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
     }
 
+    /**
+     * Sends shipping & billing data to setShippingInformation()
+     * which is called when "Next" is clicked from the shipping
+     * information view in checkout
+     * 
+     * @return \Magento\Framework\Controller\Result\Json
+     */
     public function execute()
     {
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([

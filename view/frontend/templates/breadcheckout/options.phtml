@@ -13,6 +13,9 @@
     <?php if (count($_options)): ?>
 
     require(['jquery', 'jquery/validate'], function($) {
+        /**
+         * Validate the add to cart form when inputs are updated
+         */
         $('#product_addtocart_form').on('change', function() {
             $(this).validate({
                 errorPlacement: function() {} // Hides default error labels
@@ -29,6 +32,9 @@
             }
         });
 
+        /**
+         * Generate the options data variable
+         */
         <?php $optionsData = []; ?>
         <?php foreach($_options as $_option): ?>
             <?php echo $this->getOptionHtml($_option); ?>

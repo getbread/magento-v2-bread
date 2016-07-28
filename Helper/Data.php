@@ -87,8 +87,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $helperContext
         );
     }
-
-
+    
     /**
      * Is module active?
      *
@@ -207,6 +206,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_TAX_ESTIMATE, ['_secure'=>$isSecure]);
     }
 
+    /**
+     * Get URL for controller which populates
+     * address data following shipping step in checkout
+     *
+     * @return string
+     */
     public function getConfigDataUrl()
     {
         $isSecure = $this->request->isSecure();

@@ -53,6 +53,9 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     }
 
     /**
+     * Add bread transaction ID to session and update
+     * address data in quote
+     *
      * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
@@ -78,7 +81,10 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     }
 
     /**
-     * Update quote to reflect options selected in Bread checkout
+     * Update quote to reflect options selected in Bread checkout popup
+     *
+     * @param string $token
+     * @return array
      */
     protected function updateQuote($token)
     {

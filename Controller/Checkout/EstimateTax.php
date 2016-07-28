@@ -51,6 +51,11 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $quoteManagement);
     }
 
+    /**
+     * Get tax amount for quote
+     *
+     * @return \Magento\Framework\Controller\Result\Json
+     */
     public function execute()
     {
         $this->helper->log( ["TAX ESTIMATE ACTION GET PARAMS" => $this->getRequest()->getParams()] );

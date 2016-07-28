@@ -1,6 +1,9 @@
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * Populates checkout config data when shipping step
+ * in checkout is completed
+ *
+ * @author  Bread   copyright   2016
+ * @author  Miranda @Mediotype
  */
 /*global define*/
 define(

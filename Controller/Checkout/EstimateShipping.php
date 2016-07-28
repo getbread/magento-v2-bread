@@ -55,6 +55,12 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             $quoteManagement);
     }
 
+    /**
+     * Get available shipping options and prices for address
+     * supplied through Bread checkout popup
+     *
+     * @return \Magento\Framework\Controller\Result\Json
+     */
     public function execute()
     {
         try {

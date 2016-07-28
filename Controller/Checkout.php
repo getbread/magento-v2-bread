@@ -40,7 +40,10 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Quote\Api\CartRepositoryInterface */
     protected $quoteRepository;
 
+    /** @var \Magento\Customer\Model\Session */
     protected $customerSession;
+
+    /** @var \Magento\Quote\Model\QuoteManagement */
     protected $quoteManagement;
 
     public function __construct(
@@ -81,6 +84,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      * @param \Magento\Catalog\Model\Product   $baseProduct
      * @param array                            $customOptionPieces
      * @param int                              $quantity
+     * @return void
      */
     protected function addItemToQuote(\Magento\Quote\Model\Quote $quote,
                                       \Magento\Catalog\Model\Product $product,
@@ -151,8 +155,6 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $buyRequest->addData($buyInfo);
 
         $quote->addProduct($baseProduct, $buyRequest);
-
-       return $quote;
     }
 
     /**
@@ -213,6 +215,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                         $quoteId = $this->quoteManagement->createEmptyCart();
                     }
                     $this->checkoutSession->setQuoteId($quoteId);
+                } else {
+                    $quote->removeAllItems(); // Reset items in quote
                 }
 
                 $quote = $this->checkoutSession->getQuote();
@@ -225,16 +229,21 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
         return $quote;
     }
-    
-    protected function processOrderItem($quote, $data)
+
+    /**
+     * Add product to quote when checking out from product view page
+     *
+     * @param \Magento\Quote\Model\Quote $quote
+     * @param array $data
+     */
+    protected function processOrderItem($quote, array $data)
     {
-        $quote->removeAllItems(); // Reset items in quote
         $selectedProductId = $data['selected_simple_product_id'];
         $mainProductId = $data['main_product_id'];
         $customOptionPieces = explode('***', $data['selected_sku']);
         $mainProduct = $this->catalogProductFactory->create()->load($mainProductId);
         $simpleProduct = $this->catalogProductFactory->create()->load($selectedProductId);
         $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1); // Qty always 1 when checking out from product view
-        $this->checkoutSession->setBreadItemAddedToQuote(true);
+        $this->checkoutSession->setBreadItemAddedToQuote(true); // Flag to prevent same item from getting added to quote many times
     }
 }

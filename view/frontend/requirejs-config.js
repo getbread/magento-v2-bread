@@ -1,8 +1,9 @@
 /**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * Custom RequireJS definitions
+ *
+ * @author  Bread   copyright   2016
+ * @author  Miranda @Mediotype
  */
-
 var config = {
     map: {
       '*': {

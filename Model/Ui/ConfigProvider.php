@@ -1,9 +1,10 @@
 <?php
 /**
- * Class ConfigProvider
  * Config provider for the payment method
+ *
+ * @author  Bread   copyright   2016
+ * @author  Miranda @Mediotype
  */
-
 namespace Bread\BreadCheckout\Model\Ui;
 use Magento\Checkout\Model\ConfigProviderInterface;
 
@@ -21,7 +22,8 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-    * Retrieve assoc array of checkout configuration
+    * Retrieve assoc array of checkout configuration;
+    * populates window.checkoutConfig.payment variable
     *
     * @return array
     */

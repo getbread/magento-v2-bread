@@ -102,6 +102,11 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $quoteManagement);
     }
 
+    /**
+     * Validate and process the order
+     * 
+     * @return void|\Magento\Framework\Controller\Result\Redirect
+     */
     public function execute()
     {
         try {

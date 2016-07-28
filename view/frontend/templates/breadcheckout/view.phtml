@@ -14,7 +14,6 @@
 <script type="text/javascript">
     require(['jquery'], function($){
         document.configureButton = function (items) {
-            console.log(items);
             var address             = <?php echo $this->getShippingAddressData(); ?>;
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
@@ -132,7 +131,6 @@
                 breadConfig.billingContact = billingAddress;
             }
 
-
             if (buttonOnProduct === true) {
                 breadConfig.actAsLabel = false;
             }
@@ -142,17 +140,16 @@
 
     <?php if( $this->getProduct() != null ): ?>
 
-        document.resetPriceAndSku = function (configurable) {
+        /**
+         * Reconfigure Bread checkout button with updated
+         * price and sku values
+         */
+        document.resetPriceAndSku = function(configurable) {
             if (!configurable) {
                 document.configureButton(document.defaultItems);
             }
             else {
-                if (typeof spConfig != 'undefined') {
-                    price = spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100;
-                } else {
-                    price = document.priceWithOptions;
-                }
-
+                var price = document.calculatePrice();
                 sku = document.selectedSku + document.customOptions;
 
                 if (sku != document.previousSku || price != document.previousPrice) {
@@ -163,6 +160,37 @@
                     document.configureButton(document.defaultItems);
                 }
             }
+        };
+
+        /**
+         * Calculate updated price based on attribute selections
+         * and/or custom options
+         *
+         * @returns int
+         */
+        document.calculatePrice = function() {
+            var price;
+
+            if (typeof document.priceWithOptions != 'undefined') {
+                var customPrice = document.priceWithOptions;
+            }
+
+            if (typeof spConfig != 'undefined') {
+                price = parseInt(spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100);
+
+                if ((typeof customPrice != 'undefined') &&
+                    (customPrice !== price)) {
+                    if (customPrice > price) {
+                        price = (customPrice - price) + price;
+                    } else {
+                        price = (price - customPrice) + customPrice;
+                    }
+                }
+            } else {
+                price = customPrice;
+            }
+
+            return price;
         };
 <?php endif; ?>
         document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;

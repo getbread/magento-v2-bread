@@ -6,31 +6,10 @@
             <span><?php echo __('Bread Checkout'); ?></span>
         </span>
     </div>
-    <div class="button-prevent" id="button-prevent">
-        <span class="buy_error_tip override_tip">&nbsp;</span>
-    </div>
 </div>
 
 <script type="text/javascript">
-    require(['jquery',
-        'jquery/validate'], function($){
-        String.prototype.toCamelCase = function() {
-            return this.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
-                return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
-            }).replace(/\s+/g, '');
-        }
-
-        var noHintValidation = function (name, elm, useTitle) {
-            var v       = $(name);
-            var prop    = '__advice' + name.toCamelCase();
-            v.validate();
-            if ($(elm).is(':visible') && !v.valid()) {
-                return false;
-            } else {
-                return true;
-            }
-        };
-
+    require(['jquery'], function($){
         document.configureButton = function (items) {
             var address             = <?php echo $this->getShippingAddressData(); ?>;
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
@@ -197,10 +176,6 @@
             document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
             document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
             document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
-            var o = document.getElementById("button-prevent");
-            o.addEventListener('click', function (e) {
-                $('.form-cart').validate();
-            }, true);
             document.resetPriceAndSku();
             <?php else: ?>
             document.configureButton(document.defaultItems);

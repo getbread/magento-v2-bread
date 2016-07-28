@@ -110,7 +110,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Validate Payment Method before allowing next step in checkout
      *
-     * @return $this|Mage_Payment_Model_Abstract
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function validate()
     {
@@ -182,9 +183,6 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $payment->setTransactionId($this->checkoutSession->getBreadTransactionId());
 
         $this->_place($payment, $amount, self::ACTION_AUTHORIZE);
-
-        $this->helper->log('End of authorize method');
-
         return $this;
     }
 
@@ -395,8 +393,6 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if( is_null($quote) || !$quote->getBreadTransactionId() ){
             return true;
         }
-
-        $this->helper->log($quote->getBreadTransactionId());
 
         if( !parent::isAvailable($quote) ){
             return false;
