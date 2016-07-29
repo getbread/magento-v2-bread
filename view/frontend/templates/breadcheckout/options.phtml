@@ -58,7 +58,7 @@
 
                     var elType = $(this).attr('type');
                     if (typeof elType == 'undefined') {
-                        elType = $(this).prop('tagName');
+                        elType = $(this).prop('tagName').toLowerCase();
                     }
 
                     switch (elType) {
@@ -73,14 +73,22 @@
                                 }
                             }
                             break;
-                        case 'SELECT':
-                        case 'select-one':
-                        case 'select-multiple':
+                        case 'select':
+                            var dateSelected = false;
+
+                            if ($(this).hasClass('datetime-picker')) {
+                                dateSelected = true;
+                                var role = $(this).data('calendar-role');
+                            }
+
                             $(this).children().each(function() {
                                 if ($(this).is(':selected') && $(this).val()) {
                                     val = $(this).val();
 
-                                    if (val) {
+                                    if (val && dateSelected) {
+                                        skuSuffix += '***' + optionId + '***' + role + '===' + val;
+                                        price += parseInt(configOptions.price)
+                                    } else if (val) {
                                         skuSuffix += '***' + configOptions[val].sku;
                                         price += parseInt(configOptions[val].price);
                                     }
@@ -90,18 +98,7 @@
                         default:
                             val = $(this).val();
 
-                            if ($(this).hasClass('datetime-picker') && !skipIds.hasOwnProperty(optionId)) {
-                                dateSelected = true;
-                                $('.product-custom-option[id^="options_' + optionId + '"]').each(function() {
-                                    if (val) {
-                                        dateSelected = false;
-                                    }
-                                });
-                                if (dateSelected) {
-                                    skuSuffix += '***' + optionId;
-                                    skipIds[optionId] = optionId;
-                                }
-                            } else if (val) {
+                            if (val) {
                                 skuSuffix += '***' + optionId + '===' + val;
                                 price += parseInt(configOptions[val].price);
                             }
@@ -110,6 +107,8 @@
             });
 
             document.priceWithOptions = price;
+            console.log(price);
+            console.log(skuSuffix);
             return skuSuffix;
         };
 
