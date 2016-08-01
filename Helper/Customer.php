@@ -34,7 +34,6 @@ class Customer extends Data
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\SessionFactory $customerSessionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Math\Random $random
