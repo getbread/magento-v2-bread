@@ -24,7 +24,6 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
 
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Framework\Registry $registry,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Bread\BreadCheckout\Helper\Data $breadHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
@@ -48,7 +47,6 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
 
         parent::__construct(
             $context,
-            $registry,
             $jsonHelper,
             $breadHelper,
             $catalogHelper,

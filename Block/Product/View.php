@@ -35,7 +35,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Framework\Registry $registry,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Bread\BreadCheckout\Helper\Data $breadHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
@@ -51,7 +50,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         array $data = []
     ) {
-        $this->registry = $registry;
+        $this->registry = $context->getRegistry();
         $this->jsonHelper = $jsonHelper;
         $this->breadHelper = $breadHelper;
         $this->catalogHelper = $catalogHelper;
@@ -293,6 +292,12 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         return $this->jsonEncode($optionsData);
     }
 
+    /**
+     * Publicly accessible json encoder
+     *
+     * @param $data
+     * @return string
+     */
     public function jsonEncode($data) {
         return $this->jsonHelper->jsonEncode($data);
     }
