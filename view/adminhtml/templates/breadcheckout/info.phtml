@@ -1,0 +1,50 @@
+<?php
+/**
+ * @var \Bread\BreadCheckout\Block\Payment\Form $block
+ */
+$code = $block->escapeHtml($block->getMethodCode());
+?>
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display:none;">
+    <div id="bread-btn-cntnr">
+        <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
+        <span>
+            <span><?php echo __('Bread Checkout'); ?></span>
+        </span>
+        </div>
+    </div>
+</fieldset>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        'Magento_Checkout/js/model/full-screen-loader',
+        'Bread_BreadCheckout/js/breadcheckout'
+    ], function($, fullScreenLoader, bread) {
+        $('#edit_form').on('changePaymentMethod', function(e, method) {
+            if (method == <?php echo $code; ?>) {
+                $.ajax({
+                    url: <?php echo $block->getQuoteDataUrl(); ?>,
+                    type: 'post',
+                    context: context,
+                    beforeSend: function() {
+                        fullScreenLoader.startLoader();
+                    }
+                }).done(function (response) {
+                    try {
+                        if (response !== null && typeof response === 'object') {
+                            if (response.error) {
+                                console.log(response);
+                                alert(response.error);
+                            } else {
+                                bread.configureButton(response);
+                            }
+                        }
+                    } catch (e) {
+                        console.log(e);
+                    }
+                    fullScreenLoader.stopLoader();
+                });
+            }
+        });
+    });
+</script>

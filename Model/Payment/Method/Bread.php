@@ -61,6 +61,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /** @var \Magento\Sales\Api\TransactionRepositoryInterface */
     protected $transactionRepository;
 
+    /** @var string */
+    protected $_formBlockType = 'Bread\BreadCheckout\Block\Payment\Form';
+    
     /**
      * Construct Sets API Client And Sets Available For Checkout Flag
      *
