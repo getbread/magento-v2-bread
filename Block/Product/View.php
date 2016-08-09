@@ -18,9 +18,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /** @var Magento\Framework\Json\Helper\Data */
     protected $jsonHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $breadHelper;
-
     /** @var \Bread\BreadCheckout\Helper\Catalog */
     protected $catalogHelper;
 
@@ -36,7 +33,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Bread\BreadCheckout\Helper\Data $breadHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
@@ -52,7 +48,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     ) {
         $this->registry = $context->getRegistry();
         $this->jsonHelper = $jsonHelper;
-        $this->breadHelper = $breadHelper;
         $this->catalogHelper = $catalogHelper;
         $this->customerHelper = $customerHelper;
         $this->configurableProductFactory = $configurableProductFactory;
@@ -145,7 +140,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getAsLowAs()
     {
-        return ($this->breadHelper->isAsLowAs()) ? 'true' : 'false';
+        return ($this->catalogHelper->isAsLowAs()) ? 'true' : 'false';
     }
 
     /**
@@ -155,7 +150,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     protected function _toHtml()
     {
-        if( $this->breadHelper->isEnabledOnPDP() ) {
+        if( $this->catalogHelper->isEnabledOnPDP() ) {
             return parent::_toHtml();
         }
 
@@ -169,7 +164,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getShippingAddressEstimationUrl()
     {
-        return $this->breadHelper->getShippingEstimateUrl();
+        return $this->catalogHelper->getShippingEstimateUrl();
     }
 
     /**
@@ -179,7 +174,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getTaxEstimationUrl()
     {
-        return $this->breadHelper->getTaxEstimateUrl();
+        return $this->catalogHelper->getTaxEstimateUrl();
     }
 
     /**
@@ -189,7 +184,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getValidateOrderUrl()
     {
-        return $this->breadHelper->getValidateOrderURL();
+        return $this->catalogHelper->getValidateOrderURL();
     }
 
     /**
@@ -199,7 +194,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getButtonDesign()
     {
-        return $this->breadHelper->getButtonDesign();
+        return $this->catalogHelper->getButtonDesign();
     }
 
     /**
@@ -209,7 +204,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getIsButtonOnProduct()
     {
-        return ( $this->breadHelper->isButtonOnProducts() ) ? 'true' : 'false';
+        return ( $this->catalogHelper->isButtonOnProducts() ) ? 'true' : 'false';
     }
 
     /**
@@ -229,7 +224,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getAllowCheckout()
     {
-        return ($this->breadHelper->getAllowCheckoutPDP()) ? 'true' : 'false';
+        return ($this->catalogHelper->getAllowCheckoutPDP()) ? 'true' : 'false';
     }
 
     /**
@@ -239,7 +234,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getBlockCode()
     {
-        return (string) $this->breadHelper->getBlockCodeProductView();
+        return (string) $this->catalogHelper->getBlockCodeProductView();
     }
 
     /**

@@ -10,9 +10,6 @@ namespace Bread\BreadCheckout\Block\Checkout;
 
 class Overview extends \Bread\BreadCheckout\Block\Product\View
 {
-    /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $breadHelper;
-
     /** @var \Bread\BreadCheckout\Helper\Quote */
     protected $quoteHelper;
 
@@ -25,7 +22,6 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Bread\BreadCheckout\Helper\Data $breadHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
@@ -40,7 +36,6 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         array $data = []
     ) {
-        $this->breadHelper = $breadHelper;
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;
         $this->jsonHelper = $jsonHelper;
@@ -48,7 +43,6 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
         parent::__construct(
             $context,
             $jsonHelper,
-            $breadHelper,
             $catalogHelper,
             $customerHelper,
             $configurableProductFactory,
@@ -104,7 +98,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     protected function _toHtml()
     {
-        if( $this->breadHelper->isEnabledOnCOP() ) {
+        if( $this->quoteHelper->isEnabledOnCOP() ) {
             return parent::_toHtml();
         }
 
@@ -118,7 +112,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     public function getBlockCode()
     {
-        return (string) $this->breadHelper->getBlockCodeCheckoutOverview();
+        return (string) $this->quoteHelper->getBlockCodeCheckoutOverview();
     }
 
     /**
@@ -128,7 +122,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     public function getAllowCheckout()
     {
-        return ($this->breadHelper->getAllowCheckoutCP()) ? 'true' : 'false';
+        return ($this->quoteHelper->getAllowCheckoutCP()) ? 'true' : 'false';
     }
 
 }

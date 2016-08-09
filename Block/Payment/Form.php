@@ -3,14 +3,40 @@ namespace Bread\BreadCheckout\Block\Payment;
 
 class Form extends \Magento\Payment\Block\Form
 {
-    /**
-     * Checkmo template
-     *
-     * @var string
-     */
+    /** Admin checkout form template @var string */
     protected $_template = 'Bread_BreadCheckout::breadcheckout/info.phtml';
-    protected $quoteDataUrl = '';
-    
-    
-    
+
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helper;
+
+    /**
+     * Constructor
+     */
+    public function __construct(\Magento\Framework\View\Element\Template\Context $context,
+                                \Bread\BreadCheckout\Helper\Catalog $helper,
+                                array $data = [])
+    {
+        $this->helper = $helper;
+        parent::__construct($context, $data);
+    }
+
+    /**
+     * Get controller URL for quote data retrieval
+     *
+     * @return string
+     */
+    public function getQuoteDataUrl()
+    {
+        return $this->helper->getQuoteDataUrl();
+    }
+
+    /**
+     * Get button size config setting
+     *
+     * @return string
+     */
+    public function getIsDefaultSize()
+    {
+        return (string) $this->helper->getDefaultButtonSizeHtml();
+    }
 }

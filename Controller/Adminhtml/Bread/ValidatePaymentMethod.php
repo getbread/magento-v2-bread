@@ -13,15 +13,6 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
     protected $paymentApiClient;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
-
-    /** @var \Magento\Backend\Model\Session\Quote */
-    protected $backendSessionQuote;
-
-    /** @var \Magento\Checkout\Model\Cart */
-    protected $cart;
-
     /** @var \Magento\Framework\Controller\Result\JsonFactory */
     protected $resultJsonFactory;
 
@@ -31,50 +22,50 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
     /** @var \Bread\BreadCheckout\Helper\Data */
     protected $helper;
 
+    /** @var \Magento\Sales\Model\AdminOrder\Create */
+    protected $orderCreateModel;
+
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Backend\Model\Session\Quote $backendSessionQuote,
-        \Magento\Checkout\Model\Cart $cart,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Psr\Log\LoggerInterface $logger,
-        \Bread\BreadCheckout\Helper\Data $helper
+        \Bread\BreadCheckout\Helper\Data $helper,
+        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
     ) {
         $this->paymentApiClient = $paymentApiClient;
-        $this->storeManager = $storeManager;
-        $this->backendSessionQuote = $backendSessionQuote;
-        $this->cart = $cart;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->logger = $logger;
         $this->helper = $helper;
+        $this->orderCreateModel = $orderCreateModel;
         parent::__construct($context);
     }
 
+    /**
+     * Save bread transaction ID to quote session
+     *
+     * @return \Magento\Framework\Controller\Result\Json
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function execute()
     {
-		$result     = false;
+		$result = false;
 
         try {
-            $token      = $this->getRequest()->getParam('token');
+            $token = $this->getRequest()->getParam('token');
             if ($token) {
                 $data   = $this->paymentApiClient->getInfo($token);
                 if (isset($data['breadTransactionId'])) {
-
-                    if ($this->storeManager->getStore()->isAdmin()) {
-                        $quote      = $this->backendSessionQuote->getQuote();
-                    } else {
-                        $quote      = $this->cart->getQuote();
-                    }
-
-                    $quote->setBreadTransactionId($data['breadTransactionId'])->save();
+                    $this->orderCreateModel
+                        ->getSession()
+                        ->setBreadTransactionId($data['breadTransactionId']);
                     $result     = true;
                 }
             }
         } catch (\Exception $e) {
-            $this->helper->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()], 'bread-exception.log');
+            $this->helper->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
 	        $this->logger->critical($e);
-	        throw new \Magento\Framework\Exception\LocalizedException($e);
+	        throw new \Magento\Framework\Exception\LocalizedException(__('Something went wrong processing the Bread payment. Please select a different payment method to complete checkout.'));
         }
 
         return $this->resultJsonFactory->create()->setData( ['result' => $result] );

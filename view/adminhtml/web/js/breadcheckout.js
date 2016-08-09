@@ -1,138 +1,71 @@
 define(
-    [
-        'Magento_Checkout/js/view/payment/default',
-        'Magento_Checkout/js/model/full-screen-loader',
-        'jquery'
-    ],
-    function (Component,
-              fullScreenLoader,
-              $) {
+    ['jquery', 'loadingPopup'],
+    function ($) {
         'use strict';
-        return Component.extend({
-            configureButton: function(data, context) {
+        return {
+            configureButton: function(data) {
+                if (data.shippingOptions === false) {
+                    $('#bread_feedback').html('<p><strong>Please select a shipping method first!</strong></p>');
+                    return;
+                } else {
+                    $('#bread_feedback').empty();
+                }
+
                 var breadConfig = {
-                    buttonId: data.buttonId,
-                    items: data.items,
+                    buttonId: 'bread-checkout-btn',
+                    items: data.quoteItems,
                     discounts: data.discounts,
-                    shippingOptions: data.shippingOptions,
+                    shippingOptions: [data.shippingOptions],
+                    tax: data.tax,
                     customTotal: data.grandTotal,
                     actAsLabel: false,
                     asLowAs: data.asLowAs,
+                    shippingContact: data.shippingContact,
+                    billingContact: data.billingContact,
 
                     done: function (err, tx_token) {
                         if (tx_token !== undefined) {
                             $.ajax({
                                 url: data.paymentUrl,
                                 data: {token: tx_token},
-                                type: 'post',
-                                context: context,
+                                type: 'get',
+                                context: this,
                                 beforeSend: function() {
-                                    fullScreenLoader.startLoader();
+                                    $('body').loadingPopup({
+                                        timeout: false
+                                    });
                                 }
                             }).done(function (response) {
                                 try {
-                                    if (response !== null && typeof response === 'object') {
-                                        if (response.error) {
-                                            console.log(response);
-                                            alert(response.error);
-                                        } else {
-                                            this.updateAddresses(response, tx_token);
-                                        }
+                                    if (typeof response.result !== 'undefined' && response.result === true) {
+                                        $('#bread-checkout-btn').hide();
+                                        var approved = "<p><strong>You have been approved for financing.<br/>"+
+                                            "Please continue with the checkout to complete your order.</strong></p>";
+                                        $('#bread_feedback').html(approved);
+                                        $('body').trigger('hideLoadingPopup');
                                     }
                                 } catch (e) {
                                     console.log(e);
+                                    $('body').trigger('hideLoadingPopup');
                                 }
                             });
                         }
-                    },
-
-                    /**
-                     * Calculate tax value callback
-                     *
-                     * @param shippingAddress
-                     * @param callback
-                     */
-                    calculateTax: function (shippingAddress, callback) {
-                        shippingAddress.block_key = window.checkoutConfig.payment.breadcheckout.breadConfig.blockCode;
-
-                        $.ajax({
-                            url: window.checkoutConfig.payment.breadcheckout.breadConfig.taxEstimationUrl,
-                            data: {shippingInfo: JSON.stringify(shippingAddress)},
-                            type: 'post'
-                        }).done(function (response) {
-                            try {
-                                if (typeof response == 'object') {
-                                    if (response.error) {
-                                        alert(response.error);
-                                    } else {
-                                        callback(null, response.result);
-                                    }
-                                }
-                            }
-                            catch (e) {
-                                console.log(e);
-                            }
-                        });
-                    },
-
-                    /**
-                     * Calculate shipping cost callback
-                     *
-                     * @param shippingAddress
-                     * @param callback
-                     */
-                    calculateShipping: function (shippingAddress, callback) {
-                        shippingAddress.block_key = window.checkoutConfig.payment.breadcheckout.breadConfig.blockCode;
-
-                        $.ajax({
-                            url: window.checkoutConfig.payment.breadcheckout.breadConfig.shippingEstimationUrl,
-                            data: shippingAddress,
-                            type: 'post',
-                            context: context
-                        }).done(function (response) {
-                            try {
-                                if (typeof response == 'object') {
-                                    if (response.error) {
-                                        alert(response.error);
-                                    } else {
-                                        this.setShippingRates(response.result);
-                                        callback(null, response.result);
-                                    }
-                                }
-                            }
-                            catch (e) {
-                                console.log(e);
-                            }
-                        });
                     }
                 };
 
                 /**
                  * Optional params
                  */
-                if (typeof data.billingContact !== 'undefined') {
-                    breadConfig.billingContact = data.billingContact;
-                }
-
-                if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
-                    breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
+                if (data.buttonCss !== null) {
+                    breadConfig.customCSS = data.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
                 }
 
                 /**
                  * Call the checkout method from bread.js
                  */
-                if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                    bread.checkout(breadConfig);
-                } else {
-                    fullScreenLoader.stopLoader();
-                    $('#' + data.buttonId).hide();
-                    $('#bread_transaction_id').val(window.checkoutConfig.payment.breadcheckout.transactionId);
-                    var approved = "<span><strong>You have been approved for financing.<br/>"+
-                        "Please continue with the checkout to complete your order.</strong></span>";
-                    $('#bread_feedback').html(approved);
-                    $('#bread-checkout-submit').removeAttr('disabled');
-                }
+                $('#bread-checkout-btn').show();
+                bread.checkout(breadConfig);
             }
-        });
+        }
     }
 );

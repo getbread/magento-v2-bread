@@ -21,6 +21,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimateshipping";
     const URL_TAX_ESTIMATE                          = "bread/checkout/estimatetax";
     const URL_CONFIG_DATA                           = "bread/checkout/configdata";
+    const URL_ADMIN_QUOTE_DATA                      = "breadadmin/bread/quotedata";
     const URL_ADMIN_VALIDATE_PAYMENT                = "breadadmin/bread/validatepaymentmethod";
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
@@ -219,13 +220,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get URL for quote data retrieval in admin checkout
+     *
+     * @return string
+     */
+    public function getQuoteDataUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_QUOTE_DATA, ['_secure'=>$isSecure]);
+    }
+
+    /**
      * Get Admin URL Path for Block Context Url Call
      *
      * @return string
      */
-    public function getAdminFormUrlPath()
+    public function getAdminPaymentUrl()
     {
-        return self::URL_ADMIN_VALIDATE_PAYMENT;
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_VALIDATE_PAYMENT, ['_secure'=>$isSecure]);
     }
 
     /**

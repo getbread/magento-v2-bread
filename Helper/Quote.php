@@ -16,9 +16,6 @@ class Quote extends Data {
     /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
 
-    /** @var \Magento\Backend\Model\Session\Quote */
-    protected $backendSessionQuote;
-
     /** @var \Magento\Checkout\Model\Session */
     protected $checkoutSession;
 
@@ -28,6 +25,9 @@ class Quote extends Data {
     /** @var Bread\BreadCheckout\Helper\Catalog */
     protected $helperCatalog;
 
+    /** @var \Magento\Sales\Model\AdminOrder\Create */
+    protected $orderCreateModel;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -35,16 +35,17 @@ class Quote extends Data {
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Backend\Model\Session\Quote $backendSessionQuote,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Checkout\Model\Cart $checkoutCart,
-        \Bread\BreadCheckout\Helper\Catalog $helperCatalog
+        \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
+        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
     ) {
         $this->storeManager = $storeManager;
-        $this->backendSessionQuote = $backendSessionQuote;
         $this->checkoutSession = $checkoutSession;
         $this->checkoutCart = $checkoutCart;
         $this->helperCatalog = $helperCatalog;
+        $this->orderCreateModel = $orderCreateModel;
+
         parent::__construct(
             $helperContext,
             $context,
@@ -62,10 +63,14 @@ class Quote extends Data {
      */
     public function getGrandTotal()
     {
-        $quote      = $this->getSessionQuote();
-        $quote->collectTotals();
-
-        $grandTotal = $quote->getGrandTotal();
+        if ($this->isInAdmin()) {
+            $this->orderCreateModel->collectRates();
+            $grandTotal = $this->orderCreateModel->getQuote()->getGrandTotal();
+        } else {
+            $quote = $this->getSessionQuote();
+            $quote->collectTotals();
+            $grandTotal = $quote->getGrandTotal();
+        }
 
         return $grandTotal * 100;
     }
@@ -77,11 +82,14 @@ class Quote extends Data {
      */
     public function getTaxValue()
     {
-        $quote      = $this->getSessionQuote();
-        $quote->collectTotals();
-
-        $quoteAddress       = $quote->getShippingAddress();
-        $taxAmount          = $quoteAddress->getTaxAmount();
+        if ($this->isInAdmin()) {
+            $this->orderCreateModel->collectRates();
+            $taxAmount = $this->orderCreateModel->getShippingAddress()->getTaxAmount();
+        } else {
+            $quote = $this->getSessionQuote();
+            $quote->collectTotals();
+            $taxAmount = $quote->getShippingAddress()->getTaxAmount();
+        }
 
         return $taxAmount * 100;
     }
@@ -139,14 +147,19 @@ class Quote extends Data {
      */
     public function getQuoteItemsData()
     {
-        $quote      = $this->getSessionQuote();
 
-        if($quote->hasItems() == false){
+        if ($this->isInAdmin()) {
+            $quoteItems = $this->orderCreateModel->getQuote()->getAllItems();
+        } else {
+            $quoteItems = $this->getSessionQuote()->getAllVisibleItems();
+        }
+
+        if (count($quoteItems) < 1) {
             return [];
         }
 
         $itemsData     = [];
-        foreach ($quote->getAllVisibleItems() as $item) {
+        foreach ($quoteItems as $item) {
             $price                  = $item->getPrice();
             $baseProduct            = $item->getProduct();
             $simpleProductItem      = $item->getOptionByCode('simple_product');
@@ -171,7 +184,12 @@ class Quote extends Data {
      */
     public function getBillingAddressData()
     {
-        $billingAddress     = $this->getSessionQuote()->getBillingAddress();
+        if ($this->isInAdmin()) {
+            $billingAddress = $this->orderCreateModel->getBillingAddress();
+        } else {
+            $billingAddress     = $this->getSessionQuote()->getBillingAddress();
+        }
+
 
         if(!$billingAddress->getStreetLine(1)){
             return false;
@@ -197,7 +215,12 @@ class Quote extends Data {
      */
     public function getShippingAddressData()
     {
-        $shippingAddress    = $this->getSessionQuote()->getShippingAddress();
+
+        if ($this->isInAdmin()) {
+            $shippingAddress = $this->orderCreateModel->getShippingAddress();
+        } else {
+            $shippingAddress = $this->getSessionQuote()->getShippingAddress();
+        }
 
         if(!$shippingAddress->getStreetLine(1)){
             return false;
@@ -221,10 +244,14 @@ class Quote extends Data {
      */
     public function getShippingOptions()
     {
-        $shippingAddress        = $this->getSessionQuote()->getShippingAddress();
+        if ($this->isInAdmin()) {
+            $shippingAddress = $this->orderCreateModel->getShippingAddress();
+        } else {
+            $shippingAddress = $this->getSessionQuote()->getShippingAddress();
+        }
 
         if(!$shippingAddress->getShippingMethod()){
-            return 'false';
+            return false;
         }
 
         return ['type'   => $shippingAddress->getShippingDescription(),
@@ -252,7 +279,7 @@ class Quote extends Data {
         if ($this->quote == null) {
 
             if ($this->isInAdmin()) {
-                $this->quote = $this->backendSessionQuote->getQuote();
+                $this->quote = $this->orderCreateModel->getQuote();
             }
 
             $this->quote = $this->checkoutSession->getQuote();
@@ -260,5 +287,4 @@ class Quote extends Data {
 
         return $this->quote;
     }
-
 }

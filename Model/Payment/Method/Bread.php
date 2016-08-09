@@ -20,6 +20,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_code          = 'breadcheckout';
     protected $_infoBlockType = 'Bread\BreadCheckout\Block\Payment\Info';
+    protected $_formBlockType = 'Bread\BreadCheckout\Block\Payment\Form';
 
     protected $_isGateway               = true;
     protected $_canAuthorize            = true;
@@ -61,9 +62,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /** @var \Magento\Sales\Api\TransactionRepositoryInterface */
     protected $transactionRepository;
 
-    /** @var string */
-    protected $_formBlockType = 'Bread\BreadCheckout\Block\Payment\Form';
-    
+    /** @var \Magento\Sales\Model\AdminOrder\Create */
+    protected $orderCreateModel;
+
     /**
      * Construct Sets API Client And Sets Available For Checkout Flag
      *
@@ -84,6 +85,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
+        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         $params = [])
     {
         $this->apiClient = $apiClient;
@@ -95,6 +97,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $this->transactionBuilder = $transactionBuilder;
         $this->quoteRepository = $quoteRepository;
         $this->transactionRepository = $transactionRepository;
+        $this->orderCreateModel = $orderCreateModel;
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig, $logger);
     }
 
@@ -130,8 +133,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('This financing program is available to US residents, please click the finance button and complete the application in order to complete your purchase with the financing payment method.'));
         }
 
-        $token = $this->checkoutSession->getBreadTransactionId();
-
+        $token = $this->getToken();
         if( empty($token) ) {
             $this->helper->log("ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN");
             throw new \Magento\Framework\Exception\LocalizedException(__('This financing program is unavailable, please complete the application. If the problem persists, please contact us.'));
@@ -183,7 +185,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
         $payment->setAmount($amount);
         $payment->setIsTransactionClosed(false);
-        $payment->setTransactionId($this->checkoutSession->getBreadTransactionId());
+        $payment->setTransactionId($this->getToken());
 
         $this->_place($payment, $amount, self::ACTION_AUTHORIZE);
         return $this;
@@ -388,7 +390,6 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Is the 'breadcheckout' payment method available
      *
      * @param \Magento\Quote\Api\Data\CartInterface $quote
-     *
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -404,4 +405,19 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         return true;
     }
 
+    /**
+     * Get Bread transaction ID saved in session
+     *
+     * @return string
+     */
+    protected function getToken()
+    {
+        if ($this->helper->isInAdmin()) {
+            $token = $this->orderCreateModel->getSession()->getBreadTransactionId();
+        } else {
+            $token = $this->checkoutSession->getBreadTransactionId();
+        }
+
+        return $token;
+    }
 }
