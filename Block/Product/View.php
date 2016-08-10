@@ -109,8 +109,8 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getDiscountDataJson()
     {
-        $result     = array();
-        return $this->jsonEncode($result);
+        $data     = array();
+        return $this->jsonEncode($data);
     }
 
     /**

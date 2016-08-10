@@ -9,7 +9,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery'], function($){
+    require(['jquery'], function($, quote){
         document.configureButton = function (items) {
             var address             = <?php echo $this->getShippingAddressData(); ?>;
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
@@ -21,7 +21,6 @@
                 asLowAs: <?php echo $this->getAsLowAs(); ?>,
                 actAsLabel: false,
                 items: items,
-                discounts: <?php echo $this->getDiscountDataJson(); ?>,
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
 
                 done: function (err, tx_token) {
@@ -59,7 +58,6 @@
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
                     }).done(function (response) {
-                        console.log(response);
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
@@ -95,7 +93,6 @@
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
-                        console.log(response);
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
@@ -126,11 +123,21 @@
                 breadConfig.billingContact = billingAddress;
             }
 
-
             if (buttonOnProduct === true) {
                 breadConfig.actAsLabel = false;
             }
 
+            var discountAmount =- parseInt(window.checkoutConfig.totalsData.discount_amount);
+            if (discountAmount > 0) {
+                breadConfig.discounts = [{
+                    amount: discountAmount * 100,
+                    description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
+                        window.checkoutConfig.totalsData.coupon_code :
+                        "Discount"
+                }];
+            }
+            
+            console.log(breadConfig);
             bread.checkout(breadConfig);
         };
 

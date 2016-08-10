@@ -408,7 +408,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Incomplete Checkout Message For Payment Method Form
      *
-     * @param null $store
+     * @param string $store
      * @return string
      */
     public function getIncompleteCheckoutMsg($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -419,7 +419,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Default Country
      *
-     * @param null $store
      * @return string
      */
     public function getDefaultCountry()
@@ -437,6 +436,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (bool) ($this->context->getAppState()->getAreaCode() == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
     }
 
+    /**
+     * Log to var/log/debug.log file
+     *
+     * @param mixed $data
+     * @param string $context
+     */
     public function log($data, $context = 'Bread\BreadCheckout'){
         if( $this->logEnabled() ) {
             if ( !is_string($data) ) {
