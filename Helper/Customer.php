@@ -61,18 +61,17 @@ class Customer extends Data
 
         $defaultShippingAddress     = $customer->getPrimaryShippingAddress();
 
-        if( empty($defaultShippingAddress) ) {
+        if(!$defaultShippingAddress->getStreetLine(1)){
             return [];
         }
 
         $primaryData        = [
             'fullName'      => $defaultShippingAddress->getName(),
-            'address'       => $defaultShippingAddress->getStreet1() . ($defaultShippingAddress->getStreet2() == '' ? '' : (' ' . $defaultShippingAddress->getStreet2())),
-            'address2'      => $defaultShippingAddress->getStreet3() . ($defaultShippingAddress->getStreet4() == '' ? '' : (' ' . $defaultShippingAddress->getStreet4())),
+            'address'       => $defaultShippingAddress->getStreetLine(1) . ($defaultShippingAddress->getStreetLine(2) == '' ? '' : (' ' . $defaultShippingAddress->getStreetLine(2))),
+            'address2'      => $defaultShippingAddress->getStreetLine(3) . ($defaultShippingAddress->getStreetLine(4) == '' ? '' : (' ' . $defaultShippingAddress->getStreetLine(4))),
             'city'          => $defaultShippingAddress->getCity(),
             'state'         => $defaultShippingAddress->getRegionCode(),
             'zip'           => $defaultShippingAddress->getPostcode(),
-            'email'         => $customer->getEmail(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $defaultShippingAddress->getTelephone()), -10)
         ];
 
@@ -95,14 +94,14 @@ class Customer extends Data
 
         $defaultBillingAddress     = $customer->getPrimaryBillingAddress();
 
-        if( empty($defaultBillingAddress) ) {
+        if(!$defaultBillingAddress->getStreetLine(1)){
             return [];
         }
 
         $primaryData        = [
             'fullName'      => $defaultBillingAddress->getName(),
-            'address'       => $defaultBillingAddress->getStreet1() . ($defaultBillingAddress->getStreet2() == '' ? '' : (' ' . $defaultBillingAddress->getStreet2())),
-            'address2'      => $defaultBillingAddress->getStreet3() . ($defaultBillingAddress->getStreet4() == '' ? '' : (' ' . $defaultBillingAddress->getStreet4())),
+            'address'       => $defaultBillingAddress->getStreetLine(1) . ($defaultBillingAddress->getStreetLine(2) == '' ? '' : (' ' . $defaultBillingAddress->getStreetLine(2))),
+            'address2'      => $defaultBillingAddress->getStreetLine(3) . ($defaultBillingAddress->getStreetLine(4) == '' ? '' : (' ' . $defaultBillingAddress->getStreetLine(4))),
             'city'          => $defaultBillingAddress->getCity(),
             'state'         => $defaultBillingAddress->getRegionCode(),
             'zip'           => $defaultBillingAddress->getPostcode(),
