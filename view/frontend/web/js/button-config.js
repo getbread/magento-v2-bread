@@ -8,9 +8,10 @@ define(['jquery',
             var breadConfig = {
                 buttonId: data.buttonId,
                 items: data.items,
-                discounts: data.discounts,
-                shippingOptions: data.shippingOptions,
-                customTotal: data.grandTotal,
+                billingContact: (typeof data.billingContact !== 'undefined') ?
+                    data.billingContact :
+                    data.shippingContact,
+                shippingContact: data.shippingContact,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
                 
@@ -105,12 +106,18 @@ define(['jquery',
             /**
              * Optional params
              */
-            if (typeof data.billingContact !== 'undefined') {
-                breadConfig.billingContact = data.billingContact;
-            }
-
             if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
                 breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
+            }
+
+            var discountAmount =- parseInt(window.checkoutConfig.totalsData.discount_amount);
+            if (discountAmount > 0) {
+                breadConfig.discounts = [{
+                    amount: discountAmount * 100,
+                    description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
+                        window.checkoutConfig.totalsData.coupon_code :
+                        "Discount"
+                }];
             }
 
             /**
