@@ -47,11 +47,8 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
-                    shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                    shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
-                    shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
-                    shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
-                    shippingAddress.main_product_id                 = document.productId;
+                    shippingAddress.block_key        = '<?php echo $this->getBlockCode(); ?>';
+                    shippingAddress.additional_data  = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
 
                     $.ajax({
                         url: '<?php echo $this->getTaxEstimationUrl(); ?>',
@@ -82,11 +79,8 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
-                    shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                    shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
-                    shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
-                    shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
-                    shippingAddress.main_product_id                 = document.productId;
+                    shippingAddress.block_key        = '<?php echo $this->getBlockCode(); ?>';
+                    shippingAddress.additional_data  = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
 
                     $.ajax({
                         url: '<?php echo $this->getShippingAddressEstimationUrl(); ?>',
@@ -137,56 +131,14 @@
                 }];
             }
             
-            console.log(breadConfig);
             bread.checkout(breadConfig);
         };
 
-        <?php if( $this->getProduct() != null ): ?>
-
-        document.resetPriceAndSku = function () {
-            if ((typeof optionsPrice == 'undefined') ||
-                (typeof optionsPrice.productPrice == 'undefined')) {
-                document.configureButton(document.defaultItems);
-            }
-            else {
-                price = optionsPrice.productPrice;
-
-                if (typeof(optionsPrice.optionPrices.config) != 'undefined') {
-                    price += optionsPrice.optionPrices.config.price;
-                }
-
-                for (key in optionsPrice.customPrices) {
-                    if (optionsPrice.customPrices.hasOwnProperty(key)) {
-                        price += optionsPrice.customPrices[key].price;
-                    }
-                }
-
-                sku = document.selectedSku + document.customOptions;
-                if (sku != document.previousSku || price != document.previousPrice) {
-                    document.previousSku                    = sku;
-                    document.previousPrice                  = price;
-                    document.defaultItems[0]["sku"]         = document.previousSku;
-                    document.defaultItems[0]["price"]       = document.previousPrice * 100;
-                    document.configureButton(document.defaultItems);
-                }
-            }
-        };
-        <?php endif; ?>
-        $(document).ready(function () {
+        $(document).ready(function() {
             document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
             document.previousPrice      = document.defaultItems[0]["price"];
             document.previousSku        = document.defaultItems[0]["sku"];
-
-            <?php if ($this->getProduct() != null): ?>
-            document.customOptions = "";
-            document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
-            document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
-            document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
-            document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
-            document.resetPriceAndSku();
-            <?php else: ?>
             document.configureButton(document.defaultItems);
-            <?php endif; ?>
         });
     });
 </script>
