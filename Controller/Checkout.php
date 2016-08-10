@@ -208,6 +208,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 break;
 
             case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW :
+                $removeItems = true;
+
                 if ( !$this->checkoutSession->getQuoteId() ) {
                     if ($this->customerSession->isLoggedIn()) {
                         $quoteId = $this->quoteManagement->createEmptyCartForCustomer($this->customerSession->getCustomerId());
@@ -215,11 +217,14 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                         $quoteId = $this->quoteManagement->createEmptyCart();
                     }
                     $this->checkoutSession->setQuoteId($quoteId);
-                } else {
-                    $quote->removeAllItems(); // Reset items in quote
+                    $removeItems = false;
                 }
 
                 $quote = $this->checkoutSession->getQuote();
+
+                if ($removeItems) {
+                    $quote->removeAllItems(); // Reset items in quote
+                }
 
                 if (!$this->checkoutSession->getBreadItemAddedToQuote() || !$quote->getAllVisibleItems()) {
                     $this->processOrderItem($quote, $data);
