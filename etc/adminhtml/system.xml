@@ -8,10 +8,6 @@
                 <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>
                 <comment>
                     <![CDATA[
-                            <style>
-                                .bread-logo { width: 133px; height: 44px; display: block; background: url(/skin/frontend/base/default/bread/images/bread-logo.png) 0px 0 no-repeat; }
-                                .bread-brand { color: #fff; background-color: #0c5a7b; border:1px solid #ddd; padding: 10px; font-size: 125%; }
-                            </style>
                             <div class="bread-brand">
                                 <span class="bread-logo"></span>
                             Bread Payments by <a href="https://www.getbread.com/" target="_blank">getbread.com</a> - <b>Onsite Consumer Financing</b>.

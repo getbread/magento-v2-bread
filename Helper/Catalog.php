@@ -138,7 +138,7 @@ class Catalog extends Data
 
         try {
             return (string) $this->productViewBlock->getImage($product, 'product_small_image')->getImageUrl();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
