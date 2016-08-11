@@ -39,7 +39,9 @@ define(
 
                 if (data.billingContact !== false) {
                     window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact = data.billingContact;
-                    window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact.email = checkout.getValidatedEmailValue();
+                    window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact.email = (data.billingContact.email) ?
+                        data.billingContact.email :
+                        checkout.getValidatedEmailValue();
                 }
             }
         });

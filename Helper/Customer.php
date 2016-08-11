@@ -10,8 +10,8 @@ namespace Bread\BreadCheckout\Helper;
 
 class Customer extends Data
 {
-    /** @var \Magento\Customer\Model\SessionFactory */
-    protected $customerSessionFactory;
+    /** @var \Magento\Customer\Model\Session */
+    protected $customerSession;
 
     /** @var \Magento\Customer\Model\CustomerFactory */
     protected $customerFactory;
@@ -32,13 +32,13 @@ class Customer extends Data
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Customer\Model\SessionFactory $customerSessionFactory,
+        \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Math\Random $random
     ) {
-        $this->customerSessionFactory = $customerSessionFactory;
+        $this->customerSession = $customerSession;
         $this->customerFactory = $customerFactory;
         $this->customerAddressFactory = $customerAddressFactory;
         $this->jsonHelper = $jsonHelper;
@@ -52,7 +52,7 @@ class Customer extends Data
      */
     public function getFormattedDefaultShippingAddress()
     {
-        $session                    = $this->getCustomerSession();
+        $session                    = $this->customerSession;
         $customer                   = $session->getCustomer();
 
         if( empty($customer) ) {
@@ -85,7 +85,7 @@ class Customer extends Data
      */
     public function getFormattedDefaultBillingAddress()
     {
-        $session                    = $this->getCustomerSession();
+        $session                    = $this->customerSession;
         $customer                   = $session->getCustomer();
 
         if( empty($customer) ) {
@@ -123,7 +123,7 @@ class Customer extends Data
      */
     public function createCustomer($quote, $billingContact, $shippingContact)
     {
-        $session    = $this->customerSessionFactory->create();
+        $session    = $this->customerSession;
         if ($session->isLoggedIn()) {
             return $session->getCustomer();
         }
@@ -237,7 +237,7 @@ class Customer extends Data
      */
     public function hasBillingAddress()
     {
-        if($this->getCustomerSession()->getCustomer()->getPrimaryBillingAddress() == false){
+        if($this->customerSession->getCustomer()->getPrimaryBillingAddress() == false){
             return false;
         }
 
@@ -251,18 +251,8 @@ class Customer extends Data
      */
      public function isUserLoggedIn()
      {
-         return (bool) $this->getCustomerSession()->isLoggedIn();
+         return (bool) $this->customerSession->isLoggedIn();
      }
-
-    /**
-     * Get Current Customer Session
-     *
-     * @return \Magento\Customer\Model\Session
-     */
-    protected function getCustomerSession()
-    {
-        return $this->customerSessionFactory->create();
-    }
 
     /**
      * Generate random password during automatic customer account creation

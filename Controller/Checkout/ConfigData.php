@@ -10,15 +10,20 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class ConfigData extends \Magento\Framework\App\Action\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $helper;
+    protected $quoteHelper;
+
+    /** @var \Bread\BreadCheckout\Helper\Customer */
+    protected $customerHelper;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Bread\BreadCheckout\Helper\Quote $helper
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
+        \Bread\BreadCheckout\Helper\Customer $customerHelper
     )
     {
         $this->resultFactory = $context->getResultFactory();
-        $this->helper = $helper;
+        $this->quoteHelper = $quoteHelper;
+        $this->customerHelper = $customerHelper;
         parent::__construct($context);
     }
 
@@ -32,9 +37,11 @@ class ConfigData extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
-            'shippingContact' => $this->helper->getShippingAddressData(),
-            'billingContact' => $this->helper->getBillingAddressData(),
-            'shippingOptions' => $this->helper->getShippingOptions()
+            'shippingContact' => $this->quoteHelper->getShippingAddressData(),
+            'billingContact' => ($this->customerHelper->isUserLoggedIn()) ?
+                $this->customerHelper->getFormattedDefaultBillingAddress() :
+                $this->quoteHelper->getBillingAddressData(),
+            'shippingOptions' => $this->quoteHelper->getShippingOptions()
         ]);
     }
 }
