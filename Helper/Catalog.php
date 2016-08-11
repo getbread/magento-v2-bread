@@ -10,19 +10,19 @@ namespace Bread\BreadCheckout\Helper;
 
 class Catalog extends Data
 {
-    /** @var \Magento\Catalog\Helper\Image */
-    protected $catalogImageHelper;
+    /** @var \Magento\Catalog\Block\Product\View */
+    protected $productViewBlock;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
-        \Magento\Catalog\Helper\Image $catalogImageHelper,
+        \Magento\Catalog\Block\Product\View $productViewBlock,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
-        $this->catalogImageHelper = $catalogImageHelper;
+        $this->productViewBlock = $productViewBlock;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
     }
 
@@ -132,12 +132,12 @@ class Catalog extends Data
      */
     protected function getImgSrc(\Magento\Catalog\Model\Product $product)
     {
-        if( $this->isInAdmin() == true ) {
+        if( $this->isInAdmin() ) {
             return null;
         }
 
         try {
-            return (string) $this->catalogImageHelper->init($product, 'thumbnail')->getUrl();
+            return (string) $this->productViewBlock->getImage($product, 'product_small_image')->getImageUrl();
         } catch (Exception $e) {
             return null;
         }
