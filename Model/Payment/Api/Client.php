@@ -55,7 +55,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
         $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
 
-        if( $result->status != self::STATUS_CANCELED ){
+        if( $result['status'] != self::STATUS_CANCELED ){
             $this->helper->log( ["ERROR"=>"Transaction cancel failed", "RESULT"=>$result] );
             throw new \Magento\Framework\Exception\LocalizedException(__('Transaction cancel failed (current transaction status :' . $result->status . ')'));
         }

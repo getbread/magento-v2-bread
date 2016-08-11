@@ -162,7 +162,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
-        if (!$this->canVoid($payment)) {
+        if (!$this->canVoid()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Void action is not available.'));
         }
 
@@ -300,7 +300,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     {
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
-                    $result     = $this->apiClient->authorize($payment->getTransactionId(), (int)round($amount * 100), $payment->getOrder()->getIncrementId() );
+                    $result     = $this->apiClient->authorize($this->getValidatedTxId($payment), (int)round($amount * 100), $payment->getOrder()->getIncrementId() );
                     $payment->setTransactionId($result['breadTransactionId']);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH
@@ -310,7 +310,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         , "Bread Finance Payment Authorized");
                 break;
             case self::ACTION_CAPTURE:
-                    $result     = $this->apiClient->settle($payment->getTransactionId());
+                    $result     = $this->apiClient->settle($this->getValidatedTxId($payment));
                     $payment->setTransactionId($result['breadTransactionId']);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE
@@ -320,7 +320,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         , "Bread Finance Payment Captured");
                 break;
             case self::ACTION_REFUND:
-                    $result     = $this->apiClient->refund($payment->getTransactionId(), (int)round($amount * 100));
+                    $result     = $this->apiClient->refund($this->getValidatedTxId($payment), (int)round($amount * 100));
                     $payment->setTransactionId($result['breadTransactionId']);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND
@@ -330,7 +330,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         , "Bread Finance Payment Refunded");
                 break;
             case self::ACTION_VOID:
-                $result     = $this->apiClient->cancel(str_replace('-void','',$payment->getTransactionId()));
+                    $result     = $this->apiClient->cancel($this->getValidatedTxId($payment));
                     $payment->setTransactionId($result['breadTransactionId']);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID
@@ -419,5 +419,25 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         return $token;
+    }
+
+    /**
+     * Validates and sanitizes the given transaction ID for making
+     * an API request to Bread
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function getValidatedTxId(\Magento\Payment\Model\InfoInterface $payment)
+    {
+        $rawTransId = $payment->getTransactionId();
+
+        if (preg_match('/^[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/', $rawTransId, $matches)) {
+            return $matches[0];
+        } else {
+            $this->helper->log("INVALID TRANSACTION ID PROVIDED: ". $rawTransId);
+            throw new \Magento\Framework\Exception\LocalizedException(__('Unable to process request because an invalid transaction ID was provided.'));
+        }
     }
 }
