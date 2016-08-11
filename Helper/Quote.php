@@ -101,16 +101,24 @@ class Quote extends Data {
      */
     public function getDiscountData()
     {
-        $quote      = $this->getSessionQuote();
-        $totals     = $quote->getTotals();
-        $discountData     = [];
-        if( isset($totals['discount']) && $totals['discount']->getValue() ) {
-            $discount   = ['amount'        => $totals['discount']->getValue() * -100.0,
-                           'description'   => $totals['discount']->getTitle()];
-            $discountData[]   = $discount;
+        if ($this->isInAdmin()) {
+            $discount = $this->orderCreateModel->getQuote()->getSubtotal() -
+                        $this->orderCreateModel->getQuote()->getSubtotalWithDiscount();
+            $couponTitle = $this->orderCreateModel->getQuote()->getCouponCode();
+        } else {
+            $quote = $this->getSessionQuote();
+            $discount = $quote->getQuote()->getSubtotal() -
+                        $quote->getQuote()->getSubtotalWithDiscount();
+            $couponTitle = $quote->getCouponCode();
         }
 
-        return $discountData;
+        if( $discount > 0 ) {
+            $discount   = ['amount'        => intval($discount * 100),
+                           'description'   => ($couponTitle) ?
+                                                $couponTitle : __('Discount')];
+        }
+
+        return [$discount];
     }
 
     /**
