@@ -14,6 +14,9 @@ define(['jquery',
                 shippingContact: data.shippingContact,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
+                shippingOptions: [data.shippingOptions],
+                tax: this.round(window.checkoutConfig.totalsData.tax_amount),
+                customTotal: this.round(window.checkoutConfig.totalsData.base_grand_total),
                 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
@@ -32,7 +35,7 @@ define(['jquery',
                                         console.log(response);
                                         alert(response.error);
                                     } else {
-                                        this.updateAddresses(response, tx_token);
+                                        this.updateAddress(response, tx_token);
                                     }
                                 }
                             } catch (e) {
@@ -40,66 +43,6 @@ define(['jquery',
                             }
                         });
                     }
-                },
-
-                /**
-                 * Calculate tax value callback
-                 *
-                 * @param shippingAddress
-                 * @param callback
-                 */
-                calculateTax: function (shippingAddress, callback) {
-                    shippingAddress.block_key = window.checkoutConfig.payment.breadcheckout.breadConfig.blockCode;
-
-                    $.ajax({
-                        url: window.checkoutConfig.payment.breadcheckout.breadConfig.taxEstimationUrl,
-                        data: {shippingInfo: JSON.stringify(shippingAddress)},
-                        type: 'post'
-                    }).done(function (response) {
-                        try {
-                            if (typeof response == 'object') {
-                                if (response.error) {
-                                    alert(response.error);
-                                } else {
-                                    callback(null, response.result);
-                                }
-                            }
-                        }
-                        catch (e) {
-                            console.log(e);
-                        }
-                    });
-                },
-
-                /**
-                 * Calculate shipping cost callback
-                 *
-                 * @param shippingAddress
-                 * @param callback
-                 */
-                calculateShipping: function (shippingAddress, callback) {
-                    shippingAddress.block_key = window.checkoutConfig.payment.breadcheckout.breadConfig.blockCode;
-
-                    $.ajax({
-                        url: window.checkoutConfig.payment.breadcheckout.breadConfig.shippingEstimationUrl,
-                        data: shippingAddress,
-                        type: 'post',
-                        context: context
-                    }).done(function (response) {
-                        try {
-                            if (typeof response == 'object') {
-                                if (response.error) {
-                                    alert(response.error);
-                                } else {
-                                    this.setShippingRates(response.result);
-                                    callback(null, response.result);
-                                }
-                            }
-                        }
-                        catch (e) {
-                            console.log(e);
-                        }
-                    });
                 }
             };
 
@@ -110,10 +53,10 @@ define(['jquery',
                 breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
-            var discountAmount =- this.round(parseFloat(window.checkoutConfig.totalsData.discount_amount), 2);
+            var discountAmount =- this.round(window.checkoutConfig.totalsData.discount_amount);
             if (discountAmount > 0) {
                 breadConfig.discounts = [{
-                    amount: parseInt(discountAmount * 100),
+                    amount: discountAmount,
                     description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
                         window.checkoutConfig.totalsData.coupon_code :
                         "Discount"
@@ -124,6 +67,7 @@ define(['jquery',
              * Call the checkout method from bread.js
              */
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
+                console.log(breadConfig);
                 bread.checkout(breadConfig);
             } else {
                 fullScreenLoader.stopLoader();
@@ -136,8 +80,11 @@ define(['jquery',
             }
         },
 
-        round: function(value, decimals) {
-            return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+        round: function(value) {
+            return parseInt(
+                Number(Math.round(parseFloat(value)+'e'+2)+'e-'+2)
+                * 100
+            );
         }
     };
 });

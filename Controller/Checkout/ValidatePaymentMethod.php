@@ -62,6 +62,8 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     {
         try {
             $token = $this->getRequest()->getParam('token');
+            $newData = [];
+
             if ($token) {
                 $data = $this->paymentApiClient->getInfo($token);
                 if ($data['breadTransactionId']) {
@@ -81,7 +83,7 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     }
 
     /**
-     * Update quote to reflect options selected in Bread checkout popup
+     * Update quote with billing address from Bread checkout popup
      *
      * @param string $token
      * @return array
@@ -92,20 +94,11 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
         $billingData = $this->getFormattedAddress($data['billingContact']);
 
         $quote = $this->checkoutSession->getQuote();
-
         $quote->getBillingAddress()->addData($billingData);
-
-        if (!$quote->getIsVirtual()) {
-            $shippingData = $this->getFormattedAddress($data['shippingContact']);
-            $quote->getShippingAddress()->addData($shippingData);
-        }
-
         $quote->collectTotals();
         $this->quoteRepository->save($quote);
 
-        return ['billingAddress' => $quote->getBillingAddress()->getData(),
-            'shippingAddress' => $quote->getShippingAddress()->getData(),
-            'shippingMethod' => $data['shippingMethodCode']];
+        return ['billingAddress' => $quote->getBillingAddress()->getData()];
     }
 
     /**

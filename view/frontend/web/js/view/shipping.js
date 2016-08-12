@@ -36,6 +36,7 @@ define(
              */
             updateConfigData: function(data) {
                 window.checkoutConfig.payment.breadcheckout.breadConfig.shippingContact = data.shippingContact;
+                window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = data.shippingOptions;
 
                 if (data.billingContact !== false) {
                     window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact = data.billingContact;

@@ -9,13 +9,8 @@ define(
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/action/set-billing-address',
         'Magento_Ui/js/model/messageList',
-        'Magento_Checkout/js/view/billing-address',
         'Magento_Checkout/js/model/shipping-save-processor/default',
-        'Magento_Checkout/js/model/shipping-service',
-        'Magento_Checkout/js/action/select-shipping-method',
-        'Magento_Checkout/js/action/create-shipping-address',
-        'Magento_Checkout/js/action/select-shipping-address',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/shipping-service'
     ],
     function (Component,
               $,
@@ -26,13 +21,8 @@ define(
               checkoutData,
               setBillingAddressAction,
               globalMessageList,
-              billingAddress,
               defaultProcessor,
-              shippingService,
-              selectShippingMethodAction,
-              createShippingAddress,
-              selectShippingAddress,
-              fullScreenLoader) {
+              shippingService) {
         'use strict';
         return Component.extend({
             defaults: {
@@ -107,12 +97,12 @@ define(
             },
 
             /**
-             * Update billing & shipping address data in quote
+             * Save billing address data in quote
              *
              * @param data object
              * @param token string
              */
-            updateAddresses: function(data, token) {
+            updateAddress: function(data, token) {
                 /**
                  * Billing address
                  */
@@ -125,40 +115,11 @@ define(
                 checkoutData.setNewCustomerBillingAddress(billingAddressData);
 
                 /**
-                 * Shipping address
+                 * Reload checkout section & add bread token
                  */
-                var shippingAddressData = this.getAddressData(data.shippingAddress);
-                var newShippingAddress = createShippingAddress(shippingAddressData);
-
-                // New address must be selected as a shipping address
-                selectShippingAddress(newShippingAddress);
-                checkoutData.setSelectedShippingAddress(newShippingAddress.getKey());
-                checkoutData.setNewCustomerShippingAddress(shippingAddressData);
-
-                /**
-                 * Shipping method
-                 */
-                var selectedRate;
-                $.each(window.checkoutConfig.shippingRates, function(i, rate) {
-                   var shippingCode = rate.carrier_code + '_' + rate.method_code;
-                   if (data.shippingMethod == shippingCode) {
-                       selectedRate = rate;
-                       return false;
-                   }
+                defaultProcessor.saveShippingInformation().done(function() {
+                    window.checkoutConfig.payment.breadcheckout.transactionId = token;
                 });
-
-                if (selectedRate) {
-                    selectShippingMethodAction(selectedRate);
-                    checkoutData.setSelectedShippingRate(data.shippingMethod);
-                    defaultProcessor.saveShippingInformation().done(function() {
-                        window.checkoutConfig.payment.breadcheckout.transactionId = token;
-                    });
-                } else {
-                    fullScreenLoader.stopLoader();
-                    globalMessageList.addErrorMessage({
-                        message: 'Please select a shipping method in the Bread checkout window.'
-                    });
-                }
             },
 
             /**
@@ -174,8 +135,10 @@ define(
                         1: ""
                     };
                 }
-                address.save_in_address_book = ((customer.isLoggedIn() && !billingAddress.customerHasAddresses)) ? 1 : 0;
 
+                address.save_in_address_book = ((customer.isLoggedIn() &&
+                                                 customer.getBillingAddressList().length < 1)) ?
+                                                 1 : 0;
                 return address;
             }
 
