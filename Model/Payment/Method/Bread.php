@@ -311,7 +311,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 break;
             case self::ACTION_CAPTURE:
                     $result     = $this->apiClient->settle($this->getValidatedTxId($payment));
-                    $payment->setTransactionId($result['breadTransactionId']);
+                    $payment->setTransactionId($result['breadTransactionId'])
+                            ->setAmount($amount);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE
                         , $result['breadTransactionId']
@@ -321,7 +322,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 break;
             case self::ACTION_REFUND:
                     $result     = $this->apiClient->refund($this->getValidatedTxId($payment), (int)round($amount * 100));
-                    $payment->setTransactionId($result['breadTransactionId']);
+                    $payment->setTransactionId($payment->getTransactionId())
+                            ->setAmount($amount)
+                            ->setIsTransactionClosed(1)
+                            ->setShouldCloseParentTransaction(1);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND
                         , $result['breadTransactionId']
@@ -331,7 +335,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 break;
             case self::ACTION_VOID:
                     $result     = $this->apiClient->cancel($this->getValidatedTxId($payment));
-                    $payment->setTransactionId($result['breadTransactionId']);
+                    $payment->setTransactionId($payment->getTransactionId())
+                            ->setIsTransactionClosed(1)
+                            ->setShouldCloseParentTransaction(1);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID
                         , $result['breadTransactionId']
