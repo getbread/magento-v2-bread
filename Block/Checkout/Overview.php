@@ -70,17 +70,6 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     }
 
     /**
-     * Get Discount Data
-     *
-     * @return string
-     */
-    public function getDiscountDataJson()
-    {
-        $discountData   = $this->quoteHelper->getDiscountData();
-        return $this->jsonEncode($discountData);
-    }
-
-    /**
      * Get Product Data From Quote Items
      *
      * @return string

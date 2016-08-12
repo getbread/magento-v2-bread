@@ -28,6 +28,9 @@ class Quote extends Data {
     /** @var \Magento\Sales\Model\AdminOrder\Create */
     protected $orderCreateModel;
 
+    /** @var \Magento\Framework\Pricing\PriceCurrencyInterface */
+    protected $priceCurrency;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -38,13 +41,15 @@ class Quote extends Data {
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Checkout\Model\Cart $checkoutCart,
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
-        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
+        \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
         $this->checkoutCart = $checkoutCart;
         $this->helperCatalog = $helperCatalog;
         $this->orderCreateModel = $orderCreateModel;
+        $this->priceCurrency = $priceCurrency;
 
         parent::__construct(
             $helperContext,
@@ -107,13 +112,13 @@ class Quote extends Data {
             $couponTitle = $this->orderCreateModel->getQuote()->getCouponCode();
         } else {
             $quote = $this->getSessionQuote();
-            $discount = $quote->getQuote()->getSubtotal() -
-                        $quote->getQuote()->getSubtotalWithDiscount();
+            $discount = $quote->getSubtotal() -
+                        $quote->getSubtotalWithDiscount();
             $couponTitle = $quote->getCouponCode();
         }
 
         if( $discount > 0 ) {
-            $discount   = ['amount'        => intval($discount * 100),
+            $discount   = ['amount'        => intval($this->priceCurrency->round($discount) * 100),
                            'description'   => ($couponTitle) ?
                                                 $couponTitle : __('Discount')];
         }

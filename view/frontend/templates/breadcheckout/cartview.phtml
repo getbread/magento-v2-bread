@@ -121,7 +121,7 @@
                 breadConfig.actAsLabel = false;
             }
 
-            var discountAmount =- parseInt(window.checkoutConfig.totalsData.discount_amount);
+            var discountAmount =- document.round(parseFloat(window.checkoutConfig.totalsData.discount_amount), 2);
             if (discountAmount > 0) {
                 breadConfig.discounts = [{
                     amount: discountAmount * 100,
@@ -130,8 +130,12 @@
                         "Discount"
                 }];
             }
-            
+
             bread.checkout(breadConfig);
+        };
+
+        document.round = function(value, decimals) {
+            return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
         };
 
         $(document).ready(function() {

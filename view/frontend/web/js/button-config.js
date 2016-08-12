@@ -110,10 +110,10 @@ define(['jquery',
                 breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
-            var discountAmount =- parseInt(window.checkoutConfig.totalsData.discount_amount);
+            var discountAmount =- this.round(parseFloat(window.checkoutConfig.totalsData.discount_amount), 2);
             if (discountAmount > 0) {
                 breadConfig.discounts = [{
-                    amount: discountAmount * 100,
+                    amount: parseInt(discountAmount * 100),
                     description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
                         window.checkoutConfig.totalsData.coupon_code :
                         "Discount"
@@ -134,6 +134,10 @@ define(['jquery',
                 $('#bread_feedback').html(approved);
                 $('#bread-checkout-submit').removeAttr('disabled');
             }
+        },
+
+        round: function(value, decimals) {
+            return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
         }
     };
 });
