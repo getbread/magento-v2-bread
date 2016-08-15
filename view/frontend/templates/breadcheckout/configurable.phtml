@@ -29,9 +29,9 @@
                 /**
                  * Validate add to cart form
                  */
-                $(form).validate({
+                $.mage.validation({
                     errorPlacement: function() {} // Hides default error labels
-                });
+                }, form);
 
                 if ($(form).valid()) {
                     $('.button-prevent').hide();
@@ -43,7 +43,7 @@
                         document.resetPriceAndSku(true);
                     }
                 } else {
-                    $('.mage-error', form).hide(); // Hides Magento error labels
+                    $('.mage-error:not(.product-custom-option)', form).hide(); // Hides Magento error labels
                     $('.button-prevent').show();
                 }
             };

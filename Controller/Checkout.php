@@ -126,28 +126,37 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                     $values     = $o->getValues();
                     if (count($values) > 0) {
                         foreach ($values as $v) {
-                            if ($v['sku'] == $optionKeyValue[0]) {
-                                if (array_key_exists($v->getOptionId(), $customOptionConfig)) {
-                                    $customOptionConfig[$v->getOptionId()]  =
-                                        $customOptionConfig[$v->getOptionId()].','.$v->getOptionTypeId();
-                                }
-                                else {
-                                    $customOptionConfig[$v->getOptionId()]  = $v->getOptionTypeId();
-                                }
-
+                            if ($this->compareOptions($v, $optionKeyValue[0])) {
+                                $customOptionConfig[$v->getOptionId()][] = $v->getOptionTypeId();
                                 $found      = true;
                                 break;
                             }
                         }
                     } else {
-                        if ($o['sku'] == $optionKeyValue[0]) {
-                            $customOptionConfig[$o->getOptionId()]  = $optionKeyValue[1];
+                        if ($this->compareOptions($o, $optionKeyValue[0])) {
+                            unset($optionKeyValue[0]);
+                            $optionId = $o->getOptionId();
+
+                            if ($o->getType() === \Magento\Catalog\Model\Product\Option::OPTION_TYPE_DATE) {
+                                if (!isset($buyInfo['validate_datetime_' . $optionId])) {
+                                    $buyInfo['validate_datetime_' . $optionId] = '';
+                                }
+
+                                $optionGroups = array_chunk($optionKeyValue, 2);
+                                foreach($optionGroups as $group) {
+                                    if (count($group) === 2) {
+                                        $customOptionConfig[$optionId][$group[0]] = $group[1];
+                                    }
+                                }
+                            } else {
+                                $customOptionConfig[$optionId][] = $optionKeyValue;
+                            }
+
                             $found      = true;
                         }
                     }
                 }
             }
-
             $buyInfo['options']     = $customOptionConfig;
         }
 
@@ -155,6 +164,23 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $buyRequest->addData($buyInfo);
 
         $quote->addProduct($baseProduct, $buyRequest);
+    }
+
+    /**
+     * Compare selected option ID or SKU to current option
+     * in loop
+     *
+     * @param $optionData
+     * @param $optionValue
+     * @return bool
+     */
+    protected function compareOptions($optionData, $optionValue)
+    {
+        if ( preg_match('/^id~(.+)$/', $optionValue, $matches) ) {
+            return (bool) ($optionData->getOptionId() == $matches[1]);
+        } else {
+            return (bool) ($optionData['sku'] == $optionValue);
+        }
     }
 
     /**
@@ -180,7 +206,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             }
 
             $this->totalsCollector->collectAddressTotals($quote, $address);
-            $quote->collectTotals();
+            $quote->setTotalsCollectedFlag(false)->collectTotals();
             $this->quoteRepository->save($quote);
 
             return $address;
@@ -222,7 +248,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
                 $quote = $this->checkoutSession->getQuote();
 
-                if ($removeItems) {
+                if (!$this->checkoutSession->getBreadItemAddedToQuote() && $removeItems) {
                     $quote->removeAllItems(); // Reset items in quote
                 }
 

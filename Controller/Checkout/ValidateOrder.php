@@ -200,7 +200,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
 
         try {
-            $this->quoteRepository->save($quote);
             $order = $this->quoteManagement->submit($quote);
         } catch (\Exception $e) {
             $this->helper->log(["ERROR SUBMITTING QUOTE IN PROCESS ORDER" => $e->getMessage()]);
