@@ -40,8 +40,7 @@ class ConfigData extends \Magento\Framework\App\Action\Action
             'shippingContact' => $this->quoteHelper->getShippingAddressData(),
             'billingContact' => ($this->customerHelper->isUserLoggedIn()) ?
                 $this->customerHelper->getFormattedDefaultBillingAddress() :
-                $this->quoteHelper->getBillingAddressData(),
-            'shippingOptions' => $this->quoteHelper->getShippingOptions()
+                $this->quoteHelper->getBillingAddressData()
         ]);
     }
 }

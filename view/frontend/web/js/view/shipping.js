@@ -10,9 +10,10 @@ define(
     [
         'Magento_Checkout/js/view/shipping',
         'jquery',
-        'Magento_Checkout/js/checkout-data'
+        'Magento_Checkout/js/checkout-data',
+        'Magento_Checkout/js/model/quote'
     ],
-    function (Shipping, $, checkout) {
+    function (Shipping, $, checkout, quote) {
         'use strict';
         return Shipping.extend({
             setShippingInformation: function() {
@@ -36,7 +37,11 @@ define(
              */
             updateConfigData: function(data) {
                 window.checkoutConfig.payment.breadcheckout.breadConfig.shippingContact = data.shippingContact;
-                window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = data.shippingOptions;
+                window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = {
+                    type: quote.shippingMethod().carrier_title + ' - ' + quote.shippingMethod().method_title,
+                    typeId: quote.shippingMethod().carrier_code + '_' + quote.shippingMethod().method_code,
+                    cost: this.round(quote.shippingMethod().base_amount)
+                };
 
                 if (data.billingContact !== false) {
                     window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact = data.billingContact;
@@ -44,6 +49,13 @@ define(
                         data.billingContact.email :
                         checkout.getValidatedEmailValue();
                 }
+            },
+
+            round: function(value) {
+                return parseInt(
+                    Number(Math.round(parseFloat(value)+'e'+2)+'e-'+2)
+                    * 100
+                );
             }
         });
     }

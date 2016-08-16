@@ -37,6 +37,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'buttonCss' => $this->helper->getButtonDesign(),
                     'configDataUrl' => $this->helper->getConfigDataUrl(),
                     'transactionId' => $this->helper->getBreadTransactionId(),
+                    'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,

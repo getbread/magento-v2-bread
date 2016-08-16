@@ -13,14 +13,8 @@ class Quote extends Data {
     /** @var \Magento\Sales\Model\Quote */
     protected $quote = null;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
-
     /** @var \Magento\Checkout\Model\Session */
     protected $checkoutSession;
-
-    /** @var \Magento\Checkout\Model\Cart */
-    protected $checkoutCart;
 
     /** @var Bread\BreadCheckout\Helper\Catalog */
     protected $helperCatalog;
@@ -37,16 +31,12 @@ class Quote extends Data {
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Checkout\Model\Cart $checkoutCart,
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
     ) {
-        $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
-        $this->checkoutCart = $checkoutCart;
         $this->helperCatalog = $helperCatalog;
         $this->orderCreateModel = $orderCreateModel;
         $this->priceCurrency = $priceCurrency;
@@ -56,8 +46,7 @@ class Quote extends Data {
             $context,
             $request,
             $encryptor,
-            $urlInterfaceFactory,
-            $storeManager
+            $urlInterfaceFactory
         );
     }
 
@@ -262,7 +251,7 @@ class Quote extends Data {
         } else {
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
-
+        
         if(!$shippingAddress->getShippingMethod()){
             return false;
         }
@@ -289,7 +278,7 @@ class Quote extends Data {
      */
     public function getSessionQuote()
     {
-        if ($this->quote == null) {
+        if ($this->quote === null) {
 
             if ($this->isInAdmin()) {
                 $this->quote = $this->orderCreateModel->getQuote();

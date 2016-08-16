@@ -19,11 +19,10 @@ class Catalog extends Data
         \Magento\Catalog\Block\Product\View $productViewBlock,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
-        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
     ) {
         $this->productViewBlock = $productViewBlock;
-        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
 
     /**

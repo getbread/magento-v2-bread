@@ -10,6 +10,9 @@ namespace Bread\BreadCheckout\Helper;
 
 class Customer extends Data
 {
+    /** @var \Magento\Store\Model\StoreManagerInterface */
+    protected $storeManager;
+
     /** @var \Magento\Customer\Model\Session */
     protected $customerSession;
 
@@ -38,12 +41,13 @@ class Customer extends Data
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Math\Random $random
     ) {
+        $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
         $this->customerFactory = $customerFactory;
         $this->customerAddressFactory = $customerAddressFactory;
         $this->jsonHelper = $jsonHelper;
         $this->random = $random;
-        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
     /**
      * Pass Back Bread Formatted Default Customer Address If It Exists

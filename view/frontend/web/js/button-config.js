@@ -67,7 +67,6 @@ define(['jquery',
              * Call the checkout method from bread.js
              */
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                console.log(breadConfig);
                 bread.checkout(breadConfig);
             } else {
                 fullScreenLoader.stopLoader();

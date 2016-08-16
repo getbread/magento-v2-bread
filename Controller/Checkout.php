@@ -28,7 +28,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /** @var \Psr\Log\LoggerInterface */
     protected $logger;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /** @var \Bread\BreadCheckout\Helper\Checkout */
     protected $helper;
 
     /** @var \Magento\Framework\Controller\ResultFactory */
@@ -54,7 +54,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
-        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Checkout $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session $customerSession,

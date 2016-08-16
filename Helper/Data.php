@@ -18,6 +18,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const URL_VALIDATE_PAYMENT                      = "bread/checkout/validatepaymentmethod";
     const URL_VALIDATE_ORDER                        = "bread/checkout/validateorder";
+    const URL_VALIDATE_TOTALS                       = "bread/checkout/validatetotals";
     const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimateshipping";
     const URL_TAX_ESTIMATE                          = "bread/checkout/estimatetax";
     const URL_CONFIG_DATA                           = "bread/checkout/configdata";
@@ -63,9 +64,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /** @var \Magento\Framework\UrlInterfaceFactory */
     protected $urlInterfaceFactory;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
-
     /** @var \Psr\Log\LoggerInterface */
     protected $logger;
 
@@ -74,15 +72,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
-        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
     ) {
         $this->context = $context;
         $this->request = $request;
         $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
-        $this->storeManager = $storeManager;
         $this->logger = $helperContext->getLogger();
         parent::__construct(
             $helperContext
@@ -184,6 +180,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $isSecure = $this->request->isSecure();
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_ORDER,['_secure'=>$isSecure]);
+    }
+
+    /**
+     * Get The Validate Totals URL
+     *
+     * @return string
+     */
+    public function getValidateTotalsUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_TOTALS,['_secure'=>$isSecure]);
     }
 
     /**

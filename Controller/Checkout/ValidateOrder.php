@@ -64,7 +64,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Checkout $helper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,

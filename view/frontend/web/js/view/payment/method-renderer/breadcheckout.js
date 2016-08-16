@@ -8,9 +8,10 @@ define(
         'Magento_Checkout/js/action/select-billing-address',
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/action/set-billing-address',
-        'Magento_Ui/js/model/messageList',
+        'Magento_Checkout/js/model/error-processor',
         'Magento_Checkout/js/model/shipping-save-processor/default',
-        'Magento_Checkout/js/model/shipping-service'
+        'Magento_Checkout/js/model/shipping-service',
+        'Magento_Checkout/js/model/full-screen-loader'
     ],
     function (Component,
               $,
@@ -20,9 +21,10 @@ define(
               selectBillingAddress,
               checkoutData,
               setBillingAddressAction,
-              globalMessageList,
+              errorProcessor,
               defaultProcessor,
-              shippingService) {
+              shippingService,
+              fullScreenLoader) {
         'use strict';
         return Component.extend({
             defaults: {
@@ -68,39 +70,40 @@ define(
             },
 
             /**
-             * Update shipping rates in case shipping address
-             * changed in Bread checkout form
+             * Validate that Bread authorized amount matches
+             * total in Magento quote
              *
-             * @param data object
+             * @return {boolean}
              */
-            setShippingRates: function(data) {
-                var ratesData = {};
-                $.each(data, function(i, rate) {
-                    var cost = rate.cost / 100;
-                    var method = rate.typeId.split('_');
-                    var title = rate.type.split(' - ');
-                    ratesData[i] = {
-                        'amount': cost,
-                        'available': true,
-                        'base_amount': cost,
-                        'carrier_code': method[0],
-                        'carrier_title': title[0],
-                        'error_message': "",
-                        'method_code': method[1],
-                        'method_title': title[1],
-                        'price_excl_tax': cost,
-                        'price_incl_tax': cost
+            validate: function() {
+                var passed = false;
+
+                $.ajax({
+                    url: window.checkoutConfig.payment.breadcheckout.validateTotalsUrl,
+                    data: { bread_transaction_id: this.getBreadTransactionId() },
+                    type: 'post',
+                    context: this,
+                    beforeSend: function() {
+                        fullScreenLoader.startLoader();
+                    }
+                }).done(function (response) {
+                    fullScreenLoader.stopLoader();
+
+                    if (response.valid) {
+                        passed = true;
+                    } else {
+                        errorProcessor.process(response, this.messageContainer);
                     }
                 });
-                window.checkoutConfig.shippingRates = ratesData;
-                shippingService.setShippingRates(ratesData);
+
+                return passed;
             },
 
             /**
              * Save billing address data in quote
              *
-             * @param data object
-             * @param token string
+             * @param data {object}
+             * @param token {string}
              */
             updateAddress: function(data, token) {
                 /**
@@ -125,8 +128,8 @@ define(
             /**
              * Format street and set whether to save in address book
              *
-             * @param address object
-             * @return object
+             * @param address {object}
+             * @return {object}
              */
             getAddressData: function(address) {
                 if (typeof address.street == 'string') {
