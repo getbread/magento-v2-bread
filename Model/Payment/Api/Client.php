@@ -14,6 +14,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     const STATUS_SETTLED        = 'SETTLED';
     const STATUS_PENDING        = 'PENDING';
     const STATUS_CANCELED       = 'CANCELED';
+    protected $order            = null;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
     protected $helper;
@@ -21,16 +22,29 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /** @var \Magento\Framework\Json\Helper\Data */
     protected $jsonHelper;
 
+    /** @var \Magento\Store\Model\StoreManagerInterface */
+    protected $storeResolver;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Bread\BreadCheckout\Helper\Data $helper,
-        \Magento\Framework\Json\Helper\Data $jsonHelper
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Store\Model\StoreResolver $storeResolver
     )
     {
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
+        $this->storeResolver = $storeResolver;
         parent::__construct($context, $registry);
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     */
+    public function setOrder(\Magento\Sales\Model\Order $order)
+    {
+        $this->order = $order;
     }
 
     /**
@@ -189,8 +203,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function call($url, array $data, $method = \Zend_Http_Client::POST)
     {
-        $username   = $this->helper->getApiPublicKey();
-        $password   = $this->helper->getApiSecretKey();
+        $storeId = $this->getStoreId();
+        $username   = $this->helper->getApiPublicKey($storeId);
+        $password   = $this->helper->getApiSecretKey($storeId);
 
         try {
             $curl = curl_init($url);
@@ -253,7 +268,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getTransactionInfoUrl($transactionId)
     {
-        $baseUrl = $this->helper->getTransactionApiUrl();
+        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
         return join('/', array(trim($baseUrl, '/'), 'transactions', trim($transactionId, '/')));
     }
 
@@ -264,7 +279,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getUpdateTransactionUrl($transactionId)
     {
-        $baseUrl = $this->helper->getTransactionApiUrl();
+        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
         return join('/', array(trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/')));
     }
 
@@ -283,5 +298,18 @@ class Client extends \Magento\Framework\Model\AbstractModel
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns current store ID
+     *
+     * @return int
+     */
+    protected function getStoreId()
+    {
+        if ( !isset($this->order) ) {
+            return $this->storeResolver->getCurrentStoreId();
+        }
+        return $this->order->getData('store_id');
     }
 }

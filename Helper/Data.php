@@ -113,9 +113,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null $store
      * @return mixed
      */
-    public function getApiPublicKey($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getApiPublicKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store, $storeCode);
     }
 
     /**
@@ -124,10 +124,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null $store
      * @return string
      */
-    public function getApiSecretKey($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getApiSecretKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (string) $this->encryptor->decrypt(
-            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store));
+            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode));
     }
 
     /**
@@ -151,9 +151,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null $store
      * @return mixed
      */
-    public function getTransactionApiUrl($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        if($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)){
+        if($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)){
             return self::API_LIVE_URI;
         } else {
             return self::API_SANDBOX_URI;

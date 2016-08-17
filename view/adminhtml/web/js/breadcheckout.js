@@ -14,7 +14,6 @@ define(
                 var breadConfig = {
                     buttonId: 'bread-checkout-btn',
                     items: data.quoteItems,
-                    discounts: data.discounts,
                     shippingOptions: [data.shippingOptions],
                     tax: data.tax,
                     customTotal: data.grandTotal,
@@ -58,6 +57,10 @@ define(
                  */
                 if (data.buttonCss !== null) {
                     breadConfig.customCSS = data.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
+                }
+
+                if (data.discounts > 0) {
+                    breadConfig.discounts = data.discounts;
                 }
 
                 /**

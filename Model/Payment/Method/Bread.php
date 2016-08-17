@@ -65,6 +65,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /** @var \Magento\Sales\Model\AdminOrder\Create */
     protected $orderCreateModel;
 
+    /** @var \Magento\Framework\Pricing\PriceCurrencyInterface */
+    protected $priceCurrency;
+
     /**
      * Construct Sets API Client And Sets Available For Checkout Flag
      *
@@ -86,6 +89,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         $params = [])
     {
         $this->apiClient = $apiClient;
@@ -98,6 +102,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $this->quoteRepository = $quoteRepository;
         $this->transactionRepository = $transactionRepository;
         $this->orderCreateModel = $orderCreateModel;
+        $this->priceCurrency = $priceCurrency;
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig, $logger);
     }
 
@@ -110,6 +115,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function fetchTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
     {
+        $this->apiClient->setOrder($payment->getOrder());
         return $this->apiClient->getInfo($transactionId);
     }
 
@@ -219,8 +225,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         if($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE){
+            $this->apiClient->setOrder($payment->getOrder());
             $token  = $this->checkoutSession->getBreadTransactionId();
-            $result = $this->apiClient->authorize($token, (int)round($amount * 100), $payment->getOrder()->getIncrementId() );
+            $result = $this->apiClient->authorize($token, (int) ($this->priceCurrency->round($amount) * 100), $payment->getOrder()->getIncrementId() );
             $payment->setTransactionId($result['breadTransactionId']);
         } else {
             $token  = $payment->getAuthorizationTransaction()->getTxnId();
@@ -298,9 +305,12 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType)
     {
+        $this->apiClient->setOrder($payment->getOrder());
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
-                    $result     = $this->apiClient->authorize($this->getValidatedTxId($payment), (int)round($amount * 100), $payment->getOrder()->getIncrementId() );
+                    $result     = $this->apiClient->authorize($this->getValidatedTxId($payment),
+                        (int) ($this->priceCurrency->round($amount) * 100),
+                        $payment->getOrder()->getIncrementId() );
                     $payment->setTransactionId($result['breadTransactionId']);
                     $this->addTransactionInfo($payment
                         , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH
@@ -321,7 +331,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         , "Bread Finance Payment Captured");
                 break;
             case self::ACTION_REFUND:
-                    $result     = $this->apiClient->refund($this->getValidatedTxId($payment), (int)round($amount * 100));
+                    $result     = $this->apiClient->refund($this->getValidatedTxId($payment),
+                        (int) ($this->priceCurrency->round($amount) * 100));
                     $payment->setTransactionId($payment->getTransactionId())
                             ->setAmount($amount)
                             ->setIsTransactionClosed(1)

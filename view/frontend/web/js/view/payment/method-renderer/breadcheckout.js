@@ -71,12 +71,13 @@ define(
 
             /**
              * Validate that Bread authorized amount matches
-             * total in Magento quote
+             * total in Magento quote, then call place order
              *
              * @return {boolean}
              */
-            validate: function() {
-                var passed = false;
+            placeOrder: function(data, event) {
+                this.data = data;
+                this.event = event;
 
                 $.ajax({
                     url: window.checkoutConfig.payment.breadcheckout.validateTotalsUrl,
@@ -90,13 +91,13 @@ define(
                     fullScreenLoader.stopLoader();
 
                     if (response.valid) {
-                        passed = true;
+                        /** Call parent method */
+                        return Component.prototype.placeOrder.call(this, this.data, this.event);
                     } else {
                         errorProcessor.process(response, this.messageContainer);
+                        return false;
                     }
                 });
-
-                return passed;
             },
 
             /**
