@@ -110,6 +110,8 @@ class Quote extends Data {
             $discount   = ['amount'        => intval($this->priceCurrency->round($discount) * 100),
                            'description'   => ($couponTitle) ?
                                                 $couponTitle : __('Discount')];
+        } else {
+            return false;
         }
 
         return [$discount];
