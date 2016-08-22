@@ -59,7 +59,7 @@ define(
                     breadConfig.customCSS = data.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
                 }
 
-                if (data.discounts > 0) {
+                if (data.discounts.length > 0) {
                     breadConfig.discounts = data.discounts;
                 }
 
