@@ -153,7 +153,7 @@ class Quote extends Data {
     {
 
         if ($this->isInAdmin()) {
-            $quoteItems = $this->orderCreateModel->getQuote()->getAllItems();
+            $quoteItems = $this->orderCreateModel->getQuote()->getAllVisibleItems();
         } else {
             $quoteItems = $this->getSessionQuote()->getAllVisibleItems();
         }
