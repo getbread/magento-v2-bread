@@ -155,12 +155,10 @@ class Customer extends Data
             $isNewCustomer      = true;
             $customer->setEmail($email);
             $customer->setPassword($this->generatePassword(7));
-            $billingAddress->setIsDefaultBilling('1');
-            $billingAddress->setSaveInAddressBook('1');
-            $shippingAddress->setIsDefaultShipping('1');
-            $shippingAddress->setSaveInAddressBook('1');
-            $customer->setPrimaryBillingAddress($billingAddress);
-            $customer->setPrimaryShippingAddress($shippingAddress);
+            $quote->getBillingAddress()->setIsDefaultBilling(true)->setSaveInAddressBook(true);
+            $quote->getShippingAddress()->setIsDefaultShipping(true)->setSaveInAddressBook(true);
+            $customer->setDefaultBilling($billingAddress->getId());
+            $customer->setDefaultShipping($shippingAddress->getId());
             $customer->setLastname($quote->getCustomerLastname());
             $customer->setFirstname($quote->getCustomerFirstname());
         }
