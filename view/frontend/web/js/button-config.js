@@ -2,7 +2,8 @@
  * Configure payment data and init bread checkout
  */
 define(['jquery',
-    'Magento_Checkout/js/model/full-screen-loader'], function($, fullScreenLoader){
+    'Magento_Checkout/js/model/full-screen-loader',
+    'Magento_Checkout/js/model/quote'], function($, fullScreenLoader, quote){
     return {
         configure: function(data, context) {
             var breadConfig = {
@@ -15,8 +16,8 @@ define(['jquery',
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
                 shippingOptions: [data.shippingOptions],
-                tax: this.round(window.checkoutConfig.totalsData.tax_amount),
-                customTotal: this.round(window.checkoutConfig.totalsData.base_grand_total),
+                tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
+                customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {

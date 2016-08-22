@@ -23,6 +23,7 @@ class Info extends \Magento\Payment\Block\Info
         $this->dataObjectFactory = $dataObjectFactory;
         parent::__construct($context, $data);
     }
+
     /**
      * Display Information For Admin View
      *
