@@ -97,8 +97,7 @@ class Customer extends Data
         }
 
         $defaultBillingAddress     = $customer->getPrimaryBillingAddress();
-
-        if(!$defaultBillingAddress->getStreetLine(1)){
+        if(!$defaultBillingAddress){
             return [];
         }
 
