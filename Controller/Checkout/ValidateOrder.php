@@ -156,7 +156,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         if (isset($data['discounts']) && count($data['discounts']) > 0) {
             $discountDescription = $data['discounts'][0]['description'];
-            $quote->setCouponCode(substr($discountDescription, 10, strlen($discountDescription) - 11));
+            $quote->setCouponCode($discountDescription);
         }
 
         $billingContact = $this->processAddress($data['billingContact']);

@@ -124,13 +124,12 @@
             var discountAmount =- document.round(window.checkoutConfig.totalsData.discount_amount);
             if (discountAmount > 0) {
                 breadConfig.discounts = [{
-                    amount: discountAmount * 100,
+                    amount: discountAmount,
                     description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
                         window.checkoutConfig.totalsData.coupon_code :
                         "Discount"
                 }];
             }
-
             bread.checkout(breadConfig);
         };
 
