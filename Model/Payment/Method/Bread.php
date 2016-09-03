@@ -227,7 +227,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE){
             $this->apiClient->setOrder($payment->getOrder());
             $token  = $this->checkoutSession->getBreadTransactionId();
-            $result = $this->apiClient->authorize($token, (int) ($this->priceCurrency->round($amount) * 100), $payment->getOrder()->getIncrementId() );
+            $result = $this->apiClient->authorize($token, ($this->priceCurrency->round($amount) * 100), $payment->getOrder()->getIncrementId() );
             $payment->setTransactionId($result['breadTransactionId']);
         } else {
             $token  = $payment->getAuthorizationTransaction()->getTxnId();
@@ -309,7 +309,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
                     $result     = $this->apiClient->authorize($this->getValidatedTxId($payment),
-                        (int) ($this->priceCurrency->round($amount) * 100),
+                        ($this->priceCurrency->round($amount) * 100),
                         $payment->getOrder()->getIncrementId() );
                     $payment->setTransactionId($result['breadTransactionId']);
                     $this->addTransactionInfo($payment
@@ -332,7 +332,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 break;
             case self::ACTION_REFUND:
                     $result     = $this->apiClient->refund($this->getValidatedTxId($payment),
-                        (int) ($this->priceCurrency->round($amount) * 100));
+                        ($this->priceCurrency->round($amount) * 100));
                     $payment->setTransactionId($payment->getTransactionId())
                             ->setAmount($amount)
                             ->setIsTransactionClosed(1)

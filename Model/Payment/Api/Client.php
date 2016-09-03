@@ -105,7 +105,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         }
 
         $breadAmount = $result['total'];
-        if ( (int)$breadAmount != (int)$amount )
+        if ( (int) trim($breadAmount) != (int) trim($amount) )
         {
             $this->helper->log(array("ERROR"=>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH", "BREAD AMOUNT"=>(int)$breadAmount ,"QUOTE AMOUNT"=>(int)$amount , "RESULT"=>$result));
             throw new \Magento\Framework\Exception\LocalizedException(__('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount));
