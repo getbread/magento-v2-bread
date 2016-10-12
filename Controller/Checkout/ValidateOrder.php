@@ -193,12 +193,16 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         $customer = $this->customerHelper->createCustomer($quote, $billingContact, $shippingContact);
 
+        if (!$customer) {
+            $quote->setCustomerIsGuest(true);
+        }
+
         $quote->setTotalsCollectedFlag(false)->collectTotals()->save();
-        
+
         $quote->getPayment()->importData(['method' => 'breadcheckout']);
         $quote->getPayment()->setTransactionId($data['breadTransactionId']);
         $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
-
+        
         try {
             $order = $this->quoteManagement->submit($quote);
         } catch (\Exception $e) {
@@ -216,9 +220,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $this->orderSender->send($order);
         } catch (\Exception $e) {
             $this->logger->critical($e);
+            $this->checkoutSession->setBreadItemAddedToQuote(false);
         }
 
-        if (!$this->customerSession->isLoggedIn()) {
+        if ($customer) {
             $this->customerSession->setCustomerAsLoggedIn($customer);
         }
 

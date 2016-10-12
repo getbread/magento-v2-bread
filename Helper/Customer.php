@@ -142,25 +142,26 @@ class Customer extends Data
         $email      = $quote->getCustomerEmail();
 
         $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
+
+        // Don't create a new account if one already exists for this email
         $customer->loadByEmail($email);
-        $isNewCustomer      = false;
+        if( $customer->getId() ) {
+            return;
+        }
 
         $billingAddress     = $this->customerAddressFactory->create();
         $billingAddress->setData($billingContact);
         $shippingAddress    = $this->customerAddressFactory->create();
         $shippingAddress->setData($shippingContact);
 
-        if( !$customer->getId() ) {
-            $isNewCustomer      = true;
-            $customer->setEmail($email);
-            $customer->setPassword($this->generatePassword(7));
-            $quote->getBillingAddress()->setIsDefaultBilling(true)->setSaveInAddressBook(true);
-            $quote->getShippingAddress()->setIsDefaultShipping(true)->setSaveInAddressBook(true);
-            $customer->setDefaultBilling($billingAddress->getId());
-            $customer->setDefaultShipping($shippingAddress->getId());
-            $customer->setLastname($quote->getCustomerLastname());
-            $customer->setFirstname($quote->getCustomerFirstname());
-        }
+        $customer->setEmail($email)
+            ->setPassword($this->generatePassword(7));
+        $quote->getBillingAddress()->setIsDefaultBilling(true)->setSaveInAddressBook(true);
+        $quote->getShippingAddress()->setIsDefaultShipping(true)->setSaveInAddressBook(true);
+        $customer->setDefaultBilling($billingAddress->getId())
+            ->setDefaultShipping($shippingAddress->getId())
+            ->setLastname($quote->getCustomerLastname())
+            ->setFirstname($quote->getCustomerFirstname());
 
         try {
             $customer->save();
@@ -169,21 +170,16 @@ class Customer extends Data
             $session->loginById($customer->getId());
             $quote->setCustomerId($customer->getId());
 
-            if($isNewCustomer) {
-                $billingAddress->setCustomerId($customer->getId());
-                $customer->addAddress($billingAddress);
-                $billingAddress->save();
-                $shippingAddress->setCustomerId($customer->getId());
-                $shippingAddress->setCustomer($customer);
-                $customer->addAddress($shippingAddress);
-                $shippingAddress->save();
-            }
+            $billingAddress->setCustomerId($customer->getId());
+            $customer->addAddress($billingAddress);
+            $billingAddress->save();
 
-            $customer->save();
+            $shippingAddress->setCustomerId($customer->getId())
+                ->setCustomer($customer);
+            $customer->addAddress($shippingAddress);
+            $shippingAddress->save();
 
-            if($isNewCustomer) {
-                $customer->sendNewAccountEmail();
-            }
+            $customer->save()->sendNewAccountEmail();
         } catch (\Exception $e) {
             $this->log('Exception While Logging In Customer');
             $this->logger->critical($e);
