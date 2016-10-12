@@ -38,9 +38,31 @@ class ConfigData extends \Magento\Framework\App\Action\Action
     {
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
             'shippingContact' => $this->quoteHelper->getShippingAddressData(),
-            'billingContact' => ($this->customerHelper->isUserLoggedIn()) ?
-                $this->customerHelper->getFormattedDefaultBillingAddress() :
-                $this->quoteHelper->getBillingAddressData()
+            'billingContact' => $this->getBillingAddressData()
         ]);
+    }
+
+    /**
+     * Get saved address from quote or customer default
+     * billing address, if one exists
+     *
+     * @return array|bool
+     */
+    protected function getBillingAddressData()
+    {
+        if ($data = $this->quoteHelper->getBillingAddressData()) {
+            return $data;
+        }
+
+        if (!$this->customerHelper->isUserLoggedIn()) {
+            return false;
+        }
+
+        $data = $this->customerHelper->getFormattedDefaultBillingAddress();
+        if (empty($data)) {
+            return false;
+        }
+
+        return $data;
     }
 }
