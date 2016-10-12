@@ -167,7 +167,6 @@ class Customer extends Data
             $customer->save();
             $customer->setConfirmation(null);
 
-            $session->loginById($customer->getId());
             $quote->setCustomerId($customer->getId());
 
             $billingAddress->setCustomerId($customer->getId());
