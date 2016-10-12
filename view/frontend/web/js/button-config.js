@@ -9,10 +9,6 @@ define(['jquery',
             var breadConfig = {
                 buttonId: data.buttonId,
                 items: data.items,
-                billingContact: (typeof data.billingContact !== 'undefined') ?
-                    data.billingContact :
-                    data.shippingContact,
-                shippingContact: data.shippingContact,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
                 shippingOptions: [data.shippingOptions],
@@ -52,6 +48,14 @@ define(['jquery',
              */
             if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
                 breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
+            }
+
+            if (typeof data.shippingContact !== 'undefined' && data.shippingContact != false) {
+                breadConfig.shippingContact = data.shippingContact;
+            }
+
+            if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
+                breadConfig.billingContact = data.billingContact;
             }
 
             var discountAmount =- this.round(window.checkoutConfig.totalsData.discount_amount);
