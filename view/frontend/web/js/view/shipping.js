@@ -10,45 +10,30 @@ define(
     [
         'Magento_Checkout/js/view/shipping',
         'jquery',
-        'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/model/quote'
     ],
-    function (Shipping, $, checkout, quote) {
+    function (Shipping, $, quote) {
         'use strict';
         return Shipping.extend({
             setShippingInformation: function() {
                 /** Call parent method */
                 Shipping.prototype.setShippingInformation.call(this);
 
-                /** Get updated quote data */
-                $.ajax({
-                    url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
-                    type: 'post',
-                    context: this
-                }).done(function (response) {
-                    this.updateConfigData(response);
-                });
+                /** Get updated shipping data */
+                this.updateConfigData();
             },
 
             /**
-             * Add updated quote data to window.checkoutConfig global variable
+             * Add updated shipping option data to window.checkoutConfig global variable
              *
              * @see Bread\BreadCheckout\Model\Ui\ConfigProvider
              */
-            updateConfigData: function(data) {
-                window.checkoutConfig.payment.breadcheckout.breadConfig.shippingContact = data.shippingContact;
+            updateConfigData: function() {
                 window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = {
                     type: quote.shippingMethod().carrier_title + ' - ' + quote.shippingMethod().method_title,
                     typeId: quote.shippingMethod().carrier_code + '_' + quote.shippingMethod().method_code,
                     cost: this.round(quote.shippingMethod().base_amount)
                 };
-
-                if (data.billingContact !== false) {
-                    window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact = data.billingContact;
-                    window.checkoutConfig.payment.breadcheckout.breadConfig.billingContact.email = (data.billingContact.email) ?
-                        data.billingContact.email :
-                        checkout.getValidatedEmailValue();
-                }
             },
 
             round: function(value) {

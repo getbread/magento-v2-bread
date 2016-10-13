@@ -3,10 +3,13 @@
  */
 define(['jquery',
     'Magento_Checkout/js/model/full-screen-loader',
-    'Magento_Checkout/js/model/quote'], function($, fullScreenLoader, quote){
+    'Magento_Checkout/js/model/quote',
+    'Magento_Checkout/js/checkout-data'], function($, fullScreenLoader, quote, checkout){
     return {
+        breadConfig: undefined,
+
         configure: function(data, context) {
-            var breadConfig = {
+            this.breadConfig = {
                 buttonId: data.buttonId,
                 items: data.items,
                 actAsLabel: false,
@@ -47,20 +50,16 @@ define(['jquery',
              * Optional params
              */
             if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
-                breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
-            }
-
-            if (typeof data.shippingContact !== 'undefined' && data.shippingContact != false) {
-                breadConfig.shippingContact = data.shippingContact;
+                this.breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
             if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
-                breadConfig.billingContact = data.billingContact;
+                this.breadConfig.billingContact = data.billingContact;
             }
 
             var discountAmount =- this.round(window.checkoutConfig.totalsData.discount_amount);
             if (discountAmount > 0) {
-                breadConfig.discounts = [{
+                this.breadConfig.discounts = [{
                     amount: discountAmount,
                     description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
                         window.checkoutConfig.totalsData.coupon_code :
@@ -68,13 +67,16 @@ define(['jquery',
                 }];
             }
 
-            /**
-             * Call the checkout method from bread.js
-             */
+            this.setShippingInformation();
+        },
+
+        /**
+         * Call the checkout method from bread.js
+         */
+        init: function() {
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                bread.checkout(breadConfig);
+                bread.checkout(this.breadConfig);
             } else {
-                fullScreenLoader.stopLoader();
                 $('#' + data.buttonId).hide();
                 $('#bread_transaction_id').val(window.checkoutConfig.payment.breadcheckout.transactionId);
                 var approved = "<span><strong>You have been approved for financing.<br/>"+
@@ -82,8 +84,39 @@ define(['jquery',
                 $('#bread_feedback').html(approved);
                 $('#bread-checkout-submit').removeAttr('disabled');
             }
+            fullScreenLoader.stopLoader();
         },
 
+        /**
+         * Get updated quote data
+         */
+        setShippingInformation: function() {
+            $.ajax({
+                url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
+                type: 'post',
+                context: this,
+                beforeSend: function() {
+                    fullScreenLoader.startLoader();
+                }
+            }).done(function(data) {
+                if (data.shippingContact != false) {
+                    this.breadConfig.shippingContact = data.shippingContact;
+                }
+
+                if (data.billingContact != false) {
+                    this.breadConfig.billingContact = data.billingContact;
+                    this.breadConfig.billingContact.email = (data.billingContact.email) ?
+                        data.billingContact.email :
+                        checkout.getValidatedEmailValue();
+                }
+
+                this.init();
+            });
+        },
+
+        /**
+         * Round float to 2 decimal places then convert to integer
+         */
         round: function(value) {
             return parseInt(
                 Number(Math.round(parseFloat(value)+'e'+2)+'e-'+2)
