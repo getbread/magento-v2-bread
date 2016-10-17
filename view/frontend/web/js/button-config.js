@@ -91,6 +91,10 @@ define(['jquery',
          * Get updated quote data
          */
         setShippingInformation: function() {
+            if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
+                return this.init();
+            }
+
             $.ajax({
                 url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
                 type: 'post',
