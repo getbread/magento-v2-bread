@@ -12,6 +12,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 {
     protected $_product;
 
+
     /** @var \Magento\Framework\Registry */
     protected $registry;
 
@@ -46,6 +47,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         array $data = []
     ) {
+        $this->_isScopePrivate = true;
         $this->registry = $context->getRegistry();
         $this->jsonHelper = $jsonHelper;
         $this->catalogHelper = $catalogHelper;
