@@ -19,8 +19,8 @@ define(
                 /** Call parent method */
                 Shipping.prototype.setShippingInformation.call(this);
 
-                /** Get updated shipping data */
                 this.updateConfigData();
+                this.invalidateToken();
             },
 
             /**
@@ -36,6 +36,22 @@ define(
                 };
             },
 
+            /**
+             * Invalidate existing transaction ID (in case user filled out payment
+             * form and then went back a step)
+             */
+            invalidateToken: function() {
+                if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
+                    window.checkoutConfig.payment.breadcheckout.transactionId = null;
+                }
+            },
+
+            /**
+             * Round float to 2 decimal plates and convert to integer
+             *
+             * @param value
+             * @returns {Number}
+             */
             round: function(value) {
                 return parseInt(
                     Number(Math.round(parseFloat(value)+'e'+2)+'e-'+2)
