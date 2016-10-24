@@ -47,7 +47,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         array $data = []
     ) {
-        $this->_isScopePrivate = true;
         $this->registry = $context->getRegistry();
         $this->jsonHelper = $jsonHelper;
         $this->catalogHelper = $catalogHelper;
@@ -187,6 +186,16 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getValidateOrderUrl()
     {
         return $this->catalogHelper->getValidateOrderURL();
+    }
+
+    /**
+     * Get Config Data URL
+     *
+     * @return string
+     */
+    public function getConfigDataUrl()
+    {
+        return $this->catalogHelper->getConfigDataUrl();
     }
 
     /**

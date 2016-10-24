@@ -3,7 +3,7 @@
 <div id="bread-btn-cntnr">
     <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
         <span>
-            <span><?php echo __('Bread Checkout'); ?></span>
+            <span><img src="<?php echo $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?php echo __('Bread Checkout'); ?>" /></span>
         </span>
     </div>
     <div class="button-prevent" id="button-prevent">
@@ -14,8 +14,6 @@
 <script type="text/javascript">
     require(['jquery'], function($){
         document.configureButton = function (items) {
-            var address             = <?php echo $this->getShippingAddressData(); ?>;
-            var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php echo $this->getButtonDesign(); ?>';
 
@@ -123,19 +121,25 @@
                 breadConfig.customCSS = buttonCss;
             }
 
-            if (address !== false) {
-                breadConfig.shippingContact = address;
-            }
-
-            if (billingAddress !== false) {
-                breadConfig.billingContact = billingAddress;
-            }
-
             if (buttonOnProduct === true) {
                 breadConfig.actAsLabel = false;
             }
 
-            bread.checkout(breadConfig);
+            $.ajax({
+                url: '<?php echo $this->getConfigDataUrl(); ?>',
+                type: 'post',
+                context: this
+            }).done(function(data) {
+                if (data.shippingContact != false) {
+                    breadConfig.shippingContact = data.shippingContact;
+                }
+
+                if (data.billingContact != false) {
+                    breadConfig.billingContact = data.billingContact;
+                }
+
+                bread.checkout(breadConfig);
+            });
         };
 
     <?php if( $this->getProduct() != null ): ?>
