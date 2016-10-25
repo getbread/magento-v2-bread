@@ -57,12 +57,12 @@ define(['jquery',
                 this.breadConfig.billingContact = data.billingContact;
             }
 
-            var discountAmount =- this.round(window.checkoutConfig.totalsData.discount_amount);
+            var discountAmount =- this.round(quote.getTotals()._latestValue.discount_amount);
             if (discountAmount > 0) {
                 this.breadConfig.discounts = [{
                     amount: discountAmount,
-                    description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
-                        window.checkoutConfig.totalsData.coupon_code :
+                    description: (quote.getTotals()._latestValue.coupon_code !== null) ?
+                        quote.getTotals()._latestValue.coupon_code :
                         "Discount"
                 }];
             }
