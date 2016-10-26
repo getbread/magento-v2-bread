@@ -282,17 +282,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Login Customer After Order Created From Pop Up
-     *
-     * @param null $store
-     * @return bool
-     */
-    public function isLoginAfterPopUpOrder($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_LOGIN_CUSTOMER, $store));
-    }
-
-    /**
      * Is button on product page?
      *
      * @param null $store

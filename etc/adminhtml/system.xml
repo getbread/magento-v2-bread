@@ -81,13 +81,6 @@
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="login_customer_on_order" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Login Customer On Order From Pop Up</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-                </field>
                 <field id="button_on_products" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Display as Button on Product Detail Pages When Logged In</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
