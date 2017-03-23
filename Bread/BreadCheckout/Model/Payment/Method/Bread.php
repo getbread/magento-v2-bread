@@ -457,4 +457,12 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('Unable to process request because an invalid transaction ID was provided.'));
         }
     }
+
+    /**
+     * Returns payment method code
+     * @return string
+     */
+    public function getMethodCode(){
+        return $this->_code;
+    }
 }

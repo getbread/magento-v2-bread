@@ -12,6 +12,7 @@ class Catalog extends Data
 {
     /** @var \Magento\Catalog\Block\Product\View */
     protected $productViewBlock;
+    protected $storeManager;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -19,9 +20,13 @@ class Catalog extends Data
         \Magento\Catalog\Block\Product\View $productViewBlock,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
-        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
+        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
+        \Magento\Catalog\Api\ProductRepositoryInterfaceFactory $productRepositoryFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->productViewBlock = $productViewBlock;
+        $this->_productRepositoryFactory = $productRepositoryFactory;
+        $this->storeManager = $storeManager;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
 
@@ -57,13 +62,13 @@ class Catalog extends Data
         $skuString      = $this->getSkuString($product, $theProduct);
         $price          = ($lineItemPrice !== null) ? $lineItemPrice * 100 : ( ( $baseProduct == null ) ? $product->getFinalPrice() : $baseProduct->getFinalPrice() ) * 100;
 
-        $productData = array(
+        $productData = [
             'name'      => ( $baseProduct == null ) ? $product->getName() : $baseProduct->getName(),
             'price'     => $price,
             'sku'       => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'].'///'.$skuString),
             'detailUrl' => ( $baseProduct == null ) ? $product->getProductUrl() : $baseProduct->getProductUrl(),
             'quantity'  => $qty,
-        );
+        ];
 
         $imgSrc = $this->getImgSrc($product);
         if( $imgSrc != null ) {
@@ -94,7 +99,7 @@ class Catalog extends Data
                 if ($value['option_type'] == 'multiple') {
                     $selectedOptionValues = explode(',', $value['option_value']);
                 } else {
-                    $selectedOptionValues = array($value['option_value']);
+                    $selectedOptionValues = [$value['option_value']];
                 }
                 foreach ($selectedOptionValues as $selectedOptionValue) {
                     $found = false;
@@ -132,7 +137,9 @@ class Catalog extends Data
     protected function getImgSrc(\Magento\Catalog\Model\Product $product)
     {
         if( $this->isInAdmin() ) {
-            return null;
+            $product = $this->_productRepositoryFactory->create()->getById($product->getId());
+            $imageUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+            return $imageUrl;
         }
 
         try {

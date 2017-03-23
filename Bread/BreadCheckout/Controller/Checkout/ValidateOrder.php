@@ -119,7 +119,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             }
         } catch (\Exception $e) {
             $this->logger->critical($e);
-            $this->messageManager->addError(__("Checkout With Financing On Product Page Error, Please Contact Store Owner. You may checkout by adding to cart and providing a payment in the checkout process."));
+            $this->messageManager->addErrorMessage(__("Checkout With Financing On Product Page Error, Please Contact Store Owner. You may checkout by adding to cart and providing a payment in the checkout process."));
 
             $resultRedirect = $this->resultRedirectFactory
                 ->create()
