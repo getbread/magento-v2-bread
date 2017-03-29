@@ -38,6 +38,6 @@ class Url extends Data
     {
         $url = $this->getFrontendUrl(parent::URL_LANDING_PAGE,$error?["error"=>"1"]:[]);
 
-        return preg_replace('/' . preg_quote("?") . '.*?' . '/', '', $url);
+        return preg_replace('/' . preg_quote("?") . '.*' . '/', '', $url);
     }
 }
