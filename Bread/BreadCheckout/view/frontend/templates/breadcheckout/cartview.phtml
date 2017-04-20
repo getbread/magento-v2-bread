@@ -15,6 +15,7 @@
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php echo $this->getButtonDesign(); ?>';
+            var cartSizeFinancing   = <?php echo $this->getCartSizeFinancingJson(); ?>;
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
@@ -119,6 +120,14 @@
 
             if (buttonOnProduct === true) {
                 breadConfig.actAsLabel = false;
+            }
+
+            if(cartSizeFinancing.enabled){
+                var cartSizeFinancingId = cartSizeFinancing.id;
+                var cartSizeThreshold = cartSizeFinancing.threshold;
+                var items = document.defaultItems;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
             var discountAmount =- document.round(window.checkoutConfig.totalsData.discount_amount);

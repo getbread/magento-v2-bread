@@ -53,6 +53,14 @@ define(['jquery',
                 this.breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
+            if(data.cartSizeFinancing.enabled){
+                var cartSizeFinancingId = data.cartSizeFinancing.id;
+                var cartSizeThreshold = data.cartSizeFinancing.threshold;
+                var items = data.items;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            }
+
             if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
                 this.breadConfig.billingContact = data.billingContact;
             }
