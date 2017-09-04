@@ -15,10 +15,15 @@ class ConfigProvider implements ConfigProviderInterface
     /** @var \Bread\BreadCheckout\Helper\Quote */
     protected $helper;
 
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helperData;
+
     public function __construct(
-        \Bread\BreadCheckout\Helper\Quote $helper
+        \Bread\BreadCheckout\Helper\Quote $helper,
+        \Bread\BreadCheckout\Helper\Data $helperData
     ) {
         $this->helper = $helper;
+        $this->helperData = $helperData;
     }
 
     /**
@@ -38,6 +43,9 @@ class ConfigProvider implements ConfigProviderInterface
                     'configDataUrl' => $this->helper->getConfigDataUrl(),
                     'transactionId' => $this->helper->getBreadTransactionId(),
                     'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
+                    'isCartSizeTargetedFinancing' => $this->helperData->isCartSizeTargetedFinancing(),
+                    'financingProgramId' => $this->helperData->getCartSizeFinancingId(),
+                    'cartSizeThreshold' => $this->helperData->getCartSizeThreshold(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,

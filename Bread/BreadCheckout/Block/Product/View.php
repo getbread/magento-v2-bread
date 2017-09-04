@@ -22,6 +22,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /** @var \Bread\BreadCheckout\Helper\Catalog */
     protected $catalogHelper;
 
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $dataHelper;
+
     /** @var \Bread\BreadCheckout\Helper\Customer */
     protected $customerHelper;
 
@@ -36,6 +39,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Bread\BreadCheckout\Helper\Data $dataHelper,
         \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
         \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
         \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
@@ -51,6 +55,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         $this->jsonHelper = $jsonHelper;
         $this->catalogHelper = $catalogHelper;
         $this->customerHelper = $customerHelper;
+        $this->dataHelper = $dataHelper;
         $this->configurableProductFactory = $configurableProductFactory;
         $this->configurableBlockFactory = $configurableBlockFactory;
 
@@ -246,6 +251,37 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getBlockCode()
     {
         return (string) $this->catalogHelper->getBlockCodeProductView();
+    }
+
+    /**
+     * Check if Cart Size financing is enabled
+     *
+     * @return bool
+     */
+    public function isCartSizeTargetedFinancing()
+    {
+        return $this->dataHelper->isCartSizeTargetedFinancing();
+    }
+
+    /**
+     * Get cart size over which targeted financing is enabled
+     *
+     * @return string
+     */
+    public function getCartSizeThreshold()
+    {
+        return $this->dataHelper->getCartSizeThreshold();
+    }
+
+    /**
+     * Get financing ID associated with cart size threshold
+     *
+     * @return string
+     */
+    public function getCartSizeFinancingId()
+    {
+        return $this->dataHelper->getCartSizeFinancingId();
+
     }
 
     /**

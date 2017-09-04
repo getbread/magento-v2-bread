@@ -147,7 +147,23 @@
                         ]]>
                                 </comment>
                 </field>
-                <field id="log_enabled" type="select" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cart_size_targeted_financing" type="select" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Targeted Financing based on Cart Size</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="cart_threshold" type="text" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cart Size Threshold</label>
+                    <depends>
+                        <field id="cart_size_targeted_financing">1</field>
+                    </depends>
+                </field>
+                <field id="cart_size_financing_program_id" type="text" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Financing Program Id</label>
+                    <depends>
+                        <field id="cart_size_targeted_financing">1</field>
+                    </depends>
+                </field>
+                <field id="log_enabled" type="select" sortOrder="29" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Logging</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>

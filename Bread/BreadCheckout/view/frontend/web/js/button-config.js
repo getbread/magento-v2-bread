@@ -67,6 +67,16 @@ define(['jquery',
                 }];
             }
 
+            if (window.checkoutConfig.payment.breadcheckout.isCartSizeTargetedFinancing) {
+                var cartSizeFinancingId = window.checkoutConfig.payment.breadcheckout.financingProgramId;
+                var cartSizeThreshold = window.checkoutConfig.payment.breadcheckout.cartSizeThreshold;
+                var itemsPriceSum = data.items.reduce(function (sum, item) {
+                        return sum + item.price * item.quantity
+                    }, 0) / 100;
+                this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            }
+
+
             this.setShippingInformation();
         },
 

@@ -125,6 +125,13 @@
                 breadConfig.actAsLabel = false;
             }
 
+            <?php if ($this->isCartSizeTargetedFinancing()): ?>
+            var cartSizeFinancingId = '<?php echo $this->getCartSizeFinancingId() ?>';
+            var cartSizeThreshold = '<?php echo $this->getCartSizeThreshold(); ?>';
+            var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+            breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            <?php endif; ?>
+
             $.ajax({
                 url: '<?php echo $this->getConfigDataUrl(); ?>',
                 type: 'post',
