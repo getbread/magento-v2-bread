@@ -11,7 +11,6 @@ define(['jquery',
         configure: function(data, context) {
             this.breadConfig = {
                 buttonId: data.buttonId,
-                items: data.items,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
                 shippingOptions: [data.shippingOptions],
@@ -46,14 +45,20 @@ define(['jquery',
                 }
             };
 
+
             /**
              * Optional params
              */
+
+            if (!window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                this.breadConfig.items = data.items;
+            }
+
             if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
                 this.breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
-            if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
+            if (typeof data.billingContact !== 'undefined' && data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                 this.breadConfig.billingContact = data.billingContact;
             }
 
@@ -103,11 +108,11 @@ define(['jquery',
                     fullScreenLoader.startLoader();
                 }
             }).done(function(data) {
-                if (data.shippingContact != false) {
+                if (data.shippingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                     this.breadConfig.shippingContact = data.shippingContact;
                 }
 
-                if (data.billingContact != false) {
+                if (data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                     this.breadConfig.billingContact = data.billingContact;
                     this.breadConfig.billingContact.email = (data.billingContact.email) ?
                         data.billingContact.email :

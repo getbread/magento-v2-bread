@@ -25,6 +25,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /** @var \Bread\BreadCheckout\Helper\Customer */
     protected $customerHelper;
 
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $dataHelper;
+
     /** @var \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory */
     protected $configurableProductFactory;
 
@@ -36,6 +39,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Bread\BreadCheckout\Helper\Data $dataHelper,
         \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
         \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
         \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
@@ -51,6 +55,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         $this->jsonHelper = $jsonHelper;
         $this->catalogHelper = $catalogHelper;
         $this->customerHelper = $customerHelper;
+        $this->dataHelper = $dataHelper;
         $this->configurableProductFactory = $configurableProductFactory;
         $this->configurableBlockFactory = $configurableBlockFactory;
 
@@ -236,6 +241,16 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getAllowCheckout()
     {
         return ($this->catalogHelper->getAllowCheckoutPDP()) ? 'true' : 'false';
+    }
+
+    /**
+     * Is Healthcare mode?
+     *
+     * @return bool
+     */
+    public function isHealthcare()
+    {
+        return (bool) ($this->dataHelper->isHealthcare());
     }
 
     /**

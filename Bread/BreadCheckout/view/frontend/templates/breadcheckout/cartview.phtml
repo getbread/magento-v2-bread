@@ -15,12 +15,20 @@
             var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php echo $this->getButtonDesign(); ?>';
+            var total = 0;
+            for(var i = 0; i < items.length; i++){
+                total += items[i]['price'] * items[i]['quantity'];
+            }
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
                 asLowAs: <?php echo $this->getAsLowAs(); ?>,
                 actAsLabel: false,
+                <?php if(!$this->isHealthcare()) : ?>
                 items: items,
+                <?php else : ?>
+                customTotal: total,
+                <?php endif; ?>
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
 
                 done: function (err, tx_token) {
@@ -108,7 +116,7 @@
             if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
                 breadConfig.customCSS = buttonCss;
             }
-
+            <?php if(!$this->isHealthcare()) : ?>
             if (address !== false) {
                 breadConfig.shippingContact = address;
             }
@@ -116,6 +124,7 @@
             if (billingAddress !== false) {
                 breadConfig.billingContact = billingAddress;
             }
+            <?php endif; ?>
 
             if (buttonOnProduct === true) {
                 breadConfig.actAsLabel = false;

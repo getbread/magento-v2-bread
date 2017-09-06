@@ -67,6 +67,20 @@
                         <field id="active">1</field>
                     </depends>
                 </field>
+                <field id="healthcare_mode" type="select" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Healthcare mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[
+                                    <div>
+                                        <p>If yes, no item information nor customer addresses will be sent to bread. Also, checkout from product and cart pages will be disabled.</p>
+                                    </div>
+                                ]]>
+                    </comment>
+                </field>
                 <field id="use_default_button_size" type="select" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use default button size</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

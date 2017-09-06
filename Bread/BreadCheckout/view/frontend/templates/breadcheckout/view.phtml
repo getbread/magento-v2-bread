@@ -20,7 +20,11 @@
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
                 asLowAs: <?php echo $this->getAsLowAs(); ?>,
+                <?php if(!$this->isHealthcare()) : ?>
                 items: items,
+                <?php else : ?>
+                customTotal: items[0]['price'],
+                <?php endif; ?>
                 discounts: <?php echo $this->getDiscountDataJson(); ?>,
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
 
@@ -130,6 +134,7 @@
                 type: 'post',
                 context: this
             }).done(function(data) {
+                <?php if(!$this->isHealthcare()) : ?>
                 if (data.shippingContact != false) {
                     breadConfig.shippingContact = data.shippingContact;
                 }
@@ -137,6 +142,7 @@
                 if (data.billingContact != false) {
                     breadConfig.billingContact = data.billingContact;
                 }
+                <?php endif; ?>
 
                 bread.checkout(breadConfig);
             });

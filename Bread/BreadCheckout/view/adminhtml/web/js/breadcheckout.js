@@ -13,14 +13,11 @@ define(
 
                 var breadConfig = {
                     buttonId: 'bread-checkout-btn',
-                    items: data.quoteItems,
                     shippingOptions: [data.shippingOptions],
                     tax: data.tax,
                     customTotal: data.grandTotal,
                     actAsLabel: false,
                     asLowAs: data.asLowAs,
-                    shippingContact: data.shippingContact,
-                    billingContact: data.billingContact,
 
                     done: function (err, tx_token) {
                         if (tx_token !== undefined) {
@@ -55,6 +52,13 @@ define(
                 /**
                  * Optional params
                  */
+
+                if (!data.isHealthcare) {
+                    breadConfig.shippingContact = data.shippingContact;
+                    breadConfig.billingContact = data.billingContact;
+                    breadConfig.items = data.quoteItems;
+                }
+
                 if (data.buttonCss !== null) {
                     breadConfig.customCSS = data.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
                 }
