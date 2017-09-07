@@ -38,7 +38,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'configDataUrl' => $this->helper->getConfigDataUrl(),
                     'transactionId' => $this->helper->getBreadTransactionId(),
                     'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
-                    'isHeathcare' => $this->helper->isHealthcare(),
+                    'isHealthcare' => $this->helper->isHealthcare(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,

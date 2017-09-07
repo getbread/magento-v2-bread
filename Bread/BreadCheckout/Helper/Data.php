@@ -332,7 +332,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null $store
      * @return bool
      */
-    public function isHealthcare($store = null)
+    public function isHealthcare($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store));
     }
