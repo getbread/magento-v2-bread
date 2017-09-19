@@ -12,13 +12,18 @@ class QuoteData extends \Magento\Backend\App\Action
     /** @var \Bread\BreadCheckout\Helper\Quote */
     protected $helper;
 
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $helperData;
+
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Bread\BreadCheckout\Helper\Quote $helper
+        \Bread\BreadCheckout\Helper\Quote $helper,
+        \Bread\BreadCheckout\Helper\Data $helperData
     )
     {
         $this->resultFactory = $context->getResultFactory();
         $this->helper = $helper;
+        $this->helperData = $helperData;
         parent::__construct($context);
     }
 
@@ -40,7 +45,8 @@ class QuoteData extends \Magento\Backend\App\Action
             'grandTotal' => $this->helper->getGrandTotal(),
             'asLowAs' => $this->helper->isAsLowAs(),
             'paymentUrl' => $this->helper->getAdminPaymentUrl(),
-            'buttonCss' => $this->helper->getButtonDesign()
+            'buttonCss' => $this->helper->getButtonDesign(),
+            'buttonLocation' => $this->helperData->getOtherLocation()
         ]);
     }
 }

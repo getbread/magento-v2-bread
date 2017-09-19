@@ -22,6 +22,7 @@
                 actAsLabel: false,
                 items: items,
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
+                buttonLocation: '<?php echo $this->getCartSummaryLocation(); ?>',
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
