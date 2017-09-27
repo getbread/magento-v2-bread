@@ -31,8 +31,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Store\Model\StoreResolver $storeResolver
-    )
-    {
+    ) {
+    
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->storeResolver = $storeResolver;
@@ -55,22 +55,22 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param array $lineItems
      * @throws \Exception
      */
-    public function cancel($breadTransactionId, $amount = 0, $lineItems = array())
+    public function cancel($breadTransactionId, $amount = 0, $lineItems = [])
     {
-        $data = array('type'   => 'cancel');
+        $data = ['type'   => 'cancel'];
 
-        if (!$amount == 0){
+        if (!$amount == 0) {
             $data['amount'] = $amount;
         }
 
-        if(!empty($lineItems)){
+        if (!empty($lineItems)) {
             $data['lineItems'] = $lineItems;
         }
 
         $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
 
-        if( $result['status'] != self::STATUS_CANCELED ){
-            $this->helper->log( ["ERROR"=>"Transaction cancel failed", "RESULT"=>$result] );
+        if ($result['status'] != self::STATUS_CANCELED) {
+            $this->helper->log(["ERROR"=>"Transaction cancel failed", "RESULT"=>$result]);
             throw new \Magento\Framework\Exception\LocalizedException(__('Transaction cancel failed (current transaction status :' . $result->status . ')'));
         }
 
@@ -89,25 +89,24 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
     {
-        $data_array = array('type' => 'authorize');
+        $data_array = ['type' => 'authorize'];
         if ($merchantOrderId != null) {
             $data_array['merchantOrderId'] = $merchantOrderId;
         }
 
         $result = $this->call(
             $this->getUpdateTransactionUrl($breadTransactionId),
-            $data_array);
+            $data_array
+        );
 
-        if ( $result['status'] != self::STATUS_AUTHORIZED )
-        {
-            $this->helper->log(array("ERROR"=>"AUTHORIZATION FAILED", "RESULT"=>$result));
+        if ($result['status'] != self::STATUS_AUTHORIZED) {
+            $this->helper->log(["ERROR"=>"AUTHORIZATION FAILED", "RESULT"=>$result]);
             throw new \Magento\Framework\Exception\LocalizedException(__('Transaction authorize failed (current transaction status :' . $result->status . ')'));
         }
 
         $breadAmount = $result['total'];
-        if ( (int) trim($breadAmount) != (int) trim($amount) )
-        {
-            $this->helper->log(array("ERROR"=>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH", "BREAD AMOUNT"=>(int)$breadAmount ,"QUOTE AMOUNT"=>(int)$amount , "RESULT"=>$result));
+        if ((int) trim($breadAmount) != (int) trim($amount)) {
+            $this->helper->log(["ERROR"=>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH", "BREAD AMOUNT"=>(int)$breadAmount ,"QUOTE AMOUNT"=>(int)$amount , "RESULT"=>$result]);
             throw new \Magento\Framework\Exception\LocalizedException(__('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount));
         }
 
@@ -127,7 +126,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $result = $this->call(
             $this->getTransactionInfoUrl($breadTransactionId),
             ['merchantOrderId' => $merchantOrderId],
-            \Zend_Http_Client::PUT);
+            \Zend_Http_Client::PUT
+        );
 
         return $result;
     }
@@ -144,9 +144,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
         $result = $this->call(
             $this->getUpdateTransactionUrl($breadTransactionId),
-            ['type' => 'settle']);
+            ['type' => 'settle']
+        );
 
-        if ( $result['status'] != self::STATUS_SETTLED ) {
+        if ($result['status'] != self::STATUS_SETTLED) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Transaction settle failed (current transaction status :' . $result['status'] . ')'));
         }
 
@@ -166,11 +167,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
         $data = ['type' => 'refund'];
 
-        if ( !$amount == 0 ) {
+        if (!$amount == 0) {
             $data['amount'] = $amount;
         }
 
-        if( !empty($lineItems) ) {
+        if (!empty($lineItems)) {
             $data['lineItems'] = $lineItems;
         }
 
@@ -189,7 +190,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
         return $this->call(
             $this->getTransactionInfoUrl($breadTransactionId),
             [],
-            \Zend_Http_Client::GET);
+            \Zend_Http_Client::GET
+        );
     }
 
     /**
@@ -225,21 +227,21 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
 
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($curl);
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-            if( $status != 200 ) {
-                $this->helper->log( curl_error($curl) );
+            if ($status != 200) {
+                $this->helper->log(curl_error($curl));
                 throw new \Exception(__('Call to Bread API failed.  Error: '. $result));
             }
-        } catch (\Exception $e){
-            $this->helper->log( ["USER"      => $username,
+        } catch (\Exception $e) {
+            $this->helper->log(["USER"      => $username,
                                  "PASSWORD"  => $password,
                                  "URL"       => $url,
                                  "STATUS"    => $status,
                                  "DATA"      => $data,
-                                 "RESULT"    => $result] );
+                                 "RESULT"    => $result]);
 
             curl_close($curl);
             throw $e;
@@ -247,13 +249,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
         curl_close($curl);
 
-        $this->helper->log( ["USER"      => $username,
+        $this->helper->log(["USER"      => $username,
                              "PASSWORD"  => $password,
                              "URL"       => $url,
                              "DATA"      => $data,
-                             "RESULT"    => $result] );
+                             "RESULT"    => $result]);
 
-        if(!$this->isJson($result)){
+        if (!$this->isJson($result)) {
             throw new \Magento\Framework\Exception\LocalizedException(__('API Response Is Not Valid JSON.  Result: ' . $result));
         }
 
@@ -269,7 +271,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     protected function getTransactionInfoUrl($transactionId)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        return join('/', array(trim($baseUrl, '/'), 'transactions', trim($transactionId, '/')));
+        return join('/', [trim($baseUrl, '/'), 'transactions', trim($transactionId, '/')]);
     }
 
     /**
@@ -280,7 +282,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     protected function getUpdateTransactionUrl($transactionId)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        return join('/', array(trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/')));
+        return join('/', [trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/')]);
     }
 
     /**
@@ -307,7 +309,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getStoreId()
     {
-        if ( !isset($this->order) ) {
+        if (!isset($this->order)) {
             return $this->storeResolver->getCurrentStoreId();
         }
         return $this->order->getData('store_id');

@@ -46,8 +46,7 @@ class Info extends \Magento\Payment\Block\Info
         } else {
             $transId = $info->getLastTransId();
         }
-        $transport->addData( [(string)$label => $transId] );
+        $transport->addData([(string)$label => $transId]);
         return $transport;
     }
-
 }

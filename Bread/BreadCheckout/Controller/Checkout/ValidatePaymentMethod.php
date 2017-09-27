@@ -33,12 +33,13 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement
-    )
-    {
+    ) {
+    
         $this->paymentApiClient = $paymentApiClient;
         $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
-        parent::__construct($context,
+        parent::__construct(
+            $context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
             $checkoutSession,
@@ -49,7 +50,8 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
             $totalsCollector,
             $quoteRepository,
             $customerSession,
-            $quoteManagement);
+            $quoteManagement
+        );
     }
 
     /**

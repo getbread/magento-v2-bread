@@ -32,12 +32,13 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->logger = $logger;
         $this->helper = $helper;
-        parent::__construct($context,
+        parent::__construct(
+            $context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
             $checkoutSession,
@@ -48,7 +49,8 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $totalsCollector,
             $quoteRepository,
             $customerSession,
-            $quoteManagement);
+            $quoteManagement
+        );
     }
 
     /**
@@ -58,7 +60,7 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
      */
     public function execute()
     {
-        $this->helper->log( ["TAX ESTIMATE ACTION GET PARAMS" => $this->getRequest()->getParams()] );
+        $this->helper->log(["TAX ESTIMATE ACTION GET PARAMS" => $this->getRequest()->getParams()]);
         $data       = json_decode($this->getRequest()->getParams()['shippingInfo'], true);
         try {
             $shippingAddress    = $this->getShippingAddressForQuote($data);

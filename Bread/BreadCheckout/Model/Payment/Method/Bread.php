@@ -90,8 +90,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        $params = [])
-    {
+        $params = []
+    ) {
+    
         $this->apiClient = $apiClient;
         $this->logger = $logger;
         $this->helper = $helper;
@@ -140,7 +141,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $token = $this->getToken();
-        if( empty($token) ) {
+        if (empty($token)) {
             $this->helper->log("ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN");
             throw new \Magento\Framework\Exception\LocalizedException(__('This financing program is unavailable, please complete the application. If the problem persists, please contact us.'));
         }
@@ -203,9 +204,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Magento\Sales\Model\Order\Payment $payment
      * @return \Magento\Payment\Model\Method\AbstractMethod
      */
-    public function processInvoice(\Magento\Sales\Model\Order\Invoice $invoice,
-                                   \Magento\Sales\Model\Order\Payment $payment)
-    {
+    public function processInvoice(
+        \Magento\Sales\Model\Order\Invoice $invoice,
+        \Magento\Sales\Model\Order\Payment $payment
+    ) {
+    
         $invoice->setTransactionId($payment->getLastTransId());
         return $this;
     }
@@ -224,10 +227,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('Capture action is not available.'));
         }
 
-        if($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE){
+        if ($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE) {
             $this->apiClient->setOrder($payment->getOrder());
             $token  = $this->checkoutSession->getBreadTransactionId();
-            $result = $this->apiClient->authorize($token, ($this->priceCurrency->round($amount) * 100), $payment->getOrder()->getIncrementId() );
+            $result = $this->apiClient->authorize($token, ($this->priceCurrency->round($amount) * 100), $payment->getOrder()->getIncrementId());
             $payment->setTransactionId($result['breadTransactionId']);
         } else {
             $token  = $payment->getAuthorizationTransaction()->getTxnId();
@@ -247,9 +250,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @param \Magento\Sales\Model\Order\Payment $payment
      * @return \Magento\Payment\Model\Method\AbstractMethod
      */
-    public function processCreditmemo(\Magento\Sales\Model\Order\Creditmemo $creditmemo,
-                                      \Magento\Payment\Model\InfoInterface $payment)
-    {
+    public function processCreditmemo(
+        \Magento\Sales\Model\Order\Creditmemo $creditmemo,
+        \Magento\Payment\Model\InfoInterface $payment
+    ) {
+    
         $creditmemo->setTransactionId($payment->getLastTransId());
 
         return $this;
@@ -288,10 +293,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             ->build(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_ORDER);
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        if(array_key_exists('is_closed', $transactionAdditionalInfo)){
-            $transaction->setIsClosed( (bool) $transactionAdditionalInfo['is_closed'] );
+        if (array_key_exists('is_closed', $transactionAdditionalInfo)) {
+            $transaction->setIsClosed((bool) $transactionAdditionalInfo['is_closed']);
         }
-        if(array_key_exists('message', $transactionAdditionalInfo)){
+        if (array_key_exists('message', $transactionAdditionalInfo)) {
             $transaction->setMessage($transactionAdditionalInfo['message']);
         }
     }
@@ -308,56 +313,39 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $this->apiClient->setOrder($payment->getOrder());
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
-                    $result     = $this->apiClient->authorize($this->getValidatedTxId($payment),
+                    $result     = $this->apiClient->authorize(
+                        $this->getValidatedTxId($payment),
                         ($this->priceCurrency->round($amount) * 100),
-                        $payment->getOrder()->getIncrementId() );
+                        $payment->getOrder()->getIncrementId()
+                    );
                     $payment->setTransactionId($result['breadTransactionId']);
-                    $this->addTransactionInfo($payment
-                        , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH
-                        , $result['breadTransactionId']
-                        , ['is_closed' => false, 'authorize_result' => $this->jsonHelper->jsonEncode($result)]
-                        , []
-                        , "Bread Finance Payment Authorized");
+                    $this->addTransactionInfo($payment, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH, $result['breadTransactionId'], ['is_closed' => false, 'authorize_result' => $this->jsonHelper->jsonEncode($result)], [], "Bread Finance Payment Authorized");
                 break;
             case self::ACTION_CAPTURE:
                     $result     = $this->apiClient->settle($this->getValidatedTxId($payment));
                     $payment->setTransactionId($result['breadTransactionId'])
                             ->setAmount($amount);
-                    $this->addTransactionInfo($payment
-                        , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE
-                        , $result['breadTransactionId']
-                        , ['is_closed' => false, 'settle_result' => $this->jsonHelper->jsonEncode($result)]
-                        , []
-                        , "Bread Finance Payment Captured");
+                    $this->addTransactionInfo($payment, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $result['breadTransactionId'], ['is_closed' => false, 'settle_result' => $this->jsonHelper->jsonEncode($result)], [], "Bread Finance Payment Captured");
                 break;
             case self::ACTION_REFUND:
-                    $result     = $this->apiClient->refund($this->getValidatedTxId($payment),
-                        ($this->priceCurrency->round($amount) * 100));
+                    $result     = $this->apiClient->refund(
+                        $this->getValidatedTxId($payment),
+                        ($this->priceCurrency->round($amount) * 100)
+                    );
                     $payment->setTransactionId($payment->getTransactionId())
                             ->setAmount($amount)
                             ->setIsTransactionClosed(1)
                             ->setShouldCloseParentTransaction(1);
-                    $this->addTransactionInfo($payment
-                        , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND
-                        , $result['breadTransactionId']
-                        , ['is_closed' => false, 'refund_result' => $this->jsonHelper->jsonEncode($result)]
-                        , []
-                        , "Bread Finance Payment Refunded");
+                    $this->addTransactionInfo($payment, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $result['breadTransactionId'], ['is_closed' => false, 'refund_result' => $this->jsonHelper->jsonEncode($result)], [], "Bread Finance Payment Refunded");
                 break;
             case self::ACTION_VOID:
                     $result     = $this->apiClient->cancel($this->getValidatedTxId($payment));
                     $payment->setTransactionId($payment->getTransactionId())
                             ->setIsTransactionClosed(1)
                             ->setShouldCloseParentTransaction(1);
-                    $this->addTransactionInfo($payment
-                        , \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID
-                        , $result['breadTransactionId']
-                        , ['is_closed' => true, 'cancel_result' => $this->jsonHelper->jsonEncode($result)]
-                        , []
-                        , "Bread Finance Payment Canceled");
+                    $this->addTransactionInfo($payment, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID, $result['breadTransactionId'], ['is_closed' => true, 'cancel_result' => $this->jsonHelper->jsonEncode($result)], [], "Bread Finance Payment Canceled");
                 break;
             default:
-
                 break;
         }
 
@@ -377,9 +365,13 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @return null|\Magento\Sales\Model\Order\Payment\Transaction
      * @throws \Exception
      */
-    protected function addTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionType,
-                                       $breadTransactionId, $transactionAdditionalInfo = [],
-                                       $transactionDetails = [], $message = null
+    protected function addTransactionInfo(
+        \Magento\Payment\Model\InfoInterface $payment,
+        $transactionType,
+        $breadTransactionId,
+        $transactionAdditionalInfo = [],
+        $transactionDetails = [],
+        $message = null
     ) {
         try {
             $payment->resetTransactionAdditionalInfo();
@@ -411,11 +403,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if( is_null($quote) || !$quote->getBreadTransactionId() ){
+        if (is_null($quote) || !$quote->getBreadTransactionId()) {
             return true;
         }
 
-        if( !parent::isAvailable($quote) ){
+        if (!parent::isAvailable($quote)) {
             return false;
         }
 

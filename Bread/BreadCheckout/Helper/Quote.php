@@ -8,7 +8,8 @@
  */
 namespace Bread\BreadCheckout\Helper;
 
-class Quote extends Data {
+class Quote extends Data
+{
 
     /** @var \Magento\Sales\Model\Quote */
     protected $quote = null;
@@ -106,7 +107,7 @@ class Quote extends Data {
             $couponTitle = $quote->getCouponCode();
         }
 
-        if( $discount > 0 ) {
+        if ($discount > 0) {
             $discount   = ['amount'        => intval($this->priceCurrency->round($discount) * 100),
                            'description'   => ($couponTitle) ?
                                                 $couponTitle : __('Discount')];
@@ -195,7 +196,7 @@ class Quote extends Data {
         }
 
 
-        if(!$billingAddress->getStreetLine(1)){
+        if (!$billingAddress->getStreetLine(1)) {
             return false;
         }
 
@@ -226,7 +227,7 @@ class Quote extends Data {
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
 
-        if(!$shippingAddress->getStreetLine(1)){
+        if (!$shippingAddress->getStreetLine(1)) {
             return false;
         }
 
@@ -254,7 +255,7 @@ class Quote extends Data {
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
         
-        if(!$shippingAddress->getShippingMethod()){
+        if (!$shippingAddress->getShippingMethod()) {
             return false;
         }
 
@@ -281,7 +282,6 @@ class Quote extends Data {
     public function getSessionQuote()
     {
         if ($this->quote === null) {
-
             if ($this->isInAdmin()) {
                 $this->quote = $this->orderCreateModel->getQuote();
             }

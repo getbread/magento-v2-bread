@@ -36,5 +36,4 @@ class ApiMode implements \Magento\Framework\Option\ArrayInterface
             1 => __('Live'),
         ];
     }
-
 }

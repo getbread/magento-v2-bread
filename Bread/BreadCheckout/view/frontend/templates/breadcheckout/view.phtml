@@ -125,7 +125,7 @@
                 breadConfig.actAsLabel = false;
             }
 
-            <?php if ($this->isCartSizeTargetedFinancing()): ?>
+            <?php if ($this->isCartSizeTargetedFinancing()) : ?>
             var cartSizeFinancingId = '<?php echo $this->getCartSizeFinancingId() ?>';
             var cartSizeThreshold = '<?php echo $this->getCartSizeThreshold(); ?>';
             var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
@@ -149,7 +149,7 @@
             });
         };
 
-    <?php if( $this->getProduct() != null ): ?>
+    <?php if ($this->getProduct() != null) : ?>
 
         /**
          * Reconfigure Bread checkout button with updated
@@ -209,14 +209,14 @@
         document.previousSku        = document.defaultItems[0]["sku"];
 
         $(document).ready(function () {
-            <?php if ($this->getProduct() != null): ?>
+            <?php if ($this->getProduct() != null) : ?>
                 document.customOptions = "";
                 document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
                 document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
                 document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
                 document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
                 document.resetPriceAndSku(false);
-            <?php else: ?>
+            <?php else : ?>
                 document.configureButton(document.defaultItems);
             <?php endif; ?>
         });

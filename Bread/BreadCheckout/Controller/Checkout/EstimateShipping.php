@@ -35,13 +35,14 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->messageManager = $context->getMessageManager();
         $this->logger = $logger;
         $this->helper = $helper;
-        parent::__construct($context,
+        parent::__construct(
+            $context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
             $checkoutSession,
@@ -52,7 +53,8 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             $totalsCollector,
             $quoteRepository,
             $customerSession,
-            $quoteManagement);
+            $quoteManagement
+        );
     }
 
     /**
@@ -92,7 +94,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             $this->helper->log(["ERROR" => $e->getMessage(),
                                 "PARAMS"=> $this->getRequest()->getParams()]);
             $this->logger->critical($e);
-            $this->messageManager->addError( __("Internal Error, Please Contact Store Owner. You may checkout by adding to cart and providing a payment in the checkout process.") );
+            $this->messageManager->addError(__("Internal Error, Please Contact Store Owner. You may checkout by adding to cart and providing a payment in the checkout process."));
             $response = ['error' => 1,
                          'text'  => 'Internal error'];
         }

@@ -75,8 +75,8 @@ class Checkout extends Quote
     {
         $breadAmount = $this->getBreadTransactionAmount();
         $quoteTotal  = intval($this->priceCurrency->round(
-                $this->getSessionQuote()->getGrandTotal()
-            ) * 100);
+            $this->getSessionQuote()->getGrandTotal()
+        ) * 100);
 
         if ($breadAmount === 0) {
             $info = $this->paymentApiClient->getInfo($transactionId);
@@ -85,5 +85,4 @@ class Checkout extends Quote
 
         return (bool) ($breadAmount == $quoteTotal);
     }
-
 }

@@ -130,7 +130,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getApiSecretKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (string) $this->encryptor->decrypt(
-            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode));
+            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
+        );
     }
 
     /**
@@ -141,7 +142,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        if($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)){
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
             return self::JS_LIVE_URI;
         } else {
             return self::JS_SANDBOX_URI;
@@ -156,7 +157,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        if($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)){
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
             return self::API_LIVE_URI;
         } else {
             return self::API_SANDBOX_URI;
@@ -171,7 +172,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPaymentUrl()
     {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_PAYMENT,['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_PAYMENT, ['_secure'=>$isSecure]);
     }
 
     /**
@@ -182,7 +183,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getValidateOrderURL()
     {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_ORDER,['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_ORDER, ['_secure'=>$isSecure]);
     }
 
     /**
@@ -193,7 +194,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getValidateTotalsUrl()
     {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_TOTALS,['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_TOTALS, ['_secure'=>$isSecure]);
     }
 
     /**
@@ -203,7 +204,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getShippingEstimateUrl()
     {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_ESTIMATE,['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_ESTIMATE, ['_secure'=>$isSecure]);
     }
 
     /**
@@ -472,8 +473,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $context
      */
     public function log($data, $context = 'Bread\BreadCheckout'){
-        if( $this->logEnabled() ) {
-            if ( !is_string($data) ) {
+        if ($this->logEnabled()) {
+            if (!is_string($data)) {
                 $data = print_r($data, true);
             }
             $this->logger->debug($data, [$context]);

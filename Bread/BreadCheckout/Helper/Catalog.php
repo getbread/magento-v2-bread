@@ -48,25 +48,27 @@ class Catalog extends Data
      * @param null $lineItemPrice
      * @return array
      */
-    public function getProductDataArray(\Magento\Catalog\Model\Product $product,
-                                        \Magento\Catalog\Model\Product $baseProduct = null,
-                                        $qty = 1,
-                                        $lineItemPrice = null)
-    {
+    public function getProductDataArray(
+        \Magento\Catalog\Model\Product $product,
+        \Magento\Catalog\Model\Product $baseProduct = null,
+        $qty = 1,
+        $lineItemPrice = null
+    ) {
+    
         $theProduct     = ($baseProduct == null) ? $product : $baseProduct;
         $skuString      = $this->getSkuString($product, $theProduct);
         $price          = ($lineItemPrice !== null) ? $lineItemPrice * 100 : ( ( $baseProduct == null ) ? $product->getFinalPrice() : $baseProduct->getFinalPrice() ) * 100;
 
-        $productData = array(
+        $productData = [
             'name'      => ( $baseProduct == null ) ? $product->getName() : $baseProduct->getName(),
             'price'     => $price,
             'sku'       => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'].'///'.$skuString),
             'detailUrl' => ( $baseProduct == null ) ? $product->getProductUrl() : $baseProduct->getProductUrl(),
             'quantity'  => $qty,
-        );
+        ];
 
         $imgSrc = $this->getImgSrc($product);
-        if( $imgSrc != null ) {
+        if ($imgSrc != null) {
             $productData['imageUrl'] = $imgSrc;
         }
 
@@ -80,45 +82,47 @@ class Catalog extends Data
      * @param \Magento\Catalog\Model\Product $theProduct
      * @return string
      */
-    protected function getSkuString(\Magento\Catalog\Model\Product $product,
-                                    \Magento\Catalog\Model\Product $theProduct)
-    {
+    protected function getSkuString(
+        \Magento\Catalog\Model\Product $product,
+        \Magento\Catalog\Model\Product $theProduct
+    ) {
+    
         $selectedOptions    = $theProduct->getTypeInstance(true)->getOrderOptions($theProduct);
 
-        if(!array_key_exists('options', $selectedOptions ) ) {
+        if (!array_key_exists('options', $selectedOptions)) {
             return (string) $product->getSku();
         }
 
         $skuString  = $product->getData('sku');
-            foreach( $selectedOptions['options'] as $key => $value ) {
-                if ($value['option_type'] == 'multiple') {
-                    $selectedOptionValues = explode(',', $value['option_value']);
-                } else {
-                    $selectedOptionValues = array($value['option_value']);
-                }
-                foreach ($selectedOptionValues as $selectedOptionValue) {
-                    $found = false;
-                    foreach ($theProduct->getOptions() as $option) {
-                        if ($found) {
-                            break;
-                        }
-                        if (count($option->getValues()) > 0) {
-                            if ($option->getTitle() == $value['label']) {
-                                foreach ($option->getValues() as $optionValue) {
-                                    if ($selectedOptionValue == $optionValue->getOptionTypeId()) {
-                                        $skuString = $skuString . '***' . $optionValue->getSku();
-                                        $found = true;
-                                        break;
-                                    }
+        foreach ($selectedOptions['options'] as $key => $value) {
+            if ($value['option_type'] == 'multiple') {
+                $selectedOptionValues = explode(',', $value['option_value']);
+            } else {
+                $selectedOptionValues = [$value['option_value']];
+            }
+            foreach ($selectedOptionValues as $selectedOptionValue) {
+                $found = false;
+                foreach ($theProduct->getOptions() as $option) {
+                    if ($found) {
+                        break;
+                    }
+                    if (count($option->getValues()) > 0) {
+                        if ($option->getTitle() == $value['label']) {
+                            foreach ($option->getValues() as $optionValue) {
+                                if ($selectedOptionValue == $optionValue->getOptionTypeId()) {
+                                    $skuString = $skuString . '***' . $optionValue->getSku();
+                                    $found = true;
+                                    break;
                                 }
                             }
-                        } else if ($value['label'] == $option['title']) {
-                            $skuString = $skuString . '***' . $option->getSku() . '===' . $value['option_value'];
-                            break;
                         }
+                    } elseif ($value['label'] == $option['title']) {
+                        $skuString = $skuString . '***' . $option->getSku() . '===' . $value['option_value'];
+                        break;
                     }
                 }
             }
+        }
 
         return $skuString;
     }
@@ -131,7 +135,7 @@ class Catalog extends Data
      */
     protected function getImgSrc(\Magento\Catalog\Model\Product $product)
     {
-        if( $this->isInAdmin() ) {
+        if ($this->isInAdmin()) {
             return null;
         }
 

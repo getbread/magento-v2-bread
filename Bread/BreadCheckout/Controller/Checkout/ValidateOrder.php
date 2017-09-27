@@ -71,8 +71,8 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
-    )
-    {
+    ) {
+    
         $this->paymentApiClient = $paymentApiClient;
         $this->checkoutSession = $checkoutSession;
         $this->cartHelper = $cartHelper;
@@ -87,7 +87,8 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $this->helper = $helper;
         $this->customerHelper = $customerHelper;
         $this->orderSender = $orderSender;
-        parent::__construct($context,
+        parent::__construct(
+            $context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
             $checkoutSession,
@@ -98,12 +99,13 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $totalsCollector,
             $quoteRepository,
             $customerSession,
-            $quoteManagement);
+            $quoteManagement
+        );
     }
 
     /**
      * Validate and process the order
-     * 
+     *
      * @return void|\Magento\Framework\Controller\Result\Redirect
      */
     public function execute()
@@ -252,7 +254,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     protected function processAddress($contactData)
     {
         $regionId   = null;
-        if( isset($contactData['state']) ) {
+        if (isset($contactData['state'])) {
             $region     = $this->regionFactory->create();      /** @var \Magento\Directory\Model\RegionFactory */
             $region->loadByCode($contactData['state'], $this->helper->getDefaultCountry());
             if ($region->getId()) {
@@ -271,12 +273,12 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             'country_id'    => $this->helper->getDefaultCountry()
         ];
 
-        if( null !== $regionId ) {
+        if (null !== $regionId) {
             $addressData['region']      = $contactData['state'];
             $addressData['region_id']   = $regionId;
         }
 
-        if( isset($contactData['email']) ) {
+        if (isset($contactData['email'])) {
             $addressData['email']   = $contactData['email'];
         }
 

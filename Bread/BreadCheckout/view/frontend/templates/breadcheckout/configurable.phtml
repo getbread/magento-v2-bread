@@ -95,7 +95,9 @@
 
             if (!empty($itemIds)) {
                 foreach ($itemIds as $val) {
-                    foreach ($val as $k => $v) echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
+                    foreach ($val as $k => $v) {
+                        echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
+                    }
                 }
             }
             ?>

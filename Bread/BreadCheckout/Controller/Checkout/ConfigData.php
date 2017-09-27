@@ -19,8 +19,8 @@ class ConfigData extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;
@@ -31,7 +31,7 @@ class ConfigData extends \Magento\Framework\App\Action\Action
      * Sends shipping & billing data to setShippingInformation()
      * which is called when "Next" is clicked from the shipping
      * information view in checkout
-     * 
+     *
      * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()

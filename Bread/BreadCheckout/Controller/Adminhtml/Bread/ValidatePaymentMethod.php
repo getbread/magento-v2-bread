@@ -49,7 +49,7 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-		$result = false;
+        $result = false;
 
         try {
             $token = $this->getRequest()->getParam('token');
@@ -64,10 +64,10 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
             }
         } catch (\Exception $e) {
             $this->helper->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
-	        $this->logger->critical($e);
-	        throw new \Magento\Framework\Exception\LocalizedException(__('Something went wrong processing the Bread payment. Please select a different payment method to complete checkout.'));
+            $this->logger->critical($e);
+            throw new \Magento\Framework\Exception\LocalizedException(__('Something went wrong processing the Bread payment. Please select a different payment method to complete checkout.'));
         }
 
-        return $this->resultJsonFactory->create()->setData( ['result' => $result] );
+        return $this->resultJsonFactory->create()->setData(['result' => $result]);
     }
 }

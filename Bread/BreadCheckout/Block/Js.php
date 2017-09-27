@@ -82,5 +82,4 @@ class Js extends \Magento\Framework\View\Element\Text
     {
         return $this->helper->getJsLibLocation();
     }
-
 }
