@@ -335,6 +335,75 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
     /**
+     * Get button location string for product page
+     *
+     * @return string
+     */
+    public function getProductViewLocation()
+    {
+        return $this->dataHelper->getProductViewLocation();
+    }
+
+    /**
+     * Get button location string for cart summary page
+     *
+     * @return string
+     */
+    public function getCartSummaryLocation()
+    {
+        return $this->dataHelper->getCartSummaryLocation();
+    }
+
+    /**
+     * Get button location string for checkout page
+     *
+     * @return string
+     */
+    public function getCheckoutLocation()
+    {
+        return $this->dataHelper->getCheckoutLocation();
+    }
+
+    /**
+     * Get button location string for financing page
+     *
+     * @return string
+     */
+    public function getFinancingLocation()
+    {
+        return $this->dataHelper->getFinancingLocation();
+    }
+
+    /**
+     * Get button location string for marketing page
+     *
+     * @return string
+     */
+    public function getMarketingLocation()
+    {
+        return $this->dataHelper->getMarketingLocation();
+    }
+
+    /**
+     * Get button location string for category page
+     *
+     * @return string
+     */
+    public function getCategoryPageLocation()
+    {
+        return $this->dataHelper->getCategoryPageLocation();
+    }
+
+    /**
+     * Get button location string for other purposes
+     *
+     * @return string
+     */
+    public function getOtherLocation()
+    {
+        return $this->dataHelper->getOtherLocation();
+    }
+    /**
      * Publicly accessible json encoder
      *
      * @param $data

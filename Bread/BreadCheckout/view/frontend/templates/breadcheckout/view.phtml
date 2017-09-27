@@ -23,6 +23,7 @@
                 items: items,
                 discounts: <?php echo $this->getDiscountDataJson(); ?>,
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
+                buttonLocation: '<?php echo $this->getProductViewLocation(); ?>',
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {

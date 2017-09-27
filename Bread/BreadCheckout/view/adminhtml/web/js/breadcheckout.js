@@ -21,6 +21,7 @@ define(
                     asLowAs: data.asLowAs,
                     shippingContact: data.shippingContact,
                     billingContact: data.billingContact,
+                    buttonLocation: data.buttonLocation,
 
                     done: function (err, tx_token) {
                         if (tx_token !== undefined) {

@@ -52,6 +52,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
 
+    // Bread button locations
+    const BUTTON_LOCATION_PRODUCT_VIEW              = 'product';
+    const BUTTON_LOCATION_CART_SUMMARY              = 'cart_summary';
+    const BUTTON_LOCATION_CHECKOUT                  = 'checkout';
+    const BUTTON_LOCATION_FINANCING                 = 'financing';
+    const BUTTON_LOCATION_MARKETING                 = 'marketing';
+    const BUTTON_LOCATION_CATEGORY                  = 'category';
+    const BUTTON_LOCATION_OTHER                     = 'other';
+
     /** @var \Magento\Framework\Model\Context */
     protected $context;
 
@@ -463,6 +472,76 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function isInAdmin()
     {
         return (bool) ($this->context->getAppState()->getAreaCode() == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
+    }
+
+    /**
+     * Get button location string for product page
+     *
+     * @return string
+     */
+    public function getProductViewLocation()
+    {
+        return (string) self::BUTTON_LOCATION_PRODUCT_VIEW;
+    }
+
+    /**
+     * Get button location string for cart summary page
+     *
+     * @return string
+     */
+    public function getCartSummaryLocation()
+    {
+        return (string) self::BUTTON_LOCATION_CART_SUMMARY;
+    }
+
+    /**
+     * Get button location string for checkout page
+     *
+     * @return string
+     */
+    public function getCheckoutLocation()
+    {
+        return (string) self::BUTTON_LOCATION_CHECKOUT;
+    }
+
+    /**
+     * Get button location string for financing page
+     *
+     * @return string
+     */
+    public function getFinancingLocation()
+    {
+        return (string) self::BUTTON_LOCATION_FINANCING;
+    }
+
+    /**
+     * Get button location string for marketing page
+     *
+     * @return string
+     */
+    public function getMarketingLocation()
+    {
+        return (string) self::BUTTON_LOCATION_MARKETING;
+    }
+
+    /**
+     * Get button location string for category page
+     *
+     * @return string
+     */
+    public function getCategoryPageLocation()
+    {
+        return (string) self::BUTTON_LOCATION_CATEGORY;
+    }
+
+    /**
+     * Get button location string for other purposes
+     *
+     * @return string
+     */
+    public function getOtherLocation()
+    {
+        return (string) self::BUTTON_LOCATION_OTHER;
     }
 
     /**

@@ -17,6 +17,7 @@ define(['jquery',
                 shippingOptions: [data.shippingOptions],
                 tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
+                buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
                 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
