@@ -1,7 +1,7 @@
 <?php /** @var $this Bread\BreadCheckout\Block\Product\View */ ?>
-<script type="text/javascript">
+<script>
     document.Skus = {};
-    spConfig = <?php echo $this->getJsonConfig(); ?>;
+    spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
 
     require(['jquery', 'jquery/validate'], function($) {
         $(document).ready(function () {
@@ -39,7 +39,8 @@
                     if (newProductId !== null) {
                         /** Reconfigure Bread button if we narrowed it down to 1 product */
                         document.selectedSimpleProductId = newProductId;
-                        document.selectedSku = document.baseProductSku + "///" + document.Skus[document.selectedSimpleProductId];
+                        document.selectedSku = document.baseProductSku + "///" +
+                            document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
                     }
                 } else {
@@ -91,12 +92,12 @@
             };
 
             <?php
-            $itemIds = $this->getChildProductIds($this->getProduct());
+            $itemIds = $block->getChildProductIds($block->getProduct());
 
             if (!empty($itemIds)) {
                 foreach ($itemIds as $val) {
                     foreach ($val as $k => $v) {
-                        echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
+                        /* @noEscape */ echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
                     }
                 }
             }

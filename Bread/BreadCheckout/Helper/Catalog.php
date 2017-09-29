@@ -17,7 +17,7 @@ class Catalog extends Data
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
         \Magento\Catalog\Block\Product\View $productViewBlock,
-        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Request\Http\Proxy $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
     ) {
@@ -57,7 +57,8 @@ class Catalog extends Data
     
         $theProduct     = ($baseProduct == null) ? $product : $baseProduct;
         $skuString      = $this->getSkuString($product, $theProduct);
-        $price          = ($lineItemPrice !== null) ? $lineItemPrice * 100 : ( ( $baseProduct == null ) ? $product->getFinalPrice() : $baseProduct->getFinalPrice() ) * 100;
+        $price          = ($lineItemPrice !== null) ? $lineItemPrice * 100 : ( ( $baseProduct == null ) ?
+                $product->getFinalPrice() : $baseProduct->getFinalPrice() ) * 100;
 
         $productData = [
             'name'      => ( $baseProduct == null ) ? $product->getName() : $baseProduct->getName(),
@@ -106,7 +107,7 @@ class Catalog extends Data
                     if ($found) {
                         break;
                     }
-                    if (count($option->getValues()) > 0) {
+                    if (!empty($option->getValues())) {
                         if ($option->getTitle() == $value['label']) {
                             foreach ($option->getValues() as $optionValue) {
                                 if ($selectedOptionValue == $optionValue->getOptionTypeId()) {

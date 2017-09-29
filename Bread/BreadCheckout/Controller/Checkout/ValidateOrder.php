@@ -55,11 +55,11 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Checkout\Helper\Cart $cartHelper,
         \Psr\Log\LoggerInterface $logger,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Magento\Directory\Model\RegionFactory $regionFactory,
@@ -121,7 +121,12 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             }
         } catch (\Exception $e) {
             $this->logger->critical($e);
-            $this->messageManager->addError(__("Checkout With Financing On Product Page Error, Please Contact Store Owner. You may checkout by adding to cart and providing a payment in the checkout process."));
+            $this->messageManager->addError(
+                __(
+                    "Checkout With Financing On Product Page Error, Please Contact Store Owner. 
+                    You may checkout by adding to cart and providing a payment in the checkout process."
+                )
+            );
 
             $resultRedirect = $this->resultRedirectFactory
                 ->create()
@@ -156,7 +161,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         $this->checkoutSession->setBreadTransactionId($data['breadTransactionId']);
 
-        if (isset($data['discounts']) && count($data['discounts']) > 0) {
+        if (isset($data['discounts']) && !empty($data['discounts'])) {
             $discountDescription = $data['discounts'][0]['description'];
             $quote->setCouponCode($discountDescription);
         }
@@ -239,9 +244,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $cart->truncate()->save();
         $cartItems = $cart->getItems();
         foreach ($cartItems as $item) {
-            $quote->removeItem($item->getId())->save();
+            $quote->removeItem($item->getId());
         }
 
+        $quote->save();
         $this->_redirect('checkout/onepage/success');
     }
 
@@ -265,8 +271,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $fullName       = isset($contactData['fullName']) ? explode(' ', $contactData['fullName']) : '';
         $addressData    = [
             'firstname'     => isset($contactData['firstName']) ? $contactData['firstName'] : $fullName[0],
-            'lastname'      => isset($contactData['lastName']) ? $contactData['lastName'] : (isset($fullName[1]) ? $fullName[1] : ''),
-            'street'        => $contactData['address'] . (isset($contactData['address2']) ? (' ' .  $contactData['address2']) : ''),
+            'lastname'      => isset($contactData['lastName']) ?
+                                    $contactData['lastName'] : (isset($fullName[1]) ? $fullName[1] : ''),
+            'street'        => $contactData['address'] . (isset($contactData['address2']) ?
+                                    (' ' .  $contactData['address2']) : ''),
             'city'          => $contactData['city'],
             'postcode'      => $contactData['zip'],
             'telephone'     => $contactData['phone'],

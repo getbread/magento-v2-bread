@@ -12,7 +12,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 {
     protected $_product;
 
-
     /** @var \Magento\Framework\Registry */
     protected $registry;
 
@@ -339,7 +338,8 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      * @param $data
      * @return string
      */
-    public function jsonEncode($data) {
+    public function jsonEncode($data)
+    {
         return $this->jsonHelper->jsonEncode($data);
     }
 }

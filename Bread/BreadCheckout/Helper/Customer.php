@@ -31,11 +31,11 @@ class Customer extends Data
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
-        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Request\Http\Proxy $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
@@ -71,8 +71,12 @@ class Customer extends Data
 
         $primaryData        = [
             'fullName'      => $defaultShippingAddress->getName(),
-            'address'       => $defaultShippingAddress->getStreetLine(1) . ($defaultShippingAddress->getStreetLine(2) == '' ? '' : (' ' . $defaultShippingAddress->getStreetLine(2))),
-            'address2'      => $defaultShippingAddress->getStreetLine(3) . ($defaultShippingAddress->getStreetLine(4) == '' ? '' : (' ' . $defaultShippingAddress->getStreetLine(4))),
+            'address'       => $defaultShippingAddress->getStreetLine(1) .
+                ($defaultShippingAddress->getStreetLine(2) == '' ?
+                    '' : (' ' . $defaultShippingAddress->getStreetLine(2))),
+            'address2'      => $defaultShippingAddress->getStreetLine(3) .
+                ($defaultShippingAddress->getStreetLine(4) == '' ?
+                    '' : (' ' . $defaultShippingAddress->getStreetLine(4))),
             'city'          => $defaultShippingAddress->getCity(),
             'state'         => $defaultShippingAddress->getRegionCode(),
             'zip'           => $defaultShippingAddress->getPostcode(),
@@ -103,8 +107,12 @@ class Customer extends Data
 
         $primaryData        = [
             'fullName'      => $defaultBillingAddress->getName(),
-            'address'       => $defaultBillingAddress->getStreetLine(1) . ($defaultBillingAddress->getStreetLine(2) == '' ? '' : (' ' . $defaultBillingAddress->getStreetLine(2))),
-            'address2'      => $defaultBillingAddress->getStreetLine(3) . ($defaultBillingAddress->getStreetLine(4) == '' ? '' : (' ' . $defaultBillingAddress->getStreetLine(4))),
+            'address'       => $defaultBillingAddress->getStreetLine(1) .
+                ($defaultBillingAddress->getStreetLine(2) == '' ?
+                    '' : (' ' . $defaultBillingAddress->getStreetLine(2))),
+            'address2'      => $defaultBillingAddress->getStreetLine(3) .
+                ($defaultBillingAddress->getStreetLine(4) == '' ?
+                    '' : (' ' . $defaultBillingAddress->getStreetLine(4))),
             'city'          => $defaultBillingAddress->getCity(),
             'state'         => $defaultBillingAddress->getRegionCode(),
             'zip'           => $defaultBillingAddress->getPostcode(),
@@ -225,7 +233,6 @@ class Customer extends Data
         return $this->jsonHelper->jsonEncode($primaryAddressData);
     }
 
-
     /**
      * Check if Customer has associated addresses
      *
@@ -246,7 +253,7 @@ class Customer extends Data
       * @return bool
       */
     public function isUserLoggedIn()
-     {
+    {
         return (bool) $this->customerSession->isLoggedIn();
     }
 

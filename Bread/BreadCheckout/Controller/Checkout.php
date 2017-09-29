@@ -50,14 +50,14 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
         \Bread\BreadCheckout\Helper\Checkout $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement
     ) {
     
@@ -102,7 +102,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         /** @var $catalogResource \Magento\Catalog\Model\ResourceModel\ProductFactory */
             $catalogResource            = $this->catalogResourceModelProductFactory->create();
             $options                    = [];
-            $productAttributeOptions    = $baseProduct->getTypeInstance(true)->getConfigurableAttributesAsArray($baseProduct);
+            $productAttributeOptions    = $baseProduct
+                ->getTypeInstance(true)
+                ->getConfigurableAttributesAsArray($baseProduct);
             foreach ($productAttributeOptions as $option) {
                 $options[$option['attribute_id']]   =
                     $catalogResource->getAttributeRawValue($productId, $option['attribute_id'], null);
@@ -129,7 +131,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                     }
 
                     $values     = $o->getValues();
-                    if (count($values) > 0) {
+                    if (!empty($values)) {
                         foreach ($values as $v) {
                             if ($this->compareOptions($v, $optionKeyValue[0])) {
                                 $customOptionConfig[$v->getOptionId()][] = $v->getOptionTypeId();
@@ -243,7 +245,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
                 if (!$this->checkoutSession->getQuoteId()) {
                     if ($this->customerSession->isLoggedIn()) {
-                        $quoteId = $this->quoteManagement->createEmptyCartForCustomer($this->customerSession->getCustomerId());
+                        $quoteId = $this->quoteManagement
+                            ->createEmptyCartForCustomer($this->customerSession->getCustomerId());
                     } else {
                         $quoteId = $this->quoteManagement->createEmptyCart();
                     }
@@ -279,7 +282,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $customOptionPieces = explode('***', $data['selected_sku']);
         $mainProduct = $this->catalogProductFactory->create()->load($mainProductId);
         $simpleProduct = $this->catalogProductFactory->create()->load($selectedProductId);
-        $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1); // Qty always 1 when checking out from product view
-        $this->checkoutSession->setBreadItemAddedToQuote(true); // Flag to prevent same item from getting added to quote many times
+        // Qty always 1 when checking out from product view
+        $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1);
+        // Flag to prevent same item from getting added to quote many times
+        $this->checkoutSession->setBreadItemAddedToQuote(true);
     }
 }
