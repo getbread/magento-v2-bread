@@ -38,6 +38,7 @@ define(['jquery',
                                     } else {
                                         this.updateAddress(response, tx_token);
                                     }
+                                    fullScreenLoader.stopLoader();
                                 }
                             } catch (e) {
                                 console.log(e);
