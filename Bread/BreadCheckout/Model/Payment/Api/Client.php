@@ -210,6 +210,21 @@ class Client extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Submit cart data
+     *
+     * @param $data
+     * @return string
+     * @throws Exception
+     */
+    public function submitCartData($data)
+    {
+        return $this->call(
+            $this->helper->getCartCreateApiUrl(),
+            $data,
+            \Zend_Http_Client::POST);
+    }
+
+    /**
      * Interact with the API
      *
      * @param $url
@@ -232,6 +247,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
             if ($method == \Zend_Http_Client::POST) {
                 curl_setopt($curl, CURLOPT_POST, 1);
+                curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]
+                );
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
 

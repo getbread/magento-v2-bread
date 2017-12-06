@@ -28,6 +28,12 @@ class Customer extends Data
     /** @var \Magento\Framework\Math\Random */
     protected $random;
 
+    /** @var \Magento\Framework\Mail\Template\TransportBuilder */
+    protected $_transportBuilder;
+
+    /** @var \Magento\Framework\Translate\Inline\StateInterface */
+    protected $inlineTranslation;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -39,7 +45,9 @@ class Customer extends Data
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Magento\Framework\Math\Random $random
+        \Magento\Framework\Math\Random $random,
+        \Magento\Framework\Mail\Template\TransportBuilder $_transportBuilder,
+        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation
     ) {
         $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
@@ -47,6 +55,8 @@ class Customer extends Data
         $this->customerAddressFactory = $customerAddressFactory;
         $this->jsonHelper = $jsonHelper;
         $this->random = $random;
+        $this->_transportBuilder = $_transportBuilder;
+        $this->inlineTranslation = $inlineTranslation;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
     /**
@@ -267,5 +277,88 @@ class Customer extends Data
     protected function generatePassword($length)
     {
         return $this->encryptor->getHash($this->random->getRandomString($length), true);
+    }
+
+    /**
+     * Send activation link to customer
+     * @param \Magento\Customer\Model\Customer customer
+     * @param url
+     * @param Array items
+     */
+    public function sendCartActivationEmailToCustomer($customer, $url, $items)
+    {
+        $templateOptions = ['area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId()];
+
+        $templateVars = [
+            'subject' => __("Financing Confirmation"),
+            'url' => $url,
+            'email' => $customer->getEmail(),
+            'firstName' => $customer->getFirstname(),
+            'lastName' => $customer->getLastname(),
+            'items' => $items,
+        ];
+
+        $from = [
+            'email' => $this->scopeConfig->getValue('trans_email/ident_general/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+            'name'  => $this->scopeConfig->getValue('trans_email/ident_general/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+        ];
+
+        $this->inlineTranslation->suspend();
+
+        $to = [$customer->getEmail()];
+
+        $transport = $this->_transportBuilder->setTemplateIdentifier('payment_confirmation_template')
+            ->setTemplateOptions($templateOptions)
+            ->setTemplateVars($templateVars)
+            ->setFrom($from)
+            ->addTo($to)
+            ->getTransport();
+        $transport->sendMessage();
+        $this->inlineTranslation->resume();
+    }
+
+    /**
+     * Send error report to merchant
+     * @param Exception exception
+     * @param response
+     * @param quoteId
+     * @param customer
+     * @param transactionId
+     */
+    public function sendCustomerErrorReportToMerchant($exception, $response="", $quoteId="", $transactionId=null)
+    {
+        $templateOptions = ['area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId()];
+
+        $from = [
+            'name' => $this->scopeConfig->getValue('trans_email/ident_general/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+            'email' => $this->scopeConfig->getValue('trans_email/ident_general/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+        ];
+
+        $templateVars = [
+            'exception_message' => $exception->getMessage(),
+            'quote' => $quoteId,
+            'token' => $transactionId,
+            'response' => $response
+        ];
+
+
+        $subject = __("Error report");
+
+        $emailData['subject'] = $subject;
+
+        $this->inlineTranslation->suspend();
+
+        $recipients = $this->scopeConfig->getValue('sales_email/order/copy_to', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        if($recipients){
+            $transport = $this->_transportBuilder->setTemplateIdentifier('error_report_template')
+                ->setTemplateOptions($templateOptions)
+                ->setTemplateVars($templateVars)
+                ->setFrom($from)
+                ->addTo(explode(",", $recipients))
+                ->getTransport();
+            $transport->sendMessage();
+            $this->inlineTranslation->resume();
+        }
+
     }
 }

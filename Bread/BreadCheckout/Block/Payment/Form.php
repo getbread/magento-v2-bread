@@ -33,6 +33,26 @@ class Form extends \Magento\Payment\Block\Form
     }
 
     /**
+     * Get controller URL for cart generation
+     *
+     * @return string
+     */
+    public function getGenerateCartUrl()
+    {
+        return $this->helper->getGenerateCartUrl();
+    }
+
+    /**
+     * Get controller URL for email sending
+     *
+     * @return string
+     */
+    public function getSendMailUrl()
+    {
+        return $this->helper->getSendMailUrl();
+    }
+
+    /**
      * Get button size config setting
      *
      * @return string

@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+	<template id="payment_confirmation_template" label="Payment Confirmation" file="payment_confirmation.phtml" type="html" module="Bread_BreadCheckout" area="frontend"/>
+	<template id="error_report_template" label="Error Report" file="error_report.phtml" type="html" module="Bread_BreadCheckout" area="frontend"/>
+</config>

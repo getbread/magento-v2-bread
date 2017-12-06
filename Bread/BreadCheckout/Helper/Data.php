@@ -22,8 +22,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimateshipping";
     const URL_TAX_ESTIMATE                          = "bread/checkout/estimatetax";
     const URL_CONFIG_DATA                           = "bread/checkout/configdata";
+    const URL_LANDING_PAGE				            = "bread/checkout/landingpage";
     const URL_ADMIN_QUOTE_DATA                      = "breadadmin/bread/quotedata";
     const URL_ADMIN_VALIDATE_PAYMENT                = "breadadmin/bread/validatepaymentmethod";
+    const URL_ADMIN_GENERATE_CART                   = "breadadmin/bread/generatecart";
+    const URL_ADMIN_SEND_MAIL                       = "breadadmin/bread/sendmail";
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
     const XML_CONFIG_LOG_ENABLED                    = 'payment/breadcheckout/log_enabled';
@@ -60,6 +63,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const BUTTON_LOCATION_MARKETING                 = 'marketing';
     const BUTTON_LOCATION_CATEGORY                  = 'category';
     const BUTTON_LOCATION_OTHER                     = 'other';
+    const API_CART_EXTENSION                        = 'carts/';
 
     /** @var \Magento\Framework\Model\Context */
     protected $context;
@@ -248,6 +252,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $isSecure = $this->request->isSecure();
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_QUOTE_DATA, ['_secure'=>$isSecure]);
+    }
+
+    /**
+     * Get controller URL for cart generation
+     *
+     * @return string
+     */
+    public function getGenerateCartUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_GENERATE_CART, ['_secure'=>$isSecure]);
+    }
+
+    /**
+     * Get controller URL for email sending
+     *
+     * @return string
+     */
+    public function getSendMailUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_MAIL, ['_secure'=>$isSecure]);
     }
 
     /**
@@ -567,5 +593,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             $this->logger->debug($data, [$context]);
         }
+    }
+
+    /**
+     * Get cart API Url
+     *
+     * @param null $store
+     * @return mixed
+     */
+    public function getCartCreateApiUrl($store = null)
+    {
+        return $this->getTransactionApiUrl($store).self::API_CART_EXTENSION;
     }
 }

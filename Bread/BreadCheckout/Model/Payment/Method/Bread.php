@@ -484,4 +484,12 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             );
         }
     }
+
+    /**
+     * Returns payment method code
+     * @return string
+     */
+    public function getMethodCode(){
+        return $this->_code;
+    }
 }

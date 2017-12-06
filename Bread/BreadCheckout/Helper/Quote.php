@@ -241,6 +241,37 @@ class Quote extends Data
             'address2'      => $shippingAddress->getStreetLine(3) .
                 ($shippingAddress->getStreetLine(4) == '' ? '' : (' ' . $shippingAddress->getStreetLine(4))),
             'city'          => $shippingAddress->getCity(),
+            'email'         => $shippingAddress->getEmail(),
+            'state'         => $shippingAddress->getRegionCode(),
+            'zip'           => $shippingAddress->getPostcode(),
+            'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
+        ];
+    }
+
+
+    /**
+     * Get Bread Formatted Shipping Address Data From Address Model For API
+     *
+     * @return array
+     */
+    public function getShippingAddressAPIData()
+    {
+        if ($this->isInAdmin()) {
+            $shippingAddress = $this->orderCreateModel->getShippingAddress();
+        } else {
+            $shippingAddress = $this->getSessionQuote()->getShippingAddress();
+        }
+
+        if(!$shippingAddress->getStreetLine(1)){
+            return false;
+        }
+
+        return [
+            'firstName'     => $shippingAddress->getFirstname(),
+            'lastName'      => $shippingAddress->getLastname(),
+            'address'       => $shippingAddress->getStreetLine(1) . ($shippingAddress->getStreetLine(2) == '' ? '' : (' ' . $shippingAddress->getStreetLine(2))),
+            'address2'      => $shippingAddress->getStreetLine(3) . ($shippingAddress->getStreetLine(4) == '' ? '' : (' ' . $shippingAddress->getStreetLine(4))),
+            'city'          => $shippingAddress->getCity(),
             'state'         => $shippingAddress->getRegionCode(),
             'zip'           => $shippingAddress->getPostcode(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
@@ -289,9 +320,9 @@ class Quote extends Data
         if ($this->quote === null) {
             if ($this->isInAdmin()) {
                 $this->quote = $this->orderCreateModel->getQuote();
+            }else{
+                $this->quote = $this->checkoutSession->getQuote();
             }
-
-            $this->quote = $this->checkoutSession->getQuote();
         }
 
         return $this->quote;
