@@ -6,23 +6,23 @@ $code = $block->escapeHtml($block->getMethodCode());
 ?>
 <fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display:none;">
     <div id="bread-btn-cntnr">
-        <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $block->getIsDefaultSize(); ?> style="display:none;">
+        <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php /* @noEscape */ echo $block->getIsDefaultSize(); ?> style="display:none;">
         <span>
-            <span><?php echo __('Bread Checkout'); ?></span>
+            <span><?php /* @noEscape */ echo __('Bread Checkout'); ?></span>
         </span>
         </div>
         <div id="bread_feedback"></div>
     </div>
 </fieldset>
 
-<script type="text/javascript">
+<script>
     require([
         'jquery',
         'Bread_BreadCheckout/js/breadcheckout'
     ], function($, bread) {
         var getQuoteData = function() {
             $.ajax({
-                url: '<?php echo $block->getQuoteDataUrl(); ?>',
+                url: '<?php /* @noEscape */ echo $block->getQuoteDataUrl(); ?>',
                 type: 'get',
                 context: bread
             }).done(function (response) {
@@ -37,13 +37,13 @@ $code = $block->escapeHtml($block->getMethodCode());
         };
 
         $(document).ready(function () {
-            if ($('#edit_form').find(':radio[name="payment[method]"]:checked').val() == '<?php echo $code; ?>') {
+            if ($('#edit_form').find(':radio[name="payment[method]"]:checked').val() == '<?php /* @noEscape */ echo $code; ?>') {
                 getQuoteData();
             }
         });
 
         $('#edit_form').on('changePaymentMethod', function(e, method) {
-            if (method == '<?php echo $code; ?>') {
+            if (method == '<?php /* @noEscape */ echo $code; ?>') {
                 getQuoteData();
             }
         });

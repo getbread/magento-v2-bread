@@ -23,21 +23,22 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
         \Bread\BreadCheckout\Helper\Checkout $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->logger = $logger;
         $this->helper = $helper;
-        parent::__construct($context,
+        parent::__construct(
+            $context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
             $checkoutSession,
@@ -48,7 +49,8 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $totalsCollector,
             $quoteRepository,
             $customerSession,
-            $quoteManagement);
+            $quoteManagement
+        );
     }
 
     /**
@@ -58,12 +60,14 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
      */
     public function execute()
     {
-        $this->helper->log( ["TAX ESTIMATE ACTION GET PARAMS" => $this->getRequest()->getParams()] );
+        $this->helper->log(["TAX ESTIMATE ACTION GET PARAMS" => $this->getRequest()->getParams()]);
         $data       = json_decode($this->getRequest()->getParams()['shippingInfo'], true);
         try {
             $shippingAddress    = $this->getShippingAddressForQuote($data);
             if (!$shippingAddress instanceof \Magento\Quote\Model\Quote\Address) {
-                throw new \Exception('Shipping address is not an instance of Magento\Quote\Model\Quote\Address');
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    'Shipping address is not an instance of Magento\Quote\Model\Quote\Address'
+                );
             }
             
             $result             = $shippingAddress->getTaxAmount() * 100;
@@ -74,6 +78,8 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $response = ['error' => 1,
                          'text'  => 'Internal error'];
         }
-        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $response]);
+        return $this->resultFactory->create(
+            \Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $response]
+        );
     }
 }

@@ -89,7 +89,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     protected function _toHtml()
     {
-        if( $this->quoteHelper->isEnabledOnCOP() ) {
+        if ($this->quoteHelper->isEnabledOnCOP()) {
             return parent::_toHtml();
         }
 
@@ -115,5 +115,4 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     {
         return ($this->quoteHelper->getAllowCheckoutCP()) ? 'true' : 'false';
     }
-
 }

@@ -12,7 +12,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 {
     protected $_product;
 
-
     /** @var \Magento\Framework\Registry */
     protected $registry;
 
@@ -115,7 +114,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getDiscountDataJson()
     {
-        $data     = array();
+        $data     = [];
         return $this->jsonEncode($data);
     }
 
@@ -156,7 +155,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     protected function _toHtml()
     {
-        if( $this->catalogHelper->isEnabledOnPDP() ) {
+        if ($this->catalogHelper->isEnabledOnPDP()) {
             return parent::_toHtml();
         }
 
@@ -281,7 +280,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getCartSizeFinancingId()
     {
         return $this->dataHelper->getCartSizeFinancingId();
-
     }
 
     /**
@@ -298,7 +296,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
             ->addFilterByRequiredOptions();
 
         $itemIds         = [];
-        foreach($usedChildrenProduct as $simpleProduct){
+        foreach ($usedChildrenProduct as $simpleProduct) {
             $itemIds[]   = [ $simpleProduct->getId() => $simpleProduct->getSku() ];
         }
 
@@ -315,7 +313,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     {
         $optionsData = [];
 
-        foreach($options as $option) {
+        foreach ($options as $option) {
             if ($option->getValues()) {
                 foreach ($option->getValues() as $k => $v) {
                     $optionsData[$option->getId()][$k] = [
@@ -409,8 +407,8 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      * @param $data
      * @return string
      */
-    public function jsonEncode($data) {
+    public function jsonEncode($data)
+    {
         return $this->jsonHelper->jsonEncode($data);
     }
-    
 }

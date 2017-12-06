@@ -1,28 +1,28 @@
-<?php /* @var $this Bread\BreadCheckout\Block\Checkout\Overview */ ?>
-<?php  echo $this->getBeforeHtml(); ?>
+<?php /** @var $this Bread\BreadCheckout\Block\Checkout\Overview */ ?>
+<?php  echo $block->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr">
-    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
+    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php /* @noEscape */ echo $block->getIsDefaultSize(); ?>>
         <span>
-            <span><?php echo __('Bread Checkout'); ?></span>
+            <span><?php /* @noEscape */ echo __('Bread Checkout'); ?></span>
         </span>
     </div>
 </div>
 
-<script type="text/javascript">
+<script>
     require(['jquery'], function($, quote){
         document.configureButton = function (items) {
-            var address             = <?php echo $this->getShippingAddressData(); ?>;
-            var billingAddress      = <?php echo $this->getBillingAddressData(); ?>;
-            var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
-            var buttonCss           = '<?php echo $this->getButtonDesign(); ?>';
+            var address             = <?php /* @noEscape */ echo $block->getShippingAddressData(); ?>;
+            var billingAddress      = <?php /* @noEscape */ echo $block->getBillingAddressData(); ?>;
+            var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
+            var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
-                asLowAs: <?php echo $this->getAsLowAs(); ?>,
+                asLowAs: <?php /* @noEscape */ echo $block->getAsLowAs(); ?>,
                 actAsLabel: false,
                 items: items,
-                allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
-                buttonLocation: '<?php echo $this->getCartSummaryLocation(); ?>',
+                allowCheckout: <?php /* @noEscape */ echo $this->getAllowCheckout(); ?>,
+                buttonLocation: '<?php /* @noEscape */ echo $this->getCartSummaryLocation(); ?>',
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
@@ -31,7 +31,7 @@
                         i.name = 'token';
                         i.value = tx_token;
                         var f = document.createElement('form');
-                        f.action = '<?php echo $this->getValidateOrderUrl(); ?>';
+                        f.action = '<?php /* @noEscape */ echo $block->getValidateOrderUrl(); ?>';
                         f.method = 'POST';
                         f.appendChild(i);
                         document.body.appendChild(f);
@@ -48,11 +48,11 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?php echo $this->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
+                    shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
                     $.ajax({
-                        url: '<?php echo $this->getTaxEstimationUrl(); ?>',
+                        url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
                     }).done(function (response) {
@@ -80,11 +80,11 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?php echo $this->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
+                    shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
                     $.ajax({
-                        url: '<?php echo $this->getShippingAddressEstimationUrl(); ?>',
+                        url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
@@ -131,9 +131,9 @@
                         "Discount"
                 }];
             }
-            <?php if ($this->isCartSizeTargetedFinancing()): ?>
-            var cartSizeFinancingId = '<?php echo $this->getCartSizeFinancingId() ?>';
-            var cartSizeThreshold = '<?php echo $this->getCartSizeThreshold(); ?>';
+            <?php if ($block->isCartSizeTargetedFinancing()) : ?>
+            var cartSizeFinancingId = '<?php /* @noEscape */ echo $block->getCartSizeFinancingId() ?>';
+            var cartSizeThreshold = '<?php /* @noEscape */ echo $block->getCartSizeThreshold(); ?>';
             var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
             breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             <?php endif; ?>
@@ -148,7 +148,7 @@
         };
 
         $(document).ready(function() {
-            document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
+            document.defaultItems       = <?php /* @noEscape */ echo $block->getProductDataJson(); ?>;
             document.previousPrice      = document.defaultItems[0]["price"];
             document.previousSku        = document.defaultItems[0]["sku"];
             document.configureButton(document.defaultItems);

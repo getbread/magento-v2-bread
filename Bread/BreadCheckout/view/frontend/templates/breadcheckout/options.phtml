@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author  Bread   @copyright  2016
  * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
@@ -8,18 +8,18 @@
 
 /** @var $this Bread\BreadCheckout\Block\Product\View */
 ?>
-<script type="text/javascript">
-    <?php $_options = $this->decorateArray($this->getProduct()->getOptions()); ?>
-    <?php if (count($_options)): ?>
+<script>
+    <?php $_options = $block->decorateArray($block->getProduct()->getOptions()); ?>
+    <?php if (!empty($_options)) : ?>
 
     require(['jquery', 'jquery/validate'], function($) {
         /**
          * Retrieve custom options data
          */
-        <?php foreach($_options as $_option): ?>
-            <?php echo $this->getOptionHtml($_option); ?>
+        <?php foreach ($_options as $_option) : ?>
+            <?php /* @noEscape */ echo $block->getOptionHtml($_option); ?>
         <?php endforeach; ?>
-        document.optionsData = <?php echo $this->getCustomOptionsData($_options); ?>
+        document.optionsData = <?php /* @noEscape */ echo $block->getCustomOptionsData($_options); ?>
 
         /**
          * Returns SKU with custom options appended;

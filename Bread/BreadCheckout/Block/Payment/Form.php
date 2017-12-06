@@ -12,10 +12,12 @@ class Form extends \Magento\Payment\Block\Form
     /**
      * Constructor
      */
-    public function __construct(\Magento\Framework\View\Element\Template\Context $context,
-                                \Bread\BreadCheckout\Helper\Catalog $helper,
-                                array $data = [])
-    {
+    public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Bread\BreadCheckout\Helper\Catalog $helper,
+        array $data = []
+    ) {
+    
         $this->helper = $helper;
         parent::__construct($context, $data);
     }

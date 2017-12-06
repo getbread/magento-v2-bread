@@ -31,11 +31,11 @@ class Customer extends Data
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
-        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Request\Http\Proxy $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
@@ -59,20 +59,24 @@ class Customer extends Data
         $session                    = $this->customerSession;
         $customer                   = $session->getCustomer();
 
-        if( empty($customer) ) {
+        if (empty($customer)) {
             return [];
         }
 
         $defaultShippingAddress     = $customer->getPrimaryShippingAddress();
 
-        if(!$defaultShippingAddress->getStreetLine(1)){
+        if (!$defaultShippingAddress->getStreetLine(1)) {
             return [];
         }
 
         $primaryData        = [
             'fullName'      => $defaultShippingAddress->getName(),
-            'address'       => $defaultShippingAddress->getStreetLine(1) . ($defaultShippingAddress->getStreetLine(2) == '' ? '' : (' ' . $defaultShippingAddress->getStreetLine(2))),
-            'address2'      => $defaultShippingAddress->getStreetLine(3) . ($defaultShippingAddress->getStreetLine(4) == '' ? '' : (' ' . $defaultShippingAddress->getStreetLine(4))),
+            'address'       => $defaultShippingAddress->getStreetLine(1) .
+                ($defaultShippingAddress->getStreetLine(2) == '' ?
+                    '' : (' ' . $defaultShippingAddress->getStreetLine(2))),
+            'address2'      => $defaultShippingAddress->getStreetLine(3) .
+                ($defaultShippingAddress->getStreetLine(4) == '' ?
+                    '' : (' ' . $defaultShippingAddress->getStreetLine(4))),
             'city'          => $defaultShippingAddress->getCity(),
             'state'         => $defaultShippingAddress->getRegionCode(),
             'zip'           => $defaultShippingAddress->getPostcode(),
@@ -92,19 +96,23 @@ class Customer extends Data
         $session                    = $this->customerSession;
         $customer                   = $session->getCustomer();
 
-        if( empty($customer) ) {
+        if (empty($customer)) {
             return [];
         }
 
         $defaultBillingAddress     = $customer->getPrimaryBillingAddress();
-        if(!$defaultBillingAddress){
+        if (!$defaultBillingAddress) {
             return [];
         }
 
         $primaryData        = [
             'fullName'      => $defaultBillingAddress->getName(),
-            'address'       => $defaultBillingAddress->getStreetLine(1) . ($defaultBillingAddress->getStreetLine(2) == '' ? '' : (' ' . $defaultBillingAddress->getStreetLine(2))),
-            'address2'      => $defaultBillingAddress->getStreetLine(3) . ($defaultBillingAddress->getStreetLine(4) == '' ? '' : (' ' . $defaultBillingAddress->getStreetLine(4))),
+            'address'       => $defaultBillingAddress->getStreetLine(1) .
+                ($defaultBillingAddress->getStreetLine(2) == '' ?
+                    '' : (' ' . $defaultBillingAddress->getStreetLine(2))),
+            'address2'      => $defaultBillingAddress->getStreetLine(3) .
+                ($defaultBillingAddress->getStreetLine(4) == '' ?
+                    '' : (' ' . $defaultBillingAddress->getStreetLine(4))),
             'city'          => $defaultBillingAddress->getCity(),
             'state'         => $defaultBillingAddress->getRegionCode(),
             'zip'           => $defaultBillingAddress->getPostcode(),
@@ -145,7 +153,7 @@ class Customer extends Data
 
         // Don't create a new account if one already exists for this email
         $customer->loadByEmail($email);
-        if( $customer->getId() ) {
+        if ($customer->getId()) {
             return;
         }
 
@@ -188,17 +196,17 @@ class Customer extends Data
     }
 
      /**
-     * Get Default Customer Shipping Address If It Exists
-     *
-     * @return string
-     */
+      * Get Default Customer Shipping Address If It Exists
+      *
+      * @return string
+      */
     public function getShippingAddressData()
     {
-        if( $this->isUserLoggedIn() == false ){
+        if ($this->isUserLoggedIn() == false) {
             return 'false';
         }
 
-        if( $this->hasBillingAddress() == false ){
+        if ($this->hasBillingAddress() == false) {
             return 'false';
         }
 
@@ -213,18 +221,17 @@ class Customer extends Data
      */
     public function getBillingAddressData()
     {
-        if( $this->isUserLoggedIn() == false ){
+        if ($this->isUserLoggedIn() == false) {
             return 'false';
         }
 
-        if( $this->hasBillingAddress() == false ){
+        if ($this->hasBillingAddress() == false) {
             return 'false';
         }
 
         $primaryAddressData     = $this->getFormattedDefaultBillingAddress();
         return $this->jsonHelper->jsonEncode($primaryAddressData);
     }
-
 
     /**
      * Check if Customer has associated addresses
@@ -233,7 +240,7 @@ class Customer extends Data
      */
     public function hasBillingAddress()
     {
-        if($this->customerSession->getCustomer()->getPrimaryBillingAddress() == false){
+        if ($this->customerSession->getCustomer()->getPrimaryBillingAddress() == false) {
             return false;
         }
 
@@ -241,14 +248,14 @@ class Customer extends Data
     }
 
      /**
-     * Check if current visitor is logged in
-     *
-     * @return bool
-     */
-     public function isUserLoggedIn()
-     {
-         return (bool) $this->customerSession->isLoggedIn();
-     }
+      * Check if current visitor is logged in
+      *
+      * @return bool
+      */
+    public function isUserLoggedIn()
+    {
+        return (bool) $this->customerSession->isLoggedIn();
+    }
 
     /**
      * Generate random password during automatic customer account creation
@@ -261,5 +268,4 @@ class Customer extends Data
     {
         return $this->encryptor->getHash($this->random->getRandomString($length), true);
     }
-
 }
