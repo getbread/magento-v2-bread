@@ -46,7 +46,8 @@ class QuoteData extends \Magento\Backend\App\Action
             'asLowAs' => $this->helper->isAsLowAs(),
             'paymentUrl' => $this->helper->getAdminPaymentUrl(),
             'buttonCss' => $this->helper->getButtonDesign(),
-            'buttonLocation' => $this->helperData->getOtherLocation()
+            'buttonLocation' => $this->helperData->getOtherLocation(),
+            'isHealthcare' => $this->helper->isHealthcare()
         ]);
     }
 }

@@ -47,6 +47,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'isCartSizeTargetedFinancing' => $this->helperData->isCartSizeTargetedFinancing(),
                     'financingProgramId' => $this->helperData->getCartSizeFinancingId(),
                     'cartSizeThreshold' => $this->helperData->getCartSizeThreshold(),
+                    'isHealthcare' => $this->helper->isHealthcare(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,

@@ -15,15 +15,20 @@ class ConfigData extends \Magento\Framework\App\Action\Action
     /** @var \Bread\BreadCheckout\Helper\Customer */
     protected $customerHelper;
 
+    /** @var \Bread\BreadCheckout\Helper\Data */
+    protected $dataHelper;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
-        \Bread\BreadCheckout\Helper\Customer $customerHelper
-    ) {
-    
+        \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Bread\BreadCheckout\Helper\Data $dataHelper
+    )
+    {
         $this->resultFactory = $context->getResultFactory();
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;
+        $this->dataHelper = $dataHelper;
         parent::__construct($context);
     }
 
@@ -37,8 +42,8 @@ class ConfigData extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
-            'shippingContact' => $this->quoteHelper->getShippingAddressData(),
-            'billingContact' => $this->getBillingAddressData()
+            'shippingContact' => ($this->dataHelper->isHealthcare())? false : $this->quoteHelper->getShippingAddressData(),
+            'billingContact' => ($this->dataHelper->isHealthcare())? false : $this->getBillingAddressData()
         ]);
     }
 
