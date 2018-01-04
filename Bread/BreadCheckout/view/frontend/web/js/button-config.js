@@ -38,6 +38,9 @@ define(['jquery',
                                         this.updateAddress(response, tx_token);
                                     }
                                     fullScreenLoader.stopLoader();
+                                    if(document.getElementById("bread-checkout-submit"))
+                                        document.getElementById("bread-checkout-submit").disabled = false;
+                                    }
                                 }
                             } catch (e) {
                                 console.log(e);
