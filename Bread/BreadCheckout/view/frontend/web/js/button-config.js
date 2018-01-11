@@ -87,13 +87,6 @@ define(['jquery',
         init: function() {
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                 bread.checkout(this.breadConfig);
-            } else {
-                $('#' + this.breadConfig.buttonId).hide();
-                $('#bread_transaction_id').val(window.checkoutConfig.payment.breadcheckout.transactionId);
-                var approved = "<span><strong>You have been approved for financing.<br/>"+
-                    "Please continue with the checkout to complete your order.</strong></span>";
-                $('#bread_feedback').html(approved);
-                $('#bread-checkout-submit').removeAttr('disabled');
             }
             fullScreenLoader.stopLoader();
         },

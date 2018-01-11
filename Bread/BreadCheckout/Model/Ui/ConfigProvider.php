@@ -56,7 +56,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'validateOrderUrl' => $this->helper->getValidateOrderURL(),
                         'additionalData' => '',
                         'taxEstimationUrl' => $this->helper->getTaxEstimateUrl(),
-                        'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl()
+                        'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl(),
+                        'shippingOptions' => $this->helper->getShippingOptions()
                     ]
                 ]
             ]

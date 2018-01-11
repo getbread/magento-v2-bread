@@ -18,26 +18,32 @@
                     title="Bread Checkout"
                     class="button"
                     onclick="return false;"
-                    data-bind="attr: {'data-bread-default-size': getDefaultSize() }">
+                    data-bind="attr: {'data-bread-default-size': getDefaultSize() }, visible: !breadTransactionId()">
                 <span>
-                    <span data-bind="text: $t('Bread Checkout')"></span>
+                    <span data-bind="i18n: 'Bread Checkout'"></span>
                 </span>
             </button>
             <input id="bread_transaction_id"
                    name="bread_transaction_id"
                    type="hidden"
                    class="validate-bread"
-                   data-bind="attr: {value: getBreadTransactionId() }" />
-            <div id="bread_feedback"></div>
+                   data-bind="attr: { value: breadTransactionId()}"/>
+            <div id="bread_feedback">
+                <!-- ko if: breadTransactionId() -->
+                <div>
+                    <strong data-bind="i18n: 'You have been approved for financing.'"></strong>
+                </div>
+                <div>
+                    <strong data-bind="i18n: 'Please continue with the checkout to complete your order.'"></strong>
+                </div>
+                <!-- /ko -->
+            </div>
             <div class="primary">
                 <button data-role="review-save"
                         type="submit"
                         id="bread-checkout-submit"
-                        data-bind="
-                        attr: {title: $t('Place Order')},
-                        click: placeOrder"
-                        class="action primary checkout"
-                        disabled>
+                        data-bind="attr: {title: $t('Place Order')},click: placeOrder, enable: breadTransactionId()"
+                        class="action primary checkout">
                     <span data-bind="i18n: 'Place Order'"></span>
                 </button>
             </div>
