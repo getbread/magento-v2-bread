@@ -11,13 +11,14 @@ define(['jquery',
         configure: function(data, context) {
             this.breadConfig = {
                 buttonId: data.buttonId,
+                items: data.items,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
                 shippingOptions: [data.shippingOptions],
                 tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
-                
+
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         $.ajax({
@@ -50,7 +51,6 @@ define(['jquery',
                 }
             };
 
-
             /**
              * Optional params
              */
@@ -61,6 +61,14 @@ define(['jquery',
 
             if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
                 this.breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
+            }
+
+            if(data.cartSizeFinancing.enabled){
+                var cartSizeFinancingId = data.cartSizeFinancing.id;
+                var cartSizeThreshold = data.cartSizeFinancing.threshold;
+                var items = data.items;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
             if (typeof data.billingContact !== 'undefined' && data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {

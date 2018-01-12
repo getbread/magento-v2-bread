@@ -8,13 +8,14 @@
     </div>
 </div>
 
-<script>
+<script type="text/javascript">
     require(['jquery'], function($, quote){
         document.configureButton = function (items) {
             var address             = <?php /* @noEscape */ echo $block->getShippingAddressData(); ?>;
             var billingAddress      = <?php /* @noEscape */ echo $block->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
+            var cartSizeFinancing   = <?php /* @noEscape */ echo $block->getCartSizeFinancingJson(); ?>;
             var total = 0;
             for(var i = 0; i < items.length; i++){
                 total += items[i]['price'] * items[i]['quantity'];
@@ -131,6 +132,14 @@
                 breadConfig.actAsLabel = false;
             }
 
+            if(cartSizeFinancing.enabled){
+                var cartSizeFinancingId = cartSizeFinancing.id;
+                var cartSizeThreshold = cartSizeFinancing.threshold;
+                var items = document.defaultItems;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            }
+
             var discountAmount =- document.round(window.checkoutConfig.totalsData.discount_amount);
             if (discountAmount > 0) {
                 breadConfig.discounts = [{
@@ -140,12 +149,6 @@
                         "Discount"
                 }];
             }
-            <?php if ($block->isCartSizeTargetedFinancing()) : ?>
-            var cartSizeFinancingId = '<?php /* @noEscape */ echo $block->getCartSizeFinancingId() ?>';
-            var cartSizeThreshold = '<?php /* @noEscape */ echo $block->getCartSizeThreshold(); ?>';
-            var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
-            breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            <?php endif; ?>
             bread.checkout(breadConfig);
         };
 

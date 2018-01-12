@@ -65,6 +65,14 @@ define(
                     breadConfig.customCSS = data.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
                 }
 
+                if(data.cartSizeFinancing.enabled){
+                    var cartSizeFinancingId = data.cartSizeFinancing.id;
+                    var cartSizeThreshold = data.cartSizeFinancing.threshold;
+                    var items = data.quoteItems;
+                    var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                    breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+                }
+
                 if (data.discounts.length > 0) {
                     breadConfig.discounts = data.discounts;
                 }

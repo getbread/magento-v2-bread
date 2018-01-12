@@ -119,6 +119,17 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
     /**
+     * Get cart size financing configuration
+     *
+     * @return string
+     */
+    public function getCartSizeFinancingJson()
+    {
+        $data     = $this->catalogHelper->getCartSizeFinancingData();
+        return $this->jsonEncode($data);
+    }
+
+    /**
      * Get Default Customer Shipping Address If It Exists
      *
      * @return string

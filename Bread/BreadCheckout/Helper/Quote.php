@@ -299,7 +299,7 @@ class Quote extends Data
                 'typeId' => $shippingAddress->getShippingMethod(),
                 'cost'   => $shippingAddress->getShippingAmount() * 100];
     }
-
+    
     /**
      * Get stored bread transaction ID from quote
      *

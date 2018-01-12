@@ -188,6 +188,40 @@
                         ]]>
                     </comment>
                 </field>
+				<field id="cart_size_targeted_financing" type="select" sortOrder="101" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Enable Targeted Financing based on Cart Size</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<comment>
+						<![CDATA[
+                            <div>
+								Only enable if you have received financing program Ids from your Bread representative
+						    </div>
+                        ]]>
+					</comment>
+				</field>
+				<field id="cart_threshold" type="text" translate="label" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Cart Size Threshold</label>
+					<comment>
+						<![CDATA[
+                            <div>
+                            	Cart Size (USD) over which a targeted financing program will be used
+                         	</div>
+                        ]]>
+					</comment>
+					<validate>validate-number</validate>
+					<depends><field id="cart_size_targeted_financing">1</field></depends>
+				</field>
+				<field id="cart_size_financing_program_id" type="text" sortOrder="102" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Financing Program Id</label>
+					<comment>
+						<![CDATA[
+                            <div>
+                            	Financing Program Id provided by Bread
+                            </div>
+                        ]]>
+					</comment>
+					<depends><field id="cart_size_targeted_financing">1</field></depends>
+				</field>
             </group>
         </section>
     </system>

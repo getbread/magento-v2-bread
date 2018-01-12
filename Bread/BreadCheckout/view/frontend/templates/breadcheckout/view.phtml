@@ -16,6 +16,7 @@
         document.configureButton = function (items) {
             var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
+            var cartSizeFinancing   = <?php /* @noEscape */ echo $this->getCartSizeFinancingJson(); ?>;
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
@@ -129,12 +130,12 @@
                 breadConfig.actAsLabel = false;
             }
 
-            <?php if ($block->isCartSizeTargetedFinancing()) : ?>
-            var cartSizeFinancingId = '<?php /* @noEscape */ echo $block->getCartSizeFinancingId() ?>';
-            var cartSizeThreshold = '<?php /* @noEscape */ echo $block->getCartSizeThreshold(); ?>';
-            var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
-            breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            <?php endif; ?>
+            if(cartSizeFinancing.enabled){
+                var cartSizeFinancingId = cartSizeFinancing.id;
+                var cartSizeThreshold = cartSizeFinancing.threshold;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            }
 
             $.ajax({
                 url: '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>',
