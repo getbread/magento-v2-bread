@@ -9,11 +9,11 @@ class Url extends Data
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
-        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Request\Http\Proxy $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Framework\Url $urlHelper
-    ){
+    ) {
         $this->urlHelper = $urlHelper;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
@@ -25,7 +25,8 @@ class Url extends Data
      * @param array $routeParams
      * @return string
      */
-    public function getFrontendUrl($routePath, $routeParams){
+    public function getFrontendUrl($routePath, $routeParams)
+    {
         return $this->urlHelper->getUrl($routePath, $routeParams);
     }
 
@@ -34,9 +35,9 @@ class Url extends Data
      *
      * @return string
      */
-    public function getLandingPageURL($error=false)
+    public function getLandingPageURL($error = false)
     {
-        $url = $this->getFrontendUrl(parent::URL_LANDING_PAGE,$error?["error"=>"1"]:[]);
+        $url = $this->getFrontendUrl(parent::URL_LANDING_PAGE, $error ? ["error" => "1"] : []);
 
         return preg_replace('/' . preg_quote("?") . '.*' . '/', '', $url);
     }
