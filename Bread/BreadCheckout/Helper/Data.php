@@ -49,9 +49,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_LOGIN_CUSTOMER                 = 'payment/breadcheckout/login_customer_on_order';
     const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
     const XML_CONFIG_ALLOW_CHECKOUT_CART            = 'payment/breadcheckout/allowcheckoutcart';
-    const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
-    const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
-    const XML_CONFIG_CART_SIZE_FINANCING_ID         = 'payment/breadcheckout/cart_size_financing_program_id';
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
@@ -512,39 +509,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getDefaultCountry()
     {
         return 'US';
-    }
-
-    /**
-     * Check if cart size targeted financing is enabled
-     *
-     * @param string $store
-     * @return bool
-     */
-    public function isCartSizeTargetedFinancing($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store) &&
-                       $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_CART_SIZE_FINANCING, $store));
-    }
-
-    /**
-     * Get cart size over which targeted financing is enabled
-     *
-     * @return string
-     */
-    public function getCartSizeThreshold($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_CART_SIZE_THRESHOLD, $store);
-    }
-
-    /**
-     * Get financing ID associated with cart size threshold
-     *
-     * @return string
-     */
-    public function getCartSizeFinancingId($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_CART_SIZE_FINANCING_ID, $store);
-
     }
 
     /**
