@@ -53,6 +53,9 @@ define(
              * @returns {Number}
              */
             round: function(value) {
+                if (isNaN(value)) {
+                    return 0;
+                }
                 return parseInt(
                     Number(Math.round(parseFloat(value)+'e'+2)+'e-'+2)
                     * 100
