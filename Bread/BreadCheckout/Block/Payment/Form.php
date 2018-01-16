@@ -12,10 +12,12 @@ class Form extends \Magento\Payment\Block\Form
     /**
      * Constructor
      */
-    public function __construct(\Magento\Framework\View\Element\Template\Context $context,
-                                \Bread\BreadCheckout\Helper\Catalog $helper,
-                                array $data = [])
-    {
+    public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Bread\BreadCheckout\Helper\Catalog $helper,
+        array $data = []
+    ) {
+    
         $this->helper = $helper;
         parent::__construct($context, $data);
     }
@@ -28,6 +30,26 @@ class Form extends \Magento\Payment\Block\Form
     public function getQuoteDataUrl()
     {
         return $this->helper->getQuoteDataUrl();
+    }
+
+    /**
+     * Get controller URL for cart generation
+     *
+     * @return string
+     */
+    public function getGenerateCartUrl()
+    {
+        return $this->helper->getGenerateCartUrl();
+    }
+
+    /**
+     * Get controller URL for email sending
+     *
+     * @return string
+     */
+    public function getSendMailUrl()
+    {
+        return $this->helper->getSendMailUrl();
     }
 
     /**

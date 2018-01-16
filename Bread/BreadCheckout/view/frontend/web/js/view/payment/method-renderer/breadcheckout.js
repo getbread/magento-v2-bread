@@ -1,6 +1,7 @@
 define(
     [
         'Magento_Checkout/js/view/payment/default',
+        'ko',
         'jquery',
         'buttonConfig',
         'Magento_Customer/js/model/customer',
@@ -14,6 +15,7 @@ define(
         'Magento_Checkout/js/model/full-screen-loader'
     ],
     function (Component,
+              ko,
               $,
               button,
               customer,
@@ -30,6 +32,8 @@ define(
             defaults: {
                 template: 'Bread_BreadCheckout/payment/breadcheckout'
             },
+
+            breadTransactionId: ko.observable(window.checkoutConfig.payment.breadcheckout.transactionId),
 
             initialize: function () {
                 this._super();
@@ -55,6 +59,11 @@ define(
              */
             getBreadTransactionId: function() {
                 return window.checkoutConfig.payment.breadcheckout.transactionId;
+            },
+
+            setBreadTransactionId: function(transactionId){
+                this.breadTransactionId(transactionId);
+                window.checkoutConfig.payment.breadcheckout.transactionId = transactionId;
             },
 
             /**
@@ -107,6 +116,7 @@ define(
              * @param token {string}
              */
             updateAddress: function(data, token) {
+                var self = this;
                 /**
                  * Billing address
                  */
@@ -122,7 +132,7 @@ define(
                  * Reload checkout section & add bread token
                  */
                 defaultProcessor.saveShippingInformation().done(function() {
-                    window.checkoutConfig.payment.breadcheckout.transactionId = token;
+                    self.setBreadTransactionId(token);
                 });
             },
 

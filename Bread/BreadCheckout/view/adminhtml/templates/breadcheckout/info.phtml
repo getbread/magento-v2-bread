@@ -6,23 +6,45 @@ $code = $block->escapeHtml($block->getMethodCode());
 ?>
 <fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display:none;">
     <div id="bread-btn-cntnr">
-        <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $block->getIsDefaultSize(); ?> style="display:none;">
+		<span>
+            <span><strong><?php echo __('Bread Checkout'); ?></strong></span>
+        </span>
+		<div class="bread-clearer"></div>
+		<div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $block->getIsDefaultSize(); ?> style="display:none;">
         <span>
-            <span><?php echo __('Bread Checkout'); ?></span>
+            <span><?php /* @noEscape */ echo __('Bread Checkout'); ?></span>
         </span>
         </div>
         <div id="bread_feedback"></div>
     </div>
+	<div class="bread-clearer"></div>
+	<div class="bread-create-cart">
+		<input type="button" class="action-default scalable action-secondary" value="<?php echo __("Create Cart"); ?>"/>
+	</div>
+	<div class="bread-send-mail" hidden>
+		<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAlCAYAAAAEGWqvAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH4QMWCh0HT4FsfQAAAnpJREFUWMPVWMt1ozAUvdbJ3u4gdGCmgtDB0IHJ6i3jqSBJBfEs38pKB5RAOsAduARSQWbzNEfoCCNAGPutMMeIe9/nXqEVM68BlAAy3FdUAHJ1p+AhmEvlAd8AON8g4LNga5FQnj8lAFIA+obAa8GUuMl9cAkQ0bdcPzMzABRLgyeiZ/ODmU2SAQBuBTJm3pkf8uDbguAPDvid2/LKx5iZXy0S7wtVoSCiPxb4V19bq46H35j5aJH4FBLNFcF/WuCPXZ2wYuafCwuVsti3LLQV/d3MBLwBkBHRyQHf2QF9BACglkXnJtECLwZbifp0hgpYOAVQMfOjtNNJVKCOCL4eAz6UgCFRS/Yh1cgikXDBb+VeGvKwGvCijVTCJaEjgHfbMwldIGQGQlViqNS6BvUkojFottTIzGmP4e0ngN+NFQY1ofyamT8sEn8Dq7D3gB/dhmriAO49hpdfMLxCiBrwH1M3jWNnYKjhNZL5qXMzG4EuRTFD6Wq8lkpNDoV44TO8tMOg8lgvjVmBzv3MUHeduwJ97tsyPKudzj3gmzHOPpRAQUS/ArK4ka3HCzP/DtD4BkAiax/mIvDffaU9QrJ1CHTX2gy/fMTo2AS0I4HbyL2c2i0nRqdjEXBt32h8zNiIs6+HkugjUDrg1zN+kRkZXttO39eqqkdtiiuB95II+e5Qga46i4ZfIFFarXSRhOo4wsusAy6z17kGePt86ugh0fQRaADkNnhZKFviXCiEhPIoTvCRxgIkTq4yuQQSC/wLlj8XNSR2Poxdm7lK5uAWwLe6Q8C32vlBANs3M9xm+BJaKdmbV7i/qADkK6vnH4ecxywZRPRlrv8BVEJW2C2kvd0AAAAASUVORK5CYII=" title="<?php echo __("Email cart link to customer");?>" alt="<?php echo __("Email cart link to customer");?>"/>
+	</div>
+	<div class="bread-clearer"></div>
+	<div>
+		<div id="order-message">
+			<div class="messages">
+				<div class="message message-success success" id="bread-checkout-success-message" hidden>
+				</div>
+				<div class="message message-error error" id="bread-checkout-error-message" hidden>
+				</div>
+			</div>
+		</div>
+	</div>
 </fieldset>
 
-<script type="text/javascript">
+<script>
     require([
         'jquery',
         'Bread_BreadCheckout/js/breadcheckout'
     ], function($, bread) {
         var getQuoteData = function() {
             $.ajax({
-                url: '<?php echo $block->getQuoteDataUrl(); ?>',
+                url: '<?php /* @noEscape */ echo $block->getQuoteDataUrl(); ?>',
                 type: 'get',
                 context: bread
             }).done(function (response) {
@@ -37,15 +59,98 @@ $code = $block->escapeHtml($block->getMethodCode());
         };
 
         $(document).ready(function () {
-            if ($('#edit_form').find(':radio[name="payment[method]"]:checked').val() == '<?php echo $code; ?>') {
+            if ($('#edit_form').find(':radio[name="payment[method]"]:checked').val() == '<?php /* @noEscape */ echo $code; ?>') {
                 getQuoteData();
             }
         });
 
         $('#edit_form').on('changePaymentMethod', function(e, method) {
-            if (method == '<?php echo $code; ?>') {
+            if (method == '<?php /* @noEscape */ echo $code; ?>') {
                 getQuoteData();
             }
         });
+
+		$(".bread-create-cart").click(function() {
+			jQuery('body').loader().loader("show");
+
+			$("#bread-checkout-success-message").hide();
+			$("#bread-checkout-error-message").hide();
+
+			$(".bread-send-mail").hide();
+
+			$.ajax({
+				url: '<?php echo $block->getGenerateCartUrl(); ?>',
+				type: 'post',
+				data: {
+					form_key: window.FORM_KEY
+				},
+				context: bread
+			}).success(function(response) {
+				if (!response.error) {
+					$("#bread-checkout-success-message").empty().show();
+
+					$(response.successRows).each(function(k, message) {
+						$("#bread-checkout-success-message").append('<div data-ui-id="message-message-success">' + message + '</div>');
+					});
+
+					$(".bread-send-mail")
+						.off("click")
+						.on("click", function(e) {
+							jQuery('body').loader().loader("show");
+
+							$.ajax({
+								url: '<?php echo $block->getSendMailUrl(); ?>',
+								type: 'post',
+								data: {
+									form_key: window.FORM_KEY,
+									url: response.cartUrl
+								},
+								context: bread
+							}).success(function(response) {
+								if (!response.error) {
+									$("#bread-checkout-success-message").show();
+
+									$(response.successRows).each(function(k, row) {
+										$("#bread-checkout-success-message").append('<div data-ui-id="message-message-success">' + row + '</div>');
+									});
+								} else {
+									$("#bread-checkout-error-message").empty().show();
+
+									$(response.errorRows).each(function(k, row) {
+										$("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + row + '</div>');
+									});
+								}
+							}).complete(function() {
+								jQuery('body').loader().loader("hide");
+							});
+						}).show();
+
+					$(".action-secondary .action-add").off("click.Bread")
+						.on("click.Bread", function(e) {
+							$(e.targetNode).off("click.Bread");
+
+							if ($("#p_method_breadcheckout").attr("checked")) {
+								alert("<?php echo __("If you change anything within the order, you will have to generate a new cart with Financing.");?>");
+							}
+						});
+
+				} else {
+					$("#bread-checkout-error-message").empty().show();
+
+					$(response.errorRows).each(function(k, v) {
+						$("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + v + '</div>');
+					});
+
+				}
+			}).fail(function(response) {
+				$("#bread-checkout-error-message").empty().show();
+
+				$(response.errorRows).each(function(k, v) {
+					$("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + v + '</div>');
+				});
+			}).complete(function() {
+				jQuery('body').loader().loader("hide");
+			});
+		});
     });
 </script>

@@ -6,6 +6,7 @@
  * @author  Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Model\Ui;
+
 use Magento\Checkout\Model\ConfigProviderInterface;
 
 class ConfigProvider implements ConfigProviderInterface
@@ -27,11 +28,11 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-    * Retrieve assoc array of checkout configuration;
-    * populates window.checkoutConfig.payment variable
-    *
-    * @return array
-    */
+     * Retrieve assoc array of checkout configuration;
+     * populates window.checkoutConfig.payment variable
+     *
+     * @return array
+     */
     public function getConfig()
     {
         return [
@@ -46,17 +47,21 @@ class ConfigProvider implements ConfigProviderInterface
                     'isCartSizeTargetedFinancing' => $this->helperData->isCartSizeTargetedFinancing(),
                     'financingProgramId' => $this->helperData->getCartSizeFinancingId(),
                     'cartSizeThreshold' => $this->helperData->getCartSizeThreshold(),
+                    'isHealthcare' => $this->helper->isHealthcare(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,
                         'items' => $this->helper->getQuoteItemsData(),
                         'discounts' => $this->helper->getDiscountData(),
+                        'cartSizeFinancing' => $this->helper->getCartSizeFinancingData(),
                         'asLowAs' => $this->helper->isAsLowAs(),
                         'paymentUrl' => $this->helper->getPaymentUrl(),
                         'validateOrderUrl' => $this->helper->getValidateOrderURL(),
                         'additionalData' => '',
                         'taxEstimationUrl' => $this->helper->getTaxEstimateUrl(),
-                        'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl()
+                        'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl(),
+                        'shippingOptions' => $this->helper->getShippingOptions(),
+                        'buttonLocation' => $this->helperData->getCheckoutLocation()
                     ]
                 ]
             ]

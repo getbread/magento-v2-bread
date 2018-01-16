@@ -17,21 +17,22 @@ class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Psr\Log\LoggerInterface $logger,
         \Bread\BreadCheckout\Helper\Checkout $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder
-    )
-    {
+    ) {
+    
         $this->jsonEncoder = $jsonEncoder;
 
-        parent::__construct($context,
+        parent::__construct(
+            $context,
             $catalogResourceModelProductFactory,
             $dataObjectFactory,
             $checkoutSession,
@@ -42,7 +43,8 @@ class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
             $totalsCollector,
             $quoteRepository,
             $customerSession,
-            $quoteManagement);
+            $quoteManagement
+        );
     }
 
     /**
@@ -55,7 +57,7 @@ class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
         $params = $this->getRequest()->getParams();
         $result = ['valid' => false];
 
-        if(isset($params['bread_transaction_id'])) {
+        if (isset($params['bread_transaction_id'])) {
             if ($this->helper->validateTransactionAmount($params['bread_transaction_id'])) {
                 $result['valid'] = true;
             } else {
@@ -63,7 +65,7 @@ class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
                 Please complete checkout again before placing the order.");
             }
         } else {
-           $errorMsg = __("Please complete the Bread checkout form before placing the order.");
+            $errorMsg = __("Please complete the Bread checkout form before placing the order.");
         }
 
         if (isset($errorMsg)) {

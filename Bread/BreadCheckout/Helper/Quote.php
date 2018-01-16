@@ -8,7 +8,8 @@
  */
 namespace Bread\BreadCheckout\Helper;
 
-class Quote extends Data {
+class Quote extends Data
+{
 
     /** @var \Magento\Sales\Model\Quote */
     protected $quote = null;
@@ -28,10 +29,10 @@ class Quote extends Data {
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
-        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\App\Request\Http\Proxy $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
@@ -106,8 +107,8 @@ class Quote extends Data {
             $couponTitle = $quote->getCouponCode();
         }
 
-        if( $discount > 0 ) {
-            $discount   = ['amount'        => intval($this->priceCurrency->round($discount) * 100),
+        if ($discount > 0) {
+            $discount   = ['amount'        => (int) $this->priceCurrency->round($discount) * 100,
                            'description'   => ($couponTitle) ?
                                                 $couponTitle : __('Discount')];
         } else {
@@ -138,7 +139,8 @@ class Quote extends Data {
                 $thisProduct    = $item->getOptionByCode('simple_product')->getProduct();
             }
 
-            $itemsData[]   = $this->helperCatalog->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), null);
+            $itemsData[]   = $this->helperCatalog
+                ->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), null);
         }
 
         return $itemsData;
@@ -175,7 +177,8 @@ class Quote extends Data {
                 $thisProduct            = $item->getOptionByCode('simple_product')->getProduct();
             }
 
-            $itemsData[]       = $this->helperCatalog->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $price);
+            $itemsData[]       = $this->helperCatalog
+                ->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $price);
         }
 
         return $itemsData;
@@ -194,14 +197,15 @@ class Quote extends Data {
             $billingAddress     = $this->getSessionQuote()->getBillingAddress();
         }
 
-
-        if(!$billingAddress->getStreetLine(1)){
+        if (!$billingAddress->getStreetLine(1)) {
             return false;
         }
 
         return [
-            'address'       => $billingAddress->getStreetLine(1) . ($billingAddress->getStreetLine(2) == '' ? '' : (' ' . $billingAddress->getStreetLine(2))),
-            'address2'      => $billingAddress->getStreetLine(3) . ($billingAddress->getStreetLine(4) == '' ? '' : (' ' . $billingAddress->getStreetLine(4))),
+            'address'       => $billingAddress->getStreetLine(1) .
+                ($billingAddress->getStreetLine(2) == '' ? '' : (' ' . $billingAddress->getStreetLine(2))),
+            'address2'      => $billingAddress->getStreetLine(3) .
+                ($billingAddress->getStreetLine(4) == '' ? '' : (' ' . $billingAddress->getStreetLine(4))),
             'city'          => $billingAddress->getCity(),
             'state'         => $billingAddress->getRegionCode(),
             'zip'           => $billingAddress->getPostcode(),
@@ -226,12 +230,45 @@ class Quote extends Data {
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
 
-        if(!$shippingAddress->getStreetLine(1)){
+        if (!$shippingAddress->getStreetLine(1)) {
             return false;
         }
 
         return [
             'fullName'      => $shippingAddress->getName(),
+            'address'       => $shippingAddress->getStreetLine(1) .
+                ($shippingAddress->getStreetLine(2) == '' ? '' : (' ' . $shippingAddress->getStreetLine(2))),
+            'address2'      => $shippingAddress->getStreetLine(3) .
+                ($shippingAddress->getStreetLine(4) == '' ? '' : (' ' . $shippingAddress->getStreetLine(4))),
+            'city'          => $shippingAddress->getCity(),
+            'email'         => $shippingAddress->getEmail(),
+            'state'         => $shippingAddress->getRegionCode(),
+            'zip'           => $shippingAddress->getPostcode(),
+            'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
+        ];
+    }
+
+
+    /**
+     * Get Bread Formatted Shipping Address Data From Address Model For API
+     *
+     * @return array
+     */
+    public function getShippingAddressAPIData()
+    {
+        if ($this->isInAdmin()) {
+            $shippingAddress = $this->orderCreateModel->getShippingAddress();
+        } else {
+            $shippingAddress = $this->getSessionQuote()->getShippingAddress();
+        }
+
+        if(!$shippingAddress->getStreetLine(1)){
+            return false;
+        }
+
+        return [
+            'firstName'     => $shippingAddress->getFirstname(),
+            'lastName'      => $shippingAddress->getLastname(),
             'address'       => $shippingAddress->getStreetLine(1) . ($shippingAddress->getStreetLine(2) == '' ? '' : (' ' . $shippingAddress->getStreetLine(2))),
             'address2'      => $shippingAddress->getStreetLine(3) . ($shippingAddress->getStreetLine(4) == '' ? '' : (' ' . $shippingAddress->getStreetLine(4))),
             'city'          => $shippingAddress->getCity(),
@@ -254,7 +291,7 @@ class Quote extends Data {
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
         
-        if(!$shippingAddress->getShippingMethod()){
+        if (!$shippingAddress->getShippingMethod()) {
             return false;
         }
 
@@ -262,7 +299,7 @@ class Quote extends Data {
                 'typeId' => $shippingAddress->getShippingMethod(),
                 'cost'   => $shippingAddress->getShippingAmount() * 100];
     }
-
+    
     /**
      * Get stored bread transaction ID from quote
      *
@@ -281,12 +318,11 @@ class Quote extends Data {
     public function getSessionQuote()
     {
         if ($this->quote === null) {
-
             if ($this->isInAdmin()) {
                 $this->quote = $this->orderCreateModel->getQuote();
+            }else{
+                $this->quote = $this->checkoutSession->getQuote();
             }
-
-            $this->quote = $this->checkoutSession->getQuote();
         }
 
         return $this->quote;

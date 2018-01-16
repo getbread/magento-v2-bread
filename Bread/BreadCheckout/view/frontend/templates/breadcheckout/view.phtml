@@ -1,9 +1,9 @@
-<?php /* @var $this Bread\BreadCheckout\Block\Product\View */ ?>
-<?php  echo $this->getBeforeHtml(); ?>
+<?php /** @var $this Bread\BreadCheckout\Block\Product\View */ ?>
+<?php  echo $block->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr">
-    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php echo $this->getIsDefaultSize(); ?>>
+    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php /* @noEscape */ echo $block->getIsDefaultSize(); ?>>
         <span>
-            <span><img src="<?php echo $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?php echo __('Bread Checkout'); ?>" /></span>
+            <span><img src="<?php /* @noEscape */ echo $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?php /* @noEscape */ echo __('Bread Checkout'); ?>" /></span>
         </span>
     </div>
     <div class="button-prevent" id="button-prevent">
@@ -14,13 +14,18 @@
 <script type="text/javascript">
     require(['jquery'], function($){
         document.configureButton = function (items) {
-            var buttonOnProduct     = <?php echo $this->getIsButtonOnProduct(); ?>;
-            var buttonCss           = '<?php echo $this->getButtonDesign(); ?>';
+            var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
+            var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
+            var cartSizeFinancing   = <?php /* @noEscape */ echo $this->getCartSizeFinancingJson(); ?>;
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
                 asLowAs: <?php echo $this->getAsLowAs(); ?>,
+                <?php if(!$this->isHealthcare()) : ?>
                 items: items,
+                <?php else : ?>
+                customTotal: items[0]['price'],
+                <?php endif; ?>
                 discounts: <?php echo $this->getDiscountDataJson(); ?>,
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
 
@@ -31,7 +36,7 @@
                         i.name = 'token';
                         i.value = tx_token;
                         var f = document.createElement('form');
-                        f.action = '<?php echo $this->getValidateOrderUrl(); ?>';
+                        f.action = '<?php /* @noEscape */ echo $block->getValidateOrderUrl(); ?>';
                         f.method = 'POST';
                         f.appendChild(i);
                         document.body.appendChild(f);
@@ -48,14 +53,14 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
-                    shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                    shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
+                    shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                     shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                     shippingAddress.main_product_id                 = document.productId;
 
                     $.ajax({
-                        url: '<?php echo $this->getTaxEstimationUrl(); ?>',
+                        url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
                     }).done(function (response) {
@@ -81,14 +86,14 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
-                    shippingAddress.block_key                       = '<?php echo $this->getBlockCode(); ?>';
-                    shippingAddress.additional_data                 = <?php echo  $this->jsonEncode($this->setAdditionalData()); ?>;
+                    shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                     shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                     shippingAddress.main_product_id                 = document.productId;
 
                     $.ajax({
-                        url: '<?php echo $this->getShippingAddressEstimationUrl(); ?>',
+                        url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
@@ -125,18 +130,19 @@
                 breadConfig.actAsLabel = false;
             }
 
-            <?php if ($this->isCartSizeTargetedFinancing()): ?>
-            var cartSizeFinancingId = '<?php echo $this->getCartSizeFinancingId() ?>';
-            var cartSizeThreshold = '<?php echo $this->getCartSizeThreshold(); ?>';
-            var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
-            breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            <?php endif; ?>
+            if(cartSizeFinancing.enabled){
+                var cartSizeFinancingId = cartSizeFinancing.id;
+                var cartSizeThreshold = cartSizeFinancing.threshold;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            }
 
             $.ajax({
-                url: '<?php echo $this->getConfigDataUrl(); ?>',
+                url: '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>',
                 type: 'post',
                 context: this
             }).done(function(data) {
+                <?php if(!$this->isHealthcare()) : ?>
                 if (data.shippingContact != false) {
                     breadConfig.shippingContact = data.shippingContact;
                 }
@@ -144,12 +150,13 @@
                 if (data.billingContact != false) {
                     breadConfig.billingContact = data.billingContact;
                 }
+                <?php endif; ?>
 
                 bread.checkout(breadConfig);
             });
         };
 
-    <?php if( $this->getProduct() != null ): ?>
+    <?php if ($block->getProduct() != null) : ?>
 
         /**
          * Reconfigure Bread checkout button with updated
@@ -204,19 +211,19 @@
             return price;
         };
 <?php endif; ?>
-        document.defaultItems       = <?php echo $this->getProductDataJson(); ?>;
+        document.defaultItems       = <?php /* @noEscape */ echo $block->getProductDataJson(); ?>;
         document.previousPrice      = document.defaultItems[0]["price"];
         document.previousSku        = document.defaultItems[0]["sku"];
 
         $(document).ready(function () {
-            <?php if ($this->getProduct() != null): ?>
+            <?php if ($block->getProduct() != null) : ?>
                 document.customOptions = "";
-                document.productId                      = '<?php echo $this->getProduct()->getId(); ?>';
-                document.baseProductSku                 = '<?php echo $this->getProduct()->getSku(); ?>';
-                document.selectedSku                    = '<?php echo $this->getProduct()->getSku(); ?>';
-                document.selectedSimpleProductId        = '<?php echo $this->getProduct()->getId(); ?>';
+                document.productId                      = '<?php /* @noEscape */ echo $block->getProduct()->getId(); ?>';
+                document.baseProductSku                 = '<?php /* @noEscape */ echo $block->getProduct()->getSku(); ?>';
+                document.selectedSku                    = '<?php /* @noEscape */ echo $block->getProduct()->getSku(); ?>';
+                document.selectedSimpleProductId        = '<?php /* @noEscape */ echo $block->getProduct()->getId(); ?>';
                 document.resetPriceAndSku(false);
-            <?php else: ?>
+            <?php else : ?>
                 document.configureButton(document.defaultItems);
             <?php endif; ?>
         });

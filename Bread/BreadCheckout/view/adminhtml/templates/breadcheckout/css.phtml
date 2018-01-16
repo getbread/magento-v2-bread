@@ -1,14 +1,15 @@
 <?php
 /**
-* @var \Magento\Backend\Block\Template $this
-*/
+ * @var \Magento\Backend\Block\Template $this
+ */
 ?>
 <style>
     .bread-logo {
         width: 133px;
         height: 44px;
         display: block;
-        background: url('<?php echo $this->getViewFileUrl('Bread_BreadCheckout/bread/images/bread-logo.png'); ?>') 0px 0 no-repeat;
+        background: url('<?php /* @noEscape */
+                echo $block->getViewFileUrl('Bread_BreadCheckout/bread/images/bread-logo.png'); ?>') 0px 0 no-repeat;
     }
 
     .bread-brand {
@@ -18,4 +19,24 @@
         padding: 10px;
         font-size: 125%;
     }
+
+	.admin__fieldset .bread-clearer{
+		clear: both;
+		height: 5px;
+	}
+
+	.admin__fieldset .bread-send-mail{
+		float:left;
+		margin-left: 5px;
+		cursor: pointer;
+	}
+
+	.admin__fieldset .bread-send-mail img{
+		height: 33px;
+	}
+
+	.admin__fieldset .bread-create-cart{
+		float:left;
+	}
+
 </style>

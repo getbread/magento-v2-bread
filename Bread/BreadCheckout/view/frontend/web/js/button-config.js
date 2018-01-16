@@ -17,7 +17,8 @@ define(['jquery',
                 shippingOptions: [data.shippingOptions],
                 tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
-                
+                buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
+
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         $.ajax({
@@ -37,6 +38,7 @@ define(['jquery',
                                     } else {
                                         this.updateAddress(response, tx_token);
                                     }
+                                    fullScreenLoader.stopLoader();
                                 }
                             } catch (e) {
                                 console.log(e);
@@ -49,11 +51,24 @@ define(['jquery',
             /**
              * Optional params
              */
+
+            if (!window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                this.breadConfig.items = data.items;
+            }
+
             if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
                 this.breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
-            if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
+            if(data.cartSizeFinancing.enabled){
+                var cartSizeFinancingId = data.cartSizeFinancing.id;
+                var cartSizeThreshold = data.cartSizeFinancing.threshold;
+                var items = data.items;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            }
+
+            if (typeof data.billingContact !== 'undefined' && data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                 this.breadConfig.billingContact = data.billingContact;
             }
 
@@ -67,16 +82,6 @@ define(['jquery',
                 }];
             }
 
-            if (window.checkoutConfig.payment.breadcheckout.isCartSizeTargetedFinancing) {
-                var cartSizeFinancingId = window.checkoutConfig.payment.breadcheckout.financingProgramId;
-                var cartSizeThreshold = window.checkoutConfig.payment.breadcheckout.cartSizeThreshold;
-                var itemsPriceSum = data.items.reduce(function (sum, item) {
-                        return sum + item.price * item.quantity
-                    }, 0) / 100;
-                this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            }
-
-
             this.setShippingInformation();
         },
 
@@ -86,13 +91,6 @@ define(['jquery',
         init: function() {
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                 bread.checkout(this.breadConfig);
-            } else {
-                $('#' + this.breadConfig.buttonId).hide();
-                $('#bread_transaction_id').val(window.checkoutConfig.payment.breadcheckout.transactionId);
-                var approved = "<span><strong>You have been approved for financing.<br/>"+
-                    "Please continue with the checkout to complete your order.</strong></span>";
-                $('#bread_feedback').html(approved);
-                $('#bread-checkout-submit').removeAttr('disabled');
             }
             fullScreenLoader.stopLoader();
         },
@@ -113,11 +111,11 @@ define(['jquery',
                     fullScreenLoader.startLoader();
                 }
             }).done(function(data) {
-                if (data.shippingContact != false) {
+                if (data.shippingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                     this.breadConfig.shippingContact = data.shippingContact;
                 }
 
-                if (data.billingContact != false) {
+                if (data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                     this.breadConfig.billingContact = data.billingContact;
                     this.breadConfig.billingContact.email = (data.billingContact.email) ?
                         data.billingContact.email :

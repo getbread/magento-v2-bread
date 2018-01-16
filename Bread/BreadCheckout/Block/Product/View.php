@@ -12,7 +12,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 {
     protected $_product;
 
-
     /** @var \Magento\Framework\Registry */
     protected $registry;
 
@@ -115,7 +114,18 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getDiscountDataJson()
     {
-        $data     = array();
+        $data     = [];
+        return $this->jsonEncode($data);
+    }
+
+    /**
+     * Get cart size financing configuration
+     *
+     * @return string
+     */
+    public function getCartSizeFinancingJson()
+    {
+        $data     = $this->catalogHelper->getCartSizeFinancingData();
         return $this->jsonEncode($data);
     }
 
@@ -156,7 +166,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     protected function _toHtml()
     {
-        if( $this->catalogHelper->isEnabledOnPDP() ) {
+        if ($this->catalogHelper->isEnabledOnPDP()) {
             return parent::_toHtml();
         }
 
@@ -244,6 +254,16 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
     /**
+     * Is Healthcare mode?
+     *
+     * @return bool
+     */
+    public function isHealthcare()
+    {
+        return (bool) ($this->dataHelper->isHealthcare());
+    }
+
+    /**
      * Return Block View Product Code
      *
      * @return string
@@ -281,7 +301,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getCartSizeFinancingId()
     {
         return $this->dataHelper->getCartSizeFinancingId();
-
     }
 
     /**
@@ -298,7 +317,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
             ->addFilterByRequiredOptions();
 
         $itemIds         = [];
-        foreach($usedChildrenProduct as $simpleProduct){
+        foreach ($usedChildrenProduct as $simpleProduct) {
             $itemIds[]   = [ $simpleProduct->getId() => $simpleProduct->getSku() ];
         }
 
@@ -315,7 +334,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     {
         $optionsData = [];
 
-        foreach($options as $option) {
+        foreach ($options as $option) {
             if ($option->getValues()) {
                 foreach ($option->getValues() as $k => $v) {
                     $optionsData[$option->getId()][$k] = [
@@ -335,13 +354,82 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
     /**
+     * Get button location string for product page
+     *
+     * @return string
+     */
+    public function getProductViewLocation()
+    {
+        return $this->dataHelper->getProductViewLocation();
+    }
+
+    /**
+     * Get button location string for cart summary page
+     *
+     * @return string
+     */
+    public function getCartSummaryLocation()
+    {
+        return $this->dataHelper->getCartSummaryLocation();
+    }
+
+    /**
+     * Get button location string for checkout page
+     *
+     * @return string
+     */
+    public function getCheckoutLocation()
+    {
+        return $this->dataHelper->getCheckoutLocation();
+    }
+
+    /**
+     * Get button location string for financing page
+     *
+     * @return string
+     */
+    public function getFinancingLocation()
+    {
+        return $this->dataHelper->getFinancingLocation();
+    }
+
+    /**
+     * Get button location string for marketing page
+     *
+     * @return string
+     */
+    public function getMarketingLocation()
+    {
+        return $this->dataHelper->getMarketingLocation();
+    }
+
+    /**
+     * Get button location string for category page
+     *
+     * @return string
+     */
+    public function getCategoryPageLocation()
+    {
+        return $this->dataHelper->getCategoryPageLocation();
+    }
+
+    /**
+     * Get button location string for other purposes
+     *
+     * @return string
+     */
+    public function getOtherLocation()
+    {
+        return $this->dataHelper->getOtherLocation();
+    }
+    /**
      * Publicly accessible json encoder
      *
      * @param $data
      * @return string
      */
-    public function jsonEncode($data) {
+    public function jsonEncode($data)
+    {
         return $this->jsonHelper->jsonEncode($data);
     }
-    
 }
