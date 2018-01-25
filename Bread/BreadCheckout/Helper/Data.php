@@ -34,6 +34,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_PAYMENT_ACTION                 = 'payment/breadcheckout/payment_action';
     const XML_CONFIG_HEALTHCARE_MODE                = 'payment/breadcheckout/healthcare_mode';
     const XML_CONFIG_ACTIVE_ON_PDP                  = 'payment/breadcheckout/enabled_on_product_page';
+    const XML_CONFIG_ACTIVE_ON_CAT                  = 'payment/breadcheckout/bread_category/enabled_on_category_page';
     const XML_CONFIG_ACTIVE_ON_CART_VIEW            = 'payment/breadcheckout/enabled_on_cart_page';
     const XML_CONFIG_ENABLE_AS_PAYMENT_METHOD       = 'payment/breadcheckout/display_as_payment_method';
     const XML_CONFIG_CHECKOUT_TITLE                 = 'payment/breadcheckout/title';
@@ -53,6 +54,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
     const XML_CONFIG_CART_SIZE_FINANCING_ID         = 'payment/breadcheckout/cart_size_financing_program_id';
+
+    const XML_CONFIG_CATEGORY_GROUP                 = 'payment/breadcheckout/bread_category';
+    const XML_CONFIG_CAT_AS_LOW_AS                  = 'payment/breadcheckout/bread_category/as_low_as';
+    const XML_CONFIG_CAT_LABEL_ONLY                 = 'payment/breadcheckout/bread_category/label_only';
+    const XML_CONFIG_CAT_BUTTON_DESIGN              = 'payment/breadcheckout/bread_category/button_design';
+    const XML_CONFIG_CAT_WINDOW                     = 'payment/breadcheckout/bread_category/display_new_window';
+    const XML_CONFIG_DEFAULT_BS_CAT                 = 'payment/breadcheckout/bread_category/use_default_button_size';
+    const XML_CONFIG_SELECT_CATEGORIES              = 'payment/breadcheckout/bread_category/categories';
 
     const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
