@@ -101,7 +101,11 @@ class Category extends \Magento\Framework\View\Element\Template
      */
     public function getCATButtonDesign()
     {
-        return $this->categoryHelper->getCATButtonDesign();
+        $design = $this->categoryHelper->getCATButtonDesign();
+        if (!$design) {
+            $design = $this->catalogHelper->getPDPButtonDesign();
+        }
+        return $this->categoryHelper->escapeCustomCSS($design);
     }
 
     /**

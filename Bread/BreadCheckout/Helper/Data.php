@@ -63,6 +63,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_DEFAULT_BS_CAT                 = 'payment/breadcheckout/bread_category/use_default_button_size';
     const XML_CONFIG_SELECT_CATEGORIES              = 'payment/breadcheckout/bread_category/categories';
 
+    const XML_CONFIG_CP_BUTTON_DESIGN               = 'payment/breadcheckout/bread_cartpage/button_design';
+    const XML_CONFIG_PDP_BUTTON_DESIGN              = 'payment/breadcheckout/bread_productdetail/button_design';
+
     const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
 
@@ -488,6 +491,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get Checkout Cart Button Design
+     *
+     * @param null $store
+     * @return mixed
+     */
+    public function getCartButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_CP_BUTTON_DESIGN, $store);
+    }
+
+
+    /**
+     * Get PDP Button Design
+     *
+     * @param null $store
+     * @return mixed
+     */
+    public function getPDPButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_PDP_BUTTON_DESIGN, $store);
+    }
+
+    /**
      * Check If Default Button Size Is Used
      *
      * @param null $store
@@ -629,6 +655,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             $this->logger->debug($data, [$context]);
         }
+    }
+
+    /**
+     * Replaces single quotes with double quotes to prevent javascript syntax error
+     *
+     * @param $input
+     *
+     * @return string
+     */
+    public function escapeCustomCSS($input)
+    {
+        return str_replace("'", '"', $input);
     }
 
     /**
