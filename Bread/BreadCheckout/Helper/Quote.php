@@ -108,9 +108,10 @@ class Quote extends Data
         }
 
         if ($discount > 0) {
-            $discount   = ['amount'        => (int) $this->priceCurrency->round($discount) * 100,
-                           'description'   => ($couponTitle) ?
-                                                $couponTitle : __('Discount')];
+            $discount = [
+                'amount'      => (int)($this->priceCurrency->round($discount) * 100),
+                'description' => ($couponTitle) ? $couponTitle : __('Discount')
+            ];
         } else {
             return false;
         }
