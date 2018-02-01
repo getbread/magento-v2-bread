@@ -49,6 +49,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_LOGIN_CUSTOMER                 = 'payment/breadcheckout/login_customer_on_order';
     const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
     const XML_CONFIG_ALLOW_CHECKOUT_CART            = 'payment/breadcheckout/allowcheckoutcart';
+    const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
@@ -499,6 +500,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getIncompleteCheckoutMsg($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INCOMPLETE_MSG, $store);
+    }
+
+    /**
+     * Incomplete Checkout Message For Payment Method Form
+     *
+     * @param string $store
+     *
+     * @return string
+     */
+    public function getQuoteExpiration($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_DELETE_QUOTE_AFTER, $store);
     }
 
     /**

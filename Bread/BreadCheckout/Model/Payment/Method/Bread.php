@@ -13,6 +13,7 @@ namespace Bread\BreadCheckout\Model\Payment\Method;
 
 class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 {
+
     /* internal action types */
     const ACTION_CAPTURE                = "capture";
     const ACTION_REFUND                 = "refund";
@@ -69,14 +70,36 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     protected $priceCurrency;
 
     /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
+    private $quoteHelper;
+
+    /**
      * Construct Sets API Client And Sets Available For Checkout Flag
      *
-     * @param array $params
+     * @param \Magento\Framework\Model\Context                                $context
+     * @param \Bread\BreadCheckout\Model\Payment\Api\Client                   $apiClient
+     * @param \Bread\BreadCheckout\Helper\Data                                $helper
+     * @param \Bread\BreadCheckout\Helper\Quote                               $quoteHelper
+     * @param \Magento\Framework\Json\Helper\Data                             $jsonHelper
+     * @param \Magento\Framework\Registry                                     $registry
+     * @param \Magento\Framework\Api\ExtensionAttributesFactory               $extensionFactory
+     * @param \Magento\Framework\Api\AttributeValueFactory                    $customAttributeFactory
+     * @param \Magento\Payment\Helper\Data                                    $paymentData
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface              $scopeConfig
+     * @param \Magento\Payment\Model\Method\Logger                            $logger
+     * @param \Magento\Checkout\Model\Session\Proxy                           $checkoutSession
+     * @param \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+     * @param \Magento\Quote\Api\CartRepositoryInterface                      $quoteRepository
+     * @param \Magento\Sales\Api\TransactionRepositoryInterface               $transactionRepository
+     * @param \Magento\Sales\Model\AdminOrder\Create                          $orderCreateModel
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface               $priceCurrency
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $apiClient,
         \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
@@ -112,6 +135,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             $scopeConfig,
             $logger
         );
+        $this->quoteHelper = $quoteHelper;
     }
 
     /**
@@ -489,7 +513,36 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Returns payment method code
      * @return string
      */
-    public function getMethodCode(){
+    public function getMethodCode()
+    {
         return $this->_code;
     }
+
+    /**
+     * Returns payment title with monthly estimate
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        $title = parent::getTitle();
+        if ($this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST) {
+            $data = $this->quoteHelper->submitQuote();
+            if (isset($data["asLowAs"]) && isset($data["asLowAs"]["amount"])) {
+                $title .= " " . sprintf(__("as low as %s/month"), $data["asLowAs"]["amount"]);
+            }
+        }
+        return $title;
+    }
+
+    /**
+     * Returns base payment title
+     *
+     * @return string
+     */
+    public function getBaseTitle()
+    {
+        return parent::getTitle();
+    }
+
 }

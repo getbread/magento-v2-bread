@@ -51,26 +51,26 @@ define(
              * Get if default button size enabled from config
              */
             getDefaultSize: function() {
-                return window.checkoutConfig.payment.breadcheckout.defaultSize;
+                return window.checkoutConfig.payment[this.getCode()].defaultSize;
             },
 
             /**
              * Transaction ID from Ui\ConfigProvider
              */
             getBreadTransactionId: function() {
-                return window.checkoutConfig.payment.breadcheckout.transactionId;
+                return window.checkoutConfig.payment[this.getCode()].transactionId;
             },
 
             setBreadTransactionId: function(transactionId){
                 this.breadTransactionId(transactionId);
-                window.checkoutConfig.payment.breadcheckout.transactionId = transactionId;
+                window.checkoutConfig.payment[this.getCode()].transactionId = transactionId;
             },
 
             /**
              * Initialize the bread checkout button
              */
             initComplete: function() {
-                var data = window.checkoutConfig.payment.breadcheckout.breadConfig;
+                var data = window.checkoutConfig.payment[this.getCode()].breadConfig;
 
                 if (typeof bread != 'undefined') {
                     button.configure(data, this);
@@ -88,23 +88,48 @@ define(
                 this.data = data;
                 this.event = event;
 
+                if (!this.breadTransactionId()) {
+                    button.init();
+                    return false;
+                }
+
+            },
+
+            buttonCallback: function (token) {
+                this.setBreadTransactionId(token);
                 $.ajax({
-                    url: window.checkoutConfig.payment.breadcheckout.validateTotalsUrl,
-                    data: { bread_transaction_id: this.getBreadTransactionId() },
+                    url: window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl,
+                    data: {token: token},
                     type: 'post',
                     context: this,
-                    beforeSend: function() {
+                    beforeSend: function () {
                         fullScreenLoader.startLoader();
                     }
                 }).done(function (response) {
-                    fullScreenLoader.stopLoader();
-
-                    if (response.valid) {
-                        /** Call parent method */
-                        return Component.prototype.placeOrder.call(this, this.data, this.event);
-                    } else {
-                        errorProcessor.process(response, this.messageContainer);
-                        return false;
+                    try {
+                        if (response !== null && typeof response === 'object') {
+                            if (response.error) {
+                                console.log(response);
+                                alert(response.error);
+                            } else {
+                                $.when(
+                                    this.updateAddress(response),
+                                    this.validateTotals()
+                                ).done(
+                                    $.proxy(function () {
+                                        return Component.prototype.placeOrder.call(this, this.data, this.event);
+                                    }, this)
+                                ).fail(
+                                    $.proxy(function (response) {
+                                        errorProcessor.process(response, this.messageContainer);
+                                        this.setBreadTransactionId(null)
+                                    }, this)
+                                );
+                            }
+                            fullScreenLoader.stopLoader();
+                        }
+                    } catch (e) {
+                        console.log(e);
                     }
                 });
             },
@@ -114,8 +139,10 @@ define(
              *
              * @param data {object}
              * @param token {string}
+             *
+             * @return {jQuery.Deferred}
              */
-            updateAddress: function(data, token) {
+            updateAddress: function(data) {
                 var self = this;
                 /**
                  * Billing address
@@ -131,9 +158,29 @@ define(
                 /**
                  * Reload checkout section & add bread token
                  */
-                defaultProcessor.saveShippingInformation().done(function() {
-                    self.setBreadTransactionId(token);
+                return defaultProcessor.saveShippingInformation();
+            },
+
+            /**
+             * Validate order totals
+             *
+             * @return {jQuery.Deferred}
+             */
+            validateTotals: function () {
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: window.checkoutConfig.payment[this.getCode()].validateTotalsUrl,
+                    data: {bread_transaction_id: this.breadTransactionId()},
+                    type: 'post',
+                    context: this
+                }).done(function (response) {
+                    if (response.valid) {
+                        deferred.resolve(response);
+                    } else {
+                        deferred.reject(response);
+                    }
                 });
+                return deferred;
             },
 
             /**

@@ -21,29 +21,7 @@ define(['jquery',
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
-                        $.ajax({
-                            url: data.paymentUrl,
-                            data: {token: tx_token},
-                            type: 'post',
-                            context: context,
-                            beforeSend: function() {
-                                fullScreenLoader.startLoader();
-                            }
-                        }).done(function (response) {
-                            try {
-                                if (response !== null && typeof response === 'object') {
-                                    if (response.error) {
-                                        console.log(response);
-                                        alert(response.error);
-                                    } else {
-                                        this.updateAddress(response, tx_token);
-                                    }
-                                    fullScreenLoader.stopLoader();
-                                }
-                            } catch (e) {
-                                console.log(e);
-                            }
-                        });
+                        context.buttonCallback(tx_token);
                     }
                 }
             };
@@ -90,7 +68,7 @@ define(['jquery',
          */
         init: function() {
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                bread.checkout(this.breadConfig);
+                bread.showCheckout(this.breadConfig);
             }
             fullScreenLoader.stopLoader();
         },
@@ -99,10 +77,6 @@ define(['jquery',
          * Get updated quote data
          */
         setShippingInformation: function() {
-            if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
-                return this.init();
-            }
-
             $.ajax({
                 url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
                 type: 'post',
@@ -121,8 +95,7 @@ define(['jquery',
                         data.billingContact.email :
                         checkout.getValidatedEmailValue();
                 }
-
-                this.init();
+                fullScreenLoader.stopLoader();
             });
         },
 
