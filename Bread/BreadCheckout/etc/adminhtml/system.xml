@@ -233,6 +233,32 @@
                         <source_model>Bread\BreadCheckout\Model\System\Config\Source\CategoryTree</source_model>
                     </field>
                 </group>
+                <group id="bread_productdetail" type="text" sortOrder="38" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                    <label>Settings: Product Details Page</label>
+                    <field id="button_design" type="textarea" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom CSS</label>
+                        <comment>
+                            <![CDATA[
+				                                    <div>
+				                                        <p>Enter custom CSS in a non-breaking string to overwrite default Bread CSS.</p>
+				                                    </div>
+				            ]]>
+                        </comment>
+                    </field>
+                </group>
+                <group id="bread_cartpage" type="text" sortOrder="38" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                    <label>Settings: Shopping Cart Page</label>
+                    <field id="button_design" type="textarea" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom CSS</label>
+                        <comment>
+                            <![CDATA[
+				                                    <div>
+				                                        <p>Enter custom CSS in a non-breaking string to overwrite default Bread CSS.</p>
+				                                    </div>
+				            ]]>
+                        </comment>
+                    </field>
+                </group>
             </group>
         </section>
     </system>
