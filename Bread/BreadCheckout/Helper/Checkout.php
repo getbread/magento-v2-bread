@@ -12,9 +12,6 @@ class Checkout extends Quote
 {
     const BREAD_AMOUNT = "bread_transaction_amount";
 
-    /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
-    protected $paymentApiClient;
-
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -27,8 +24,6 @@ class Checkout extends Quote
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
     ) {
-        $this->paymentApiClient = $paymentApiClient;
-
         parent::__construct(
             $helperContext,
             $context,
@@ -38,7 +33,8 @@ class Checkout extends Quote
             $checkoutSession,
             $helperCatalog,
             $orderCreateModel,
-            $priceCurrency
+            $priceCurrency,
+            $paymentApiClient
         );
     }
 

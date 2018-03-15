@@ -115,4 +115,15 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     {
         return ($this->quoteHelper->getAllowCheckoutCP()) ? 'true' : 'false';
     }
+
+    /**
+     * Get Extra Button Design CSS
+     *
+     * @return mixed
+     */
+    public function getButtonDesign()
+    {
+        $design = $this->dataHelper->escapeCustomCSS($this->catalogHelper->getCartButtonDesign());
+        return $design ? $design : parent::getButtonDesign();
+    }
 }

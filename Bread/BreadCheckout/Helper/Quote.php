@@ -10,6 +10,9 @@ namespace Bread\BreadCheckout\Helper;
 
 class Quote extends Data
 {
+    const BREAD_SESSION_QUOTE_RESULT_KEY  = "bread_quote_result";
+    const BREAD_SESSION_QUOTE_UPDATED_KEY = "bread_quote_updated_at";
+
 
     /** @var \Magento\Sales\Model\Quote */
     protected $quote = null;
@@ -25,7 +28,25 @@ class Quote extends Data
 
     /** @var \Magento\Framework\Pricing\PriceCurrencyInterface */
     protected $priceCurrency;
+    /**
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     */
+    protected $paymentApiClient;
 
+    /**
+     * Quote constructor.
+     *
+     * @param \Magento\Framework\App\Helper\Context             $helperContext
+     * @param \Magento\Framework\Model\Context                  $context
+     * @param \Magento\Framework\App\Request\Http\Proxy         $request
+     * @param \Magento\Framework\Encryption\Encryptor           $encryptor
+     * @param \Magento\Framework\UrlInterfaceFactory            $urlInterfaceFactory
+     * @param \Magento\Checkout\Model\Session\Proxy             $checkoutSession
+     * @param Catalog                                           $helperCatalog
+     * @param \Magento\Sales\Model\AdminOrder\Create            $orderCreateModel
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
+     * @param \Bread\BreadCheckout\Model\Payment\Api\Client     $paymentApiClient
+     */
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -35,12 +56,14 @@ class Quote extends Data
         \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
-        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->helperCatalog = $helperCatalog;
         $this->orderCreateModel = $orderCreateModel;
         $this->priceCurrency = $priceCurrency;
+        $this->paymentApiClient = $paymentApiClient;
 
         parent::__construct(
             $helperContext,
@@ -73,16 +96,22 @@ class Quote extends Data
     /**
      * get Tax Value from Quote
      *
+     * @param bool $collectRates
+     *
      * @return float
      */
-    public function getTaxValue()
+    public function getTaxValue($collectRates = true)
     {
         if ($this->isInAdmin()) {
-            $this->orderCreateModel->collectRates();
+            if ($collectRates) {
+                $this->orderCreateModel->collectRates();
+            }
             $taxAmount = $this->orderCreateModel->getShippingAddress()->getTaxAmount();
         } else {
             $quote = $this->getSessionQuote();
-            $quote->collectTotals();
+            if ($collectRates) {
+                $quote->collectTotals();
+            }
             $taxAmount = $quote->getShippingAddress()->getTaxAmount();
         }
 
@@ -249,7 +278,6 @@ class Quote extends Data
         ];
     }
 
-
     /**
      * Get Bread Formatted Shipping Address Data From Address Model For API
      *
@@ -327,5 +355,53 @@ class Quote extends Data
         }
 
         return $this->quote;
+    }
+
+    /**
+     * @return \Magento\Checkout\Model\Session|\Magento\Sales\Model\AdminOrder\Create
+     */
+    public function getSession()
+    {
+        if ($this->isInAdmin()) {
+            return $this->orderCreateModel;
+        } else {
+            return $this->checkoutSession;
+        }
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return array|string
+     */
+    public function submitQuote($quote = null)
+    {
+        if (!$quote) {
+            $quote = $this->getSessionQuote();
+        }
+
+        $session = $this->getSession();
+        if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
+            $arr = [];
+            $arr["expiration"]                 = date('Y-m-d', strtotime("+" . $this->getQuoteExpiration() . "days"));
+            $arr["options"]                    = [];
+            $arr["options"]["orderRef"]        = $quote->getId();
+            $arr["options"]["shippingOptions"] = [$this->getShippingOptions()];
+            $arr["options"]["shippingContact"] = $this->getShippingAddressData();
+            $arr["options"]["billingContact"]  = $this->getBillingAddressData();
+            $arr["options"]["items"]           = $this->getQuoteItemsData();
+            $arr["options"]["discounts"]       = $this->getDiscountData() ? $this->getDiscountData() : [];
+            $arr["options"]["tax"]             = $this->getTaxValue(false);
+
+            try {
+                $result = $this->paymentApiClient->submitCartData($arr);
+            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                $result = [];
+            }
+
+            $session->setData(self::BREAD_SESSION_QUOTE_RESULT_KEY, $result);
+            $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
+        }
+        return $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
     }
 }

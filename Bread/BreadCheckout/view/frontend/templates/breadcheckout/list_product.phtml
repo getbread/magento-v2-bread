@@ -1,0 +1,97 @@
+<?php /** @var \Bread\BreadCheckout\Block\Product\Category $block */ ?>
+
+<!-- Bread Checkout extension version: <?php echo $block->getModuleVersion(); ?> -->
+<?php
+$product   = $block->getProduct();
+$productId = $product->getId();
+?>
+<div id="bread-btn-cntnr-<?php echo $productId; ?>">
+    <div id='bread-checkout-btn-<?php echo $productId; ?>' title="Bread Checkout"
+         class="button" <?php echo $block->useDefaultButtonSizeCategory(); ?>>
+        <span>
+            <span><?php echo __('Bread Checkout'); ?></span>
+        </span>
+    </div>
+    <div class='button-prevent'
+         id='button-prevent'>
+        <span class="buy_error_tip override_tip">&nbsp;</span>
+    </div>
+</div>
+
+<script type="text/javascript">
+    require(['jquery'], function ($) {
+        document.configureButton<?php echo $productId;?> = function (items) {
+            var address = <?php echo $block->getShippingAddressData(); ?>;
+            var billingAddress = <?php echo $block->getBillingAddressData(); ?>;
+            var labelOnly = <?php  echo $block->isLabelOnlyOnCategories(); ?>;
+            var buttonCss = '<?php echo $block->getCATButtonDesign(); ?>';
+
+            var breadConfig = {
+                buttonId: 'bread-checkout-btn-<?php echo $productId;?>',
+                asLowAs: <?php echo $block->isAsLowAsCAT(); ?>,
+                showInWindow: <?php echo $block->getShowInWindowCAT()?>,
+                <?php if (!$block->isHealthcare()) : ?>
+                items: items,
+                <?php else : ?>
+                customTotal: items[0]['price'],
+                <?php endif; ?>
+                discounts: [],
+                allowCheckout: false,
+                buttonLocation: '<?php echo $block->getCategoryPageLocation(); ?>',
+                done: function (err, tx_token) {
+                    if (tx_token !== undefined) {
+                        var i = document.createElement('input');
+                        i.type = 'hidden';
+                        i.name = 'token';
+                        i.value = tx_token;
+                        var f = document.createElement('form');
+                        f.action = '<?php echo $block->getValidateOrderURL(); ?>';
+                        f.method = 'POST';
+                        f.appendChild(i);
+                        document.body.appendChild(f);
+                        f.submit();
+                    }
+
+                    return;
+                },
+
+            };
+
+            if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
+                breadConfig.customCSS = buttonCss;
+            }
+            <?php if (!$block->isHealthcare()) : ?>
+            if (address !== false) {
+                breadConfig.shippingContact = address;
+            }
+
+            if (billingAddress !== false) {
+                breadConfig.billingContact = billingAddress;
+            }
+            <?php endif; ?>
+            if (!labelOnly) {
+                breadConfig.actAsLabel = false;
+            }
+
+            bread.checkout(breadConfig);
+        };
+
+        $(document).ready(function () {
+            <?php
+            $data = $block->getProductDataJson($product);
+            ?>
+            var product = <?php echo $data; ?>;
+            var originalPrice = product.price;
+
+            document.configureButton<?php echo $productId; ?>([product]);
+            $("[data-role=priceBox][data-product-id=<?php echo $productId;?>]").on("updatePrice", function (event, data) {
+                if (data) {
+                    product.price = Math.round(originalPrice + data.prices.finalPrice.amount * 100);
+                    document.configureButton<?php echo $productId; ?>([product]);
+                }
+            });
+
+        });
+    });
+
+</script>

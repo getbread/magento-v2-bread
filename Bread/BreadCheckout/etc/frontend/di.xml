@@ -7,4 +7,8 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Catalog\Block\Product\ListProduct">
+        <plugin name="bread-category"
+                type="Bread\BreadCheckout\Model\Plugin\ListProductPlugin" sortOrder="1"/>
+    </type>
 </config>

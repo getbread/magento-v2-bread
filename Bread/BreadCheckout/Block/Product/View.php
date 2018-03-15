@@ -220,7 +220,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getButtonDesign()
     {
-        return $this->catalogHelper->getButtonDesign();
+        return $this->dataHelper->escapeCustomCSS($this->catalogHelper->getPDPButtonDesign());
     }
 
     /**

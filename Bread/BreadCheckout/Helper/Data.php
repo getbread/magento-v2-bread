@@ -34,6 +34,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_PAYMENT_ACTION                 = 'payment/breadcheckout/payment_action';
     const XML_CONFIG_HEALTHCARE_MODE                = 'payment/breadcheckout/healthcare_mode';
     const XML_CONFIG_ACTIVE_ON_PDP                  = 'payment/breadcheckout/enabled_on_product_page';
+    const XML_CONFIG_ACTIVE_ON_CAT                  = 'payment/breadcheckout/bread_category/enabled_on_category_page';
     const XML_CONFIG_ACTIVE_ON_CART_VIEW            = 'payment/breadcheckout/enabled_on_cart_page';
     const XML_CONFIG_ENABLE_AS_PAYMENT_METHOD       = 'payment/breadcheckout/display_as_payment_method';
     const XML_CONFIG_CHECKOUT_TITLE                 = 'payment/breadcheckout/title';
@@ -49,10 +50,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_LOGIN_CUSTOMER                 = 'payment/breadcheckout/login_customer_on_order';
     const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
     const XML_CONFIG_ALLOW_CHECKOUT_CART            = 'payment/breadcheckout/allowcheckoutcart';
+    const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
     const XML_CONFIG_CART_SIZE_FINANCING_ID         = 'payment/breadcheckout/cart_size_financing_program_id';
+
+    const XML_CONFIG_CATEGORY_GROUP                 = 'payment/breadcheckout/bread_category';
+    const XML_CONFIG_CAT_AS_LOW_AS                  = 'payment/breadcheckout/bread_category/as_low_as';
+    const XML_CONFIG_CAT_LABEL_ONLY                 = 'payment/breadcheckout/bread_category/label_only';
+    const XML_CONFIG_CAT_BUTTON_DESIGN              = 'payment/breadcheckout/bread_category/button_design';
+    const XML_CONFIG_CAT_WINDOW                     = 'payment/breadcheckout/bread_category/display_new_window';
+    const XML_CONFIG_DEFAULT_BS_CAT                 = 'payment/breadcheckout/bread_category/use_default_button_size';
+    const XML_CONFIG_SELECT_CATEGORIES              = 'payment/breadcheckout/bread_category/categories';
+
+    const XML_CONFIG_CP_BUTTON_DESIGN               = 'payment/breadcheckout/bread_cartpage/button_design';
+    const XML_CONFIG_PDP_BUTTON_DESIGN              = 'payment/breadcheckout/bread_productdetail/button_design';
 
     const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
@@ -479,6 +492,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get Checkout Cart Button Design
+     *
+     * @param null $store
+     * @return mixed
+     */
+    public function getCartButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_CP_BUTTON_DESIGN, $store);
+    }
+
+
+    /**
+     * Get PDP Button Design
+     *
+     * @param null $store
+     * @return mixed
+     */
+    public function getPDPButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_PDP_BUTTON_DESIGN, $store);
+    }
+
+    /**
      * Check If Default Button Size Is Used
      *
      * @param null $store
@@ -499,6 +535,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getIncompleteCheckoutMsg($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INCOMPLETE_MSG, $store);
+    }
+
+    /**
+     * Incomplete Checkout Message For Payment Method Form
+     *
+     * @param string $store
+     *
+     * @return string
+     */
+    public function getQuoteExpiration($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_DELETE_QUOTE_AFTER, $store);
     }
 
     /**
@@ -620,6 +668,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             $this->logger->debug($data, [$context]);
         }
+    }
+
+    /**
+     * Replaces single quotes with double quotes to prevent javascript syntax error
+     *
+     * @param $input
+     *
+     * @return string
+     */
+    public function escapeCustomCSS($input)
+    {
+        return str_replace("'", '"', $input);
     }
 
     /**
