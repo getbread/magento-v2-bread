@@ -193,7 +193,7 @@
                 var customPrice = document.priceWithOptions;
             }
 
-            if (typeof spConfig != 'undefined') {
+            if ((typeof spConfig != 'undefined') && (typeof spConfig.optionPrices[document.selectedSimpleProductId] != 'undefined')) {
                 price = parseInt(spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100);
 
                 if ((typeof customPrice != 'undefined') &&
