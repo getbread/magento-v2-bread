@@ -213,6 +213,17 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         return $this->catalogHelper->getConfigDataUrl();
     }
 
+     /**
+     * Get Discounts Data URL
+     *
+     * @return string
+     */
+    public function getDiscountsDataUrl()
+    {
+        return $this->catalogHelper->getDiscountsDataUrl();
+    }
+
+
     /**
      * Get Extra Button Design CSS
      *
