@@ -23,6 +23,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_TAX_ESTIMATE                          = "bread/checkout/estimatetax";
     const URL_CONFIG_DATA                           = "bread/checkout/configdata";
     const URL_DISCOUNTS_DATA                        = "bread/checkout/discountsdata";
+    const URL_CLEAR_QUOTE                           = "bread/checkout/clearquote";
     const URL_LANDING_PAGE				            = "bread/checkout/landingpage";
     const URL_ADMIN_QUOTE_DATA                      = "breadadmin/bread/quotedata";
     const URL_ADMIN_VALIDATE_PAYMENT                = "breadadmin/bread/validatepaymentmethod";
@@ -259,7 +260,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_CONFIG_DATA, ['_secure'=>$isSecure]);
     }
 
-        /**
+    /**
      * Get URL for controller which populates
      * discounts following shipping step in checkout
      *
@@ -271,6 +272,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_DISCOUNTS_DATA, ['_secure'=>$isSecure]);
     }
 
+    /**
+     * Get URL for controller which clears quote
+     * after shopping cart rules precalculation
+     *
+     * @return string
+     */
+    public function getClearQuoteUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_CLEAR_QUOTE, ['_secure'=>$isSecure]);
+    }
 
     /**
      * Get URL for quote data retrieval in admin checkout

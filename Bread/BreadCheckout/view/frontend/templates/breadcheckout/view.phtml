@@ -177,15 +177,22 @@
                         if (response.discounts != false) {
                             breadConfig.discounts = response.discounts;
                             bread.checkout(breadConfig);
-                            productForm.submit(function(e) {
-                                e.preventDefault();
-                                location.reload();
-                            });
+                            document.clearQuote();
                         }
                     });
                 };
             });
                    
+        };
+
+        /**
+         * Remove items fron quote after 
+         * discount calculation
+         */
+        document.clearQuote = function() {
+            $.ajax({
+                url: '<?php /* @noEscape */ echo $block->getClearQuoteUrl(); ?>'
+            });
         };
 
     <?php if ($block->getProduct() != null) : ?>

@@ -223,6 +223,15 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         return $this->catalogHelper->getDiscountsDataUrl();
     }
 
+     /**
+     * Get Clear Quote Data URL
+     *
+     * @return string
+     */
+    public function getClearQuoteUrl()
+    {
+        return $this->catalogHelper->getClearQuoteUrl();
+    }
 
     /**
      * Get Extra Button Design CSS
