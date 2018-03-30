@@ -265,7 +265,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 }
                 break;
         }
-
+        
+        $address    = $quote->getShippingAddress();
+        $this->totalsCollector->collectAddressTotals($quote, $address);
+        $quote->setTotalsCollectedFlag(false)->collectTotals();
+        $this->quoteRepository->save($quote);
         return $quote;
     }
 

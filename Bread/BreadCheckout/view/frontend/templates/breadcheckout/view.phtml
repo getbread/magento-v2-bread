@@ -12,7 +12,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery'], function($){
+    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
         document.configureButton = function (items) {
             var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
@@ -154,6 +154,45 @@
 
                 bread.checkout(breadConfig);
             });
+
+            //  DISCOUNTS
+            $(document).ready(function () {
+                var productForm = $('#product_addtocart_form');
+                $.mage.validation({
+                    errorPlacement: function() {} // Hides default error labels
+                }, productForm);
+                if(productForm.valid()) {
+                    var disc = {};
+                    disc.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
+                    disc.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
+                    disc.selected_sku                    = document.selectedSku + document.customOptions;
+                    disc.selected_simple_product_id      = document.selectedSimpleProductId;
+                    disc.main_product_id                 = document.productId;
+                    $.ajax({
+                        url: '<?php /* @noEscape */ echo $block->getDiscountsDataUrl(); ?>',
+                        data: disc,
+                        type: 'post',
+                        context: this
+                    }).done(function(response) {
+                        if (response.discounts != false) {
+                            breadConfig.discounts = response.discounts;
+                            bread.checkout(breadConfig);
+                            document.clearQuote();
+                        }
+                    });
+                };
+            });
+                   
+        };
+
+        /**
+         * Remove items fron quote after 
+         * discount calculation
+         */
+        document.clearQuote = function() {
+            $.ajax({
+                url: '<?php /* @noEscape */ echo $block->getClearQuoteUrl(); ?>'
+            });
         };
 
     <?php if ($block->getProduct() != null) : ?>
@@ -193,7 +232,7 @@
                 var customPrice = document.priceWithOptions;
             }
 
-            if (typeof spConfig != 'undefined') {
+            if ((typeof spConfig != 'undefined') && (typeof spConfig.optionPrices[document.selectedSimpleProductId] != 'undefined')) {
                 price = parseInt(spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100);
 
                 if ((typeof customPrice != 'undefined') &&
@@ -226,6 +265,7 @@
             <?php else : ?>
                 document.configureButton(document.defaultItems);
             <?php endif; ?>
+            var messages = $.cookieStorage.get('mage-messages');
         });
     });
 </script>

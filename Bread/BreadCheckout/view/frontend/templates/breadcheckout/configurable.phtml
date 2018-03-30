@@ -3,7 +3,7 @@
     document.Skus = {};
     spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
 
-    require(['jquery', 'jquery/validate'], function($) {
+    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
         $(document).ready(function () {
 
             /**
@@ -15,17 +15,20 @@
             $('#product_addtocart_form').on('change', function() {
                 spConfig.updateButton(this);
             });
+            
 
             spConfig.updateButton = function(form) {
                 /**
                  * Get values from hidden inputs
                  */
                 var selectedOptions = {};
+                var validSuperAttribute = '';
                 $('[name^="super_attribute"]').each(function() {
                     var attributeId = $(this).attr('name').match(/\[(\d+)\]/)[1];
                     selectedOptions[attributeId] = $(this).val();
+                    validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
                 });
-
+                validSuperAttribute =  validSuperAttribute && validSuperAttribute.search("false") === -1; 
                 /**
                  * Validate add to cart form
                  */
@@ -33,7 +36,7 @@
                     errorPlacement: function() {} // Hides default error labels
                 }, form);
 
-                if ($(form).valid()) {
+                if ($(form).valid() && validSuperAttribute) {
                     $('.button-prevent').hide();
                     var newProductId = spConfig.getIdOfSelectedProduct(selectedOptions);
                     if (newProductId !== null) {

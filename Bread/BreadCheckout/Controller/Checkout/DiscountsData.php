@@ -1,23 +1,22 @@
 <?php
 /**
- * Get Tax Estimate
+ * Get updated shipping, billing, and shipping option data
  *
  * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
+class DiscountsData extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Magento\Framework\Controller\ResultFactory  */
-    protected $resultFactory;
+    /** @var \Bread\BreadCheckout\Helper\Quote */
+    protected $quoteHelper;
 
-    /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    /** @var \Bread\BreadCheckout\Helper\Customer */
+    protected $customerHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    protected $dataHelper;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -31,12 +30,17 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session\Proxy $customerSession,
-        \Magento\Quote\Model\QuoteManagement $quoteManagement
-    ) {
-    
+        \Magento\Quote\Model\QuoteManagement $quoteManagement,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
+        \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Bread\BreadCheckout\Helper\Data $dataHelper
+
+    )
+    {
         $this->resultFactory = $context->getResultFactory();
-        $this->logger = $logger;
-        $this->helper = $helper;
+        $this->quoteHelper = $quoteHelper;
+        $this->customerHelper = $customerHelper;
+        $this->dataHelper = $dataHelper;
         parent::__construct(
             $context,
             $catalogResourceModelProductFactory,
@@ -54,31 +58,21 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
     }
 
     /**
-     * Get tax amount for quote
+     * Sends shipping & billing data to setShippingInformation()
+     * which is called when "Next" is clicked from the shipping
+     * information view in checkout
      *
      * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
-        $data       = json_decode($this->getRequest()->getParams()['shippingInfo'], true);
-        try {
-            $shippingAddress    = $this->getShippingAddressForQuote($data);
-            if (!$shippingAddress instanceof \Magento\Quote\Model\Quote\Address) {
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    'Shipping address is not an instance of Magento\Quote\Model\Quote\Address'
-                );
-            }
-            
-            $result             = $shippingAddress->getTaxAmount() * 100;
-            $response           = $result;
-        } catch (\Exception $e) {
-            $this->helper->log("EXCEPTION IN TAX ESTIMATE ACTION", 'bread-exception.log');
-            $this->logger->critical($e);
-            $response = ['error' => 1,
-                         'text'  => 'Internal error'];
-        }
-        return $this->resultFactory->create(
-            \Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $response]
-        );
+        $params = $this->getRequest()->getParams();
+        
+        $this->getQuote($params);
+        $discounts = $this->quoteHelper->getDiscountData();
+        
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
+            'discounts' =>  ($discounts)? $discounts : []
+        ]);
     }
 }
