@@ -1,24 +1,14 @@
 <?php
 /**
- * Get Tax Estimate
+ * Get updated shipping, billing, and shipping option data
  *
  * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
+class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Magento\Framework\Controller\ResultFactory  */
-    protected $resultFactory;
-
-    /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
-
-    /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
-
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
@@ -32,11 +22,10 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement
-    ) {
-    
+
+    )
+    {
         $this->resultFactory = $context->getResultFactory();
-        $this->logger = $logger;
-        $this->helper = $helper;
         parent::__construct(
             $context,
             $catalogResourceModelProductFactory,
@@ -54,31 +43,26 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
     }
 
     /**
-     * Get tax amount for quote
+     * Sends shipping & billing data to setShippingInformation()
+     * which is called when "Next" is clicked from the shipping
+     * information view in checkout
      *
      * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
-        $data       = json_decode($this->getRequest()->getParams()['shippingInfo'], true);
+        $quote = $this->checkoutSession->getQuote();
+        
         try {
-            $shippingAddress    = $this->getShippingAddressForQuote($data);
-            if (!$shippingAddress instanceof \Magento\Quote\Model\Quote\Address) {
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    'Shipping address is not an instance of Magento\Quote\Model\Quote\Address'
-                );
-            }
-            
-            $result             = $shippingAddress->getTaxAmount() * 100;
-            $response           = $result;
-        } catch (\Exception $e) {
-            $this->helper->log("EXCEPTION IN TAX ESTIMATE ACTION", 'bread-exception.log');
-            $this->logger->critical($e);
-            $response = ['error' => 1,
-                         'text'  => 'Internal error'];
+            $this->checkoutSession->setBreadItemAddedToQuote(false);
+            $quote->removeAllItems(); // Reset items in quote
+            $this->quoteRepository->save($quote);
+            $result = true;
+        } catch (Exception $e) {
+            $result = false;
         }
-        return $this->resultFactory->create(
-            \Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $response]
-        );
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
+            'result' =>  $result
+        ]);
     }
 }
