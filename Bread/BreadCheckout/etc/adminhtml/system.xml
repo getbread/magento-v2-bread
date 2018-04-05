@@ -192,7 +192,6 @@
                     <label>Settings: Category Pages</label>
                     <field id="enabled_on_category_page" sortOrder="0" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Display on Category Page</label>
-                        <frontend_type>select</frontend_type>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
                     <field id="as_low_as" sortOrder="0" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -202,18 +201,14 @@
                     <field id="label_only" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Display as label only</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <sort_order>3</sort_order>
                     </field>
                     <field id="display_new_window" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Display in new window (instead of modal)</label>
-                        <frontend_type>select</frontend_type>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <sort_order>4</sort_order>
 
                     </field>
                     <field id="button_design" type="textarea" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom CSS</label>
-                        <sort_order>5</sort_order>
                         <comment>
                             <![CDATA[
 				                <div>
@@ -224,9 +219,7 @@
                     </field>
                     <field id="use_default_button_size" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Use default button size</label>
-                        <frontend_type>select</frontend_type>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <sort_order>6</sort_order>
                     </field>
                     <field id="categories" type="multiselect" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Select Categories</label>
