@@ -19,6 +19,9 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     /** @var \Magento\Framework\Json\Helper\Data */
     protected $jsonHelper;
 
+    /** @var \Magento\Checkout\Model\Session */
+    protected $checkoutSession;
+
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
@@ -35,11 +38,13 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
+        \Magento\Checkout\Model\Session $checkoutSession,
         array $data = []
     ) {
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;
         $this->jsonHelper = $jsonHelper;
+        $this->checkoutSession = $checkoutSession;
 
         parent::__construct(
             $context,
@@ -89,7 +94,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     protected function _toHtml()
     {
-        if ($this->quoteHelper->isEnabledOnCOP()) {
+        if ($this->quoteHelper->isEnabledOnCOP() && $this->isProductsAllowedInCard()) {
             return parent::_toHtml();
         }
 
@@ -125,5 +130,26 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     {
         $design = $this->dataHelper->escapeCustomCSS($this->catalogHelper->getCartButtonDesign());
         return $design ? $design : parent::getButtonDesign();
+    }
+
+    /**
+     * Check if Product Type is allowed in the card
+     *
+     * @return bool
+     */
+    public function isProductsAllowedInCard()
+    {
+        $cartItems = $this->checkoutSession->getQuote()->getAllVisibleItems();
+        $notAllowedProductTypes = array(
+            \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
+        );
+
+        foreach ($cartItems as $cartItem) {
+            if (in_array($cartItem->getProduct()->getTypeId(), $notAllowedProductTypes)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
