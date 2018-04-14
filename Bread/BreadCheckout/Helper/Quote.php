@@ -319,7 +319,7 @@ class Quote extends Data
         } else {
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
-        
+
         if (!$shippingAddress->getShippingMethod()) {
             return false;
         }
@@ -328,7 +328,7 @@ class Quote extends Data
                 'typeId' => $shippingAddress->getShippingMethod(),
                 'cost'   => $shippingAddress->getShippingAmount() * 100];
     }
-    
+
     /**
      * Get stored bread transaction ID from quote
      *
@@ -403,5 +403,26 @@ class Quote extends Data
             $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
         }
         return $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
+    }
+
+    /**
+     * Check if Product Type is allowed in the Cart
+     *
+     * @return bool
+     */
+    public function isProductsAllowedInCart()
+    {
+        $quote = $this->getSessionQuote();
+        $notAllowedProductTypes = array(
+            \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
+        );
+
+        foreach ($quote->getAllVisibleItems() as $cartItem) {
+            if (in_array($cartItem->getProduct()->getTypeId(), $notAllowedProductTypes)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
