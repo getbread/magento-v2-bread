@@ -89,7 +89,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     protected function _toHtml()
     {
-        if ($this->quoteHelper->isEnabledOnCOP()) {
+        if ($this->quoteHelper->isEnabledOnCOP() && $this->quoteHelper->isProductsAllowedInCart()) {
             return parent::_toHtml();
         }
 
