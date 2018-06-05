@@ -1,7 +1,7 @@
 {
     "name": "breadfinance/module-breadcheckout",
     "description": "Offers the Bread financing and checkout tools for your Magento store",
-    "license": "MITL",
+    "license": "MIT",
     "minimum-stability": "stable",
     "require": {
         "php": "~5.6.0|7.0.2|~7.0.6",
@@ -29,7 +29,7 @@
     "type": "magento2-module",
     "extra": {
         "map": [
-            "*", "Bread/BreadCheckout"
+            "breadfinance/module-breadcheckout", "Bread/BreadCheckout"
         ]
     },
     "repositories": [{
