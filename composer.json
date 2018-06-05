@@ -1,52 +1,47 @@
 {
-  "name": "bread/module-breadcheckout",
-  "description": "Offers the Bread financing and checkout tools for your Magento store",
-  "version": "2.0.0",
-  "license": "MITL",
-  "require": {
-    "php": "~5.6.0|7.0.2|~7.0.6",
-    "magento/module-config": "100.2.*",
-    "magento/module-store": "100.2.*",
-    "magento/module-checkout": "100.2.*",
-    "magento/module-sales": "100.2.*",
-    "magento/module-quote": "100.2.*",
-    "magento/module-customer": "100.2.*",
-    "magento/module-payment": "100.2.*",
-    "magento/module-backend": "100.2.*",
-    "magento/module-tax": "100.2.*",
-    "magento/module-directory": "100.2.*",
-    "magento/module-theme": "100.2.*",
-    "magento/module-catalog": "100.2.*",
-    "magento/module-eav": "100.2.*",
-    "magento/framework": "100.2.*",
-    "magento/module-ui": "100.2.*",
-    "magento/module-vault": "100.2.*",
-    "lib-libxml": "*"
-  },
-  "suggest": {
-    "magento/module-checkout-agreements": "100.2.*"
-  },
-  "type": "magento2-module",
-  "extra": {
-    "map": [
-      [
-        "*",
-        "Bread/BreadCheckout"
-      ]
-    ]
-  },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/getbread/magento-v2-bread"
+    "name": "breadfinance/module-breadcheckout",
+    "description": "Offers the Bread financing and checkout tools for your Magento store",
+    "license": "MITL",
+    "minimum-stability": "stable",
+    "require": {
+        "php": "~5.6.0|7.0.2|~7.0.6",
+        "magento/module-config": "101.0.*",
+        "magento/module-store": "100.2.*",
+        "magento/module-checkout": "100.2.*",
+        "magento/module-sales": "101.0.*",
+        "magento/module-quote": "101.0.*",
+        "magento/module-customer": "101.0.*",
+        "magento/module-payment": "100.2.*",
+        "magento/module-backend": "100.2.*",
+        "magento/module-tax": "100.2.*",
+        "magento/module-directory": "100.2.*",
+        "magento/module-theme": "100.2.*",
+        "magento/module-catalog": "102.0.*",
+        "magento/module-eav": "101.0.*",
+        "magento/framework": "101.0.*",
+        "magento/module-ui": "101.0.*",
+        "magento/module-vault": "101.0.*",
+        "lib-libxml": "*"
+    },
+    "suggest": {
+        "magento/module-checkout-agreements": "100.2.*"
+    },
+    "type": "magento2-module",
+    "extra": {
+        "map": [
+            "*", "Bread/BreadCheckout"
+        ]
+    },
+    "repositories": [{
+        "type": "vcs",
+        "url": "git@github.com:breadfinance/magento-v2-bread.git"
+    }],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Bread\\BreadCheckout\\": ""
+        }
     }
-  ],
-  "autoload": {
-    "files": [
-      "registration.php"
-    ],
-    "psr-4": {
-      "Bread\\BreadCheckout\\": ""
-    }
-  }
 }
