@@ -29,7 +29,7 @@
     "type": "magento2-module",
     "extra": {
         "map": [
-            "breadfinance/module-breadcheckout", "Bread/BreadCheckout"
+            "*", "Bread/BreadCheckout"
         ]
     },
     "repositories": [{
