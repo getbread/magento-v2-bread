@@ -29,8 +29,10 @@
     "type": "magento2-module",
     "extra": {
         "map": [
-            "*",
-            "Bread/BreadCheckout"
+            [
+                "*",
+                "Bread/BreadCheckout"
+            ]
         ]
     },
     "repositories": [{
