@@ -32,7 +32,7 @@
         "map": [
             [
                 "*",
-                ""
+                "Bread/Breadcheckout"
             ]
         ]
     },
@@ -41,7 +41,7 @@
         "url": "git@github.com:breadfinance/magento-v2-bread.git"
     }],
     "autoload": {
-        "files": ["/../../../app/code/Bread/Breadcheckout/registration.php"],
+        "files": ["/../app/code/Bread/Breadcheckout/registration.php"],
         "psr-4": {
             "Bread\\BreadCheckout\\": ""
         }
