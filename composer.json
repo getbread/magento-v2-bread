@@ -22,15 +22,16 @@
         "magento/framework": "101.0.*",
         "magento/module-ui": "101.0.*",
         "magento/module-vault": "101.0.*",
-        "lib-libxml": "*"
+        "lib-libxml": "*",
+        "breadfinance/module-breadcheckout": "dev-master"
     },
     "suggest": {
         "magento/module-checkout-agreements": "100.2.*"
     },
     "type": "magento2-module",
     "repositories": [{
-        "type": "vcs",
-        "url": "git@github.com:breadfinance/magento-v2-bread.git"
+        "type": "git",
+        "url": "https://github.com/breadfinance/magento-v2-bread.git"
     }],
     "autoload": {
         "files": ["registration.php"],
