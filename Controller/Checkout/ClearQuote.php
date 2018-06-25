@@ -58,7 +58,7 @@ class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
             $quote->removeAllItems(); // Reset items in quote
             $this->quoteRepository->save($quote);
             $result = true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $result = false;
         }
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
