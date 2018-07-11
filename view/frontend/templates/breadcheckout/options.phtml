@@ -12,7 +12,7 @@
     <?php $_options = $block->decorateArray($block->getProduct()->getOptions()); ?>
     <?php if (!empty($_options)) : ?>
 
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
+    require(['jquery'], function($) {
         /**
          * Retrieve custom options data
          */

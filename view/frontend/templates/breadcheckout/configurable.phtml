@@ -3,8 +3,8 @@
     document.Skus = {};
     spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
 
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
-        $(document).ready(function () {
+    require(['jquery'], function($) {
+        $(document).on('load', function () {
 
             /**
              * Overlay element onto bread button to prevent
@@ -15,7 +15,7 @@
             $('#product_addtocart_form').on('change', function() {
                 spConfig.updateButton(this);
             });
-            
+
 
             spConfig.updateButton = function(form) {
                 /**
