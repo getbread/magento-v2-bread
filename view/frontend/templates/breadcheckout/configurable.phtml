@@ -4,7 +4,7 @@
     spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
 
     require(['jquery'], function($) {
-        $(document).on('load', function () {
+        $(document).ready(function () {
 
             /**
              * Overlay element onto bread button to prevent
