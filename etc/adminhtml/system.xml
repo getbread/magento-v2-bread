@@ -24,9 +24,11 @@
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiMode</source_model>
                 </field>
                 <field id="api_public_key" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>API Public Key</label>
+                    <validate>validate-length maximum-length-36 validate-length minimum-length-36</validate>
+		    <label>API Public Key</label>
                 </field>
                 <field id="api_secret_key" type="obscure" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+		    <validate>validate-length maximum-length-36</validate>
                     <label>API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
