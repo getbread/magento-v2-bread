@@ -3,7 +3,7 @@
     document.Skus = {};
     spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
 
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
+    require(['jquery'], function($) {
         $(document).ready(function () {
 
             /**
@@ -15,7 +15,7 @@
             $('#product_addtocart_form').on('change', function() {
                 spConfig.updateButton(this);
             });
-            
+
 
             spConfig.updateButton = function(form) {
                 /**

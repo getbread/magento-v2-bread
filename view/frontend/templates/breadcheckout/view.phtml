@@ -12,7 +12,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
+    require(['jquery'], function($) {
         document.configureButton = function (items) {
             var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
@@ -156,7 +156,7 @@
             });
 
             //  DISCOUNTS
-            $(document).ready(function () {
+            $(document).on('load', function () {
                 var productForm = $('#product_addtocart_form');
                 $.mage.validation({
                     errorPlacement: function() {} // Hides default error labels
