@@ -12,7 +12,11 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery'], function($) {
+    require([
+        'jquery',
+        'jquery/validate',
+        'mage/validation'
+    ], function($) {
         document.configureButton = function (items) {
             var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
@@ -53,11 +57,14 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
+                    var productForm = $('#product_addtocart_form');
+
                     shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                     shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                     shippingAddress.main_product_id                 = document.productId;
+                    shippingAddress.buy_request                     = productForm.serialize();
 
                     $.ajax({
                         url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
@@ -86,11 +93,14 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
+                    var productForm = $('#product_addtocart_form');
+
                     shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
                     shippingAddress.selected_sku                    = document.selectedSku + document.customOptions;
                     shippingAddress.selected_simple_product_id      = document.selectedSimpleProductId;
                     shippingAddress.main_product_id                 = document.productId;
+                    shippingAddress.buy_request                     = productForm.serialize();
 
                     $.ajax({
                         url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
@@ -156,7 +166,7 @@
             });
 
             //  DISCOUNTS
-            $(document).on('load', function () {
+            $(document).ready(function () {
                 var productForm = $('#product_addtocart_form');
                 $.mage.validation({
                     errorPlacement: function() {} // Hides default error labels
@@ -168,13 +178,14 @@
                     disc.selected_sku                    = document.selectedSku + document.customOptions;
                     disc.selected_simple_product_id      = document.selectedSimpleProductId;
                     disc.main_product_id                 = document.productId;
+                    disc.buy_request                     = productForm.serialize();
                     $.ajax({
                         url: '<?php /* @noEscape */ echo $block->getDiscountsDataUrl(); ?>',
                         data: disc,
                         type: 'post',
                         context: this
                     }).done(function(response) {
-                        if (response.discounts != false) {
+                        if (response.discounts) {
                             breadConfig.discounts = response.discounts;
                             bread.checkout(breadConfig);
                             document.clearQuote();
@@ -182,11 +193,10 @@
                     });
                 };
             });
-                   
         };
 
         /**
-         * Remove items fron quote after 
+         * Remove items fron quote after
          * discount calculation
          */
         document.clearQuote = function() {
@@ -195,7 +205,7 @@
             });
         };
 
-    <?php if ($block->getProduct() != null) : ?>
+<?php if ($block->getProduct() != null) : ?>
 
         /**
          * Reconfigure Bread checkout button with updated
