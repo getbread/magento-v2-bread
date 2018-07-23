@@ -3,7 +3,7 @@
     document.Skus = {};
     spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
 
-    require(['jquery'], function($) {
+    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
         $(document).ready(function () {
 
             /**
