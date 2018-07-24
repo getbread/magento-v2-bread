@@ -161,9 +161,14 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         $this->checkoutSession->setBreadTransactionId($data['breadTransactionId']);
 
-        if (isset($data['discounts']) && !empty($data['discounts'])) {
-            $discountDescription = $data['discounts'][0]['description'];
-            $quote->setCouponCode($discountDescription);
+        $productPage = $this->getRequest()->getParam('product_page');
+        if ($productPage) {
+            $quote->setCouponCode('');
+        } else {
+            if (isset($data['discounts']) && !empty($data['discounts'])) {
+                $discountDescription = $data['discounts'][0]['description'];
+                $quote->setCouponCode($discountDescription);
+            }
         }
 
         $billingContact = $this->processAddress($data['billingContact']);

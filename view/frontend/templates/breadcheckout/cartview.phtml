@@ -9,7 +9,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery'], function($, quote){
+    require(['jquery', 'jquery/validate', 'mage/validation'], function($, quote){
         document.configureButton = function (items) {
             var address             = <?php /* @noEscape */ echo $block->getShippingAddressData(); ?>;
             var billingAddress      = <?php /* @noEscape */ echo $block->getBillingAddressData(); ?>;
