@@ -522,12 +522,13 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Returns payment title with monthly estimate
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getTitle()
     {
         $title = parent::getTitle();
         if ($this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST) {
-            $data = $this->quoteHelper->submitQuote();
+            $data = $this->quoteHelper->submitQuote(null,false);
             if (isset($data["asLowAs"]) && isset($data["asLowAs"]["amount"])) {
                 $title .= " " . sprintf(__("as low as %s/month"), $data["asLowAs"]["amount"]);
             }
