@@ -425,4 +425,24 @@ class Quote extends Data
 
         return true;
     }
+
+    /**
+     * Get Tooltip message to show on payment method
+     *
+     * @return string
+     */
+    public function getMethodTooltip()
+    {
+        $session = $this->getSession();
+        $quoteResult = $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
+
+        if(empty($quoteResult)){
+            $quoteResult = $this->submitQuote();
+        }
+
+        if($quoteResult && array_key_exists('asLowAs',$quoteResult)){
+            return $quoteResult['asLowAs']['asLowAsText'];
+        }
+
+    }
 }

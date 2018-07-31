@@ -61,7 +61,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'taxEstimationUrl' => $this->helper->getTaxEstimateUrl(),
                         'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl(),
                         'shippingOptions' => $this->helper->getShippingOptions(),
-                        'buttonLocation' => $this->helperData->getCheckoutLocation()
+                        'buttonLocation' => $this->helperData->getCheckoutLocation(),
+                        'methodTooltip' => $this->helper->getMethodTooltip(),
                     ]
                 ]
             ]
