@@ -26,7 +26,7 @@ define(
                             $.ajax({
                                 url: data.paymentUrl,
                                 data: {token: tx_token},
-                                type: 'post',
+                                type: 'get',
                                 context: this,
                                 beforeSend: function() {
                                     $('body').loadingPopup({
