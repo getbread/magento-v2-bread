@@ -9,6 +9,11 @@
         </label>
     </div>
 
+    <!-- ko if: isEmbeddedCheckout() -->
+        <div id="bread-checkout-embedded"></div>
+    <!-- /ko -->
+
+    <!-- ko ifnot: isEmbeddedCheckout() -->
     <div class="payment-method-content" data-bind="css: getCode()">
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
@@ -35,9 +40,10 @@
                         id="bread-checkout-submit"
                         data-bind="attr: {title: $t('Place Order')}, click: placeOrder"
                         class="action primary checkout">
-                    <span data-bind="i18n: 'Place Order'"></span>
+                    <span data-bind="i18n: 'Place Order123'"></span>
                 </button>
             </div>
         </div>
     </div>
+    <!-- /ko -->
 </div>

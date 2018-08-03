@@ -67,6 +67,17 @@ define(
             },
 
             /**
+             * Embedded checkout enabled
+             */
+            isEmbeddedCheckout: function(){
+                return window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout;
+            },
+
+            test: function(){
+
+            },
+
+            /**
              * Initialize the bread checkout button
              */
             initComplete: function() {
@@ -74,6 +85,10 @@ define(
 
                 if (typeof bread != 'undefined') {
                     button.configure(data, this);
+
+                    if(data.embeddedCheckout){
+                        button.embeddedCheckout();
+                    }
                 }
                 return true;
             },

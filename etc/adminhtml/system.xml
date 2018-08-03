@@ -181,6 +181,10 @@
                         <field id="cart_size_targeted_financing">1</field>
                     </depends>
                 </field>
+                <field id="embedded" type="select" sortOrder="21" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Embedded Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="log_enabled" type="select" sortOrder="29" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Logging</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

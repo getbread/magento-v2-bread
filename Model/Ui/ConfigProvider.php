@@ -50,6 +50,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'isHealthcare' => $this->helper->isHealthcare(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
+                        'formId' => 'bread-checkout-embedded',
+                        'embeddedCheckout' => $this->helperData->embeddedCheckoutEnabled(),
                         'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,
                         'items' => $this->helper->getQuoteItemsData(),
                         'discounts' => $this->helper->getDiscountData(),

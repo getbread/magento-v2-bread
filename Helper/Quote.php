@@ -142,7 +142,7 @@ class Quote extends Data
                 'description' => ($couponTitle) ? $couponTitle : __('Discount')
             ];
         } else {
-            return false;
+            return [];
         }
 
         return [$discount];
