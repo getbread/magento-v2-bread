@@ -529,7 +529,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if ($this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST) {
             $data = $this->quoteHelper->submitQuote();
             if (isset($data["asLowAs"]) && isset($data["asLowAs"]["amount"])) {
-                $title .= " " . sprintf(__("as low as %s/month"), $data["asLowAs"]["amount"]);
+                $title .= " " . sprintf(__("as low as %s/month*"), $data["asLowAs"]["amount"]);
             }
         }
         return $title;
