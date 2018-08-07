@@ -67,6 +67,13 @@ define(
             },
 
             /**
+             * Payment Method tooltip from Ui\Configprovider
+             */
+            getMethodTooltip: function() {
+                return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTooltip;
+            },
+
+            /**
              * Initialize the bread checkout button
              */
             initComplete: function() {
