@@ -374,7 +374,7 @@ class Quote extends Data
      *
      * @return array|string
      */
-    public function submitQuote($quote = null)
+    public function submitQuote($quote = null, $fullRequest = true)
     {
         if (!$quote) {
             $quote = $this->getSessionQuote();
@@ -382,16 +382,27 @@ class Quote extends Data
 
         $session = $this->getSession();
         if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
-            $arr = [];
-            $arr["expiration"]                 = date('Y-m-d', strtotime("+" . $this->getQuoteExpiration() . "days"));
-            $arr["options"]                    = [];
-            $arr["options"]["orderRef"]        = $quote->getId();
-            $arr["options"]["shippingOptions"] = [$this->getShippingOptions()];
-            $arr["options"]["shippingContact"] = $this->getShippingAddressData();
-            $arr["options"]["billingContact"]  = $this->getBillingAddressData();
-            $arr["options"]["items"]           = $this->getQuoteItemsData();
-            $arr["options"]["discounts"]       = $this->getDiscountData() ? $this->getDiscountData() : [];
-            $arr["options"]["tax"]             = $this->getTaxValue(false);
+
+            if($fullRequest){
+                $arr = [];
+                $arr["expiration"]                 = date('Y-m-d', strtotime("+" . $this->getQuoteExpiration() . "days"));
+                $arr["options"]                    = [];
+                $arr["options"]["orderRef"]        = $quote->getId();
+                $arr["options"]["shippingOptions"] = [$this->getShippingOptions()];
+                $arr["options"]["shippingContact"] = $this->getShippingAddressData();
+                $arr["options"]["billingContact"]  = $this->getBillingAddressData();
+                $arr["options"]["items"]           = $this->getQuoteItemsData();
+                $arr["options"]["discounts"]       = $this->getDiscountData() ? $this->getDiscountData() : [];
+                $arr["options"]["tax"]             = $this->getTaxValue(false);
+
+            } else {
+
+                $grandTotal = (int)(floatval($quote->getGrandTotal()) * 100);
+
+                $arr = [];
+                $arr['options'] = [];
+                $arr['options']['customTotal'] = $grandTotal;
+            }
 
             try {
                 $result = $this->paymentApiClient->submitCartData($arr);
