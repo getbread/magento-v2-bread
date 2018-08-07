@@ -25,8 +25,11 @@ define(
                         if (tx_token !== undefined) {
                             $.ajax({
                                 url: data.paymentUrl,
-                                data: {token: tx_token},
-                                type: 'get',
+                                data: {
+                                    token: tx_token,
+                                    form_key: window.FORM_KEY
+                                },
+                                type: 'post',
                                 context: this,
                                 beforeSend: function() {
                                     $('body').loadingPopup({
