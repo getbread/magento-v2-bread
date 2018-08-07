@@ -34,9 +34,8 @@ class DiscountsData extends \Bread\BreadCheckout\Controller\Checkout
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Bread\BreadCheckout\Helper\Data $dataHelper
-
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;

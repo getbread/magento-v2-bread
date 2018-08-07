@@ -19,8 +19,8 @@ class QuoteData extends \Magento\Backend\App\Action
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $helper,
         \Bread\BreadCheckout\Helper\Data $helperData
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->helper = $helper;
         $this->helperData = $helperData;

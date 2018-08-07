@@ -78,7 +78,7 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
                          'text'  => 'Internal error'];
         }
         return $this->resultFactory->create(
-            \Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(['result' => $response]
-        );
+            \Magento\Framework\Controller\ResultFactory::TYPE_JSON
+        )->setData(['result' => $response]);
     }
 }

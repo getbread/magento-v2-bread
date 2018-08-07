@@ -291,7 +291,7 @@ class Quote extends Data
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
 
-        if(!$shippingAddress->getStreetLine(1)){
+        if (!$shippingAddress->getStreetLine(1)) {
             return false;
         }
 
@@ -349,7 +349,7 @@ class Quote extends Data
         if ($this->quote === null) {
             if ($this->isInAdmin()) {
                 $this->quote = $this->orderCreateModel->getQuote();
-            }else{
+            } else {
                 $this->quote = $this->checkoutSession->getQuote();
             }
         }
@@ -413,9 +413,9 @@ class Quote extends Data
     public function isProductsAllowedInCart()
     {
         $quote = $this->getSessionQuote();
-        $notAllowedProductTypes = array(
+        $notAllowedProductTypes = [
             \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
-        );
+        ];
 
         foreach ($quote->getAllVisibleItems() as $cartItem) {
             if (in_array($cartItem->getProduct()->getTypeId(), $notAllowedProductTypes)) {

@@ -70,8 +70,8 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper
-    )
-    {
+    ) {
+    
         $this->request          = $request;
         $this->paymentApiClient = $paymentApiClient;
         $this->customer         = $customer;
@@ -97,13 +97,14 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      *
      * @return \Magento\Framework\Controller\Result\Json
      */
-    public function execute() {
+    public function execute()
+    {
         $transactionId = $this->request->getParam("transactionId");
         $orderRef = $this->request->getParam("orderRef");
 
-        if($transactionId && $orderRef && !$this->request->getParam("error")){
-            $this->validateBackendOrder($transactionId,$orderRef);
-        }else{
+        if ($transactionId && $orderRef && !$this->request->getParam("error")) {
+            $this->validateBackendOrder($transactionId, $orderRef);
+        } else {
             $this->messageManager->addErrorMessage($this->__('There was an error with your financing program'));
             $this->_redirect("/");
         }
@@ -113,10 +114,10 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      * Create Magento Order From Backend Quote
      *
      */
-    public function validateBackendOrder($transactionId, $orderRef){
+    public function validateBackendOrder($transactionId, $orderRef)
+    {
         try {
             if ($transactionId) {
-
                 $data       = $this->paymentApiClient->getInfo($transactionId);
 
                 $customer   = $this->customerFactory->create();

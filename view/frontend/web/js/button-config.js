@@ -4,11 +4,11 @@
 define(['jquery',
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/model/quote',
-    'Magento_Checkout/js/checkout-data'], function($, fullScreenLoader, quote, checkout){
+    'Magento_Checkout/js/checkout-data'], function ($, fullScreenLoader, quote, checkout) {
     return {
         breadConfig: undefined,
 
-        configure: function(data, context) {
+        configure: function (data, context) {
             this.breadConfig = {
                 buttonId: data.buttonId,
                 items: data.items,
@@ -38,11 +38,13 @@ define(['jquery',
                 this.breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
             }
 
-            if(data.cartSizeFinancing.enabled){
+            if (data.cartSizeFinancing.enabled) {
                 var cartSizeFinancingId = data.cartSizeFinancing.id;
                 var cartSizeThreshold = data.cartSizeFinancing.threshold;
                 var items = data.items;
-                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                var itemsPriceSum = items.reduce(function (sum, item) {
+                    return sum + item.price * item.quantity
+                }, 0) / 100;
                 this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
@@ -66,7 +68,7 @@ define(['jquery',
         /**
          * Call the checkout method from bread.js
          */
-        init: function() {
+        init: function () {
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                 bread.showCheckout(this.breadConfig);
             }
@@ -76,15 +78,15 @@ define(['jquery',
         /**
          * Get updated quote data
          */
-        setShippingInformation: function() {
+        setShippingInformation: function () {
             $.ajax({
                 url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
                 type: 'post',
                 context: this,
-                beforeSend: function() {
+                beforeSend: function () {
                     fullScreenLoader.startLoader();
                 }
-            }).done(function(data) {
+            }).done(function (data) {
                 if (data.shippingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                     this.breadConfig.shippingContact = data.shippingContact;
                 }
@@ -102,7 +104,7 @@ define(['jquery',
         /**
          * Round float to 2 decimal places then convert to integer
          */
-        round: function(value) {
+        round: function (value) {
             return parseInt(
                 Number(Math.round(parseFloat(value)+'e'+2)+'e-'+2)
                 * 100

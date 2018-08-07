@@ -17,7 +17,7 @@ define(
              *
              * @returns {boolean}
              */
-            validate: function() {
+            validate: function () {
                 if (Discount.prototype.validate.call(this)) { // Call parent method
                     if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
                         window.checkoutConfig.payment.breadcheckout.transactionId = null;

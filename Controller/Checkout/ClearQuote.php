@@ -22,9 +22,8 @@ class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement
-
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         parent::__construct(
             $context,

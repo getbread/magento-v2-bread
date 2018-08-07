@@ -7,13 +7,13 @@ use Braintree\Exception;
 class GenerateCart extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected  $helper;
-    protected  $cart;
-    protected  $config;
-    protected  $paymentApiClient;
-    protected  $customerHelper;
-    protected  $breadMethod;
-    protected  $urlHelper;
+    protected $helper;
+    protected $cart;
+    protected $config;
+    protected $paymentApiClient;
+    protected $customerHelper;
+    protected $breadMethod;
+    protected $urlHelper;
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -24,8 +24,8 @@ class GenerateCart extends \Magento\Backend\App\Action
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
         \Bread\BreadCheckout\Helper\Url $urlHelper
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->helper = $helper;
         $this->cart = $cart;
@@ -94,8 +94,7 @@ class GenerateCart extends \Magento\Backend\App\Action
             ];
 
             $ret["cartUrl"] = $result["url"];
-
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $ret["error"] = true;
             $ret["errorRows"][] = __("There was an error in cart creation:");
             $ret["errorRows"][] = $e->getMessage();

@@ -14,19 +14,21 @@ define(
         'Magento_Checkout/js/model/shipping-service',
         'Magento_Checkout/js/model/full-screen-loader'
     ],
-    function (Component,
-              ko,
-              $,
-              button,
-              customer,
-              createBillingAddress,
-              selectBillingAddress,
-              checkoutData,
-              setBillingAddressAction,
-              errorProcessor,
-              defaultProcessor,
-              shippingService,
-              fullScreenLoader) {
+    function (
+        Component,
+        ko,
+        $,
+        button,
+        customer,
+        createBillingAddress,
+        selectBillingAddress,
+        checkoutData,
+        setBillingAddressAction,
+        errorProcessor,
+        defaultProcessor,
+        shippingService,
+        fullScreenLoader
+    ) {
         'use strict';
         return Component.extend({
             defaults: {
@@ -43,25 +45,25 @@ define(
             /**
              * Payment code
              */
-            getCode: function() {
+            getCode: function () {
                 return 'breadcheckout';
             },
 
             /**
              * Get if default button size enabled from config
              */
-            getDefaultSize: function() {
+            getDefaultSize: function () {
                 return window.checkoutConfig.payment[this.getCode()].defaultSize;
             },
 
             /**
              * Transaction ID from Ui\ConfigProvider
              */
-            getBreadTransactionId: function() {
+            getBreadTransactionId: function () {
                 return window.checkoutConfig.payment[this.getCode()].transactionId;
             },
 
-            setBreadTransactionId: function(transactionId){
+            setBreadTransactionId: function (transactionId) {
                 this.breadTransactionId(transactionId);
                 window.checkoutConfig.payment[this.getCode()].transactionId = transactionId;
             },
@@ -69,7 +71,7 @@ define(
             /**
              * Initialize the bread checkout button
              */
-            initComplete: function() {
+            initComplete: function () {
                 var data = window.checkoutConfig.payment[this.getCode()].breadConfig;
 
                 if (typeof bread != 'undefined') {
@@ -84,7 +86,7 @@ define(
              *
              * @return {boolean}
              */
-            placeOrder: function(data, event) {
+            placeOrder: function (data, event) {
                 this.data = data;
                 this.event = event;
 
@@ -142,7 +144,7 @@ define(
              *
              * @return {jQuery.Deferred}
              */
-            updateAddress: function(data) {
+            updateAddress: function (data) {
                 var self = this;
                 /**
                  * Billing address
@@ -189,7 +191,7 @@ define(
              * @param address {object}
              * @return {object}
              */
-            getAddressData: function(address) {
+            getAddressData: function (address) {
                 if (typeof address.street == 'string') {
                     address.street = {
                         0: address.street,

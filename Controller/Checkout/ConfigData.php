@@ -23,8 +23,8 @@ class ConfigData extends \Magento\Framework\App\Action\Action
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Bread\BreadCheckout\Helper\Data $dataHelper
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;

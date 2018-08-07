@@ -141,7 +141,7 @@ class Catalog extends Data
      */
     protected function getImgSrc(\Magento\Catalog\Model\Product $product)
     {
-        if( $this->isInAdmin() ) {
+        if ($this->isInAdmin()) {
             $product = $this->_productRepositoryFactory->create()->getById($product->getId());
             $imageUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
             return $imageUrl;

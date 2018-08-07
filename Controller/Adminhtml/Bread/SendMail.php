@@ -4,12 +4,12 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 class SendMail extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected  $request;
-    protected  $helper;
-    protected  $cart;
-    protected  $config;
-    protected  $paymentApiClient;
-    protected  $customerHelper;
+    protected $request;
+    protected $helper;
+    protected $cart;
+    protected $config;
+    protected $paymentApiClient;
+    protected $customerHelper;
 
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
@@ -19,8 +19,8 @@ class SendMail extends \Magento\Backend\App\Action
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Bread\BreadCheckout\Helper\Customer $customerHelper
-    )
-    {
+    ) {
+    
         $this->request = $request;
         $this->resultFactory = $context->getResultFactory();
         $this->helper = $helper;
@@ -36,7 +36,8 @@ class SendMail extends \Magento\Backend\App\Action
      *
      * @return \Magento\Framework\Controller\Result\Json
      */
-    public function execute(){
+    public function execute()
+    {
         $quote = $this->helper->getSessionQuote();
 
         $url = $this->request->getParam("url");
@@ -46,16 +47,14 @@ class SendMail extends \Magento\Backend\App\Action
                      "successRows"=> [],
                      "errorRows" => [],
         ];
-        try{
+        try {
             $this->customerHelper->sendCartActivationEmailToCustomer($quote->getCustomer(), $url, $items);
             $ret["successRows"][] = __("Email was successfully sent to your customer.");
-
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $ret["error"] = true;
             $ret["errorRows"][] = __("An error occurred while sending email:");
             $ret["errorRows"][] = $e->getMessage();
         }
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($ret);
     }
-
 }

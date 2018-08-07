@@ -325,7 +325,7 @@ class Customer extends Data
      * @param customer
      * @param transactionId
      */
-    public function sendCustomerErrorReportToMerchant($exception, $response="", $quoteId="", $transactionId=null)
+    public function sendCustomerErrorReportToMerchant($exception, $response = "", $quoteId = "", $transactionId = null)
     {
         $templateOptions = ['area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId()];
 
@@ -349,7 +349,7 @@ class Customer extends Data
         $this->inlineTranslation->suspend();
 
         $recipients = $this->scopeConfig->getValue('sales_email/order/copy_to', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        if($recipients){
+        if ($recipients) {
             $transport = $this->_transportBuilder->setTemplateIdentifier('error_report_template')
                 ->setTemplateOptions($templateOptions)
                 ->setTemplateVars($templateVars)
@@ -359,6 +359,5 @@ class Customer extends Data
             $transport->sendMessage();
             $this->inlineTranslation->resume();
         }
-
     }
 }
