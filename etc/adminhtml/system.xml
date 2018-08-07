@@ -193,12 +193,12 @@
                     </comment>
                 </field>
                 <field id="per_month" type="select" sortOrder="30" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Show price per month</label>
+                    <label><![CDATA[Show "As Low As" price]]></label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         <![CDATA[
                                 <div>
-                                    <p>If set to yes, per month calculation will appear in checkout method.</p>
+                                    <p>If set to yes, the monthly price will be shown to the user in the payment method description at checkout.</p>
                                 </div>
                         ]]>
                     </comment>
