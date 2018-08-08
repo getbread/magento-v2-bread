@@ -40,6 +40,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_ACTIVE_ON_CART_VIEW            = 'payment/breadcheckout/enabled_on_cart_page';
     const XML_CONFIG_ENABLE_AS_PAYMENT_METHOD       = 'payment/breadcheckout/display_as_payment_method';
     const XML_CONFIG_CHECKOUT_TITLE                 = 'payment/breadcheckout/title';
+    const XML_CONFIG_CHECKOUT_PER_MONTH             = 'payment/breadcheckout/per_month';
     const XML_CONFIG_INCOMPLETE_MSG                 = 'payment/breadcheckout/incomplete_checkout_message';
     const XML_CONFIG_API_PUB_KEY                    = 'payment/breadcheckout/api_public_key';
     const XML_CONFIG_API_SECRET_KEY                 = 'payment/breadcheckout/api_secret_key';
@@ -348,6 +349,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPaymentMethodTitle($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (string) $this->__("" . $this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_TITLE, $store));
+    }
+
+
+    /**
+     * Show per month calculation next to payment method title on checkout
+     *
+     * @param $store
+     * @return string
+     */
+    public function showPerMonthCalculation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_PER_MONTH, $store);
     }
 
     /**
