@@ -141,10 +141,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
      *
      * @param $data
      * @throws \Exception
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processOrder($data)
     {
+        // @codingStandardsIgnoreStart
         $this->helper->log(["PROCESS ORDER DATA" => $data]);
 
         $quote = $this->checkoutSession->getQuote();
@@ -255,6 +255,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         $quote->save();
         $this->_redirect('checkout/onepage/success');
+        // @codingStandardsIgnoreEnd
     }
 
     /**

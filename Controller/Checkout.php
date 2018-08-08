@@ -85,8 +85,6 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      * @param array $customOptionPieces
      * @param $quantity
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      *
      * @return void
      */
@@ -102,6 +100,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $baseProductId      = $baseProduct->getId();
         $buyInfo            = ['qty' =>  $quantity];
 
+        // @codingStandardsIgnoreStart
         if ($baseProductId != $productId) {
         /** @var $catalogResource \Magento\Catalog\Model\ResourceModel\ProductFactory */
             $catalogResource            = $this->catalogResourceModelProductFactory->create();
@@ -172,6 +171,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             }
             $buyInfo['options']     = $customOptionConfig;
         }
+        // @codingStandardsIgnoreEnd
 
         $buyRequest = $this->dataObjectFactory->create();
         $buyRequest->addData($buyInfo);

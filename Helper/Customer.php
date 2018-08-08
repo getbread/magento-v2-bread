@@ -340,8 +340,14 @@ class Customer extends Data
         $templateOptions = ['area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId()];
 
         $from = [
-            'name' => $this->scopeConfig->getValue('trans_email/ident_general/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-            'email' => $this->scopeConfig->getValue('trans_email/ident_general/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+            'name' => $this->scopeConfig->getValue(
+                'trans_email/ident_general/name',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ),
+            'email' => $this->scopeConfig->getValue(
+                'trans_email/ident_general/email',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            )
         ];
 
         $templateVars = [
@@ -351,19 +357,23 @@ class Customer extends Data
             'response' => $response
         ];
 
-        $subject = __("Error report");
+        $subject = __('Error report');
 
         $emailData['subject'] = $subject;
 
         $this->inlineTranslation->suspend();
 
-        $recipients = $this->scopeConfig->getValue('sales_email/order/copy_to', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $recipients = $this->scopeConfig->getValue(
+            'sales_email/order/copy_to',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
         if ($recipients) {
             $transport = $this->_transportBuilder->setTemplateIdentifier('error_report_template')
                 ->setTemplateOptions($templateOptions)
                 ->setTemplateVars($templateVars)
                 ->setFrom($from)
-                ->addTo(explode(",", $recipients))
+                ->addTo(explode(',', $recipients))
                 ->getTransport();
             $transport->sendMessage();
             $this->inlineTranslation->resume();

@@ -67,11 +67,15 @@ class GenerateCart extends \Magento\Backend\App\Action
 
             $arr = [];
 
-            $arr["expiration"] = date( 'Y-m-d',
+            $arr["expiration"] = date(
+                'Y-m-d',
                 strtotime(
-                    "+" . $this->config->getValue('checkout/cart/delete_quote_after',
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE) . "days")
-                );
+                    "+" . $this->config->getValue(
+                        'checkout/cart/delete_quote_after',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ) . "days"
+                )
+            );
             $arr["options"] = [];
             $arr["options"]["orderRef"] = $quote->getId();
 

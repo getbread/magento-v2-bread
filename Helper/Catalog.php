@@ -86,9 +86,6 @@ class Catalog extends Data
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param \Magento\Catalog\Model\Product $theProduct
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     *
      * @return string
      */
     protected function getSkuString(
@@ -101,7 +98,7 @@ class Catalog extends Data
         if (!array_key_exists('options', $selectedOptions)) {
             return (string) $product->getSku();
         }
-
+        // @codingStandardsIgnoreStart
         $skuString  = $product->getData('sku');
         foreach ($selectedOptions['options'] as $key => $value) {
             if ($value['option_type'] == 'multiple') {
@@ -132,6 +129,7 @@ class Catalog extends Data
                 }
             }
         }
+        // @codingStandardsIgnoreEnd
 
         return $skuString;
     }
