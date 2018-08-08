@@ -11,7 +11,7 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Magento\Framework\Json\EncoderInterface */
-    protected $jsonEncoder;
+    public $jsonEncoder;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,

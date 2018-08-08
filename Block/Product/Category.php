@@ -10,7 +10,7 @@ namespace Bread\BreadCheckout\Block\Product;
 class Category extends \Magento\Framework\View\Element\Template
 {
 
-    protected $_template = 'Bread_BreadCheckout::breadcheckout/list_product.phtml';
+    public $_template = 'Bread_BreadCheckout::breadcheckout/list_product.phtml';
     /**
      * @var \Bread\BreadCheckout\Helper\Category
      */

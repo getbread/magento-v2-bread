@@ -13,25 +13,24 @@ class Quote extends Data
     const BREAD_SESSION_QUOTE_RESULT_KEY  = "bread_quote_result";
     const BREAD_SESSION_QUOTE_UPDATED_KEY = "bread_quote_updated_at";
 
-
     /** @var \Magento\Sales\Model\Quote */
-    protected $quote = null;
+    public $quote = null;
 
     /** @var \Magento\Checkout\Model\Session */
-    protected $checkoutSession;
+    public $checkoutSession;
 
     /** @var Bread\BreadCheckout\Helper\Catalog */
-    protected $helperCatalog;
+    public $helperCatalog;
 
     /** @var \Magento\Sales\Model\AdminOrder\Create */
-    protected $orderCreateModel;
+    public $orderCreateModel;
 
     /** @var \Magento\Framework\Pricing\PriceCurrencyInterface */
-    protected $priceCurrency;
+    public $priceCurrency;
     /**
      * @var \Bread\BreadCheckout\Model\Payment\Api\Client
      */
-    protected $paymentApiClient;
+    public $paymentApiClient;
 
     /**
      * Quote constructor.
@@ -295,6 +294,7 @@ class Quote extends Data
             return false;
         }
 
+        // @codingStandardsIgnoreStart
         return [
             'firstName'     => $shippingAddress->getFirstname(),
             'lastName'      => $shippingAddress->getLastname(),
@@ -305,6 +305,7 @@ class Quote extends Data
             'zip'           => $shippingAddress->getPostcode(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
         ];
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -370,9 +371,9 @@ class Quote extends Data
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
-     *
-     * @return array|string
+     * @param null $quote
+     * @return mixed
+     * @throws \Exception
      */
     public function submitQuote($quote = null)
     {

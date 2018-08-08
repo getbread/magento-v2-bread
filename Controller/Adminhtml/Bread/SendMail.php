@@ -4,12 +4,12 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 class SendMail extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $request;
-    protected $helper;
-    protected $cart;
-    protected $config;
-    protected $paymentApiClient;
-    protected $customerHelper;
+    public $request;
+    public $helper;
+    public $cart;
+    public $config;
+    public $paymentApiClient;
+    public $customerHelper;
 
     public function __construct(
         \Magento\Framework\App\Request\Http $request,

@@ -7,13 +7,13 @@ use Braintree\Exception;
 class GenerateCart extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $helper;
-    protected $cart;
-    protected $config;
-    protected $paymentApiClient;
-    protected $customerHelper;
-    protected $breadMethod;
-    protected $urlHelper;
+    public $helper;
+    public $cart;
+    public $config;
+    public $paymentApiClient;
+    public $customerHelper;
+    public $breadMethod;
+    public $urlHelper;
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -54,20 +54,24 @@ class GenerateCart extends \Magento\Backend\App\Action
             ];
 
             if (!$quote || ($quote && $quote->getItemsQty() == 0)) {
-                throw new Exception(__("Cart is empty"));
+                throw new \Magento\Framework\Exception\LocalizedException(__("Cart is empty"));
             }
 
             if ($quote->getPayment()->getMethodInstance()->getCode() != $this->breadMethod->getMethodCode()) {
-                throw new Exception(__("In order to checkout with bread you must choose bread as payment option."));
+                throw new \Magento\Framework\Exception\LocalizedException(__("In order to checkout with bread you must choose bread as payment option."));
             }
 
             if (!$this->helper->getShippingOptions()) {
-                throw new Exception(__("Please specify a shipping method."));
+                throw new \Magento\Framework\Exception\LocalizedException(__("Please specify a shipping method."));
             }
 
             $arr = [];
 
-            $arr["expiration"] = date('Y-m-d', strtotime("+" . $this->config->getValue('checkout/cart/delete_quote_after', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) . "days"));
+            $arr["expiration"] = date( 'Y-m-d',
+                strtotime(
+                    "+" . $this->config->getValue('checkout/cart/delete_quote_after',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE) . "days")
+                );
             $arr["options"] = [];
             $arr["options"]["orderRef"] = $quote->getId();
 

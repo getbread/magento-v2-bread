@@ -10,13 +10,13 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class DiscountsData extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $quoteHelper;
+    public $quoteHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Customer */
-    protected $customerHelper;
+    public $customerHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $dataHelper;
+    public $dataHelper;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,

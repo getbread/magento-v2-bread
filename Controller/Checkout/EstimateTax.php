@@ -11,13 +11,13 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Magento\Framework\Controller\ResultFactory  */
-    protected $resultFactory;
+    public $resultFactory;
 
     /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    public $logger;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,

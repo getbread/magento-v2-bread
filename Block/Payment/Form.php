@@ -4,10 +4,10 @@ namespace Bread\BreadCheckout\Block\Payment;
 class Form extends \Magento\Payment\Block\Form
 {
     /** Admin checkout form template @var string */
-    protected $_template = 'Bread_BreadCheckout::breadcheckout/info.phtml';
+    public $_template = 'Bread_BreadCheckout::breadcheckout/info.phtml';
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     /**
      * Constructor

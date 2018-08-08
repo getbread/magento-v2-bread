@@ -14,10 +14,10 @@ class ConfigProvider implements ConfigProviderInterface
     const CODE = 'breadcheckout';
 
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $helper;
+    public $helper;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helperData;
+    public $helperData;
 
     public function __construct(
         \Bread\BreadCheckout\Helper\Quote $helper,

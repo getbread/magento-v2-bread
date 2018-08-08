@@ -11,40 +11,40 @@ namespace Bread\BreadCheckout\Controller;
 abstract class Checkout extends \Magento\Framework\App\Action\Action
 {
     /** @var \Magento\Catalog\Model\ResourceModel\ProductFactory */
-    protected $catalogResourceModelProductFactory;
+    public $catalogResourceModelProductFactory;
     
     /** @var \Magento\Framework\DataObjectFactory */
-    protected $dataObjectFactory;
+    public $dataObjectFactory;
 
     /** @var \Magento\Checkout\Model\Cart */
-    protected $checkoutSession;
+    public $checkoutSession;
 
     /** @var \Magento\Quote\Model\QuoteFactory */
-    protected $quoteFactory;
+    public $quoteFactory;
 
     /** @var \Magento\Catalog\Model\ProductFactory */
-    protected $catalogProductFactory;
+    public $catalogProductFactory;
 
     /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    public $logger;
 
     /** @var \Bread\BreadCheckout\Helper\Checkout */
-    protected $helper;
+    public $helper;
 
     /** @var \Magento\Framework\Controller\ResultFactory */
-    protected $resultFactory;
+    public $resultFactory;
 
     /** @var \Magento\Quote\Model\Quote\TotalsCollector */
-    protected $totalsCollector;
+    public $totalsCollector;
 
     /** @var \Magento\Quote\Api\CartRepositoryInterface */
-    protected $quoteRepository;
+    public $quoteRepository;
 
     /** @var \Magento\Customer\Model\Session */
-    protected $customerSession;
+    public $customerSession;
 
     /** @var \Magento\Quote\Model\QuoteManagement */
-    protected $quoteManagement;
+    public $quoteManagement;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -75,15 +75,19 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $this->resultFactory = $context->getResultFactory();
         parent::__construct($context);
     }
-    
+
     /**
      * Add Item To Quote
      *
-     * @param \Magento\Quote\Model\Quote       $quote
-     * @param \Magento\Catalog\Model\Product   $product
-     * @param \Magento\Catalog\Model\Product   $baseProduct
-     * @param array                            $customOptionPieces
-     * @param int                              $quantity
+     * @param \Magento\Quote\Model\Quote $quote
+     * @param \Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $baseProduct
+     * @param array $customOptionPieces
+     * @param $quantity
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
      * @return void
      */
     protected function addItemToQuote(
@@ -151,9 +155,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
                                 $optionGroups = array_chunk($optionKeyValue, 2);
                                 foreach ($optionGroups as $group) {
+                                    // @codingStandardsIgnoreStart
                                     if (count($group) === 2) {
                                         $customOptionConfig[$optionId][$group[0]] = $group[1];
                                     }
+                                    // @codingStandardsIgnoreEnd
                                 }
                             } else {
                                 $customOptionConfig[$optionId][] = $optionKeyValue;
@@ -230,6 +236,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      *
      * @param array $data
      * @return \Magento\Quote\Model\Quote
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getQuote(array $data)
     {
@@ -276,8 +284,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /**
      * Add product to quote when checking out from product view page
      *
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param $quote
      * @param array $data
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function processOrderItem($quote, array $data)
     {

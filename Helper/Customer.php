@@ -11,28 +11,28 @@ namespace Bread\BreadCheckout\Helper;
 class Customer extends Data
 {
     /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
+    public $storeManager;
 
     /** @var \Magento\Customer\Model\Session */
-    protected $customerSession;
+    public $customerSession;
 
     /** @var \Magento\Customer\Model\CustomerFactory */
-    protected $customerFactory;
+    public $customerFactory;
 
     /** @var \Magento\Customer\Model\AddressFactory */
-    protected $customerAddressFactory;
+    public $customerAddressFactory;
 
     /** @var Magento\Framework\Json\Helper\Data */
-    protected $jsonHelper;
+    public $jsonHelper;
 
     /** @var \Magento\Framework\Math\Random */
-    protected $random;
+    public $random;
 
     /** @var \Magento\Framework\Mail\Template\TransportBuilder */
-    protected $_transportBuilder;
+    public $_transportBuilder;
 
     /** @var \Magento\Framework\Translate\Inline\StateInterface */
-    protected $inlineTranslation;
+    public $inlineTranslation;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -284,10 +284,14 @@ class Customer extends Data
      * @param \Magento\Customer\Model\Customer customer
      * @param url
      * @param Array items
+     * @ignore
      */
     public function sendCartActivationEmailToCustomer($customer, $url, $items)
     {
-        $templateOptions = ['area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId()];
+        $templateOptions = [
+            'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
+            'store' => $this->storeManager->getStore()->getId()
+        ];
 
         $templateVars = [
             'subject' => __("Financing Confirmation"),
@@ -299,8 +303,14 @@ class Customer extends Data
         ];
 
         $from = [
-            'email' => $this->scopeConfig->getValue('trans_email/ident_general/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-            'name'  => $this->scopeConfig->getValue('trans_email/ident_general/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+            'email' => $this->scopeConfig->getValue(
+                'trans_email/ident_general/email',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ),
+            'name'  => $this->scopeConfig->getValue(
+                'trans_email/ident_general/name',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            )
         ];
 
         $this->inlineTranslation->suspend();
@@ -340,7 +350,6 @@ class Customer extends Data
             'token' => $transactionId,
             'response' => $response
         ];
-
 
         $subject = __("Error report");
 

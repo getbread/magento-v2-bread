@@ -11,7 +11,7 @@ namespace Bread\BreadCheckout\Block;
 class Js extends \Magento\Framework\View\Element\Text
 {
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     public function __construct(
         \Magento\Framework\View\Element\Context $context,

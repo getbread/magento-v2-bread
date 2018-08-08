@@ -13,7 +13,7 @@ class Info extends \Magento\Payment\Block\Info
     /**
      * @var \Magento\Framework\DataObjectFactory
      */
-    protected $dataObjectFactory;
+    public $dataObjectFactory;
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,

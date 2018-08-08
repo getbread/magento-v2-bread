@@ -19,55 +19,55 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     const ACTION_REFUND                 = "refund";
     const ACTION_VOID                   = "void";
 
-    protected $_code          = 'breadcheckout';
-    protected $_infoBlockType = 'Bread\BreadCheckout\Block\Payment\Info';
-    protected $_formBlockType = 'Bread\BreadCheckout\Block\Payment\Form';
+    public $_code          = 'breadcheckout';
+    public $_infoBlockType = 'Bread\BreadCheckout\Block\Payment\Info';
+    public $_formBlockType = 'Bread\BreadCheckout\Block\Payment\Form';
 
-    protected $_isGateway               = true;
-    protected $_canAuthorize            = true;
-    protected $_canCapture              = true;
-    protected $_canCapturePartial       = false;
-    protected $_canOrder                = false;
-    protected $_canRefund               = true;
-    protected $_canRefundInvoicePartial = true;
-    protected $_canVoid                 = true;
-    protected $_canUseInternal          = true;
-    protected $_canUseCheckout          = true;
-    protected $_canUseForMultishipping  = false;
-    protected $_canFetchTransactionInfo = true;
-    protected $_canSaveCc               = false;
-    protected $_canReviewPayment        = true;
-    protected $_allowCurrencyCode       = ['USD'];
+    public $_isGateway               = true;
+    public $_canAuthorize            = true;
+    public $_canCapture              = true;
+    public $_canCapturePartial       = false;
+    public $_canOrder                = false;
+    public $_canRefund               = true;
+    public $_canRefundInvoicePartial = true;
+    public $_canVoid                 = true;
+    public $_canUseInternal          = true;
+    public $_canUseCheckout          = true;
+    public $_canUseForMultishipping  = false;
+    public $_canFetchTransactionInfo = true;
+    public $_canSaveCc               = false;
+    public $_canReviewPayment        = true;
+    public $_allowCurrencyCode       = ['USD'];
 
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
-    protected $apiClient;
+    public $apiClient;
 
     /** @var \Magento\Payment\Model\Method\Logger */
-    protected $logger;
+    public $logger;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     /** @var \Magento\Framework\Json\Helper\Data */
-    protected $jsonHelper;
+    public $jsonHelper;
 
     /** @var \Magento\Checkout\Model\Session */
-    protected $checkoutSession;
+    public $checkoutSession;
 
     /** @var \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface */
-    protected $transactionBuilder;
+    public $transactionBuilder;
 
     /** @var \Magento\Quote\Api\CartRepositoryInterface */
-    protected $quoteRepository;
+    public $quoteRepository;
 
     /** @var \Magento\Sales\Api\TransactionRepositoryInterface */
-    protected $transactionRepository;
+    public $transactionRepository;
 
     /** @var \Magento\Sales\Model\AdminOrder\Create */
-    protected $orderCreateModel;
+    public $orderCreateModel;
 
     /** @var \Magento\Framework\Pricing\PriceCurrencyInterface */
-    protected $priceCurrency;
+    public $priceCurrency;
 
     /**
      * @var \Bread\BreadCheckout\Helper\Quote
@@ -142,8 +142,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Fetch Payment Info
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param string                  $transactionId
-     * @return mixed
+     * @param string $transactionId
+     * @return array|mixed
+     * @throws \Exception
      */
     public function fetchTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
     {
@@ -190,7 +191,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Process Cancel Payment
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @return $this
+     * @return $this|Bread
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function cancel(\Magento\Payment\Model\InfoInterface $payment)
     {
@@ -345,9 +347,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Process API Call Based on Request Type And Add Normalized Magento Transaction Data To Orders
      *
-     * @param $payment
+     * @param \Magento\Payment\Model\InfoInterface $payment
      * @param $amount
      * @param $requestType
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType)
     {
@@ -417,12 +421,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Add payment transaction info to payment object
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param string $transactionId
-     * @param string $transactionType
-     * @param array $breadTransactionId
      * @param array $transactionAdditionalInfo
-     * @return null|\Magento\Sales\Model\Order\Payment\Transaction
-     * @throws \Exception
+     * @param array $transactionDetails
+     * @param null $message
+     * @return \Magento\Payment\Model\InfoInterface
      */
     protected function addTransactionInfo(
         \Magento\Payment\Model\InfoInterface $payment,
@@ -522,6 +524,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Returns payment title with monthly estimate
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getTitle()
     {
