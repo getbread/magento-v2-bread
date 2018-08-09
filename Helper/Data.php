@@ -44,6 +44,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_INCOMPLETE_MSG                 = 'payment/breadcheckout/incomplete_checkout_message';
     const XML_CONFIG_API_PUB_KEY                    = 'payment/breadcheckout/api_public_key';
     const XML_CONFIG_API_SECRET_KEY                 = 'payment/breadcheckout/api_secret_key';
+    const XML_CONFIG_API_SANDBOX_PUB_KEY            = 'payment/breadcheckout/api_sandbox_public_key';
+    const XML_CONFIG_API_SANDBOX_SECRET_KEY         = 'payment/breadcheckout/api_sandbox_secret_key';
     const XML_CONFIG_JS_LIB_LOCATION                = 'payment/breadcheckout/js_location';
     const XML_CONFIG_BUTTON_ON_PRODUCTS             = 'payment/breadcheckout/button_on_products';
     const XML_CONFIG_BUTTON_DESIGN                  = 'payment/breadcheckout/button_design';
@@ -149,7 +151,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getApiPublicKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store, $storeCode);
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store, $storeCode);
+        } else {
+            return $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_PUB_KEY, $store, $storeCode);
+        }
     }
 
     /**
@@ -160,9 +166,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getApiSecretKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (string) $this->encryptor->decrypt(
-            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
-        );
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->encryptor->decrypt(
+                $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
+            );
+        } else {
+            return (string) $this->encryptor->decrypt(
+                $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_SECRET_KEY, $store, $storeCode)
+            );
+        }
     }
 
     /**
