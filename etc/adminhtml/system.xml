@@ -25,14 +25,14 @@
                 </field>
                 <field id="api_public_key" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-36 validate-length minimum-length-36</validate>
-		            <label>Production API Public Key</label>
+		            <label>Live API Public Key</label>
                     <depends>
                         <field id="api_mode">1</field>
                     </depends>
                 </field>
                 <field id="api_secret_key" type="obscure" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
 		            <validate>validate-length maximum-length-36</validate>
-                    <label>Production API Secret Key</label>
+                    <label>Live API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <depends>
                         <field id="api_mode">1</field>
