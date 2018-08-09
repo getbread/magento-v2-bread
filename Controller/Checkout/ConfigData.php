@@ -10,21 +10,21 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class ConfigData extends \Magento\Framework\App\Action\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $quoteHelper;
+    public $quoteHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Customer */
-    protected $customerHelper;
+    public $customerHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $dataHelper;
+    public $dataHelper;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Bread\BreadCheckout\Helper\Data $dataHelper
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;
@@ -41,10 +41,12 @@ class ConfigData extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        // @codingStandardsIgnoreStart
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
-            'shippingContact' => ($this->dataHelper->isHealthcare())? false : $this->quoteHelper->getShippingAddressData(),
+            'shippingContact' => ($this->dataHelper->isHealthcare()) ? false : $this->quoteHelper->getShippingAddressData(),
             'billingContact' => ($this->dataHelper->isHealthcare())? false : $this->getBillingAddressData()
         ]);
+        // @codingStandardsIgnoreEnd
     }
 
     /**

@@ -15,7 +15,7 @@ define(
     function (Shipping, $, quote) {
         'use strict';
         return Shipping.extend({
-            setShippingInformation: function() {
+            setShippingInformation: function () {
                 /** Call parent method */
                 Shipping.prototype.setShippingInformation.call(this);
 
@@ -28,7 +28,7 @@ define(
              *
              * @see Bread\BreadCheckout\Model\Ui\ConfigProvider
              */
-            updateConfigData: function() {
+            updateConfigData: function () {
                 window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = {
                     type: quote.shippingMethod().carrier_title + ' - ' + quote.shippingMethod().method_title,
                     typeId: quote.shippingMethod().carrier_code + '_' + quote.shippingMethod().method_code,
@@ -40,7 +40,7 @@ define(
              * Invalidate existing transaction ID (in case user filled out payment
              * form and then went back a step)
              */
-            invalidateToken: function() {
+            invalidateToken: function () {
                 if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
                     window.checkoutConfig.payment.breadcheckout.transactionId = null;
                 }
@@ -52,7 +52,7 @@ define(
              * @param value
              * @returns {Number}
              */
-            round: function(value) {
+            round: function (value) {
                 if (isNaN(value)) {
                     return 0;
                 }

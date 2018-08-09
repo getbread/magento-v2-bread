@@ -11,13 +11,13 @@ namespace Bread\BreadCheckout\Block\Checkout;
 class Overview extends \Bread\BreadCheckout\Block\Product\View
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $quoteHelper;
+    public $quoteHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Customer */
-    protected $customerHelper;
+    public $customerHelper;
 
     /** @var \Magento\Framework\Json\Helper\Data */
-    protected $jsonHelper;
+    public $jsonHelper;
 
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,

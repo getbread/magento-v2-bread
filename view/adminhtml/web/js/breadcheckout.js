@@ -3,7 +3,7 @@ define(
     function ($) {
         'use strict';
         return {
-            configureButton: function(data) {
+            configureButton: function (data) {
                 if (data.shippingOptions === false) {
                     $('#bread_feedback').html('<p><strong>Please select a shipping method first!</strong></p>');
                     return;
@@ -31,7 +31,7 @@ define(
                                 },
                                 type: 'post',
                                 context: this,
-                                beforeSend: function() {
+                                beforeSend: function () {
                                     $('body').loadingPopup({
                                         timeout: false
                                     });
@@ -68,11 +68,12 @@ define(
                     breadConfig.customCSS = data.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
                 }
 
-                if(data.cartSizeFinancing.enabled){
+                if (data.cartSizeFinancing.enabled) {
                     var cartSizeFinancingId = data.cartSizeFinancing.id;
                     var cartSizeThreshold = data.cartSizeFinancing.threshold;
                     var items = data.quoteItems;
-                    var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                    var itemsPriceSum = items.reduce(function (sum, item) {
+    return sum + item.price * item.quantity}, 0) / 100;
                     breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
                 }
 

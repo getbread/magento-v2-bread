@@ -24,7 +24,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_CONFIG_DATA                           = "bread/checkout/configdata";
     const URL_DISCOUNTS_DATA                        = "bread/checkout/discountsdata";
     const URL_CLEAR_QUOTE                           = "bread/checkout/clearquote";
-    const URL_LANDING_PAGE				            = "bread/checkout/landingpage";
+    const URL_LANDING_PAGE                          = "bread/checkout/landingpage";
     const URL_ADMIN_QUOTE_DATA                      = "breadadmin/bread/quotedata";
     const URL_ADMIN_VALIDATE_PAYMENT                = "breadadmin/bread/validatepaymentmethod";
     const URL_ADMIN_GENERATE_CART                   = "breadadmin/bread/generatecart";
@@ -84,22 +84,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const API_CART_EXTENSION                        = 'carts/';
 
     /** @var \Magento\Framework\Model\Context */
-    protected $context;
+    public $context;
 
     /** @var \Magento\Framework\App\Request\Http */
-    protected $request;
+    public $request;
 
     /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
-    protected $scopeConfig;
+    public $scopeConfig;
 
     /** @var \Magento\Framework\Encryption\Encryptor */
-    protected $encryptor;
+    public $encryptor;
 
     /** @var \Magento\Framework\UrlInterfaceFactory */
-    protected $urlInterfaceFactory;
+    public $urlInterfaceFactory;
 
     /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    public $logger;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -430,7 +430,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isHealthcare($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store));
+        return (bool) (
+            $this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store)
+        );
     }
 
     /**
@@ -452,8 +454,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllowCheckoutPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool) ($this->isActive($store) 
-			&& !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_PDP, $store));
+        return (bool) ($this->isActive($store)
+            && !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_PDP, $store));
     }
 
     /**
@@ -464,8 +466,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllowCheckoutCP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool) ($this->isActive($store) && 
-			!$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_CART, $store));
+        return (bool) ($this->isActive($store) &&
+            !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_CART, $store));
     }
 
     /**
@@ -540,7 +542,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(self::XML_CONFIG_CP_BUTTON_DESIGN, $store);
     }
-
 
     /**
      * Get PDP Button Design
@@ -703,7 +704,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($this->logEnabled()) {
             if (!is_string($data)) {
+                // @codingStandardsIgnoreStart
                 $data = print_r($data, true);
+                // @codingStandardsIgnoreEnd
             }
             $this->logger->debug($data, [$context]);
         }

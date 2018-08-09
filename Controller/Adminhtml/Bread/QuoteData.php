@@ -10,17 +10,17 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 class QuoteData extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $helper;
+    public $helper;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helperData;
+    public $helperData;
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $helper,
         \Bread\BreadCheckout\Helper\Data $helperData
-    )
-    {
+    ) {
+    
         $this->resultFactory = $context->getResultFactory();
         $this->helper = $helper;
         $this->helperData = $helperData;

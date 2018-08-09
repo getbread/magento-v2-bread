@@ -10,28 +10,28 @@ namespace Bread\BreadCheckout\Block\Product;
 
 class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable
 {
-    protected $_product;
+    public $_product;
 
     /** @var \Magento\Framework\Registry */
-    protected $registry;
+    public $registry;
 
     /** @var Magento\Framework\Json\Helper\Data */
-    protected $jsonHelper;
+    public $jsonHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Catalog */
-    protected $catalogHelper;
+    public $catalogHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $dataHelper;
+    public $dataHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Customer */
-    protected $customerHelper;
+    public $customerHelper;
 
     /** @var \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory */
-    protected $configurableProductFactory;
+    public $configurableProductFactory;
 
     /** @var \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory */
-    protected $configurableBlockFactory;
+    public $configurableBlockFactory;
 
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
@@ -213,7 +213,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         return $this->catalogHelper->getConfigDataUrl();
     }
 
-     /**
+    /**
      * Get Discounts Data URL
      *
      * @return string
@@ -224,10 +224,10 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
      /**
-     * Get Clear Quote Data URL
-     *
-     * @return string
-     */
+      * Get Clear Quote Data URL
+      *
+      * @return string
+      */
     public function getClearQuoteUrl()
     {
         return $this->catalogHelper->getClearQuoteUrl();

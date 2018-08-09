@@ -14,16 +14,17 @@ class Client extends \Magento\Framework\Model\AbstractModel
     const STATUS_SETTLED        = 'SETTLED';
     const STATUS_PENDING        = 'PENDING';
     const STATUS_CANCELED       = 'CANCELED';
-    protected $order            = null;
+
+    public $order            = null;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     /** @var \Magento\Framework\Json\Helper\Data */
-    protected $jsonHelper;
+    public $jsonHelper;
 
     /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeResolver;
+    public $storeResolver;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -53,7 +54,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param $breadTransactionId
      * @param int $amount
      * @param array $lineItems
-     * @throws \Exception
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function cancel($breadTransactionId, $amount = 0, $lineItems = [])
     {
@@ -213,19 +215,21 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * Submit cart data
      *
      * @param $data
-     * @return string
-     * @throws Exception
+     * @return mixed
+     * @throws \Exception
      */
     public function submitCartData($data)
     {
         return $this->call(
             $this->helper->getCartCreateApiUrl(),
             $data,
-            \Zend_Http_Client::POST);
+            \Zend_Http_Client::POST
+        );
     }
 
     /**
      * Interact with the API
+     * @TODO switch over to using \Magento\Framework\HTTP\Client\Curl
      *
      * @param $url
      * @param array $data
@@ -239,6 +243,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $username   = $this->helper->getApiPublicKey($storeId);
         $password   = $this->helper->getApiSecretKey($storeId);
 
+        // @codingStandardsIgnoreStart
         try {
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_HEADER, 0);
@@ -249,8 +254,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_POST, 1);
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json',
-                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]
-                );
+                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
 
@@ -282,6 +286,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         }
 
         curl_close($curl);
+        // @codingStandardsIgnoreEnd
 
         $this->helper->log(["USER"      => $username,
                              "PASSWORD"  => $password,

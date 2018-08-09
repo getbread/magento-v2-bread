@@ -11,8 +11,8 @@ namespace Bread\BreadCheckout\Helper;
 class Catalog extends Data
 {
     /** @var \Magento\Catalog\Block\Product\View */
-    protected $productViewBlock;
-    protected $storeManager;
+    public $productViewBlock;
+    public $storeManager;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -98,7 +98,7 @@ class Catalog extends Data
         if (!array_key_exists('options', $selectedOptions)) {
             return (string) $product->getSku();
         }
-
+        // @codingStandardsIgnoreStart
         $skuString  = $product->getData('sku');
         foreach ($selectedOptions['options'] as $key => $value) {
             if ($value['option_type'] == 'multiple') {
@@ -129,6 +129,7 @@ class Catalog extends Data
                 }
             }
         }
+        // @codingStandardsIgnoreEnd
 
         return $skuString;
     }
@@ -136,14 +137,16 @@ class Catalog extends Data
     /**
      * Get Img Src Value
      *
-     * @param   \Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @return null|string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getImgSrc(\Magento\Catalog\Model\Product $product)
     {
-        if( $this->isInAdmin() ) {
+        if ($this->isInAdmin()) {
             $product = $this->_productRepositoryFactory->create()->getById($product->getId());
-            $imageUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+            $imageUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
+                . 'catalog/product' . $product->getImage();
             return $imageUrl;
         }
 

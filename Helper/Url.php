@@ -5,7 +5,11 @@ use Braintree\Exception;
 
 class Url extends Data
 {
-    protected $urlHelper;
+    /**
+     * @var \Magento\Framework\Url
+     */
+    public $urlHelper;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,

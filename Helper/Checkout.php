@@ -64,8 +64,9 @@ class Checkout extends Quote
      * Verify that Magento's quote amount matches the amount
      * authorized by Bread
      *
-     * @param string $transactionId
+     * @param $transactionId
      * @return bool
+     * @throws \Exception
      */
     public function validateTransactionAmount($transactionId)
     {

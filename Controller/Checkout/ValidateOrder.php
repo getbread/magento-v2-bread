@@ -11,46 +11,46 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
-    protected $paymentApiClient;
+    public $paymentApiClient;
 
     /** @var \Magento\Checkout\Model\Session */
-    protected $checkoutSession;
+    public $checkoutSession;
 
     /** @var \Magento\Checkout\Helper\Cart */
-    protected $cartHelper;
+    public $cartHelper;
 
     /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    public $logger;
 
     /** @var \Magento\Framework\Message\ManagerInterface */
-    protected $messageManager;
+    public $messageManager;
 
     /** @var \Magento\Framework\Controller\Result\RedirectFactory */
-    protected $resultRedirectFactory;
+    public $resultRedirectFactory;
 
     /** @var \Magento\Customer\Model\Session */
-    protected $customerSession;
+    public $customerSession;
 
     /** @var \Magento\Quote\Model\QuoteManagement */
-    protected $quoteManagement;
+    public $quoteManagement;
 
     /** @var \Magento\Catalog\Model\ProductFactory */
-    protected $catalogProductFactory;
+    public $catalogProductFactory;
 
     /** @var \Magento\Directory\Model\RegionFactory */
-    protected $regionFactory;
+    public $regionFactory;
 
     /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
+    public $storeManager;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     /** @var \Bread\BreadCheckout\Helper\Customer */
-    protected $customerHelper;
+    public $customerHelper;
 
     /** @var \Magento\Sales\Model\Order\Email\Sender\OrderSender */
-    protected $orderSender;
+    public $orderSender;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -144,6 +144,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
      */
     protected function processOrder($data)
     {
+        // @codingStandardsIgnoreStart
         $this->helper->log(["PROCESS ORDER DATA" => $data]);
 
         $quote = $this->checkoutSession->getQuote();
@@ -254,6 +255,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         $quote->save();
         $this->_redirect('checkout/onepage/success');
+        // @codingStandardsIgnoreEnd
     }
 
     /**

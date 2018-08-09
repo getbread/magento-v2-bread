@@ -11,16 +11,16 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Magento\Framework\Controller\ResultFactory */
-    protected $resultFactory;
+    public $resultFactory;
 
     /** @var \Magento\Framework\Message\ManagerInterface */
-    protected $messageManager;
+    public $messageManager;
 
     /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    public $logger;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,

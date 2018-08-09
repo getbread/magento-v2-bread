@@ -13,7 +13,7 @@ class ListProductPlugin
     /**
      * @var \Bread\BreadCheckout\Helper\Category
      */
-    protected $categoryHelper;
+    private $categoryHelper;
 
     /**
      * @var \Magento\Framework\Registry
@@ -36,11 +36,11 @@ class ListProductPlugin
     }
 
     /**
-     * @param \Magento\Catalog\Block\Product\ListProduct $subject
-     * @param callable                                   $proceed
-     * @param \Magento\Catalog\Model\Product             $product
-     *
+     * @param $subject
+     * @param callable $proceed
+     * @param $product
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function aroundGetProductPrice($subject, callable $proceed, $product)
     {

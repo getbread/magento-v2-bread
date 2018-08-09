@@ -28,8 +28,8 @@ class QuoteSubmitBefore implements \Magento\Framework\Event\ObserverInterface
 
     /**
      * @param \Magento\Framework\Event\Observer $observer
-     *
-     * @return $this
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {

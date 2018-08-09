@@ -11,19 +11,19 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
-    protected $paymentApiClient;
+    public $paymentApiClient;
 
     /** @var \Magento\Framework\Controller\Result\JsonFactory */
-    protected $resultJsonFactory;
+    public $resultJsonFactory;
 
     /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    public $logger;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $helper;
+    public $helper;
 
     /** @var \Magento\Sales\Model\AdminOrder\Create */
-    protected $orderCreateModel;
+    public $orderCreateModel;
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,

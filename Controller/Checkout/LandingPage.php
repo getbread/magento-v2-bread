@@ -5,52 +5,52 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 {
 
     /** @var \Magento\Framework\App\Request\Http */
-    protected $request;
+    public $request;
 
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
-    protected $paymentApiClient;
+    public $paymentApiClient;
 
     /** @var \Magento\Customer\Model\Customer */
-    protected $customer;
+    public $customer;
 
     /** @var \Magento\Customer\Model\Session */
-    protected $customerSession;
+    public $customerSession;
 
     /** @var \Magento\Checkout\Model\Session */
-    protected $checkoutSession;
+    public $checkoutSession;
 
     /** @var \Magento\Quote\Api\CartRepositoryInterface */
-    protected $quoteRepository;
+    public $quoteRepository;
 
     /** @var \Magento\Quote\Model\QuoteManagement */
-    protected $quoteManagement;
+    public $quoteManagement;
 
     /** @var \Bread\BreadCheckout\Helper\Checkout */
-    protected $helper;
+    public $helper;
 
     /** @var \Psr\Log\LoggerInterface */
-    protected $logger;
+    public $logger;
 
     /** @var \Magento\Customer\Model\CustomerFactory */
-    protected $customerFactory;
+    public $customerFactory;
 
     /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
+    public $storeManager;
 
     /** @var \Magento\Quote\Model\QuoteFactory */
-    protected $quoteFactory;
+    public $quoteFactory;
 
     /** @var \Magento\Checkout\Helper\Cart */
-    protected $cartHelper;
+    public $cartHelper;
 
     /** @var \Magento\Sales\Model\Order\Email\Sender\OrderSender */
-    protected $orderSender;
+    public $orderSender;
 
     /** @var \Bread\BreadCheckout\Helper\Quote */
-    protected $quoteHelper;
+    public $quoteHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Customer */
-    protected $customerHelper;
+    public $customerHelper;
 
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
@@ -70,8 +70,8 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper
-    )
-    {
+    ) {
+    
         $this->request          = $request;
         $this->paymentApiClient = $paymentApiClient;
         $this->customer         = $customer;
@@ -97,13 +97,14 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      *
      * @return \Magento\Framework\Controller\Result\Json
      */
-    public function execute() {
+    public function execute()
+    {
         $transactionId = $this->request->getParam("transactionId");
         $orderRef = $this->request->getParam("orderRef");
 
-        if($transactionId && $orderRef && !$this->request->getParam("error")){
-            $this->validateBackendOrder($transactionId,$orderRef);
-        }else{
+        if ($transactionId && $orderRef && !$this->request->getParam("error")) {
+            $this->validateBackendOrder($transactionId, $orderRef);
+        } else {
             $this->messageManager->addErrorMessage($this->__('There was an error with your financing program'));
             $this->_redirect("/");
         }
@@ -113,10 +114,10 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      * Create Magento Order From Backend Quote
      *
      */
-    public function validateBackendOrder($transactionId, $orderRef){
+    public function validateBackendOrder($transactionId, $orderRef)
+    {
         try {
             if ($transactionId) {
-
                 $data       = $this->paymentApiClient->getInfo($transactionId);
 
                 $customer   = $this->customerFactory->create();
@@ -126,14 +127,16 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
                 $this->customerSession->setCustomerAsLoggedIn($customer);
 
-                $this->processBackendOrder($orderRef, $transactionId, $data);
+                $this->processBackendOrder($orderRef, $data);
 
                 $this->_redirect('checkout/onepage/success');
             }
         } catch (\Exception $e) {
             $this->helper->log($e);
             $this->customerHelper->sendCustomerErrorReportToMerchant($e, "", $orderRef, $transactionId);
-            $this->messageManager->addErrorMessage(__('There was an error with your financing program. Notification was sent to merchant.'));
+            $this->messageManager->addErrorMessage(
+                __('There was an error with your financing program. Notification was sent to merchant.')
+            );
             $this->_redirect("/");
         }
     }
@@ -141,11 +144,11 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
     /**
      * Process Order Placed From Bread Pop Up
-     *
+     * @param $orderRef
      * @param $data
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function processBackendOrder($orderRef, $transactionId, $data)
+    protected function processBackendOrder($orderRef, $data)
     {
         $quote = $this->quoteFactory->create()->loadByIdWithoutStore($orderRef);
 
@@ -204,9 +207,11 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         $cart = $this->cartHelper->getCart();
         $cart->truncate()->save();
         $cartItems = $cart->getItems();
+        // @codingStandardsIgnoreStart
         foreach ($cartItems as $item) {
             $quote->removeItem($item->getId())->save();
         }
+        // @codingStandardsIgnoreEnd
 
         $this->_redirect('checkout/onepage/success');
     }
