@@ -25,6 +25,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_DISCOUNTS_DATA                        = "bread/checkout/discountsdata";
     const URL_CLEAR_QUOTE                           = "bread/checkout/clearquote";
     const URL_LANDING_PAGE                          = "bread/checkout/landingpage";
+    const URL_SHIPPING_OPTION                       = "bread/checkout/shippingoption";
     const URL_ADMIN_QUOTE_DATA                      = "breadadmin/bread/quotedata";
     const URL_ADMIN_VALIDATE_PAYMENT                = "breadadmin/bread/validatepaymentmethod";
     const URL_ADMIN_GENERATE_CART                   = "breadadmin/bread/generatecart";
@@ -339,6 +340,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $isSecure = $this->request->isSecure();
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_VALIDATE_PAYMENT, ['_secure'=>$isSecure]);
+    }
+
+    /**
+     * Get controller URL for shipping option selected
+     *
+     * @return string
+     */
+    public function getShippingOptionUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_OPTION, ['_secure'=>$isSecure]);
     }
 
     /**
