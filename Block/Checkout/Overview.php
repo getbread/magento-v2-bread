@@ -35,6 +35,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
+        \Magento\Framework\Data\Form\FormKey $formKey,
         array $data = []
     ) {
         $this->quoteHelper = $quoteHelper;
@@ -56,6 +57,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
             $currentCustomer,
             $priceCurrency,
             $configurableAttributeData,
+            $formKey,
             $data
         );
     }

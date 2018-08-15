@@ -33,6 +33,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /** @var \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory */
     public $configurableBlockFactory;
 
+    /** @var \Magento\Framework\Data\Form\FormKey */
+    public $formKey;
+
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
@@ -48,6 +51,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
+        \Magento\Framework\Data\Form\FormKey $formKey,
         array $data = []
     ) {
         $this->registry = $context->getRegistry();
@@ -57,6 +61,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         $this->dataHelper = $dataHelper;
         $this->configurableProductFactory = $configurableProductFactory;
         $this->configurableBlockFactory = $configurableBlockFactory;
+        $this->formKey = $formKey;
 
         parent::__construct(
             $context,
@@ -442,6 +447,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     {
         return $this->dataHelper->getOtherLocation();
     }
+
     /**
      * Publicly accessible json encoder
      *
@@ -451,5 +457,15 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function jsonEncode($data)
     {
         return $this->jsonHelper->jsonEncode($data);
+    }
+
+    /**
+     * Get form key
+     *
+     * @return string
+     */
+    public function getFormKey()
+    {
+        return $this->formKey->getFormKey();
     }
 }

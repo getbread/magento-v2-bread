@@ -35,10 +35,15 @@
                         i.type = 'hidden';
                         i.name = 'token';
                         i.value = tx_token;
+                        var fk = document.createElement('input');
+                        fk.type = 'hidden';
+                        fk.name = 'form_key';
+                        fk.value = '<?php echo $block->getFormKey(); ?>';
                         var f = document.createElement('form');
                         f.action = '<?php /* @noEscape */ echo $block->getValidateOrderUrl(); ?>?product_page=1';
                         f.method = 'POST';
                         f.appendChild(i);
+                        f.appendChild(fk);
                         document.body.appendChild(f);
                         f.submit();
                     }

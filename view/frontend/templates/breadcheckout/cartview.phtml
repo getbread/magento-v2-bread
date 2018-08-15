@@ -36,13 +36,18 @@
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         var i = document.createElement('input');
+                        var fk = document.createElement('input');
                         i.type = 'hidden';
                         i.name = 'token';
                         i.value = tx_token;
+                        fk.type = 'hidden';
+                        fk.name = 'form_key';
+                        fk.value = '<?php echo $block->getFormKey(); ?>';
                         var f = document.createElement('form');
                         f.action = '<?php /* @noEscape */ echo $block->getValidateOrderUrl(); ?>';
                         f.method = 'POST';
                         f.appendChild(i);
+                        f.appendChild(fk);
                         document.body.appendChild(f);
                         f.submit();
                     }
