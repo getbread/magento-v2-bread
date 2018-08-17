@@ -92,6 +92,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Model\Quote $quote,
         \Magento\Catalog\Model\Product $product,
         \Magento\Catalog\Model\Product $baseProduct,
+        $buyRequest,
         array $customOptionPieces,
         $quantity
     ) {
@@ -114,6 +115,24 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             }
 
             $buyInfo['super_attribute']     = $options;
+        }
+
+        if (isset($buyRequest['bundle_options'])) {
+            foreach ($buyRequest['bundle_options'] as $key => $value) {
+                if (empty($value)) {
+                    unset($buyRequest['bundle_options'][$key]);
+                }
+            }
+        }
+
+        if (!empty($buyRequest['bundle_option'])) {
+            $bundleOptionQty = isset($buyRequest['bundle_option_qty']) ? $buyRequest['bundle_option_qty'] : array();
+            $buyInfo['product']                     = $baseProductId;
+            $buyInfo['selected_configurable_option']= $buyRequest['selected_configurable_option'];
+            $buyInfo['related_product']             = $buyRequest['related_product'];
+            $buyInfo['bundle_option']               = $buyRequest['bundle_option'];
+            $buyInfo['bundle_option_qty']           = $bundleOptionQty;
+            $buyInfo['qty']                         = $buyRequest['qty'];
         }
 
         $counter    = 0;
@@ -290,13 +309,19 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      */
     protected function processOrderItem($quote, array $data)
     {
-        $selectedProductId = $data['selected_simple_product_id'];
-        $mainProductId = $data['main_product_id'];
+        $selectedProductId  = $data['selected_simple_product_id'];
+        $mainProductId      = $data['main_product_id'];
         $customOptionPieces = explode('***', $data['selected_sku']);
+        $buyRequest         = array();
+
+        if (isset($data['buy_request'])) {
+            parse_str($data['buy_request'], $buyRequest);
+        }
+
         $mainProduct = $this->catalogProductFactory->create()->load($mainProductId);
         $simpleProduct = $this->catalogProductFactory->create()->load($selectedProductId);
         // Qty always 1 when checking out from product view
-        $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1);
+        $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $buyRequest, $customOptionPieces, 1);
         // Flag to prevent same item from getting added to quote many times
         $this->checkoutSession->setBreadItemAddedToQuote(true);
     }

@@ -1,0 +1,260 @@
+<?php /** @var $this Bread\BreadCheckout\Block\Product\Bundle */ ?>
+
+<script type="text/javascript">
+require([
+        'jquery',
+        'bundleHelper',
+        'jquery/ui',
+        'jquery/validate',
+        'mage/validation'
+   ], function($, bundleHelper) {
+        'use strict';
+
+        var globalConfig = {
+            optionConfig:               <?php /* @noEscape */ echo $block->getJsonConfig(); ?>,
+            optionConfigBundle:         <?php /* @noEscape */ echo $block->getBundleProductDataJson(); ?>,
+            //optionCustomConfigBundle:   document.customOptionsBundleProduct,
+            optionBundleSelector:       'input.bundle.option, select.bundle.option, textarea.bundle.option',
+            optionBundleQtySelector:    'input.qty',
+            optionBundleCustomSelector: '.product-custom-option',
+            optionHandlers:             {},
+            optionCustomHandlers:       {}
+        };
+
+        var bundleConfig = {
+            addToCartForm:              '#product_addtocart_form',
+            buttonPrimaryCustom:        '.action.primary.customize',
+            buttonBackCustom:           '.action.back.customization',
+            bundleButtonMainConSel:     '.product-info-main',
+            bundleButtonDetailsContSel: '.bundle-info .product-details',
+            bundleButtonSel:            '#bread-btn-cntnr',
+            bundleButtonPreventSel:     '.button-prevent',
+        };
+
+        $(document).ready(function() {
+            /**
+             * Overlay element onto bread button to prevent
+             * it from being clicked until options are selected
+             */
+            $(bundleConfig.bundleButtonPreventSel).show();
+
+            $(bundleConfig.buttonPrimaryCustom).on('click', function() {
+                $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonDetailsContSel);
+                $(bundleConfig.addToCartForm).bundleBread();
+            });
+
+            $(bundleConfig.buttonBackCustom).on('click', function() {
+                $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonMainConSel);
+                $(bundleConfig.bundleButtonPreventSel).show();
+            });
+        });
+
+        /**
+         * Widget Bread bundle product:
+         * Handles rendering of Bundle options and configure Bread button
+         */
+        $.widget('mage.bundleBread', {
+            options: globalConfig,
+            cache: {},
+
+            /**
+             * @private
+             */
+            _init: function initPriceBundle() {
+                var form = this.element,
+                    options = $(this.options.optionBundleSelector, form);
+                options.trigger('change');
+            },
+
+            /**
+             * @private
+             */
+            _create: function createPriceBundle() {
+                var form = this.element,
+                    options = $(this.options.optionBundleSelector, form),
+                    qty = $(this.options.optionBundleQtySelector, form);
+                    //customOptions = $(this.options.optionBundleCustomSelector, form);
+
+                this.cache.currentElement                  = this.options.optionConfig;
+                //this.cache.currentElement.selectedCustom   = '';
+                this.cache.currentElementBundle            = this.options.optionConfigBundle;
+                //this.cache.currentElementCustomBundle      = this.options.optionCustomConfigBundle;
+                this.cache.currentElement.previousSku      = this.cache.currentElementBundle.sku;
+                this.cache.currentElement.previousPrice    = this.cache.currentElementBundle.selectedPrice;
+
+                options.on('change', this._onBundleOptionChanged.bind(this));
+                qty.on('change', this._onQtyFieldChanged.bind(this));
+                //customOptions.on('change', this._onBundleCustomOptionChanged.bind(this));
+            },
+
+            /**
+             * Handle change on bundle option inputs
+             * @param {jQuery.Event} event
+             * @private
+             */
+            _onBundleOptionChanged: function onBundleOptionChanged(event) {
+                var changes,
+                    bundleOption = $(event.target),
+                    handler = this.options.optionHandlers[bundleOption.data('role')];
+
+                bundleOption.data('optionContainer', bundleOption.closest(this.options.controlContainer));
+                bundleOption.data('qtyField', bundleOption.data('optionContainer')
+                    .find(this.options.optionBundleQtySelector));
+
+                if (handler && handler instanceof Function) {
+                    changes = handler(bundleOption, this.options.optionConfig, this);
+                } else {
+                    changes = bundleHelper.defaultGetOptionValue(bundleOption, this.options.optionConfig);
+                }
+
+                if (changes) {
+                    this.updateBread(changes);
+                }
+            },
+
+            _getFormData: function getFormData($form){
+                var unindexed_array = $('#product_addtocart_form').serializeArray();
+                var indexed_array = {};
+
+                $.map(unindexed_array, function(n, i){
+                    indexed_array[n['name']] = n['value'];
+                });
+
+                return indexed_array;
+            },
+
+            /**
+             * Handle change on bundle option inputs
+             * @param {jQuery.Event} event
+             * @private
+             */
+            _onBundleCustomOptionChanged: function onBundleCustomOptionChanged(event) {
+                var changes,
+                    bundleOption = $(event.target);
+
+                changes = bundleHelper.defaultGetCustomOptionValue(bundleOption, this.options.optionCustomConfigBundle);
+
+                if (changes) {
+                    this.updateBread(changes);
+                }
+            },
+
+            /**
+             * Handle change on qty inputs near bundle option
+             * @param {jQuery.Event} event
+             * @private
+             */
+            _onQtyFieldChanged: function onQtyFieldChanged(event) {
+                var field = $(event.target),
+                    optionInstance,
+                    optionConfig;
+
+                if (field.data('optionId') && field.data('optionValueId')) {
+                    optionInstance = field.data('option');
+                    optionConfig = this.options.optionConfig
+                        .options[field.data('optionId')]
+                        .selections[field.data('optionValueId')];
+                    optionConfig.qty = field.val();
+                    optionInstance.trigger('change');
+                }
+            },
+
+            /**
+             * @param {String} key
+             * @param {String} row
+             * @private
+             */
+            _renderCustomOption: function (key, row) {
+                if (row && row.length > 0 && row[0] !== null) {
+                    var widget = this;
+                    var optionTotalPrice = 0;
+                    var optionSku = '';
+
+                    row.forEach(function(item){
+                        var sku = widget.cache.currentElementCustomBundle.options[key].selections[item].sku;
+                        optionTotalPrice += widget.cache.currentElementCustomBundle.options[key].selections[item].prices.finalPrice.amount;
+
+                        optionSku += sku + '-';
+                        if(qty > 1) {
+                            optionSku += qty + '-';
+                        }
+                    });
+
+                    this.cache.currentElement.selectedPrice += optionTotalPrice;
+                    this.cache.currentElement.selectedSku += optionSku;
+                    this.cache.currentKey = key;
+                    this.cache.currentElementCount += row.length;
+                    this.cache.currentKey = null;
+                }
+            },
+
+            /**
+             * @param {String} key
+             * @param {String} row
+             * @private
+             */
+            _renderOption: function (key, row) {
+                if (row && row.length > 0 && row[0] !== null) {
+                    var widget = this;
+                    var optionTotalPrice = 0;
+                    var optionSku = '';
+
+                    row.forEach(function(item){
+                        var sku = widget.cache.currentElementBundle.options[key].selections[item].sku;
+                        var qty = widget.cache.currentElement.options[key].selections[item].qty;
+
+                        optionTotalPrice += widget.cache.currentElement.options[key].selections[item].prices.finalPrice.amount
+                            * widget.cache.currentElement.options[key].selections[item].qty;
+
+                        optionSku += sku + '-';
+                        if(qty > 1) {
+                            optionSku += qty + '-';
+                        }
+                    });
+
+                    this.cache.currentElement.selectedPrice += optionTotalPrice;
+                    this.cache.currentElement.selectedSku += optionSku;
+                    this.cache.currentKey = key;
+                    this.cache.currentElementCount += row.length;
+                    this.cache.currentKey = null;
+                }
+            },
+
+            /**
+             * Method extracts data from the event and updates the Bread button
+             * @private
+             */
+            updateBread: function updateBread(changes) {
+                this.cache.currentElementCount             = 0;
+                this.cache.currentElement.selectedPrice    = 0;
+                this.cache.currentElement.selectedSku      = this.options.optionConfigBundle.sku + '///';
+
+                $.each(this.cache.currentElement.selected, $.proxy(this._renderOption, this));
+                //$.each(this.cache.currentElement.selectedCustom, $.proxy(this._renderCustomOption, this));
+                this.cache.currentElement.selectedSku = this.cache.currentElement.selectedSku.slice(0, -1);
+
+                if($(bundleConfig.addToCartForm).valid()) {
+                    $(bundleConfig.bundleButtonPreventSel).hide();
+                } else {
+                    $(bundleConfig.bundleButtonPreventSel).show();
+                }
+
+                if((this.cache.currentElement.previousPrice != this.cache.currentElement.selectedPrice)
+                    || (this.cache.currentElement.previousSku != this.cache.currentElement.selectedSku)) {
+
+                    this.cache.currentElement.previousPrice = this.cache.currentElement.selectedPrice;
+                    this.cache.currentElement.previousSku = this.cache.currentElement.selectedSku;
+
+                    if(this.cache.currentElement.selectedPrice > 0) {
+                        document.defaultItems[0]["sku"]     = this.cache.currentElement.selectedSku;
+                        document.defaultItems[0]["price"]   = this.cache.currentElement.selectedPrice * 100;
+                        document.selectedSku                = this.cache.currentElement.selectedSku;
+                        document.configureButton(document.defaultItems);
+                    }
+                }
+            },
+        });
+
+        return $.mage.bundleBread;
+    });
+</script>
