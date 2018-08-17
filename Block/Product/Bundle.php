@@ -10,25 +10,25 @@ namespace Bread\BreadCheckout\Block\Product;
 
 class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
 {
-    protected $_product;
+    public $_product;
 
     /** @var \Magento\Framework\Registry */
-    protected $registry;
+    public $registry;
 
     /** @var Magento\Framework\Json\Helper\Data */
-    protected $jsonHelper;
+    public $jsonHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Catalog */
-    protected $catalogHelper;
+    public $catalogHelper;
 
     /** @var \Magento\Catalog\Helper\Product */
-    protected $catalogProduct;
+    public $catalogProduct;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
-    protected $dataHelper;
+    public $dataHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Customer */
-    protected $customerHelper;
+    public $customerHelper;
 
     /**
      * @param \Magento\Catalog\Block\Product\Context $context
