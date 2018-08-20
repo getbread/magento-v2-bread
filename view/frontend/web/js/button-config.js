@@ -70,7 +70,24 @@ define(['jquery',
          */
         init: function () {
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                bread.showCheckout(this.breadConfig);
+
+                var self = this;
+
+                if(this.breadConfig.shippingOptions[0] !== false){
+                    bread.showCheckout(this.breadConfig);
+                } else {
+                    /* ocs save selected shipping method */
+                    $.ajax({
+                        url: window.checkoutConfig.payment.breadcheckout.shippingOptionUrl,
+                        type: 'post',
+                        context: this
+                    }).done(function (data) {
+                        self.breadConfig.shippingOptions = [data];
+                        self.breadConfig.customTotal =  this.round(quote.getTotals()._latestValue.base_grand_total);
+                        bread.showCheckout(self.breadConfig);
+                    });
+                }
+
             }
             fullScreenLoader.stopLoader();
         },

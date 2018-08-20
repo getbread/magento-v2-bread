@@ -42,6 +42,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'defaultSize' => $this->helper->useDefaultButtonSize(),
                     'buttonCss' => $this->helper->getButtonDesign(),
                     'configDataUrl' => $this->helper->getConfigDataUrl(),
+                    'shippingOptionUrl' => $this->helper->getShippingOptionUrl(),
                     'transactionId' => $this->helper->getBreadTransactionId(),
                     'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
                     'isCartSizeTargetedFinancing' => $this->helperData->isCartSizeTargetedFinancing(),
