@@ -420,6 +420,7 @@ class Quote extends Data
     /**
      * Check if Product Type is allowed in the Cart
      *
+     * @deprecated
      * @return bool
      */
     public function isProductsAllowedInCart()
