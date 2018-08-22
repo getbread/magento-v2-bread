@@ -21,8 +21,14 @@ $code = $block->escapeHtml($block->getMethodCode());
     <div class="bread-create-cart">
         <input type="button" class="action-default scalable action-secondary" value="<?php echo __("Create Cart"); ?>"/>
     </div>
-    <div class="bread-send-mail" hidden>
+    <div class="bread-send-mail bread-row" hidden>
         <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAlCAYAAAAEGWqvAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH4QMWCh0HT4FsfQAAAnpJREFUWMPVWMt1ozAUvdbJ3u4gdGCmgtDB0IHJ6i3jqSBJBfEs38pKB5RAOsAduARSQWbzNEfoCCNAGPutMMeIe9/nXqEVM68BlAAy3FdUAHJ1p+AhmEvlAd8AON8g4LNga5FQnj8lAFIA+obAa8GUuMl9cAkQ0bdcPzMzABRLgyeiZ/ODmU2SAQBuBTJm3pkf8uDbguAPDvid2/LKx5iZXy0S7wtVoSCiPxb4V19bq46H35j5aJH4FBLNFcF/WuCPXZ2wYuafCwuVsti3LLQV/d3MBLwBkBHRyQHf2QF9BACglkXnJtECLwZbifp0hgpYOAVQMfOjtNNJVKCOCL4eAz6UgCFRS/Yh1cgikXDBb+VeGvKwGvCijVTCJaEjgHfbMwldIGQGQlViqNS6BvUkojFottTIzGmP4e0ngN+NFQY1ofyamT8sEn8Dq7D3gB/dhmriAO49hpdfMLxCiBrwH1M3jWNnYKjhNZL5qXMzG4EuRTFD6Wq8lkpNDoV44TO8tMOg8lgvjVmBzv3MUHeduwJ97tsyPKudzj3gmzHOPpRAQUS/ArK4ka3HCzP/DtD4BkAiax/mIvDffaU9QrJ1CHTX2gy/fMTo2AS0I4HbyL2c2i0nRqdjEXBt32h8zNiIs6+HkugjUDrg1zN+kRkZXttO39eqqkdtiiuB95II+e5Qga46i4ZfIFFarXSRhOo4wsusAy6z17kGePt86ugh0fQRaADkNnhZKFviXCiEhPIoTvCRxgIkTq4yuQQSC/wLlj8XNSR2Poxdm7lK5uAWwLe6Q8C32vlBANs3M9xm+BJaKdmbV7i/qADkK6vnH4ecxywZRPRlrv8BVEJW2C2kvd0AAAAASUVORK5CYII=" title="<?php echo __("Email cart link to customer");?>" alt="<?php echo __("Email cart link to customer");?>"/>
+    </div>
+    <div class="bread-api-mail bread-row" hidden>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAlCAMAAAAzx5qdAAABWVBMVEWZmZnm5ub5+fmfn5+srKy/v7/s7OzZ2dmzs7Ompqa5ubnGxsaRkZGXj4efl46QkJCik4TT09PMzMzz8/OIiIjJycmRkI9+fn6KioqLioqOj4+Bi5WGhoagoKCpqal6iJiNjIx8ipdyiJ7Pz8+YjoObm5uHi4+SkZCPj4+flo2JioqNjo+fkoPf39+ekYOMi4qgloycl5GEjpiNi4qQi4eclpGOioV6iJV6iJaJiYl5eXl/ipiDjJV2iZ+CipHHx8eXjYSNjItycnKBgYFxcXGBjpyKi4yMkJR3iqCioqK2traNjY3Ozs6EhIR4eHiVlZV/f3/IyMiMjI2JjZGNjYzAwMBoaGioqKiamJeWlpaCgoKDg4OAjZuMjIyRkJCampqYmJiWjYR/iZSIjpWSkpKDiZCQj4+BiZG6urqGjpiPjo6PkZG9vb1/iZOHioyIiox/i5iurq7////qsHzoAAAAc3RSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8A74uvfgAAAbpJREFUeNqNlFdXwkAQhcNuAqRA6EUBUUBABbEh2Hvvvffezf9/MAfCbnKWOTJPycx3dzNzBzjk5NgYcfVHXQNNCk7ENeM9nYNtve2jHrZi4Fi0JEsr+7OqctXd5bakRUyeEBLMlZ6JE25nXgndlc1ZASGxcY2maSZF/ieSCaZ+A7lkxW3idYh8vkN/8ZFScTE5FnOmjgNvHX0kKeuIg8p95tfbR/wSn1vYVnJTaeZI84UOo6mhpdO1aZ8UOVO+h028wFlCQppmx3XB+/pWWAwGVyNfdQG2U54GTxQz95cZMXx0nTh4Tjd4xLOW8H4jX7yI3hxufFQ3n2pN8wBPT8qPPwTO47uJ6l7FbdxMjWUVgm7ca1aNhdXsZ5l8KRDGNEqTyyFVCemrUZuejfCAwkuWrz5tEKaONtbbC/NWCwuYXCdDHGshZuwFwhhkbWQSCLEWAnbBhrTE81RhsgvzsAl28uwtEB5pMmya9TD6A4YMsEMNCQCPoTGzCklPIgwbg3g4ByvgDNu4tS4i+i8FryTC8Bz+mYnM8IBCphPyApjVV4n01NLaC846zLUaBo4ABcAjTtP8tpZDb/wPkVdm6HaM05IAAAAASUVORK5CYII=" title="<?php echo __("Email cart link to customer via Bread API");?>" alt="<?php echo __("Email cart link to customer via Bread API");?>"/>
+    </div>
+    <div class="bread-send-sms bread-row" hidden>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAlCAMAAAAzx5qdAAADAFBMVEXr3c5XW1/9/PvBwcKKiIf6+vqQjo2LiYaMi4mAiJCJjpN6iJapqamEhIS5ubmAgIB2iZyGh4mRj4xVW2GhoaGop6bg4ODt3s18iZZ6e3va2tqlnJRycnLf0sVRVluCgoK+tq3Rw7R/iZNYXGGQkI+hl47V1dVlaGx4eHhTWF3Ozs5eYmaqqaeHiIqCiI747uX26dyNjpDl2Mpyfoqvr692dnePjo2jo6NwcHBvcXKEiY56iZh6h5WZmZnHu6399u/69fFtb3Hl1sfbzsCMjY6OjIuJi4+Gio2HiYuBiZKCiI2Dh4x5h5d/g4Z7fH9pa25OU1iLjY+FiIt4iZtcX2NHTVOPj4+QkJCLi4uRkZFdYWWOjo6NjY2MjIyIiIiSkpKKioqJiYn///+Hh4d1dXWprK+GhoaUlJRcYGR/f3+Tk5OdoKNgZWpscXXCxMZeYWWIiYmFiYzz8/Tm5+j68ur78+uEiIx0dHSRlJiKiYj89vB4fIF+fn6ysrLO0NGNjYx4eXtxc3WQkZD+/fywsLCEiY2GiYxfY2jy8vL8+viLioqLjI378ul6e338/PyWkpDR0dHT09Owrqv7+fba292Ih4eJiImFhYWPlJbj1cV+fn2Hiotob3aBh41aXWGEiYxsbW6Ah4+Fio/i0b/u4tSWlZBdYGOsrrDPz9CKiouKi4tudHuAgYOPjYz68uuipKaMjY2NjIyFh4yNjI348euvqKF3h5iPkI+IiImIiYhzd3uJiIiHj5WKion69O6dl5GVkY2Jj5Zia3W7sKR9ipTk5OTt3MqNjo3Vw7C1uLq0tLSyrqivpJmMiobWxbNxcnPRwa+Ah5CDiZCDipB8fHx8h5J0hJOrpaGFiImvq6iHiIiypJW0rqh8iJTXyLiblI1+ipRiZWhiZ21pbXGopJ/f39+GkJb//v2zrqnDua5hZGienp6Hi5BjZmiFjJD39/dZXWJaXmLPwbGRkZDPw7aRkJCBiY+JjI+Hi4+JiId8gIP9+vfWybx8h5SIioz///+pqQnAAAABAHRSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AU/cHJQAAA6JJREFUeAGN1Xd8E2Ucx/EW6KgmhNZQkxIRSKGtwaFQhLYoFSzFAgXq93d3ubtcLjvdA9qmlCFQQAYyVNx74MC998C9ce+9hzisW7y7pL5Scm38/NM/7vV+Nc/zvJ7nl7I/oR0pPz4zcuLIL8amnL4/sQQw5LAzxt1yl0t2vXXxBw8etzopWDzq7wtLKgThiY3Ni07pLX22Kwk4+qCylhXplE9KN2e6jqpZtWlQcMN9B7Pp9F/ssCNrrpwxCPjzk7LMfIqL/V0u3T5kYPDXXHkKQ4xSDPDuSI/l8gHBbT29u1eR280Tx8WIeO8wy6wHBgInlP3DcMSaCq1hL8XItZG1pc8PAJa8+9JujvUatm19urbbF+ZrVSLIEcuvXfrg3Fd/IxJ3Tj8izbPl0zUmm5HjiHg2MseSogtWv57Fqyt2hb3HT0jzrF9mDauLFyLNlkc/1wNLHs5KZ4iTGLfJ52Mn53pyg4crQrg/w3LOiXrgiqqX8yXZGBC5ION9paPQPGF4wM2R4M6Y890xemBm9jdTKEjWqb4wy0kUKDRJnKAtomT2SXrg50UL+YB5W95Qs7GjuFuUJFYWSAM9s9/TA2Ncs35hZfPWNM/3eZNlm80oBZkoaDl/rB548+yNzE9yt5U15G3xpO2a3jHVGKzVwNrKL/XAxLtvJWI40Vho27km1+N5zOwrdksqqKwckwiWtwNo2kwkBR0ALhGGr98F4CKOWOs6AEsb+4NGRDuNiFdBtc9mmg8g5KWViObvB4oQS+QCqQD21ZJxNIACl7gAsVrjQBvQOTO7ohxYKX5dAIWbeAbK3yYmAHyknEMd0BgHWoGG26suyyHGbTT8gXkfY5ptGvY5ECIWOOS6xJPuBJQPL3iJWO9XmHc1blz2IaodcJJQAKUGf9sBu9QOrXJlX+1IvR73eOwoD6kgsg5adQecw5n+q6LbxDnwQzFwLGCwo0m9D5NG1WvblHjjLiiCncgJB6ViARyGEBx9N85fj4Y4UAc8pdzpSakoUoGTygF8G2iC85pqYLz6AxpQHweWo6/qKNgMYD7vREi2oq/OGIj9i2ijz2I0wAIQGSdOjex9BNHq2/qtoXEpgKLzXsvM0QDZYScVNNdsH6p98rfqva2LP7tjg3KxY/EbMlpGvD8jyes9t2RFDt2pvrAnP+fKGvHQpqTzoezSvRULbxLYyqqscZa3u/7PBNrTnq1MoDd694xPPoHUdjz+ojrj3nnyUL0Z9y8r9XGjEehGzQAAAABJRU5ErkJggg==" title="<?php echo __("SMS cart link to customer");?>" alt="<?php echo __("SMS cart link to customer");?>"/>
     </div>
     <div class="bread-clearer"></div>
     <div>
@@ -77,6 +83,8 @@ $code = $block->escapeHtml($block->getMethodCode());
             $("#bread-checkout-error-message").hide();
 
             $(".bread-send-mail").hide();
+            $(".bread-api-mail").hide();
+            $(".bread-send-sms").hide();
 
             $.ajax({
                 url: '<?php echo $block->getGenerateCartUrl(); ?>',
@@ -104,6 +112,70 @@ $code = $block->escapeHtml($block->getMethodCode());
                                 data: {
                                     form_key: window.FORM_KEY,
                                     url: response.cartUrl
+                                },
+                                context: bread
+                            }).success(function(response) {
+                                if (!response.error) {
+                                    $("#bread-checkout-success-message").show();
+
+                                    $(response.successRows).each(function(k, row) {
+                                        $("#bread-checkout-success-message").append('<div data-ui-id="message-message-success">' + row + '</div>');
+                                    });
+                                } else {
+                                    $("#bread-checkout-error-message").empty().show();
+
+                                    $(response.errorRows).each(function(k, row) {
+                                        $("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + row + '</div>');
+                                    });
+                                }
+                            }).complete(function() {
+                                jQuery('body').loader().loader("hide");
+                            });
+                        }).show();
+
+                    $(".bread-api-mail")
+                        .off("click")
+                        .on("click", function(e) {
+                            jQuery('body').loader().loader("show");
+
+                            $.ajax({
+                                url: '<?php echo $block->getSendBreadMail(); ?>',
+                                type: 'post',
+                                data: {
+                                    form_key: window.FORM_KEY,
+                                    id: response.id
+                                },
+                                context: bread
+                            }).success(function(response) {
+                                if (!response.error) {
+                                    $("#bread-checkout-success-message").show();
+
+                                    $(response.successRows).each(function(k, row) {
+                                        $("#bread-checkout-success-message").append('<div data-ui-id="message-message-success">' + row + '</div>');
+                                    });
+                                } else {
+                                    $("#bread-checkout-error-message").empty().show();
+
+                                    $(response.errorRows).each(function(k, row) {
+                                        $("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + row + '</div>');
+                                    });
+                                }
+                            }).complete(function() {
+                                jQuery('body').loader().loader("hide");
+                            });
+                        }).show();
+
+                    $(".bread-send-sms")
+                        .off("click")
+                        .on("click", function(e) {
+                            jQuery('body').loader().loader("show");
+
+                            $.ajax({
+                                url: '<?php echo $block->getSendSmsUrl(); ?>',
+                                type: 'post',
+                                data: {
+                                    form_key: window.FORM_KEY,
+                                    id: response.id
                                 },
                                 context: bread
                             }).success(function(response) {

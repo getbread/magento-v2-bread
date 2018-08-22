@@ -304,6 +304,47 @@ class Client extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Send cart sms
+     *
+     * @param  string $cartId
+     * @param  string $phone
+     * @return mixed
+     * @throws \Exception
+     */
+    public function sendSms($cartId, $phone)
+    {
+        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        $sendSmsUrl = join('/', array(trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'text'));
+        $data = array('phone' => $phone);
+        return $this->call(
+            $sendSmsUrl,
+            $data,
+            \Zend_Http_Client::POST
+        );
+    }
+
+    /**
+     * Send cart email
+     *
+     * @param  string $cartId
+     * @param  string $email
+     * @param  string $name
+     * @return  mixed
+     * @throws \Exception
+     */
+    public function sendEmail($cartId, $email, $name)
+    {
+        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        $sendEmailUrl = join('/', array(trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'email'));
+        $data = array('email' => $email, 'name' => $name);
+        return $this->call(
+            $sendEmailUrl,
+            $data,
+            \Zend_Http_Client::POST
+        );
+    }
+
+    /**
      * Form transaction info URI string
      *
      * @param $transactionId
