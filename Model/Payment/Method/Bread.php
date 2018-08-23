@@ -2,9 +2,6 @@
 /**
  * Bread Finance Payment Method
  *
- * @method Bread_BreadCheckout_Model_Payment_Api_Client apiClient
- * @method setApiClient($value)
- *
  * @author  Bread   copyright   2016
  * @author  Joel    @Mediotype
  * @author  Miranda @Mediotype
@@ -69,9 +66,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /** @var \Magento\Framework\Pricing\PriceCurrencyInterface */
     public $priceCurrency;
 
-    /**
-     * @var \Bread\BreadCheckout\Helper\Quote
-     */
+    /** @var \Bread\BreadCheckout\Helper\Quote */
     private $quoteHelper;
 
     /**
