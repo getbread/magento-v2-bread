@@ -15,7 +15,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /** @var \Magento\Framework\Registry */
     public $registry;
 
-    /** @var Magento\Framework\Json\Helper\Data */
+    /** @var \Magento\Framework\Json\Helper\Data */
     public $jsonHelper;
 
     /** @var \Bread\BreadCheckout\Helper\Catalog */
@@ -105,6 +105,30 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         $data       = [$this->catalogHelper->getProductDataArray($product, null)];
 
         return $this->jsonEncode($data);
+    }
+
+    /**
+     * Get initial grouped item data
+     *
+     * @return string
+     */
+    public function getGroupedDataJson()
+    {
+        $product = $this->getProduct();
+        $data    = [$this->catalogHelper->getGroupedProductDataArray($product)];
+
+        return $this->jsonEncode($data);
+
+    }
+
+    /**
+     * Get grouped product update url
+     *
+     * @return string
+     */
+    public function getGroupedButtonUpdate()
+    {
+        return $this->dataHelper->getGroupedProductItemsUrl();
     }
 
     /**

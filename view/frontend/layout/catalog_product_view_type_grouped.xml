@@ -1,11 +1,15 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <head>
-        <remove src="Bread_BreadCheckout::bread/css/bread.css"/>
-    </head>
     <body>
-        <referenceBlock name="breadcheckout.prod.js" remove="true"/>
+
         <referenceBlock name="breadcheckout.prod.view" remove="true"/>
         <referenceBlock name="breadcheckout.checkout.options" remove="true"/>
+
+        <referenceContainer name="product.info.extrahint">
+            <block template="Bread_BreadCheckout::breadcheckout/grouped.phtml"
+                   class="Bread\BreadCheckout\Block\Product\View"
+                   name="breadcheckout.checkout.grouped"
+            />
+        </referenceContainer>
     </body>
 </page>

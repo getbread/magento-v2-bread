@@ -269,7 +269,15 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 }
 
                 if (!$this->checkoutSession->getBreadItemAddedToQuote() || !$quote->getAllVisibleItems()) {
-                    $this->processOrderItem($quote, $data);
+
+                    if(array_key_exists('product_type',$data) &&
+                        $data['product_type'] === \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
+                    ){
+                        $this->processGroupedItems($quote,$data);
+                    } else {
+                        $this->processOrderItem($quote, $data);
+                    }
+
                 }
                 break;
         }
@@ -298,6 +306,22 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         // Qty always 1 when checking out from product view
         $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $customOptionPieces, 1);
         // Flag to prevent same item from getting added to quote many times
+        $this->checkoutSession->setBreadItemAddedToQuote(true);
+    }
+
+    /**
+     * Add product to quote when checking out from product view page with grouped product
+     *
+     * @param $quote \Magento\Quote\Model\Quote
+     * @param array $data
+     */
+    protected function processGroupedItems($quote,array $data)
+    {
+        foreach ($data['items'] as $item){
+            $simpleProduct = $this->catalogProductFactory->create()->loadByAttribute('sku',$item['sku']);
+            $this->logger->debug(print_r($simpleProduct->getId(),true));
+            $this->addItemToQuote($quote,$simpleProduct,$simpleProduct,[],$item['quantity']);
+        }
         $this->checkoutSession->setBreadItemAddedToQuote(true);
     }
 }
