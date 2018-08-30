@@ -80,7 +80,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             $code       = [];
             foreach ($data as $method) {
                 foreach ($method as $rate) {
-                    if (array_key_exists($rate->getCode(), $code)) {
+                    if (array_key_exists($rate->getCode(), $code) || !empty($rate->getErrorMessage())) {
                         continue;
                     }
                     $code[$rate->getCode()] = true;
