@@ -59,6 +59,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function cancel($breadTransactionId, $amount = 0, $lineItems = [])
     {
+        /* Check if already canceled in bread */
+        $transaction = $this->getInfo($breadTransactionId);
+        if($transaction['status'] === self::STATUS_CANCELED){
+            return $transaction;
+        }
+
         $data = ['type'   => 'cancel'];
 
         if (!$amount == 0) {
