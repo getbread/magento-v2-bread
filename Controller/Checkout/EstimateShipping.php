@@ -70,7 +70,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
 
             if (!$address instanceof \Magento\Quote\Model\Quote\Address) {
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    'Shipping address is not an instance of Magento\Quote\Model\Quote\Address'
+                    __('Shipping address is not an instance of Magento\Quote\Model\Quote\Address')
                 );
             }
 

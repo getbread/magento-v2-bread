@@ -65,7 +65,7 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $shippingAddress    = $this->getShippingAddressForQuote($data);
             if (!$shippingAddress instanceof \Magento\Quote\Model\Quote\Address) {
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    'Shipping address is not an instance of Magento\Quote\Model\Quote\Address'
+                    __('Shipping address is not an instance of Magento\Quote\Model\Quote\Address')
                 );
             }
             

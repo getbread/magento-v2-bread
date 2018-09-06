@@ -24,6 +24,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_CONFIG_DATA                           = "bread/checkout/configdata";
     const URL_DISCOUNTS_DATA                        = "bread/checkout/discountsdata";
     const URL_CLEAR_QUOTE                           = "bread/checkout/clearquote";
+    const URL_GROUPED_ITEMS                         = "bread/checkout/groupeditems";
     const URL_LANDING_PAGE                          = "bread/checkout/landingpage";
     const URL_SHIPPING_OPTION                       = "bread/checkout/shippingoption";
     const URL_ADMIN_QUOTE_DATA                      = "breadadmin/bread/quotedata";
@@ -298,6 +299,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_CLEAR_QUOTE, ['_secure'=>$isSecure]);
     }
 
+    /**
+     * Get URL for controller which returns data
+     * for grouped product items
+     *
+     * @return string
+     */
+    public function getGroupedProductItemsUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_GROUPED_ITEMS, ['_secure'=>$isSecure]);
+    }
     /**
      * Get URL for quote data retrieval in admin checkout
      *
