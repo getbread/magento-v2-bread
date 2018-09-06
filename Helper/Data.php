@@ -10,27 +10,29 @@ namespace Bread\BreadCheckout\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const API_SANDBOX_URI                           = "https://api-sandbox.getbread.com/";
-    const API_LIVE_URI                              = "https://api.getbread.com/";
+    const API_SANDBOX_URI                           = 'https://api-sandbox.getbread.com/';
+    const API_LIVE_URI                              = 'https://api.getbread.com/';
 
-    const JS_SANDBOX_URI                            = "https://checkout-sandbox.getbread.com/bread.js";
-    const JS_LIVE_URI                               = "https://checkout.getbread.com/bread.js";
+    const JS_SANDBOX_URI                            = 'https://checkout-sandbox.getbread.com/bread.js';
+    const JS_LIVE_URI                               = 'https://checkout.getbread.com/bread.js';
 
-    const URL_VALIDATE_PAYMENT                      = "bread/checkout/validatepaymentmethod";
-    const URL_VALIDATE_ORDER                        = "bread/checkout/validateorder";
-    const URL_VALIDATE_TOTALS                       = "bread/checkout/validatetotals";
-    const URL_SHIPPING_ESTIMATE                     = "bread/checkout/estimateshipping";
-    const URL_TAX_ESTIMATE                          = "bread/checkout/estimatetax";
-    const URL_CONFIG_DATA                           = "bread/checkout/configdata";
-    const URL_DISCOUNTS_DATA                        = "bread/checkout/discountsdata";
-    const URL_CLEAR_QUOTE                           = "bread/checkout/clearquote";
-    const URL_GROUPED_ITEMS                         = "bread/checkout/groupeditems";
-    const URL_LANDING_PAGE                          = "bread/checkout/landingpage";
-    const URL_SHIPPING_OPTION                       = "bread/checkout/shippingoption";
-    const URL_ADMIN_QUOTE_DATA                      = "breadadmin/bread/quotedata";
-    const URL_ADMIN_VALIDATE_PAYMENT                = "breadadmin/bread/validatepaymentmethod";
-    const URL_ADMIN_GENERATE_CART                   = "breadadmin/bread/generatecart";
-    const URL_ADMIN_SEND_MAIL                       = "breadadmin/bread/sendmail";
+    const URL_VALIDATE_PAYMENT                      = 'bread/checkout/validatepaymentmethod';
+    const URL_VALIDATE_ORDER                        = 'bread/checkout/validateorder';
+    const URL_VALIDATE_TOTALS                       = 'bread/checkout/validatetotals';
+    const URL_SHIPPING_ESTIMATE                     = 'bread/checkout/estimateshipping';
+    const URL_TAX_ESTIMATE                          = 'bread/checkout/estimatetax';
+    const URL_CONFIG_DATA                           = 'bread/checkout/configdata';
+    const URL_DISCOUNTS_DATA                        = 'bread/checkout/discountsdata';
+    const URL_CLEAR_QUOTE                           = 'bread/checkout/clearquote';
+    const URL_GROUPED_ITEMS                         = 'bread/checkout/groupeditems';
+    const URL_LANDING_PAGE                          = 'bread/checkout/landingpage';
+    const URL_SHIPPING_OPTION                       = 'bread/checkout/shippingoption';
+    const URL_ADMIN_QUOTE_DATA                      = 'breadadmin/bread/quotedata';
+    const URL_ADMIN_VALIDATE_PAYMENT                = 'breadadmin/bread/validatepaymentmethod';
+    const URL_ADMIN_GENERATE_CART                   = 'breadadmin/bread/generatecart';
+    const URL_ADMIN_SEND_MAIL                       = 'breadadmin/bread/sendmail';
+    const URL_ADMIN_SEND_MAIL_BREAD                 = 'breadadmin/bread/sendbreademail';
+    const URL_ADMIN_SEND_SMS                        = 'breadadmin/bread/sendsms';
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
     const XML_CONFIG_LOG_ENABLED                    = 'payment/breadcheckout/log_enabled';
@@ -341,6 +343,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $isSecure = $this->request->isSecure();
         return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_MAIL, ['_secure'=>$isSecure]);
+    }
+
+    /**
+     * Get controller URL for email sending via Bread
+     *
+     * @return string
+     */
+    public function getSendMailBreadUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_MAIL_BREAD, ['_secure'=>$isSecure]);
+    }
+
+    /**
+     * Get controller URL for sms sending
+     *
+     * @return string
+     */
+    public function getSendSmsUrl()
+    {
+        $isSecure = $this->request->isSecure();
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_SMS, ['_secure'=>$isSecure]);
     }
 
     /**
