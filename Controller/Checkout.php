@@ -344,8 +344,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     {
         foreach ($data['items'] as $item){
             $simpleProduct = $this->catalogProductFactory->create()->loadByAttribute('sku',$item['sku']);
-            $this->logger->debug(print_r($simpleProduct->getId(),true));
-            $this->addItemToQuote($quote,$simpleProduct,$simpleProduct,[],$item['quantity']);
+            $this->addItemToQuote($quote,$simpleProduct,$simpleProduct,[],[],$item['quantity']);
         }
         $this->checkoutSession->setBreadItemAddedToQuote(true);
     }
