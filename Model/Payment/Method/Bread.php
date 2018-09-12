@@ -268,7 +268,13 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
         if ($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE) {
             $this->apiClient->setOrder($payment->getOrder());
-            $token  = $this->checkoutSession->getBreadTransactionId();
+
+            if($this->_appState->getAreaCode() === \Magento\Framework\App\Area::AREA_ADMINHTML){
+                $token = $this->orderCreateModel->getSession()->getBreadTransactionId();
+            } else {
+                $token  = $this->checkoutSession->getBreadTransactionId();
+            }
+
             $result = $this->apiClient->authorize(
                 $token,
                 ($this->priceCurrency->round($amount) * 100),
