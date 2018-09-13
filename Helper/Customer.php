@@ -187,15 +187,6 @@ class Customer extends Data
 
             $quote->setCustomerId($customer->getId());
 
-            $billingAddress->setCustomerId($customer->getId());
-            $customer->addAddress($billingAddress);
-            $billingAddress->save();
-
-            $shippingAddress->setCustomerId($customer->getId())
-                ->setCustomer($customer);
-            $customer->addAddress($shippingAddress);
-            $shippingAddress->save();
-
             $customer->save()->sendNewAccountEmail();
         } catch (\Exception $e) {
             $this->log('Exception While Logging In Customer');
