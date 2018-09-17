@@ -10,20 +10,24 @@ namespace Bread\BreadCheckout\Block;
 
 class Js extends \Magento\Framework\View\Element\Text
 {
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
-    /** @var \Magento\Framework\Module\ModuleListInterface */
-    private $moduleList;
+    /**
+     * @var \Magento\Framework\Module\PackageInfo
+     */
+    private $packageInfo;
 
     public function __construct(
         \Magento\Framework\View\Element\Context $context,
         \Bread\BreadCheckout\Helper\Data $helper,
-        \Magento\Framework\Module\ModuleListInterface $moduleList,
+        \Magento\Framework\Module\PackageInfo $packageInfo,
         array $data = []
     ) {
         $this->helper = $helper;
-        $this->moduleList = $moduleList;
+        $this->packageInfo = $packageInfo;
 
         parent::__construct(
             $context,
@@ -52,9 +56,10 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     protected function generateJsIncludeString()
     {
-        $code       = '<script src="%s" data-api-key="%s" m2-module-version="%s"></script>';
-        $html       = sprintf($code, $this->getJsLibLocation(), $this->getPublicApiKey(),$this->getModuleVersion());
 
+        $code       = '<script src="%s" data-api-key="%s"  m2-module-version="%s"></script>';
+        $html       = sprintf($code, $this->getJsLibLocation(), $this->getPublicApiKey(), $this->getModuleVersion());
+      
         return $html;
     }
 
@@ -95,7 +100,6 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     private function getModuleVersion()
     {
-        $data = $this->moduleList->getOne('Bread_BreadCheckout');
-        return $data['setup_version'];
+        return $this->packageInfo->getVersion('Bread_BreadCheckout');
     }
 }
