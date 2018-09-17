@@ -10,15 +10,24 @@ namespace Bread\BreadCheckout\Block;
 
 class Js extends \Magento\Framework\View\Element\Text
 {
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
+
+    /**
+     * @var \Magento\Framework\Module\PackageInfo
+     */
+    private $packageInfo;
 
     public function __construct(
         \Magento\Framework\View\Element\Context $context,
         \Bread\BreadCheckout\Helper\Data $helper,
+        \Magento\Framework\Module\PackageInfo $packageInfo,
         array $data = []
     ) {
         $this->helper = $helper;
+        $this->packageInfo = $packageInfo;
 
         parent::__construct(
             $context,
@@ -47,8 +56,8 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     protected function generateJsIncludeString()
     {
-        $code       = '<script src="%s" data-api-key="%s"></script>';
-        $html       = sprintf($code, $this->getJsLibLocation(), $this->getPublicApiKey());
+        $code       = '<script src="%s" data-api-key="%s"  m2-module-version="%s"></script>';
+        $html       = sprintf($code, $this->getJsLibLocation(), $this->getPublicApiKey(), $this->getModuleVersion());
 
         return $html;
     }
@@ -81,5 +90,15 @@ class Js extends \Magento\Framework\View\Element\Text
     protected function getJsLibLocation()
     {
         return $this->helper->getJsLibLocation();
+    }
+
+    /**
+     * Get current module version
+     *
+     * @return string
+     */
+    private function getModuleVersion()
+    {
+        return $this->packageInfo->getVersion('Bread_BreadCheckout');
     }
 }
