@@ -12,7 +12,8 @@ define(
         'Magento_Checkout/js/model/error-processor',
         'Magento_Checkout/js/model/shipping-save-processor/default',
         'Magento_Checkout/js/model/shipping-service',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'Magento_Checkout/js/model/payment/additional-validators'
     ],
     function (
         Component,
@@ -27,7 +28,8 @@ define(
         errorProcessor,
         defaultProcessor,
         shippingService,
-        fullScreenLoader
+        fullScreenLoader,
+        additionalValidators
     ) {
         'use strict';
         return Component.extend({
@@ -97,9 +99,12 @@ define(
                 this.data = data;
                 this.event = event;
 
-                if (!this.breadTransactionId()) {
-                    button.init();
-                    return false;
+                if(additionalValidators.validate()){
+
+                    if (!this.breadTransactionId()) {
+                        button.init();
+                        return false;
+                    }
                 }
 
             },

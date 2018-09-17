@@ -102,6 +102,7 @@ class GenerateCart extends \Magento\Backend\App\Action
             ];
 
             $ret["cartUrl"] = $result["url"];
+            $ret["id"] = $result["id"];
         } catch (\Exception $e) {
             $ret["error"] = true;
             $ret["errorRows"][] = __("There was an error in cart creation:");

@@ -1,11 +1,19 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <head>
-        <remove src="Bread_BreadCheckout::bread/css/bread.css"/>
-    </head>
     <body>
-        <referenceBlock name="breadcheckout.prod.js" remove="true"/>
-        <referenceBlock name="breadcheckout.prod.view" remove="true"/>
-        <referenceBlock name="breadcheckout.checkout.options" remove="true"/>
+        <referenceContainer name="product.info.extrahint">
+            <block template="Bread_BreadCheckout::breadcheckout/view.phtml"
+                class="Bread\BreadCheckout\Block\Product\Bundle" as="breadcheckout.prod.view" name="breadcheckout.prod.view"/>
+        </referenceContainer>
+
+        <referenceBlock name="product.info.options.wrapper">
+            <referenceBlock name="breadcheckout.checkout.options" remove="true"/>
+
+            <!-- <block template="Bread_BreadCheckout::breadcheckout/options_bundle.phtml"
+                class="Magento\Catalog\Block\Product\View\Options" name="breadcheckout.checkout.bundle.options"/> -->
+
+            <block template="Bread_BreadCheckout::breadcheckout/bundle.phtml"
+                class="Bread\BreadCheckout\Block\Product\Bundle" name="breadcheckout.checkout.bundle"/>
+        </referenceBlock>
     </body>
 </page>

@@ -82,6 +82,38 @@ class Catalog extends Data
     }
 
     /**
+     * Get formatted product data for grouped product
+     * based on lowest price associated item
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getGroupedProductDataArray(\Magento\Catalog\Model\Product $product)
+    {
+        $grouped = $product->getTypeInstance();
+        $associatedProductsCollection = $grouped->getAssociatedProductCollection($product)
+            ->addAttributeToSelect('name')
+            ->addAttributeToSort('price','ASC');
+        $item = $associatedProductsCollection->getFirstItem();
+
+        $productData = [
+            'name'      => $item->getName(),
+            'price'     => $item->getFinalPrice() * 100,
+            'sku'       => $item->getSku(),
+            'detailUrl' => $item->getProductUrl(),
+            'quantity'  => 1,
+        ];
+
+        $imgSrc = $this->getImgSrc($item);
+        if ($imgSrc != null) {
+            $productData['imageUrl'] = $imgSrc;
+        }
+
+        return $productData;
+    }
+
+    /**
      * Return Product SKU Or Formatted SKUs for Products With Options
      *
      * @param \Magento\Catalog\Model\Product $product

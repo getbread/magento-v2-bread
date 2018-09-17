@@ -16,8 +16,9 @@ class Form extends \Magento\Payment\Block\Form
         \Magento\Framework\View\Element\Template\Context $context,
         \Bread\BreadCheckout\Helper\Catalog $helper,
         array $data = []
-    ) {
-    
+    )
+    {
+
         $this->helper = $helper;
         parent::__construct($context, $data);
     }
@@ -50,6 +51,22 @@ class Form extends \Magento\Payment\Block\Form
     public function getSendMailUrl()
     {
         return $this->helper->getSendMailUrl();
+    }
+
+    /**
+     * Get controller URL for email sending via bread API
+     */
+    public function getSendBreadMail()
+    {
+        return $this->helper->getSendMailBreadUrl();
+    }
+
+    /**
+     * Get controller URL for sms sending
+     */
+    public function getSendSmsUrl()
+    {
+        return $this->helper->getSendSmsUrl();
     }
 
     /**

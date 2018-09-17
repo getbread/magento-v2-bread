@@ -70,7 +70,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
 
             if (!$address instanceof \Magento\Quote\Model\Quote\Address) {
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    'Shipping address is not an instance of Magento\Quote\Model\Quote\Address'
+                    __('Shipping address is not an instance of Magento\Quote\Model\Quote\Address')
                 );
             }
 
@@ -80,7 +80,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             $code       = [];
             foreach ($data as $method) {
                 foreach ($method as $rate) {
-                    if (array_key_exists($rate->getCode(), $code)) {
+                    if (array_key_exists($rate->getCode(), $code) || !empty($rate->getErrorMessage())) {
                         continue;
                     }
                     $code[$rate->getCode()] = true;

@@ -73,7 +73,8 @@ define(
                     var cartSizeThreshold = data.cartSizeFinancing.threshold;
                     var items = data.quoteItems;
                     var itemsPriceSum = items.reduce(function (sum, item) {
-    return sum + item.price * item.quantity}, 0) / 100;
+                        return sum + item.price * item.quantity
+                    }, 0) / 100;
                     breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
                 }
 
