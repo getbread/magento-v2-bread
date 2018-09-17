@@ -9,7 +9,9 @@
         height: 44px;
         display: block;
         background: url('<?php /* @noEscape */
-                echo $block->getViewFileUrl('Bread_BreadCheckout/bread/images/bread-logo.png'); ?>') 0px 0 no-repeat;
+                echo $block->getViewFileUrl('Bread_BreadCheckout/bread/images/bread-logo.png'); ?>');
+        background-repeat: no-repeat;
+        background-size: 133px 44px;
     }
 
     .bread-brand {
@@ -25,13 +27,15 @@
         height: 5px;
     }
 
-    .admin__fieldset .bread-send-mail{
+    .admin__fieldset .bread-row{
         float:left;
         margin-left: 5px;
         cursor: pointer;
     }
 
-    .admin__fieldset .bread-send-mail img{
+    .admin__fieldset .bread-send-mail img,
+    .admin__fieldset .bread-api-mail img,
+    {
         height: 33px;
     }
 
