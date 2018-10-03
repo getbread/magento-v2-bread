@@ -34,10 +34,6 @@ define(['jquery',
                 this.breadConfig.items = data.items;
             }
 
-            if (window.checkoutConfig.payment.breadcheckout.buttonCss !== null) {
-                this.breadConfig.customCSS = window.checkoutConfig.payment.breadcheckout.buttonCss + ' .bread-amt, .bread-dur { display:none; } .bread-text::after{ content: "Finance Application"; }';
-            }
-
             if (data.cartSizeFinancing.enabled) {
                 var cartSizeFinancingId = data.cartSizeFinancing.id;
                 var cartSizeThreshold = data.cartSizeFinancing.threshold;
