@@ -20,6 +20,13 @@ define(['jquery',
                 tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
+                onShowCheckoutError: function(data){
+                    console.log(data);
+                    alert({
+                        content: "An error happend with Bread Payment Method"
+                    });
+
+                },
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
@@ -71,7 +78,6 @@ define(['jquery',
          * Call the checkout method from bread.js
          */
         init: function () {
-            window.addEventListener("message", this.getBreadMessages, false);
 
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
 
@@ -94,21 +100,6 @@ define(['jquery',
 
             }
             fullScreenLoader.stopLoader();
-        },
-
-        getBreadMessages: function(event){
-
-            var message = event;
-
-            if(message.origin.indexOf('.getbread.com') === -1){
-                return;
-            }
-
-            alert({
-                content: message.data
-            });
-
-            return false;
         },
 
         /**
