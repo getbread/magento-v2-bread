@@ -20,10 +20,10 @@ define(['jquery',
                 tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
-                onShowCheckoutError: function(data){
-                    console.log(data);
+                onShowCheckoutError: function(message){
+
                     alert({
-                        content: "An error happend with Bread Payment Method"
+                        content: message.data
                     });
 
                 },
