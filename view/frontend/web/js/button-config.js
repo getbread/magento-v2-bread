@@ -4,7 +4,9 @@
 define(['jquery',
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/model/quote',
-    'Magento_Checkout/js/checkout-data'], function ($, fullScreenLoader, quote, checkout) {
+    'Magento_Checkout/js/checkout-data',
+    'Magento_Ui/js/modal/alert'
+], function ($, fullScreenLoader, quote, checkout,alert) {
     return {
         breadConfig: undefined,
 
@@ -18,6 +20,13 @@ define(['jquery',
                 tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
+                onShowCheckoutError: function(message){
+
+                    alert({
+                        content: message.data
+                    });
+
+                },
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
@@ -69,6 +78,7 @@ define(['jquery',
          * Call the checkout method from bread.js
          */
         init: function () {
+
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
 
                 var self = this;
