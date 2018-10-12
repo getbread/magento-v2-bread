@@ -31,7 +31,7 @@ class Category extends Data
      */
     public function getCATButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_CAT_BUTTON_DESIGN, $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_CAT_BUTTON_DESIGN, $store);
     }
 
     /**
