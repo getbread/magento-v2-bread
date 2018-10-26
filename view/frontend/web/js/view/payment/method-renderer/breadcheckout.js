@@ -73,10 +73,6 @@ define(
                 return window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout;
             },
 
-            test: function(){
-
-            },
-
             /**
              * Initialize the bread checkout button
              */
