@@ -10,6 +10,13 @@
     </div>
 
     <div class="payment-method-content" data-bind="css: getCode()">
+
+        <!-- ko if: isEmbeddedCheckout() -->
+        <div id="bread-checkout-embedded"></div>
+        <!-- /ko -->
+
+        <!-- ko ifnot: isEmbeddedCheckout() -->
+
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!-- /ko -->
@@ -39,5 +46,8 @@
                 </button>
             </div>
         </div>
+
+        <!-- /ko -->
+
     </div>
 </div>

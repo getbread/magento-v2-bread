@@ -202,7 +202,11 @@
                         <field id="cart_size_targeted_financing">1</field>
                     </depends>
                 </field>
-                <field id="log_enabled" type="select" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="embedded" type="select" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Embedded Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="log_enabled" type="select" sortOrder="26" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Logging</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -213,7 +217,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="per_month" type="select" sortOrder="26" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="per_month" type="select" sortOrder="27" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label><![CDATA[Show "As Low As" price]]></label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>

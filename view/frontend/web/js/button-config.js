@@ -12,7 +12,6 @@ define(['jquery',
 
         configure: function (data, context) {
             this.breadConfig = {
-                buttonId: data.buttonId,
                 items: data.items,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
@@ -38,6 +37,12 @@ define(['jquery',
             /**
              * Optional params
              */
+
+            if(data.embeddedCheckout){
+                this.breadConfig.formId = data.formId;
+            } else {
+                this.breadConfig.buttonId = data.buttonId;
+            }
 
             if (!window.checkoutConfig.payment.breadcheckout.isHealthcare) {
                 this.breadConfig.items = data.items;
@@ -94,6 +99,16 @@ define(['jquery',
                     });
                 }
 
+            }
+            fullScreenLoader.stopLoader();
+        },
+
+        /**
+         * Initialize embedded checkout
+         */
+        embeddedCheckout: function() {
+            if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
+                bread.checkout(this.breadConfig);
             }
             fullScreenLoader.stopLoader();
         },
