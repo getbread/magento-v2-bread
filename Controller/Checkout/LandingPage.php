@@ -105,7 +105,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         if ($transactionId && $orderRef && !$this->request->getParam("error")) {
             $this->validateBackendOrder($transactionId, $orderRef);
         } else {
-            $this->messageManager->addErrorMessage($this->__('There was an error with your financing program'));
+            $this->messageManager->addErrorMessage(__('There was an error with your financing program'));
             $this->_redirect("/");
         }
     }
