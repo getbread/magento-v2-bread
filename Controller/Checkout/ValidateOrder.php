@@ -37,9 +37,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     /** @var \Magento\Catalog\Model\ProductFactory */
     public $catalogProductFactory;
 
-    /** @var \Magento\Directory\Model\RegionFactory */
-    public $regionFactory;
-
     /** @var \Magento\Store\Model\StoreManagerInterface */
     public $storeManager;
 
@@ -62,7 +59,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
-        \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Bread\BreadCheckout\Helper\Checkout $helper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
@@ -82,7 +78,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $this->customerSession = $customerSession;
         $this->quoteManagement = $quoteManagement;
         $this->catalogProductFactory = $catalogProductFactory;
-        $this->regionFactory = $regionFactory;
         $this->storeManager = $storeManager;
         $this->helper = $helper;
         $this->customerHelper = $customerHelper;
@@ -106,7 +101,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     /**
      * Validate and process the order
      *
-     * @return void|\Magento\Framework\Controller\Result\Redirect
+     * @return $this|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
@@ -172,8 +167,8 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             }
         }
 
-        $billingContact = $this->processAddress($data['billingContact']);
-        $shippingContact = $this->processAddress($data['shippingContact']);
+        $billingContact = $this->customerHelper->processAddress($data['billingContact']);
+        $shippingContact = $this->customerHelper->processAddress($data['shippingContact']);
 
         if (!isset($shippingContact['email'])) {
             $shippingContact['email'] = $billingContact['email'];
@@ -204,9 +199,9 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         }
         $quote->getPayment()->setMethod('breadcheckout');
 
-        $customer = $this->customerHelper->createCustomer($quote, $billingContact, $shippingContact);
+        $customer = $this->customerHelper->createCustomer($quote, $billingContact, $shippingContact,false);
 
-        if (!$customer) {
+        if (!$customer->getId()) {
             $quote->setCustomerIsGuest(true);
         }
 
@@ -236,7 +231,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $this->checkoutSession->setBreadItemAddedToQuote(false);
         }
 
-        if ($customer) {
+        if ($customer->getId()) {
             $this->customerSession->setCustomerAsLoggedIn($customer);
         }
 
@@ -256,47 +251,5 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $quote->save();
         $this->_redirect('checkout/onepage/success');
         // @codingStandardsIgnoreEnd
-    }
-
-    /**
-     * Format Address Data
-     *
-     * @param array $contactData
-     * @return array
-     */
-    protected function processAddress($contactData)
-    {
-        $regionId   = null;
-        if (isset($contactData['state'])) {
-            $region     = $this->regionFactory->create();      /** @var \Magento\Directory\Model\RegionFactory */
-            $region->loadByCode($contactData['state'], $this->helper->getDefaultCountry());
-            if ($region->getId()) {
-                $regionId   = $region->getId();
-            }
-        }
-
-        $fullName       = isset($contactData['fullName']) ? explode(' ', $contactData['fullName']) : '';
-        $addressData    = [
-            'firstname'     => isset($contactData['firstName']) ? $contactData['firstName'] : $fullName[0],
-            'lastname'      => isset($contactData['lastName']) ?
-                                    $contactData['lastName'] : (isset($fullName[1]) ? $fullName[1] : ''),
-            'street'        => $contactData['address'] . (isset($contactData['address2']) ?
-                                    (' ' .  $contactData['address2']) : ''),
-            'city'          => $contactData['city'],
-            'postcode'      => $contactData['zip'],
-            'telephone'     => $contactData['phone'],
-            'country_id'    => $this->helper->getDefaultCountry()
-        ];
-
-        if (null !== $regionId) {
-            $addressData['region']      = $contactData['state'];
-            $addressData['region_id']   = $regionId;
-        }
-
-        if (isset($contactData['email'])) {
-            $addressData['email']   = $contactData['email'];
-        }
-
-        return $addressData;
     }
 }

@@ -34,6 +34,9 @@ class Customer extends Data
     /** @var \Magento\Framework\Translate\Inline\StateInterface */
     public $inlineTranslation;
 
+    /** @var \Magento\Directory\Model\RegionFactory */
+    public $regionFactory;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -47,7 +50,8 @@ class Customer extends Data
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Math\Random $random,
         \Magento\Framework\Mail\Template\TransportBuilder $_transportBuilder,
-        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation
+        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
+        \Magento\Directory\Model\RegionFactory $regionFactory
     ) {
         $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
@@ -57,6 +61,7 @@ class Customer extends Data
         $this->random = $random;
         $this->_transportBuilder = $_transportBuilder;
         $this->inlineTranslation = $inlineTranslation;
+        $this->regionFactory = $regionFactory;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
     /**
@@ -139,24 +144,25 @@ class Customer extends Data
      * @param $quote
      * @param $billingContact
      * @param $shippingContact
-     * @return \Magento\Customer\Model\Customer|void
+     * @param $createCartsOrder
+     * @return \Magento\Customer\Model\Customer
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function createCustomer($quote, $billingContact, $shippingContact)
+    public function createCustomer($quote, $billingContact, $shippingContact, $createCartsOrder = false)
     {
         $session    = $this->customerSession;
-        if ($session->isLoggedIn()) {
+        if ($session->isLoggedIn() && $createCartsOrder === false) {
             return $session->getCustomer();
         }
 
         $quote->setCustomerLastname($billingContact['lastname']);
         $quote->setCustomerFirstname($billingContact['firstname']);
 
+        $customer   = $this->customerFactory->create(); /** @var \Magento\Customer\Model\CustomerFactory */
         if ($this->isAutoCreateCustomerAccountEnabled() == false) {
-            return;
+            return $customer;
         }
 
-        $customer   = $this->customerFactory->create(); /** @var \Magento\Customer\Model\CustomerFactory */
         $email      = $quote->getCustomerEmail();
 
         $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
@@ -164,7 +170,7 @@ class Customer extends Data
         // Don't create a new account if one already exists for this email
         $customer->loadByEmail($email);
         if ($customer->getId()) {
-            return;
+            return $customer;
         }
 
         $billingAddress     = $this->customerAddressFactory->create();
@@ -197,8 +203,13 @@ class Customer extends Data
             $shippingAddress->save();
 
             $customer->save()->sendNewAccountEmail();
+
+            if($createCartsOrder){
+                $this->customerSession->setCustomer($customer);
+            }
+
         } catch (\Exception $e) {
-            $this->log('Exception While Logging In Customer');
+            $this->log('Exception While Creating Customer');
             $this->logger->critical($e);
         }
 
@@ -378,5 +389,47 @@ class Customer extends Data
             $transport->sendMessage();
             $this->inlineTranslation->resume();
         }
+    }
+
+    /**
+     * Format Address Data
+     *
+     * @param array $contactData
+     * @return array
+     */
+    public function processAddress($contactData)
+    {
+        $regionId   = null;
+        if (isset($contactData['state'])) {
+            $region     = $this->regionFactory->create();      /** @var \Magento\Directory\Model\RegionFactory */
+            $region->loadByCode($contactData['state'], $this->getDefaultCountry());
+            if ($region->getId()) {
+                $regionId   = $region->getId();
+            }
+        }
+
+        $fullName       = isset($contactData['fullName']) ? explode(' ', $contactData['fullName']) : '';
+        $addressData    = [
+            'firstname'     => isset($contactData['firstName']) ? $contactData['firstName'] : $fullName[0],
+            'lastname'      => isset($contactData['lastName']) ?
+                $contactData['lastName'] : (isset($fullName[1]) ? $fullName[1] : ''),
+            'street'        => $contactData['address'] . (isset($contactData['address2']) ?
+                    (' ' .  $contactData['address2']) : ''),
+            'city'          => $contactData['city'],
+            'postcode'      => $contactData['zip'],
+            'telephone'     => $contactData['phone'],
+            'country_id'    => $this->getDefaultCountry()
+        ];
+
+        if (null !== $regionId) {
+            $addressData['region']      = $contactData['state'];
+            $addressData['region_id']   = $regionId;
+        }
+
+        if (isset($contactData['email'])) {
+            $addressData['email']   = $contactData['email'];
+        }
+
+        return $addressData;
     }
 }
