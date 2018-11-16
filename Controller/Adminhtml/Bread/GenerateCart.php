@@ -84,10 +84,14 @@ class GenerateCart extends \Magento\Backend\App\Action
 
             $arr["options"]["shippingOptions"] = [ $this->helper->getShippingOptions() ];
 
-            $arr["options"]["shippingContact"] = $this->helper->getShippingAddressData();
-            $arr["options"]["billingContact"] = $this->helper->getBillingAddressData();
+            if(!$this->helper->isHealthcare()){
+                $arr["options"]["shippingContact"] = $this->helper->getShippingAddressData();
+                $arr["options"]["billingContact"] = $this->helper->getBillingAddressData();
 
-            $arr["options"]["items"] = $this->helper->getQuoteItemsData();
+                $arr["options"]["items"] = $this->helper->getQuoteItemsData();
+            } else {
+                $arr["options"]["customTotal"] = $quote->getGrandTotal() * 100;
+            }
 
             $arr["options"]["discounts"] = $this->helper->getDiscountData() ? $this->helper->getDiscountData() : [];
 
