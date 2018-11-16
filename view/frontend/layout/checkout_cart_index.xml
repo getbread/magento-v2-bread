@@ -5,7 +5,7 @@
     </head>
     <body>
         <referenceContainer name="content">
-            <block class="Bread\BreadCheckout\Block\Js" as="breadcheckout.prod.js" name="breadcheckout.prod.js"/>
+            <block class="Bread\BreadCheckout\Block\Js" as="breadcheckout.prod.js" name="breadcheckout.prod.js" before="-"/>
         </referenceContainer>
         <referenceContainer name="checkout.cart.methods">
             <block template="Bread_BreadCheckout::breadcheckout/cartview.phtml" class="Bread\BreadCheckout\Block\Checkout\Overview" as="breadcheckout.checkout.view" name="breadcheckout.checkout.view"/>
