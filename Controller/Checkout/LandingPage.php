@@ -105,7 +105,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         if ($transactionId && $orderRef && !$this->request->getParam("error")) {
             $this->validateBackendOrder($transactionId, $orderRef);
         } else {
-            $this->messageManager->addErrorMessage($this->__('There was an error with your financing program'));
+            $this->messageManager->addErrorMessage(__('There was an error with your financing program'));
             $this->_redirect("/");
         }
     }
@@ -125,7 +125,9 @@ class LandingPage extends \Magento\Framework\App\Action\Action
                 $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
                 $customer->loadByEmail($data["billingContact"]["email"]);
 
-                $this->customerSession->setCustomerAsLoggedIn($customer);
+                if($customer->getId()){
+                    $this->customerSession->setCustomerAsLoggedIn($customer);
+                }
 
                 $this->processBackendOrder($orderRef, $data);
 
@@ -152,6 +154,15 @@ class LandingPage extends \Magento\Framework\App\Action\Action
     {
         $quote = $this->quoteFactory->create()->loadByIdWithoutStore($orderRef);
 
+        $billingAddress = $this->customerHelper->processAddress($data['billingContact']);
+        $shippingAddress = $this->customerHelper->processAddress($data['shippingContact']);
+
+        if (!isset($shippingAddress['email'])) {
+            $shippingAddress['email'] = $billingAddress['email'];
+        }
+
+        $customer = $this->customerHelper->createCustomer($quote,$billingAddress,$shippingAddress,true);
+
         $this->checkoutSession->setBreadTransactionId($data['breadTransactionId']);
 
         if (!$quote->getPayment()->getQuote()) {
@@ -159,13 +170,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         }
         $quote->getPayment()->setMethod('breadcheckout');
 
-        $customer   = $this->customerFactory->create();
-
-        $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
-
-        $customer = $customer->loadByEmail($data["billingContact"]["email"]);
-
-        if (!$customer) {
+        if (!$customer->getId()) {
             $quote->setCustomerIsGuest(true);
         }
 
@@ -195,7 +200,8 @@ class LandingPage extends \Magento\Framework\App\Action\Action
             $this->checkoutSession->setBreadItemAddedToQuote(false);
         }
 
-        if ($customer) {
+        if ($customer->getId()) {
+            $this->customerSession->setCustomer($customer);
             $this->customerSession->setCustomerAsLoggedIn($customer);
         }
 
