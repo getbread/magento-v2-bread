@@ -361,6 +361,26 @@ class Client extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     *
+     * @param $transactionId
+     * @param $trackingNumber
+     * @param $carrierName
+     * @return mixed
+     * @throws \Exception
+     */
+    public function setShippingDetails($transactionId, $trackingNumber, $carrierName)
+    {
+        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        $setShippingDetailsUrl = join('/', array(trim($baseUrl,'/'), 'transactions', trim($transactionId), 'shipment'));
+        $data = array('trackingNumber' => $trackingNumber, 'carrierName' => $carrierName);
+        return $this->call(
+            $setShippingDetailsUrl,
+            $data,
+            \Zend_Http_Client::POST
+        );
+    }
+
+    /**
      * Form transaction info URI string
      *
      * @param $transactionId

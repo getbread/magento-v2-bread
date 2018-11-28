@@ -57,11 +57,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_API_MODE                       = 'payment/breadcheckout/api_mode';
     const XML_CONFIG_DEFAULT_BUTTON_SIZE            = 'payment/breadcheckout/use_default_button_size';
     const XML_CONFIG_CREATE_CUSTOMER                = 'payment/breadcheckout/create_customer_account';
-    const XML_CONFIG_LOGIN_CUSTOMER                 = 'payment/breadcheckout/login_customer_on_order';
     const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
     const XML_CONFIG_ALLOW_CHECKOUT_CART            = 'payment/breadcheckout/allowcheckoutcart';
     const XML_CONFIG_EMBEDDED_CHECKOUT              = 'payment/breadcheckout/embedded';
     const XML_CONFIG_PRODUCT_TYPE_MSG               = 'payment/breadcheckout/product_type_msg';
+    const XML_CONFIG_ORDER_SHIPPED                  = 'payment/breadcheckout/order_shipped';
     const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
@@ -675,6 +675,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function embeddedCheckoutEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_EMBEDDED_CHECKOUT, $store);
+    }
+
+    /**
+     * Dispatch order shipment details to Bread
+     *
+     * @param null $store
+     * @return bool
+     */
+    public function dispatchShipmentData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_ORDER_SHIPPED,$store);
     }
 
     /**
