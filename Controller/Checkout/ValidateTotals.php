@@ -61,11 +61,11 @@ class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
             if ($this->helper->validateTransactionAmount($params['bread_transaction_id'])) {
                 $result['valid'] = true;
             } else {
-                $errorMsg = __("Your order total does not match the amount authorized by Bread.
-                Please complete checkout again before placing the order.");
+                $errorMsg = __('Your order total does not match the amount authorized by Bread.
+                Please complete checkout again before placing the order.');
             }
         } else {
-            $errorMsg = __("Please complete the Bread checkout form before placing the order.");
+            $errorMsg = __('Please complete the Bread checkout form before placing the order.');
         }
 
         if (isset($errorMsg)) {

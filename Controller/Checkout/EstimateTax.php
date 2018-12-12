@@ -72,7 +72,7 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
             $result             = $shippingAddress->getTaxAmount() * 100;
             $response           = $result;
         } catch (\Exception $e) {
-            $this->helper->log("EXCEPTION IN TAX ESTIMATE ACTION", 'bread-exception.log');
+            $this->helper->log('EXCEPTION IN TAX ESTIMATE ACTION', 'bread-exception.log');
             $this->logger->critical($e);
             $response = ['error' => 1,
                          'text'  => 'Internal error'];

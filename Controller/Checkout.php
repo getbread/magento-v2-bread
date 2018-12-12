@@ -227,9 +227,16 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             $quote      = $this->getQuote($data);
             $address    = $quote->getShippingAddress();
 
+            $regionId   = $address->getRegionModel()
+                ->loadByCode($data['state'],$this->helper->getDefaultCountry())
+                ->getId();
+
             $address->setCountryId($this->helper->getDefaultCountry())
+
+                ->setStreet($data['address'])
                 ->setCity($data['city'])
                 ->setPostcode($data['zip'])
+                ->setRegionId($regionId)
                 ->setRegion($data['state'])
                 ->setCollectShippingRates(true);
 

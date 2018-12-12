@@ -134,7 +134,6 @@ define(
                     try {
                         if (response !== null && typeof response === 'object') {
                             if (response.error) {
-                                console.log(response);
                                 alert(response.error);
                             } else {
                                 $.when(

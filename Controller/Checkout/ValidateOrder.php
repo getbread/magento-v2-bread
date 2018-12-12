@@ -116,7 +116,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             }
         } catch (\Exception $e) {
             $this->logger->critical($e);
-            $this->messageManager->addError(
+            $this->messageManager->addErrorMessage(
                 __(
                     "Checkout With Financing On Product Page Error, Please Contact Store Owner. 
                     You may checkout by adding to cart and providing a payment in the checkout process."
@@ -142,8 +142,8 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         // @codingStandardsIgnoreStart
         $this->helper->log(["PROCESS ORDER DATA" => $data]);
 
-        $quote = $this->checkoutSession->getQuote();
         /** @var $quote \Magento\Quote\Model\Quote */
+        $quote = $this->checkoutSession->getQuote();
 
         $storeId = $this->storeManager->getStore()->getId();
         $quote->setStoreId($storeId);
@@ -203,6 +203,8 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         if (!$customer->getId()) {
             $quote->setCustomerIsGuest(true);
+        } else {
+            $quote->setCustomer($customer->getDataModel());
         }
 
         $quote->setTotalsCollectedFlag(false)->collectTotals()->save();
@@ -248,7 +250,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $quote->removeItem($item->getId());
         }
 
-        $quote->save();
+        $this->quoteRepository->save($quote);
         $this->_redirect('checkout/onepage/success');
         // @codingStandardsIgnoreEnd
     }

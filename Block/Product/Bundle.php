@@ -30,7 +30,11 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     /** @var \Bread\BreadCheckout\Helper\Customer */
     public $customerHelper;
 
+    /** @var \Magento\Framework\Data\Form\FormKey */
+    private $formKey;
+
     /**
+     * Bundle constructor.
      * @param \Magento\Catalog\Block\Product\Context $context
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param \Bread\BreadCheckout\Helper\Catalog $catalogHelper
@@ -41,6 +45,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
      * @param \Magento\Bundle\Model\Product\PriceFactory $productPrice
      * @param \Magento\Framework\Locale\FormatInterface $localeFormat
+     * @param \Magento\Framework\Data\Form\FormKey $formKey
      * @param array $data
      */
     public function __construct(
@@ -54,6 +59,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Magento\Bundle\Model\Product\PriceFactory $productPrice,
         \Magento\Framework\Locale\FormatInterface $localeFormat,
+        \Magento\Framework\Data\Form\FormKey $formKey,
         array $data = []
     ) {
         $this->registry = $context->getRegistry();
@@ -62,6 +68,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         $this->customerHelper = $customerHelper;
         $this->dataHelper = $dataHelper;
         $this->catalogProduct = $catalogProduct;
+        $this->formKey = $formKey;
 
         parent::__construct(
             $context,
@@ -452,5 +459,15 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public function jsonEncode($data)
     {
         return $this->jsonHelper->jsonEncode($data);
+    }
+
+    /**
+     * Get form key
+     *
+     * @return string
+     */
+    public function getFormKey()
+    {
+        return $this->formKey->getFormKey();
     }
 }

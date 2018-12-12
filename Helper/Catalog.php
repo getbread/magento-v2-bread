@@ -12,7 +12,12 @@ class Catalog extends Data
 {
     /** @var \Magento\Catalog\Block\Product\View */
     public $productViewBlock;
+
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     public $storeManager;
+
+    /** @var \Magento\Catalog\Api\ProductRepositoryInterfaceFactory  */
+    public $productRepositoryFactory;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -25,7 +30,7 @@ class Catalog extends Data
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->productViewBlock = $productViewBlock;
-        $this->_productRepositoryFactory = $productRepositoryFactory;
+        $this->productRepositoryFactory = $productRepositoryFactory;
         $this->storeManager = $storeManager;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
@@ -176,7 +181,7 @@ class Catalog extends Data
     protected function getImgSrc(\Magento\Catalog\Model\Product $product)
     {
         if ($this->isInAdmin()) {
-            $product = $this->_productRepositoryFactory->create()->getById($product->getId());
+            $product = $this->productRepositoryFactory->create()->getById($product->getId());
             $imageUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
                 . 'catalog/product' . $product->getImage();
             return $imageUrl;

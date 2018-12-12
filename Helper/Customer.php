@@ -37,6 +37,12 @@ class Customer extends Data
     /** @var \Magento\Directory\Model\RegionFactory */
     public $regionFactory;
 
+    /** @var \Magento\Customer\Api\CustomerRepositoryInterface */
+    public $customerRepository;
+
+    /** @var \Magento\Customer\Api\AddressRepositoryInterface */
+    public $addressRepository;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -51,7 +57,9 @@ class Customer extends Data
         \Magento\Framework\Math\Random $random,
         \Magento\Framework\Mail\Template\TransportBuilder $_transportBuilder,
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
-        \Magento\Directory\Model\RegionFactory $regionFactory
+        \Magento\Directory\Model\RegionFactory $regionFactory,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
     ) {
         $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
@@ -62,6 +70,8 @@ class Customer extends Data
         $this->_transportBuilder = $_transportBuilder;
         $this->inlineTranslation = $inlineTranslation;
         $this->regionFactory = $regionFactory;
+        $this->customerRepository = $customerRepository;
+        $this->addressRepository = $addressRepository;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
     /**
@@ -178,31 +188,36 @@ class Customer extends Data
         $shippingAddress    = $this->customerAddressFactory->create();
         $shippingAddress->setData($shippingContact);
 
-        $customer->setEmail($email)
-            ->setPassword($this->generatePassword(7));
-        $quote->getBillingAddress()->setIsDefaultBilling(true)->setSaveInAddressBook(true);
-        $quote->getShippingAddress()->setIsDefaultShipping(true)->setSaveInAddressBook(true);
-        $customer->setDefaultBilling($billingAddress->getId())
-            ->setDefaultShipping($shippingAddress->getId())
-            ->setLastname($quote->getCustomerLastname())
+        $customer->setEmail($email)->setPassword($this->generatePassword(7));
+        $customer->setLastname($quote->getCustomerLastname())
             ->setFirstname($quote->getCustomerFirstname());
 
         try {
-            $customer->save();
+            $customerInterface = $this->customerRepository->save($customer->getDataModel());
+
             $customer->setConfirmation(null);
+            $quote->setCustomerId($customerInterface->getId());
 
-            $quote->setCustomerId($customer->getId());
+            $billingAddressDataObject = $billingAddress->getDataModel();
+            $billingAddressDataObject->setIsDefaultBilling(true);
+            if($billingContact == $shippingContact){
+                $billingAddressDataObject->setIsDefaultShipping(true);
+            }
+            $billingAddressDataObject->setCustomerId($customerInterface->getId());
 
-            $billingAddress->setCustomerId($customer->getId());
-            $customer->addAddress($billingAddress);
-            $billingAddress->save();
+            $this->addressRepository->save($billingAddressDataObject);
 
-            $shippingAddress->setCustomerId($customer->getId())
-                ->setCustomer($customer);
-            $customer->addAddress($shippingAddress);
-            $shippingAddress->save();
+            if($billingContact !== $shippingContact){
 
-            $customer->save()->sendNewAccountEmail();
+                $shippingAddressDataObject = $shippingAddress->getDataModel();
+                $shippingAddressDataObject->setIsDefaultShipping(true);
+                $shippingAddressDataObject->setCustomerId($customerInterface->getId());
+
+                $this->addressRepository->save($shippingAddressDataObject);
+
+            }
+
+            $customer->sendNewAccountEmail('registered', '', $customerInterface->getStoreId());
 
             if($createCartsOrder){
                 $this->customerSession->setCustomer($customer);
