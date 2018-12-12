@@ -74,7 +74,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
                 );
             }
 
-            $address->collectShippingRates()->save();
+            $address->collectShippingRates();
             $data       = $address->getGroupedAllShippingRates();
             $methods    = [];
             $code       = [];
@@ -93,13 +93,13 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             }
             $response = $methods;
         } catch (\Exception $e) {
-            $this->helper->log(["ERROR" => $e->getMessage(),
-                                "PARAMS"=> $this->getRequest()->getParams()]);
+            $this->helper->log(['ERROR' => $e->getMessage(),
+                                'PARAMS'=> $this->getRequest()->getParams()]);
             $this->logger->critical($e);
-            $this->messageManager->addError(
+            $this->messageManager->addErrorMessage(
                 __(
-                    "Internal Error, Please Contact Store Owner. You may checkout by adding to cart 
-                    and providing a payment in the checkout process."
+                    'Internal Error, Please Contact Store Owner. You may checkout by adding to cart 
+                    and providing a payment in the checkout process.'
                 )
             );
             $response = ['error' => 1,

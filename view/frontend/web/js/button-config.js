@@ -1,12 +1,14 @@
 /**
  * Configure payment data and init bread checkout
  */
-define(['jquery',
+define([
+    'jquery',
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/checkout-data',
     'Magento_Ui/js/modal/alert'
 ], function ($, fullScreenLoader, quote, checkout,alert) {
+
     return {
         breadConfig: undefined,
 
@@ -19,6 +21,7 @@ define(['jquery',
                 tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
+                disableEditShipping: true,
                 onShowCheckoutError: function(message){
 
                     alert({
@@ -72,13 +75,14 @@ define(['jquery',
                 }];
             }
 
-            this.setShippingInformation();
         },
 
         /**
          * Call the checkout method from bread.js
          */
         init: function () {
+
+            this.setShippingInformation();
 
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
 
@@ -117,6 +121,7 @@ define(['jquery',
          * Get updated quote data
          */
         setShippingInformation: function () {
+            
             $.ajax({
                 url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
                 type: 'post',

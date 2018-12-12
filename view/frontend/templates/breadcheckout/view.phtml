@@ -32,13 +32,18 @@
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         var i = document.createElement('input');
+                        var k = document.createElement('input');
                         i.type = 'hidden';
                         i.name = 'token';
                         i.value = tx_token;
+                        k.type = 'hidden';
+                        k.name = 'form_key';
+                        k.value = '<?php echo $block->getFormKey(); ?>';
                         var f = document.createElement('form');
                         f.action = '<?php /* @noEscape */ echo $block->getValidateOrderUrl(); ?>?product_page=1';
                         f.method = 'POST';
                         f.appendChild(i);
+                        f.appendChild(k);
                         document.body.appendChild(f);
                         f.submit();
                     }
@@ -160,35 +165,6 @@
 
                 bread.checkout(breadConfig);
             });
-
-            //  DISCOUNTS
-        /*   $(document).ready(function () {
-                var productForm = $('#product_addtocart_form');
-                $.mage.validation({
-                    errorPlacement: function() {} // Hides default error labels
-                }, productForm);
-                if(productForm.valid()) {
-                    var disc = {};
-                    disc.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
-                    disc.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
-                    disc.selected_sku                    = document.selectedSku + document.customOptions;
-                    disc.selected_simple_product_id      = document.selectedSimpleProductId;
-                    disc.main_product_id                 = document.productId;
-                    disc.buy_request                     = productForm.serialize();
-                    $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getDiscountsDataUrl(); ?>',
-                        data: disc,
-                        type: 'post',
-                        context: this
-                    }).done(function(response) {
-                        if (response.discounts != false) {
-                            breadConfig.discounts = response.discounts;
-                            bread.checkout(breadConfig);
-                            document.clearQuote();
-                        }
-                    });
-                };
-            });*/
                    
         };
 
@@ -272,7 +248,6 @@
             <?php else : ?>
                 document.configureButton(document.defaultItems);
             <?php endif; ?>
-//            var messages = $.cookieStorage.get('mage-messages');
         });
     });
 </script>
