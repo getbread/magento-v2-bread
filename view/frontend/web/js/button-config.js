@@ -81,7 +81,7 @@ define([
          * Public init method, sets shipping information
          */
         init: function () {
-            this.setShippingInformation();
+            this.setShippingInformation(false);
         },
 
         /**
@@ -115,19 +115,28 @@ define([
         },
 
         /**
-         * Initialize embedded checkout
+         * Public init for embedded checkout, sets shipping information
          */
         embeddedCheckout: function() {
+            this.setShippingInformation(true);
+            fullScreenLoader.stopLoader();
+        },
+
+        /**
+         * Bread Embedded init
+         *
+         * @private
+         */
+        _initEmbedded: function(){
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                 bread.checkout(this.breadConfig);
             }
-            fullScreenLoader.stopLoader();
         },
 
         /**
          * Get updated quote data and initialize
          */
-        setShippingInformation: function () {
+        setShippingInformation: function (isEmbedded) {
             
             $.ajax({
                 url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
@@ -149,7 +158,12 @@ define([
                 }
                 fullScreenLoader.stopLoader();
 
-                this._init();
+                if(isEmbedded === false){
+                    this._init();
+                } else {
+                    this._initEmbedded();
+                }
+
             });
         },
 

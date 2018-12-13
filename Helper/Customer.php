@@ -189,6 +189,7 @@ class Customer extends Data
         $shippingAddress->setData($shippingContact);
 
         $customer->setEmail($email)->setPassword($this->generatePassword(7));
+        $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
         $customer->setLastname($quote->getCustomerLastname())
             ->setFirstname($quote->getCustomerFirstname());
 
