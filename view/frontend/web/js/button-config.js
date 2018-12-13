@@ -78,15 +78,22 @@ define([
         },
 
         /**
-         * Call the checkout method from bread.js
+         * Public init method, sets shipping information
          */
         init: function () {
-
             this.setShippingInformation();
+        },
+
+        /**
+         * Bread modal init
+         *
+         * @private
+         */
+        _init: function(){
+
+            var self = this;
 
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-
-                var self = this;
 
                 if(this.breadConfig.shippingOptions[0] !== false){
                     bread.showCheckout(this.breadConfig);
@@ -104,7 +111,7 @@ define([
                 }
 
             }
-            fullScreenLoader.stopLoader();
+
         },
 
         /**
@@ -118,7 +125,7 @@ define([
         },
 
         /**
-         * Get updated quote data
+         * Get updated quote data and initialize
          */
         setShippingInformation: function () {
             
@@ -141,6 +148,8 @@ define([
                         checkout.getValidatedEmailValue();
                 }
                 fullScreenLoader.stopLoader();
+
+                this._init();
             });
         },
 
