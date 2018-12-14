@@ -216,7 +216,7 @@
             }
 
             if ((typeof spConfig != 'undefined') && (typeof spConfig.optionPrices[document.selectedSimpleProductId] != 'undefined')) {
-                price = parseInt(spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100);
+                price = parseInt(Math.round(spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100));
 
                 if ((typeof customPrice != 'undefined') &&
                     (customPrice !== price)) {
