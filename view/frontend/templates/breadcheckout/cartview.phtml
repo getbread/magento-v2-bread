@@ -158,10 +158,7 @@
         };
 
         document.round = function(value) {
-            return parseInt(
-                Number(Math.round(parseFloat(value) + 'e' + 2) + 'e-' + 2)
-                * 100
-            );
+            return parseInt(Math.round(value * 100));
         };
 
         $(document).ready(function() {

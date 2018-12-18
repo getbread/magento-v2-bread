@@ -113,6 +113,7 @@ define(
                 if(additionalValidators.validate()){
 
                     if (!this.breadTransactionId()) {
+                        button.setCouponDiscounts();
                         button.init();
                         return false;
                     }
