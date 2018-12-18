@@ -65,16 +65,6 @@ define([
                 this.breadConfig.billingContact = data.billingContact;
             }
 
-            var discountAmount =- this.round(quote.getTotals()._latestValue.discount_amount);
-            if (discountAmount > 0) {
-                this.breadConfig.discounts = [{
-                    amount: discountAmount,
-                    description: (quote.getTotals()._latestValue.coupon_code !== null) ?
-                        quote.getTotals()._latestValue.coupon_code :
-                        "Discount"
-                }];
-            }
-
         },
 
         /**
@@ -168,13 +158,33 @@ define([
         },
 
         /**
+         * Sets coupon discount
+         */
+        setCouponDiscounts: function(){
+
+            var discountAmount =- this.round(quote.getTotals()._latestValue.discount_amount);
+            if (discountAmount > 0) {
+                this.breadConfig.discounts = [{
+                    amount: discountAmount,
+                    description: (quote.getTotals()._latestValue.coupon_code !== null) ?
+                        quote.getTotals()._latestValue.coupon_code :
+                        "Discount"
+                }];
+            }
+            /* this is needed if coupon is removed to update total price */
+            this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+        },
+
+        /**
          * Round float to 2 decimal places then convert to integer
          */
         round: function (value) {
-            return parseInt(
-                Number(Math.round(parseFloat(value)+'e'+2)+'e-'+2)
-                * 100
-            );
+
+            if(typeof value === "number"){
+                return parseInt(Math.round(value * 100));
+            }
+
+            console.trace(typeof value + " passed instead of number");
         }
     };
 });

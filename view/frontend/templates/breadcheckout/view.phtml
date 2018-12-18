@@ -1,5 +1,21 @@
 <?php /** @var $block Bread\BreadCheckout\Block\Product\View */ ?>
 <?php  echo $block->getBeforeHtml(); ?>
+
+<?php
+$_options = $block->decorateArray($block->getProduct()->getOptions());
+$allowCheckout = true;
+foreach ($_options as $option) {
+    if ($option->getValues()) {
+        foreach ($option->getValues() as $k => $v) {
+            if($v->getPrice() > 0){
+                $allowCheckout = false;
+                break;
+            }
+        }
+    }
+}
+?>
+
 <div id="bread-btn-cntnr">
     <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php /* @noEscape */ echo $block->getIsDefaultSize(); ?>>
         <span>
@@ -17,7 +33,6 @@
             var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
             var cartSizeFinancing   = <?php /* @noEscape */ echo $this->getCartSizeFinancingJson(); ?>;
-
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
                 asLowAs: <?php echo $this->getAsLowAs(); ?>,
@@ -27,7 +42,11 @@
                 customTotal: items[0]['price'],
                 <?php endif; ?>
                 discounts: <?php echo $this->getDiscountDataJson(); ?>,
+                <?php if($allowCheckout):?>
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
+                <?php else: ?>
+                allowCheckout: false,
+                <?php endif; ?>
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
