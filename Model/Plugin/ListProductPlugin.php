@@ -51,7 +51,8 @@ class ListProductPlugin
         /** @var \Magento\Framework\View\Layout $layout */
         $layout = $subject->getLayout();
 
-        if ($this->categoryHelper->isEnabledForCategory($category)) {
+        if ($this->categoryHelper->isEnabledForCategory($category)
+            && $this->categoryHelper->allowedProductType($product->getTypeId())) {
             /** @var \Bread\BreadCheckout\Block\Product\Category $block */
             $block = $layout->createBlock(\Bread\BreadCheckout\Block\Product\Category::class);
             $block->setProduct($product);

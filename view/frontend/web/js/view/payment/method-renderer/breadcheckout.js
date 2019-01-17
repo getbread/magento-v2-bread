@@ -85,6 +85,20 @@ define(
             },
 
             /**
+             * Invalid product type message
+             */
+            getCheckoutMessage: function(){
+                return window.checkoutConfig.payment[this.getCode()].breadConfig.productTypeMessage;
+            },
+
+            /**
+             * Validate product types result
+             */
+            isCartValid: function(){
+                return window.checkoutConfig.payment[this.getCode()].breadConfig.cartValidation;
+            },
+
+            /**
              * Initialize the bread checkout button
              */
             initComplete: function () {

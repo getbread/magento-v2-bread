@@ -19,6 +19,7 @@
                 <create_order_before>1</create_order_before>
                 <login_customer_on_order>1</login_customer_on_order>
                 <log_enabled>0</log_enabled>
+                <product_type_msg>Gift cards cannot be purchased with financing. Please remove any gift cards from your cart and try again.</product_type_msg>
             </breadcheckout>
         </payment>
     </default>

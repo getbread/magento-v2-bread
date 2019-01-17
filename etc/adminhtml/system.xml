@@ -228,6 +228,16 @@
                         ]]>
                     </comment>
                 </field>
+                <field id="product_type_msg" type="textarea" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Invalid product type message</label>
+                    <comment>
+                        <![CDATA[
+				                <div>
+				                    <p>Message displayed to user when non supported product type is in cart, such as gift card</p>
+				                </div>
+				            ]]>
+                    </comment>
+                </field>
                 <group id="bread_category" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>Settings: Category Pages</label>
                     <field id="enabled_on_category_page" sortOrder="0" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
