@@ -19,7 +19,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     /** @var \Magento\Checkout\Helper\Cart */
     public $cartHelper;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /** @var \Bread\BreadCheckout\Helper\Log */
     public $logger;
 
     /** @var \Magento\Framework\Message\ManagerInterface */
@@ -54,7 +54,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Checkout\Helper\Cart $cartHelper,
-        \Psr\Log\LoggerInterface $logger,
+        \Bread\BreadCheckout\Helper\Log $logger,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
@@ -108,18 +108,18 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $token = $this->getRequest()->getParam('token');
             if ($token) {
-                $this->helper->log([
-                    "VALIDATE ORDER TOKEN" => $token,
+                $this->logger->log([
+                    'VALIDATE ORDER TOKEN' => $token,
                 ]);
                 $data = $this->paymentApiClient->getInfo($token);
                 $this->processOrder($data);
             }
         } catch (\Exception $e) {
-            $this->logger->critical($e);
+            $this->logger->log(['MESSAGE' => $e->getMessage()]);
             $this->messageManager->addErrorMessage(
                 __(
-                    "Checkout With Financing On Product Page Error, Please Contact Store Owner. 
-                    You may checkout by adding to cart and providing a payment in the checkout process."
+                    'Checkout With Financing On Product Page Error, Please Contact Store Owner. 
+                    You may checkout by adding to cart and providing a payment in the checkout process.'
                 )
             );
 
@@ -140,7 +140,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     protected function processOrder($data)
     {
         // @codingStandardsIgnoreStart
-        $this->helper->log(["PROCESS ORDER DATA" => $data]);
+        $this->logger->log(['PROCESS ORDER DATA' => $data]);
 
         /** @var $quote \Magento\Quote\Model\Quote */
         $quote = $this->checkoutSession->getQuote();
@@ -179,13 +179,13 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $billingContact['region_id'] = $shippingContact['region_id'];
         }
 
-        $this->helper->log(["SHIPPING CONTACT" => $shippingContact, "BILLING CONTACT" => $billingContact]);
+        $this->logger->log(['SHIPPING CONTACT' => $shippingContact, 'BILLING CONTACT' => $billingContact]);
 
         $billingAddress = $quote->getBillingAddress()->addData($billingContact);
         $shippingAddress = $quote->getShippingAddress()->addData($shippingContact)->setCollectShippingRates(true);
 
         if (!isset($data['shippingMethodCode'])) {
-            $this->helper->log("Shipping Method Code Is Not Set On The Response");
+            $this->logger->log('Shipping Method Code Is Not Set On The Response');
         }
 
         $shippingAddress->setShippingMethod($data['shippingMethodCode']);
@@ -211,13 +211,12 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         $quote->getPayment()->importData(['method' => 'breadcheckout']);
         $quote->getPayment()->setTransactionId($data['breadTransactionId']);
-        $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
+        $quote->getPayment()->setAdditionalData('BREAD CHECKOUT DATA', json_encode($data));
         
         try {
             $order = $this->quoteManagement->submit($quote);
         } catch (\Exception $e) {
-            $this->helper->log(["ERROR SUBMITTING QUOTE IN PROCESS ORDER" => $e->getMessage()]);
-            $this->logger->critical($e);
+            $this->logger->log(['ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage()]);
             throw $e;
         }
 
@@ -229,7 +228,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $this->orderSender->send($order);
         } catch (\Exception $e) {
-            $this->logger->critical($e);
+            $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $this->checkoutSession->setBreadItemAddedToQuote(false);
         }
 

@@ -1,21 +1,6 @@
 <?php /** @var $block Bread\BreadCheckout\Block\Product\View */ ?>
 <?php  echo $block->getBeforeHtml(); ?>
 
-<?php
-$_options = $block->decorateArray($block->getProduct()->getOptions());
-$allowCheckout = true;
-foreach ($_options as $option) {
-    if ($option->getValues()) {
-        foreach ($option->getValues() as $k => $v) {
-            if($v->getPrice() > 0){
-                $allowCheckout = false;
-                break;
-            }
-        }
-    }
-}
-?>
-
 <div id="bread-btn-cntnr">
     <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?php /* @noEscape */ echo $block->getIsDefaultSize(); ?>>
         <span>
@@ -42,12 +27,7 @@ foreach ($_options as $option) {
                 customTotal: items[0]['price'],
                 <?php endif; ?>
                 discounts: <?php echo $this->getDiscountDataJson(); ?>,
-                <?php if($allowCheckout):?>
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
-                <?php else: ?>
-                allowCheckout: false,
-                <?php endif; ?>
-
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         var i = document.createElement('input');
@@ -258,7 +238,6 @@ foreach ($_options as $option) {
 
         $(document).ready(function () {
             <?php if ($block->getProduct() != null) : ?>
-                document.customOptions = "";
                 document.productId                      = '<?php /* @noEscape */ echo $block->getProduct()->getId(); ?>';
                 document.baseProductSku                 = '<?php /* @noEscape */ echo $block->getProduct()->getSku(); ?>';
                 document.selectedSku                    = '<?php /* @noEscape */ echo $block->getProduct()->getSku(); ?>';

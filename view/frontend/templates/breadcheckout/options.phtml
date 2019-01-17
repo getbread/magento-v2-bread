@@ -6,110 +6,18 @@
  * @author  Miranda @Mediotype
  */
 
-/** @var $this Bread\BreadCheckout\Block\Product\View */
+/** @var $block Bread\BreadCheckout\Block\Product\View */
 ?>
-<script>
-    <?php $_options = $block->decorateArray($block->getProduct()->getOptions()); ?>
-    <?php if (!empty($_options)) : ?>
-
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
-        /**
-         * Retrieve custom options data
-         */
-        <?php foreach ($_options as $_option) : ?>
-            <?php /* @noEscape */ echo $block->getOptionHtml($_option); ?>
-        <?php endforeach; ?>
-        document.optionsData = <?php /* @noEscape */ echo $block->getCustomOptionsData($_options); ?>
-
-        /**
-         * Returns SKU with custom options appended;
-         * has side effect of updating the product price
-         */
-        document.getSkuForOptions = function() {
-            var skuSuffix = '';
-            var skipIds = [];
-            var price = document.round(document.basePrice);
-            
-            $('.product-custom-option').each(function() {
-                var optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
-
-                if (document.optionsData[optionId]) {
-                    var configOptions = document.optionsData[optionId];
-
-                    var val = $(this).val();
-                    if (val) {
-                        var sku = (configOptions[val]) ?
-                            configOptions[val].sku : configOptions.sku;
-                        var identifier = (sku === null) ?
-                            'id~' + optionId : sku;
-                    }
-
-                    var elType = $(this).attr('type');
-                    if (typeof elType == 'undefined') {
-                        elType = $(this).prop('tagName').toLowerCase();
-                    }
-
-                    switch (elType) {
-                        case 'checkbox':
-                        case 'radio':
-                            if ($(this).is(':checked') && val) {
-                                skuSuffix += '***' + identifier;
-                                price += document.round(configOptions[val].price);
-                            }
-                            break;
-                        case 'select':
-                            if (val && $(this).hasClass('datetime-picker')) {
-                                var role = $(this).data('calendar-role');
-                                skuSuffix += '***' + identifier + '===' + role + '===' + val;
-                                price += document.round(configOptions.price)
-                            } else if (val) {
-                                skuSuffix += '***' + identifier;
-                                price += document.round(configOptions[val].price);
-                            }
-                            break;
-                        default:
-                            if (val) {
-                                skuSuffix += '***' + identifier + '===' + val;
-                                price += document.round(configOptions[val].price);
-                            }
-                    }
+<?php $_options = $block->decorateArray($block->getProduct()->getOptions()); ?>
+<?php if (!empty($_options)) : ?>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Bread_BreadCheckout/js/product/options": {
+                    "optionsData": <?= $block->getCustomOptionsData($_options); ?>
                 }
-            });
+            }
+        }
+    </script>
+<?php endif; ?>
 
-            document.priceWithOptions = price;
-            return skuSuffix;
-        };
-
-        document.round = function(value) {
-            return parseInt(
-                Number(Math.round(parseFloat(value) + 'e' + 2) + 'e-' + 2)
-            );
-        };
-
-        $(document).on('load', function() {
-            document.basePrice = document.previousPrice;
-            document.customOptions = document.getSkuForOptions();
-
-            /**
-             * Validate the add to cart form when inputs are updated
-             */
-            $('#product_addtocart_form').on('change', function() {
-                $.mage.validation({
-                    errorPlacement: function() {} // Hides default error labels
-                }, this);
-
-                if ($(this).valid()) {
-                    document.customOptions = document.getSkuForOptions();
-                    $('.button-prevent').hide();
-                    if (document.customOptions !== '') {
-                        document.resetPriceAndSku(true);
-                    }
-                } else {
-                    $('.mage-error:not(.product-custom-option)', this).hide(); // Hides Magento error labels
-                    $('.button-prevent').show();
-                }
-            });
-        });
-    });
-    <?php endif; ?>
-</script>

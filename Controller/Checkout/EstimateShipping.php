@@ -29,7 +29,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
-        \Psr\Log\LoggerInterface $logger,
+        \Bread\BreadCheckout\Helper\Log $logger,
         \Bread\BreadCheckout\Helper\Checkout $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
@@ -93,9 +93,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             }
             $response = $methods;
         } catch (\Exception $e) {
-            $this->helper->log(['ERROR' => $e->getMessage(),
-                                'PARAMS'=> $this->getRequest()->getParams()]);
-            $this->logger->critical($e);
+            $this->logger->log(['ERROR' => $e->getMessage(),'PARAMS'=> $this->getRequest()->getParams()]);
             $this->messageManager->addErrorMessage(
                 __(
                     'Internal Error, Please Contact Store Owner. You may checkout by adding to cart 

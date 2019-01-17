@@ -22,7 +22,7 @@ class Customer extends Data
     /** @var \Magento\Customer\Model\AddressFactory */
     public $customerAddressFactory;
 
-    /** @var Magento\Framework\Json\Helper\Data */
+    /** @var \Magento\Framework\Json\Helper\Data */
     public $jsonHelper;
 
     /** @var \Magento\Framework\Math\Random */
@@ -43,6 +43,9 @@ class Customer extends Data
     /** @var \Magento\Customer\Api\AddressRepositoryInterface */
     public $addressRepository;
 
+    /** @var Log  */
+    public $logger;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -59,7 +62,8 @@ class Customer extends Data
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
+        \Bread\BreadCheckout\Helper\Log $logger
     ) {
         $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
@@ -72,6 +76,7 @@ class Customer extends Data
         $this->regionFactory = $regionFactory;
         $this->customerRepository = $customerRepository;
         $this->addressRepository = $addressRepository;
+        $this->logger = $logger;
         parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
     }
     /**
@@ -225,8 +230,7 @@ class Customer extends Data
             }
 
         } catch (\Exception $e) {
-            $this->log('Exception While Creating Customer');
-            $this->logger->critical($e);
+            $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
         }
 
         return $customer;

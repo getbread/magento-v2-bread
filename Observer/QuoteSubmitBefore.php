@@ -34,13 +34,13 @@ class QuoteSubmitBefore implements \Magento\Framework\Event\ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         /** @var \Magento\Sales\Model\Order $order */
-        $order = $observer->getData("order");
+        $order = $observer->getData('order');
 
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $order->getPayment();
 
         if ($payment && $payment->getMethod() == $this->breadPayment->getMethodCode()) {
-            $payment->setAdditionalInformation("method_title", $this->breadPayment->getBaseTitle());
+            $payment->setAdditionalInformation('method_title', $this->breadPayment->getBaseTitle());
         }
 
         return $this;
