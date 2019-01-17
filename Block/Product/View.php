@@ -215,7 +215,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     protected function _toHtml()
     {
         if ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW
-            && $this->catalogHelper->isEnabledOnPDP()) {
+            && $this->catalogHelper->isEnabledOnPDP()
+            && $this->catalogHelper->allowedProductType($this->getProduct()->getTypeId())
+        ) {
             return parent::_toHtml();
         } elseif ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW
                   && $this->catalogHelper->isEnabledOnCOP()){

@@ -66,6 +66,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'shippingOptions' => $this->helper->getShippingOptions(),
                         'buttonLocation' => $this->helperData->getCheckoutLocation(),
                         'methodTooltip' => $this->helper->getMethodTooltip(),
+                        'productTypeMessage' => $this->helperData->getProductTypeMessage(),
+                        'cartValidation' => $this->helper->validateAllowedProductTypes()
                     ]
                 ]
             ]

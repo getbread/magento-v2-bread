@@ -458,4 +458,23 @@ class Quote extends Data
         }
 
     }
+
+    /**
+     * Check if cart contains valid product types
+     *
+     * @return bool
+     */
+    public function validateAllowedProductTypes()
+    {
+        $quote = $this->getSessionQuote();
+        $items = $quote->getAllVisibleItems();
+
+        foreach ($items as $item) {
+            if($this->allowedProductType($item->getProductType()) === false){
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

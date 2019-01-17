@@ -36,6 +36,7 @@
                 </div>
                 <!-- /ko -->
             </div>
+            <!-- ko if: isCartValid() -->
             <div class="primary">
                 <button data-role="review-save"
                         type="submit"
@@ -45,8 +46,15 @@
                     <span data-bind="i18n: 'Place Order'"></span>
                 </button>
             </div>
+            <!-- /ko -->
         </div>
 
+        <!-- /ko -->
+
+        <!-- ko ifnot: isCartValid() -->
+        <div class="checkout_error_tip">
+            <span data-bind="text: getCheckoutMessage()"></span>
+        </div>
         <!-- /ko -->
 
     </div>
