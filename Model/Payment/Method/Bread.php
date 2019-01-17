@@ -12,13 +12,13 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
     /* internal action types */
-    const ACTION_CAPTURE                = "capture";
-    const ACTION_REFUND                 = "refund";
-    const ACTION_VOID                   = "void";
+    const ACTION_CAPTURE                = 'capture';
+    const ACTION_REFUND                 = 'refund';
+    const ACTION_VOID                   = 'void';
 
-    public $_code          = 'breadcheckout';
-    public $_infoBlockType = 'Bread\BreadCheckout\Block\Payment\Info';
-    public $_formBlockType = 'Bread\BreadCheckout\Block\Payment\Form';
+    public $_code                       = 'breadcheckout';
+    public $_infoBlockType              = 'Bread\BreadCheckout\Block\Payment\Info';
+    public $_formBlockType              = 'Bread\BreadCheckout\Block\Payment\Form';
 
     public $_isGateway               = true;
     public $_canAuthorize            = true;
@@ -101,6 +101,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Bread\BreadCheckout\Helper\Log $breadLogger,
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
@@ -111,7 +112,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     ) {
     
         $this->apiClient = $apiClient;
-        $this->logger = $logger;
+        $this->logger = $breadLogger;
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->_canUseCheckout = $this->helper->isPaymentMethodAtCheckout();
@@ -163,7 +164,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         if (!$this->canUseForCountry($billingCountry)) {
-            $this->helper->log("ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY". $billingCountry);
+            $this->logger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY'. $billingCountry);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('This financing program is available to US residents, please click the finance button 
                 and complete the application in order to complete your purchase with the financing payment method.')
@@ -172,7 +173,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
         $token = $this->getToken();
         if (empty($token)) {
-            $this->helper->log("ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN");
+            $this->logger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('This financing program is unavailable, please complete the application. 
                 If the problem persists, please contact us.')
@@ -369,7 +370,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         $payment,
                         ['is_closed' => false, 'authorize_result' => $this->jsonHelper->jsonEncode($result)],
                         [],
-                        "Bread Finance Payment Authorized"
+                        'Bread Finance Payment Authorized'
                     );
                 break;
             case self::ACTION_CAPTURE:
@@ -380,7 +381,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         $payment,
                         ['is_closed' => false, 'settle_result' => $this->jsonHelper->jsonEncode($result)],
                         [],
-                        "Bread Finance Payment Captured"
+                        'Bread Finance Payment Captured'
                     );
                 break;
             case self::ACTION_REFUND:
@@ -396,7 +397,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         $payment,
                         ['is_closed' => false, 'refund_result' => $this->jsonHelper->jsonEncode($result)],
                         [],
-                        "Bread Finance Payment Refunded"
+                        'Bread Finance Payment Refunded'
                     );
                 break;
             case self::ACTION_VOID:
@@ -408,7 +409,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                         $payment,
                         ['is_closed' => true, 'cancel_result' => $this->jsonHelper->jsonEncode($result)],
                         [],
-                        "Bread Finance Payment Canceled"
+                        'Bread Finance Payment Canceled'
                     );
                 break;
             default:
@@ -450,8 +451,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
             return $payment;
         } catch (\Exception $e) {
-            $this->helper->log($e->getMessage());
-            $this->helper->log($e->getTraceAsString());
+            $this->logger->log(['ERROR'=>$e->getMessage(),'TRACE'=>$e->getTraceAsString()]);
         }
     }
 
@@ -505,7 +505,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if (preg_match('/^[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/', $rawTransId, $matches)) {
             return $matches[0];
         } else {
-            $this->helper->log("INVALID TRANSACTION ID PROVIDED: ". $rawTransId);
+            $this->logger->log('INVALID TRANSACTION ID PROVIDED: '. $rawTransId);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Unable to process request because an invalid transaction ID was provided.')
             );
@@ -534,8 +534,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
         if ($this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST && $showPerMonth) {
             $data = $this->quoteHelper->submitQuote();
-            if (isset($data["asLowAs"]) && isset($data["asLowAs"]["amount"])) {
-                $title .= " " . sprintf(__("as low as %s/month*"), $data["asLowAs"]["amount"]);
+            if (isset($data['asLowAs']) && isset($data['asLowAs']['amount'])) {
+                $title .= ' ' . sprintf(__('as low as %s/month*'), $data['asLowAs']['amount']);
             }
         }
         return $title;

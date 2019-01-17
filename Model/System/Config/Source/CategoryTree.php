@@ -103,7 +103,7 @@ class CategoryTree extends \Magento\Framework\App\Config\Value
             $catId    = $category->getId();
             $catLevel = $category->getLevel();
 
-            $catName = str_repeat("----", $catLevel - $lowest) . $catName;
+            $catName = str_repeat('----', $catLevel - $lowest) . $catName;
 
             $options[] = [
                 'label' => $catName,

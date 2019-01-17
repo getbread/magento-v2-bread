@@ -35,7 +35,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const URL_ADMIN_SEND_SMS                        = 'breadadmin/bread/sendsms';
 
     const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
-    const XML_CONFIG_LOG_ENABLED                    = 'payment/breadcheckout/log_enabled';
+
     const XML_CONFIG_AS_LOW_AS                      = 'payment/breadcheckout/as_low_as';
     const XML_CONFIG_PAYMENT_ACTION                 = 'payment/breadcheckout/payment_action';
     const XML_CONFIG_HEALTHCARE_MODE                = 'payment/breadcheckout/healthcare_mode';
@@ -105,9 +105,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /** @var \Magento\Framework\UrlInterfaceFactory */
     public $urlInterfaceFactory;
 
-    /** @var \Psr\Log\LoggerInterface */
-    public $logger;
-
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -120,7 +117,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
-        $this->logger = $helperContext->getLogger();
         parent::__construct(
             $helperContext
         );
@@ -143,10 +139,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null $store
      * @return bool
      */
-    public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+/*    public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_LOG_ENABLED, $store);
-    }
+    }*/
 
     /**
      * Get API Pub Key
@@ -764,24 +760,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getOtherLocation()
     {
         return (string) self::BUTTON_LOCATION_OTHER;
-    }
-
-    /**
-     * Log to var/log/debug.log file
-     *
-     * @param mixed $data
-     * @param string $context
-     */
-    public function log($data, $context = 'Bread\BreadCheckout')
-    {
-        if ($this->logEnabled()) {
-            if (!is_string($data)) {
-                // @codingStandardsIgnoreStart
-                $data = print_r($data, true);
-                // @codingStandardsIgnoreEnd
-            }
-            $this->logger->debug($data, [$context]);
-        }
     }
 
     /**

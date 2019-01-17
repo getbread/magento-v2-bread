@@ -46,7 +46,7 @@ class ListProductPlugin
     {
         $result = $proceed($product);
         /** @var \Magento\Catalog\Model\Category $category */
-        $category = $this->registry->registry("current_category");
+        $category = $this->registry->registry('current_category');
 
         /** @var \Magento\Framework\View\Layout $layout */
         $layout = $subject->getLayout();

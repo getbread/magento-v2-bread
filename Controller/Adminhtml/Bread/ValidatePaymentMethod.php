@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
+
+
 class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
@@ -16,7 +18,7 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
     /** @var \Magento\Framework\Controller\Result\JsonFactory */
     public $resultJsonFactory;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /** @var \Bread\BreadCheckout\Helper\Log */
     public $logger;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
@@ -29,13 +31,13 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Psr\Log\LoggerInterface $logger,
+        \Bread\BreadCheckout\Helper\Log $log,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
     ) {
         $this->paymentApiClient = $paymentApiClient;
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->logger = $logger;
+        $this->logger = $log;
         $this->helper = $helper;
         $this->orderCreateModel = $orderCreateModel;
         parent::__construct($context);
@@ -63,8 +65,7 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
                 }
             }
         } catch (\Exception $e) {
-            $this->helper->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
-            $this->logger->critical($e);
+            $this->logger->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __(
                     'Something went wrong processing the Bread payment. 

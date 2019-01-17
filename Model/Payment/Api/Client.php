@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Model\Payment\Api;
 
+use Magento\Setup\Exception;
+
 class Client extends \Magento\Framework\Model\AbstractModel
 {
     const STATUS_AUTHORIZED     = 'AUTHORIZED';
@@ -26,17 +28,21 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /** @var \Magento\Store\Model\StoreManagerInterface */
     public $storeResolver;
 
+    public $logger;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Magento\Store\Model\StoreResolver $storeResolver
+        \Magento\Store\Model\StoreResolver $storeResolver,
+        \Bread\BreadCheckout\Helper\Log $log
     ) {
     
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->storeResolver = $storeResolver;
+        $this->logger = $log;
         parent::__construct($context, $registry);
     }
 
@@ -78,7 +84,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
 
         if ($result['status'] != self::STATUS_CANCELED) {
-            $this->helper->log(["ERROR"=>"Transaction cancel failed", "RESULT"=>$result]);
+            $this->logger->log(['ERROR'=>'Transaction cancel failed', 'RESULT'=>$result]);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Transaction cancel failed (current transaction status :' . $result->status . ')')
             );
@@ -110,7 +116,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         );
 
         if ($result['status'] != self::STATUS_AUTHORIZED) {
-            $this->helper->log(["ERROR"=>"AUTHORIZATION FAILED", "RESULT"=>$result]);
+            $this->logger->log(['ERROR'=>'AUTHORIZATION FAILED', 'RESULT'=>$result]);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Transaction authorize failed (current transaction status :' . $result->status . ')')
             );
@@ -118,12 +124,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
         $breadAmount = $result['total'];
         if ((int) trim($breadAmount) != (int) trim($amount)) {
-            $this->helper->log(
+            $this->logger->log(
                 [
-                    "ERROR"         =>"BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH",
-                    "BREAD AMOUNT"  =>(int)$breadAmount,
-                    "QUOTE AMOUNT"  =>(int)$amount,
-                    "RESULT"        =>$result
+                    'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
+                    'BREAD AMOUNT'  =>(int)$breadAmount,
+                    'QUOTE AMOUNT'  =>(int)$amount,
+                    'RESULT'        =>$result
                 ]
             );
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -253,7 +259,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         try {
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_HEADER, 0);
-            curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
+            curl_setopt($curl, CURLOPT_USERPWD, $username . ':' . $password);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
             if ($method == \Zend_Http_Client::POST) {
@@ -280,12 +286,14 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 );
             }
         } catch (\Exception $e) {
-            $this->helper->log(["USER"      => $username,
-                                 "PASSWORD"  => $password,
-                                 "URL"       => $url,
-                                 "STATUS"    => $status,
-                                 "DATA"      => $data,
-                                 "RESULT"    => $result]);
+            $this->logger->log([
+                'USER'      => $username,
+                'PASSWORD'  => $password,
+                'URL'       => $url,
+                'STATUS'    => $status,
+                'DATA'      => $data,
+                'RESULT'    => $result
+            ]);
 
             curl_close($curl);
             throw $e;
@@ -294,11 +302,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
         curl_close($curl);
         // @codingStandardsIgnoreEnd
 
-        $this->helper->log(["USER"      => $username,
-                             "PASSWORD"  => $password,
-                             "URL"       => $url,
-                             "DATA"      => $data,
-                             "RESULT"    => $result]);
+        $this->logger->log([
+                'USER'      => $username,
+                'PASSWORD'  => $password,
+                'URL'       => $url,
+                'DATA'      => $data,
+                'RESULT'    => $result
+            ]);
 
         if (!$this->isJson($result)) {
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -383,8 +393,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
         try {
             $this->jsonHelper->jsonDecode($string);
-        } catch (\Zend_Json_Exception $e) {
-            $this->helper->log($e->getMessage());
+        } catch (\Exception $e) {
+            $this->logger->log($e->getMessage());
             return false;
         }
         return true;
