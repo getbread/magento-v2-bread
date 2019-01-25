@@ -71,7 +71,7 @@ class Checkout extends Quote
     public function validateTransactionAmount($transactionId)
     {
         $breadAmount = $this->getBreadTransactionAmount();
-        $quoteTotal = (int)($this->priceCurrency->round($this->getSessionQuote()->getGrandTotal()) * 100);
+        $quoteTotal = (int)($this->priceCurrency->round($this->getSessionQuote()->getGrandTotal() * 100));
 
         if ($breadAmount === 0) {
             $info = $this->paymentApiClient->getInfo($transactionId);

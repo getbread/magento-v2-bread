@@ -47,6 +47,7 @@ foreach ($_options as $option) {
                 <?php else: ?>
                 allowCheckout: false,
                 <?php endif; ?>
+                <?php if($block->isDownloadable()):?>requireShippingContact:false,<?php endif;?>
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
