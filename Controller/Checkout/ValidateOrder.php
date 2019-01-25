@@ -168,7 +168,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         }
 
         $billingContact = $this->customerHelper->processAddress($data['billingContact']);
-        $shippingContact = $this->customerHelper->processAddress($data['shippingContact']);
+        $shippingContact = $quote->isVirtual() ? $billingContact : $this->customerHelper->processAddress($data['shippingContact']);
 
         if (!isset($shippingContact['email'])) {
             $shippingContact['email'] = $billingContact['email'];

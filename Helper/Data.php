@@ -147,7 +147,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
             \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL,
             \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE,
-            //\Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
+            \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
             \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
         ];
         return in_array($typeId,$allowedProductTypes);

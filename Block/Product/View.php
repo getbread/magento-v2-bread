@@ -501,4 +501,12 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         return $this->jsonHelper->jsonEncode($data);
     }
 
+    /**
+     * Is downloadable type
+     * @return bool
+     */
+    public function isDownloadable()
+    {
+        return $this->getProduct()->getTypeId() === \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE;
+    }
 }

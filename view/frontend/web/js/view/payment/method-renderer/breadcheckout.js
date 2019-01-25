@@ -13,7 +13,8 @@ define(
         'Magento_Checkout/js/model/shipping-save-processor/default',
         'Magento_Checkout/js/model/shipping-service',
         'Magento_Checkout/js/model/full-screen-loader',
-        'Magento_Checkout/js/model/payment/additional-validators'
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'Magento_Checkout/js/model/quote'
     ],
     function (
         Component,
@@ -29,7 +30,8 @@ define(
         defaultProcessor,
         shippingService,
         fullScreenLoader,
-        additionalValidators
+        additionalValidators,
+        quote
     ) {
         'use strict';
         return Component.extend({
@@ -197,6 +199,9 @@ define(
                 /**
                  * Reload checkout section & add bread token
                  */
+                if(quote.isVirtual()){
+                    return defaultProcessor;
+                }
                 return defaultProcessor.saveShippingInformation();
             },
 

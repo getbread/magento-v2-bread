@@ -225,6 +225,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     {
         try {
             $quote      = $this->getQuote($data);
+
+            if($quote->getIsVirtual()){
+                return $quote->getBillingAddress();
+            }
+
             $address    = $quote->getShippingAddress();
 
             $regionId   = $address->getRegionModel()
