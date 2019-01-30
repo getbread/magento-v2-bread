@@ -21,6 +21,7 @@ define(
                     shippingContact: data.shippingContact,
                     billingContact: data.billingContact,
                     buttonLocation: data.buttonLocation,
+                    disableEditShipping: true,
                     done: function (err, tx_token) {
                         if (tx_token !== undefined) {
                             $.ajax({
