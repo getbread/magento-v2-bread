@@ -81,6 +81,7 @@ class GenerateCart extends \Magento\Backend\App\Action
 
             $arr["options"]["completeUrl"] = $this->urlHelper->getLandingPageURL();
             $arr["options"]["errorUrl"] = $this->urlHelper->getLandingPageURL(true);
+            $arr['options']['disableEditShipping'] = true;
 
             $arr["options"]["shippingOptions"] = [ $this->helper->getShippingOptions() ];
 
