@@ -78,6 +78,7 @@ class GenerateCart extends \Magento\Backend\App\Action
 
             $arr['options']['completeUrl'] = $this->urlHelper->getLandingPageURL();
             $arr['options']['errorUrl'] = $this->urlHelper->getLandingPageURL(true);
+            $arr['options']['disableEditShipping'] = true;
 
             $arr['options']['shippingOptions'] = [ $this->helper->getShippingOptions() ];
 
@@ -99,7 +100,7 @@ class GenerateCart extends \Magento\Backend\App\Action
             $ret['successRows'] = [
                 __('Cart with Financing was successfully created.'),
                 __('Following link can be used by your customer to complete purchase.'),
-                sprintf("<a href='%1$s'>%1$s</a>", $result['url'])
+                sprintf('<a href="%1$s">%1$s</a>', $result["url"])
             ];
 
             $ret['cartUrl'] = $result['url'];
