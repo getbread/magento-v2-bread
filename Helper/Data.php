@@ -60,6 +60,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
     const XML_CONFIG_ALLOW_CHECKOUT_CART            = 'payment/breadcheckout/allowcheckoutcart';
     const XML_CONFIG_EMBEDDED_CHECKOUT              = 'payment/breadcheckout/embedded';
+    const XML_CONFIG_PRODUCT_TYPE_MSG               = 'payment/breadcheckout/product_type_msg';
     const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
@@ -131,6 +132,36 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_MODULE_ACTIVE, $store);
+    }
+
+    /**
+     * Check product type against allowed product type list
+     *
+     * @param string $typeId
+     * @return bool
+     */
+    public function allowedProductType($typeId)
+    {
+        $allowedProductTypes = [
+            \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE,
+            \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
+            \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL,
+            \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE,
+            \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
+            \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
+        ];
+        return in_array($typeId,$allowedProductTypes);
+    }
+
+    /**
+     * Return custom message for non supported product type
+     *
+     * @param string $store
+     * @return mixed
+     */
+    public function getProductTypeMessage($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_PRODUCT_TYPE_MSG, $store);
     }
 
     /**

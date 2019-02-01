@@ -17,11 +17,10 @@ define([
                 items: data.items,
                 actAsLabel: false,
                 asLowAs: data.asLowAs,
-                shippingOptions: [data.shippingOptions],
-                tax: this.round(quote.getTotals()._latestValue.base_tax_amount),
                 customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
                 disableEditShipping: true,
+                requireShippingContact: !quote.isVirtual(),
                 onShowCheckoutError: function(message){
 
                     alert({
@@ -40,6 +39,11 @@ define([
             /**
              * Optional params
              */
+
+            if(!quote.isVirtual()){
+                this.breadConfig.shippingOptions =  [data.shippingOptions];
+                this.breadConfig.tax = this.round(quote.getTotals()._latestValue.base_tax_amount);
+            }
 
             if(data.embeddedCheckout){
                 this.breadConfig.formId = data.formId;
@@ -85,8 +89,15 @@ define([
 
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
 
-                if(this.breadConfig.shippingOptions[0] !== false){
+                if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false){
+
                     bread.showCheckout(this.breadConfig);
+
+                } else if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()){
+
+                    this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+                    bread.showCheckout(this.breadConfig);
+
                 } else {
                     /* ocs save selected shipping method */
                     $.ajax({
@@ -95,7 +106,7 @@ define([
                         context: this
                     }).done(function (data) {
                         self.breadConfig.shippingOptions = [data];
-                        self.breadConfig.customTotal =  this.round(quote.getTotals()._latestValue.base_grand_total);
+                        self.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
                         bread.showCheckout(self.breadConfig);
                     });
                 }
@@ -146,6 +157,11 @@ define([
                         data.billingContact.email :
                         checkout.getValidatedEmailValue();
                 }
+
+                if(quote.isVirtual()){
+                    this.breadConfig.shippingContact = data.billingContact;
+                }
+
                 fullScreenLoader.stopLoader();
 
                 if(isEmbedded === false){
@@ -179,12 +195,7 @@ define([
          * Round float to 2 decimal places then convert to integer
          */
         round: function (value) {
-
-            if(typeof value === "number"){
-                return parseInt(Math.round(value * 100));
-            }
-
-            console.trace(typeof value + " passed instead of number");
+            return Math.round(value * 100);
         }
     };
 });

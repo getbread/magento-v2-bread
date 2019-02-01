@@ -17,7 +17,7 @@
     z-index: 500
 }
 .buy_error_tip:after {
-    content: 'Please complete product configuration'
+    content: attr(data-content);
 }
 
 .button-prevent{
@@ -44,5 +44,21 @@
 }
 
 .button-prevent:hover span.buy_error_tip {
-    display: block
+    display: block;
+}
+
+.checkout_error_tip {
+    background-color: white;
+    color: black;
+    width:80%;
+    top: -30px;
+    padding: 5px 7px;
+    font-size: 11px;
+    line-height: 16px;
+    text-decoration: none;
+    text-indent: 0;
+    text-align: center;
+    border: 2px solid #b00;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }

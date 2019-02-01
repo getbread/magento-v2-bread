@@ -8,7 +8,7 @@
         </span>
     </div>
     <div class="button-prevent" id="button-prevent">
-        <span class="buy_error_tip override_tip">&nbsp;</span>
+        <span class="buy_error_tip override_tip" data-content="<?= __('Please complete product configuration') ?>">&nbsp;</span>
     </div>
 </div>
 
@@ -28,6 +28,7 @@
                 <?php endif; ?>
                 discounts: <?php echo $this->getDiscountDataJson(); ?>,
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
+                <?php if($block->isDownloadable()):?>requireShippingContact:false,<?php endif;?>
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         var i = document.createElement('input');

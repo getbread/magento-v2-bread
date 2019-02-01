@@ -148,4 +148,24 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
         $design = $this->dataHelper->escapeCustomCSS($this->catalogHelper->getCartButtonDesign());
         return $design ? $design : parent::getButtonDesign();
     }
+
+    /**
+     * Validate allowed products wrapper for block class
+     *
+     * @return bool
+     */
+    public function validateAllowedProductTypes()
+    {
+        return $this->quoteHelper->validateAllowedProductTypes();
+    }
+
+    /**
+     * Custom product type error message
+     *
+     * @return string
+     */
+    public function productTypeErrorMessage()
+    {
+        return $this->_escaper->escapeHtml($this->catalogHelper->getProductTypeMessage());
+    }
 }

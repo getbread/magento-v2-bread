@@ -6,10 +6,22 @@
             <span><?php /* @noEscape */ echo __('Bread Checkout'); ?></span>
         </span>
     </div>
+    <div class="button-prevent" id="button-prevent">
+        <span class="buy_error_tip override_tip" data-content="<?= $block->productTypeErrorMessage() ?>">&nbsp;</span>
+    </div>
 </div>
 
 <script type="text/javascript">
     require(['jquery', 'jquery/validate', 'mage/validation'], function($, quote){
+
+        var validateProductTypes = Boolean(<?= $block->validateAllowedProductTypes() ?>);
+        if(validateProductTypes === false){
+            var buttonPrevent = $('#button-prevent');
+            buttonPrevent.css('width','100%');
+            buttonPrevent.css('height','100%');
+            buttonPrevent.show();
+        }
+
         document.configureButton = function (items) {
             var address             = <?php /* @noEscape */ echo $block->getShippingAddressData(); ?>;
             var billingAddress      = <?php /* @noEscape */ echo $block->getBillingAddressData(); ?>;
