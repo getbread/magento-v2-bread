@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Model\Payment\Api;
 
-use Magento\Setup\Exception;
-
 class Client extends \Magento\Framework\Model\AbstractModel
 {
     const STATUS_AUTHORIZED     = 'AUTHORIZED';

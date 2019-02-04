@@ -46,7 +46,7 @@
                         i.value = tx_token;
                         k.type = 'hidden';
                         k.name = 'form_key';
-                        k.value = '<?php echo $block->getFormKey(); ?>';
+                        k.value = $.cookie('form_key');
                         var f = document.createElement('form');
                         f.action = '<?php /* @noEscape */ echo $block->getValidateOrderUrl(); ?>?product_page=1';
                         f.method = 'POST';
