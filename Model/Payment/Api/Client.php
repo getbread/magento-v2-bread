@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Model\Payment\Api;
 
-use Magento\Setup\Exception;
-
 class Client extends \Magento\Framework\Model\AbstractModel
 {
     const STATUS_AUTHORIZED     = 'AUTHORIZED';
@@ -280,7 +278,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             if ($status != 200) {
-                $this->helper->log(curl_error($curl));
+                $this->logger->log(curl_error($curl));
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('Call to Bread API failed.  Error: '. $result)
                 );
