@@ -28,13 +28,11 @@
                     selectedOptions[attributeId] = $(this).val();
                     validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
                 });
-                validSuperAttribute =  validSuperAttribute && validSuperAttribute.search("false") === -1; 
+                validSuperAttribute =  Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
                 /**
                  * Validate add to cart form
                  */
-                $.mage.validation({
-                    errorPlacement: function() {} // Hides default error labels
-                }, form);
+                $.mage.validation({errorPlacement:function () {},highlight:function () {}}, form);
 
                 if ($(form).valid() && validSuperAttribute) {
                     $('.button-prevent').hide();
@@ -47,7 +45,6 @@
                         document.resetPriceAndSku(true);
                     }
                 } else {
-                    $('.mage-error:not(.product-custom-option)', form).hide(); // Hides Magento error labels
                     $('.button-prevent').show();
                 }
             };
