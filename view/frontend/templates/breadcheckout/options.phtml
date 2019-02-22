@@ -14,7 +14,8 @@
         {
             "*": {
                 "Bread_BreadCheckout/js/product/options": {
-                    "optionsData": <?= $block->getCustomOptionsData($_options); ?>
+                    "optionsData": <?= $block->getCustomOptionsData($_options); ?>,
+                    "productType": "<?= $block->getProduct()->getTypeId()?>"
                 }
             }
         }
