@@ -26,7 +26,12 @@ define([
             }
 
             $('.product-custom-option').each(function(u) {
-                var optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+
+                if($(this).attr('type') !== 'file'){
+                    var optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+                } else {
+                    var optionId = $(this).attr('name').match(/\_(\d+)\_/)[1];
+                }
 
                 if (optionsData[optionId]) {
                     var configOptions = optionsData[optionId];
