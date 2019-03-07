@@ -69,7 +69,7 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
                 );
             }
             
-            $result             = $shippingAddress->getTaxAmount() * 100;
+            $result             = round($shippingAddress->getTaxAmount()) * 100;
             $response           = $result;
         } catch (\Exception $e) {
             $this->logger->log(['EXCEPTION IN TAX ESTIMATE ACTION' => $e->getMessage()]);

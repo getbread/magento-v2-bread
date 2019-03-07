@@ -120,8 +120,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
             );
         }
 
-        $breadAmount = $result['total'];
-        if ((int) trim($breadAmount) != (int) trim($amount)) {
+        $breadAmount = trim($result['total']);
+        $amount = trim($amount);
+
+        if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
             $this->logger->log(
                 [
                     'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',

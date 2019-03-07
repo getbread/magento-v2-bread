@@ -1,20 +1,37 @@
-define(['jquery', 'jquery/validate', 'mage/validation', 'domReady!'], function($) {
+define([
+    'jquery',
+    'jquery/validate',
+    'mage/validation',
+    'domReady!'
+], function($) {
 
     'use strict';
 
     return function(config){
-
         var optionsData = config.optionsData;
+        var productType = config.productType;
         /**
          * Returns SKU with custom options appended;
          * has side effect of updating the product price
          */
-        document.getSkuForOptions = function() {
+        document.getSkuForOptions = function(selectedOptions) {
+
             var skuSuffix = '';
-            var price = document.round(document.basePrice);
+            var selected = (typeof spConfig !== 'undefined') ? spConfig.getIdOfSelectedProduct(selectedOptions) : null;
+
+            if(productType === 'configurable' && selected !== null){
+                var price = document.round(spConfig.optionPrices[selected].finalPrice.amount * 100);
+            } else {
+                var price = document.round(document.basePrice);
+            }
 
             $('.product-custom-option').each(function(u) {
-                var optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+
+                if($(this).attr('type') !== 'file'){
+                    var optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+                } else {
+                    var optionId = $(this).attr('name').match(/\_(\d+)\_/)[1];
+                }
 
                 if (optionsData[optionId]) {
                     var configOptions = optionsData[optionId];
@@ -36,7 +53,7 @@ define(['jquery', 'jquery/validate', 'mage/validation', 'domReady!'], function($
                         case 'checkbox':
                         case 'radio':
                             if ($(this).is(':checked') && val) {
-                                skuSuffix += '***' + identifier;
+                                skuSuffix += '***' + identifier + '===' + val;
                                 price += document.round(configOptions[val].price);
                             }
                             break;
@@ -46,8 +63,14 @@ define(['jquery', 'jquery/validate', 'mage/validation', 'domReady!'], function($
                                 skuSuffix += '***' + identifier + '===' + role + '===' + val;
                                 price += document.round(configOptions.price)
                             } else if (val) {
-                                skuSuffix += '***' + identifier;
+                                skuSuffix += '***' + identifier + '===' + val;
                                 price += document.round(configOptions[val].price);
+                            }
+                            break;
+                        case 'text':
+                            if(val !== ""){
+                                skuSuffix += '***' + identifier + '===' + val;
+                                price += document.round(configOptions.price);
                             }
                             break;
                         default:
@@ -69,7 +92,6 @@ define(['jquery', 'jquery/validate', 'mage/validation', 'domReady!'], function($
             );
         };
 
-
         document.basePrice = document.previousPrice;
         document.customOptions = document.getSkuForOptions();
 
@@ -77,16 +99,30 @@ define(['jquery', 'jquery/validate', 'mage/validation', 'domReady!'], function($
          * Validate the add to cart form when inputs are updated
          */
         $('#product_addtocart_form').on('change', function() {
-            $.mage.validation({
-                errorPlacement: function() {} // Hides default error labels
-            }, this);
+            $.mage.validation({errorPlacement:function () {},highlight:function () {}}, this);
 
-            if ($(this).valid()) {
-                document.customOptions = document.getSkuForOptions();
+            if(productType === 'configurable'){
+
+                var selectedOptions = {};
+                var validSuperAttribute = '';
+                $('[name^="super_attribute"]').each(function() {
+                    var attributeId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+                    selectedOptions[attributeId] = $(this).val();
+                    validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
+                });
+                validSuperAttribute =  Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
+
+                var isValid = $(this).valid() && validSuperAttribute;
+
+            }else{
+                var isValid = $(this).valid();
+            }
+
+            if (isValid) {
+                document.customOptions = document.getSkuForOptions(selectedOptions);
                 $('.button-prevent').hide();
                 document.resetPriceAndSku(true);
             } else {
-                $('.mage-error:not(.product-custom-option)', this).hide(); // Hides Magento error labels
                 $('.button-prevent').show();
             }
         });

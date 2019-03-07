@@ -96,12 +96,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         array $customOptionPieces,
         $quantity
     ) {
-    
+
         $productId          = $product->getId();
         $baseProductId      = $baseProduct->getId();
         $buyInfo            = ['qty' =>  $quantity];
 
-        // @codingStandardsIgnoreStart
         if ($baseProductId != $productId) {
         /** @var $catalogResource \Magento\Catalog\Model\ResourceModel\ProductFactory */
             $catalogResource            = $this->catalogResourceModelProductFactory->create();
@@ -135,18 +134,12 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             $buyInfo['qty']                         = $buyRequest['qty'];
         }
 
-        $counter    = 0;
-        if (count($customOptionPieces) > 1) {
+        if (count($customOptionPieces)) {
             $customOptionConfig     = [];
             foreach ($customOptionPieces as $customOption) {
-                $counter++;
-                if ($counter == 1) {
-                    continue;
-                }
 
                 $optionKeyValue     = explode('===', $customOption);
                 $found              = false;
-
                 foreach ($baseProduct->getOptions() as $o) {
                     if ($found) {
                         break;
@@ -156,7 +149,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                     if (!empty($values)) {
                         foreach ($values as $v) {
                             if ($this->compareOptions($v, $optionKeyValue[0])) {
-                                $customOptionConfig[$v->getOptionId()][] = $v->getOptionTypeId();
+                                $customOptionConfig[$v->getOptionId()][] = $optionKeyValue[1];
                                 $found      = true;
                                 break;
                             }
@@ -173,14 +166,12 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
                                 $optionGroups = array_chunk($optionKeyValue, 2);
                                 foreach ($optionGroups as $group) {
-                                    // @codingStandardsIgnoreStart
                                     if (count($group) === 2) {
                                         $customOptionConfig[$optionId][$group[0]] = $group[1];
                                     }
-                                    // @codingStandardsIgnoreEnd
                                 }
                             } else {
-                                $customOptionConfig[$optionId][] = $optionKeyValue;
+                                $customOptionConfig[$optionId] = $optionKeyValue[1];
                             }
 
                             $found      = true;
@@ -190,7 +181,6 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             }
             $buyInfo['options']     = $customOptionConfig;
         }
-        // @codingStandardsIgnoreEnd
 
         $buyRequest = $this->dataObjectFactory->create();
         $buyRequest->addData($buyInfo);
