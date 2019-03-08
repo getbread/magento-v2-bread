@@ -302,6 +302,37 @@
                         </comment>
                     </field>
                 </group>
+                <group id="instore_pickup" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                    <label>Settings: In Store Pickup</label>
+                    <field id="enable" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="method_code" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enter method code used for in store pickup</label>
+                    </field>
+                    <field id="country_id" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" >
+                        <label>Country</label>
+                        <frontend_class>countries</frontend_class>
+                        <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    </field>
+                    <field id="region_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" >
+                        <label>Region/State</label>
+                    </field>
+                    <field id="telephone" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Telephone</label>
+                        <validate>validate-digits</validate>
+                    </field>
+                    <field id="street" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Street</label>
+                    </field>
+                    <field id="city" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>City</label>
+                    </field>
+                    <field id="postcode" type="text" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Postcode</label>
+                    </field>
+                </group>
             </group>
         </section>
     </system>

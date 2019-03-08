@@ -78,6 +78,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_CP_BUTTON_DESIGN               = 'payment/breadcheckout/bread_cartpage/button_design';
     const XML_CONFIG_PDP_BUTTON_DESIGN              = 'payment/breadcheckout/bread_productdetail/button_design';
 
+    const XML_CONFIG_STORE_PICKUP_ENABLED           = 'payment/breadcheckout/instore_pickup/enabled';
+    const XML_CONFIG_STORE_PICKUP_METHOD            = 'payment/breadcheckout/instore_pickup/method_code';
+    const XML_CONFIG_STORE_PICKUP_COUNTRY           = 'payment/breadcheckout/instore_pickup/country_id';
+    const XML_CONFIG_STORE_PICKUP_REGION            = 'payment/breadcheckout/instore_pickup/region_id';
+    const XML_CONFIG_STORE_PICKUP_TELEPHONE         = 'payment/breadcheckout/instore_pickup/telephone';
+    const XML_CONFIG_STORE_PICKUP_STREET            = 'payment/breadcheckout/instore_pickup/street';
+    const XML_CONFIG_STORE_PICKUP_CITY              = 'payment/breadcheckout/instore_pickup/city';
+    const XML_CONFIG_STORE_PICKUP_POSTCODE          = 'payment/breadcheckout/instore_pickup/postcode';
+
+
     const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
 
@@ -815,4 +825,91 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->getTransactionApiUrl($store).self::API_CART_EXTENSION;
     }
+
+    /**
+     * In Store Pickup Enabled
+     *
+     * @return bool
+     */
+    public function inStorePickupEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_ENABLED, $store);
+    }
+
+    /**
+     * In Store Pickup Method
+     *
+     * @return string
+     */
+    public function getInStorePickupMethod($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return trim($this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_METHOD, $store));
+    }
+
+    /**
+     * Get Country Id
+     *
+     * @param string $store
+     * @return mixed
+     */
+    public function getInStorePickupCountry($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_COUNTRY,$store);
+    }
+
+    /**
+     * Get Region Id
+     *
+     * @param string $store
+     * @return mixed
+     */
+    public function getInStorePickupRegionId($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_REGION,$store);
+    }
+
+    /**
+     * Get Telephone
+     *
+     * @param string $store
+     * @return mixed
+     */
+    public function getInStorePickupTelephone($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_TELEPHONE,$store);
+    }
+
+    /**
+     * Get Street
+     *
+     * @param string $store
+     * @return mixed
+     */
+    public function getInStorePickupStreet($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_STREET,$store);
+    }
+
+    /**
+     * Get City
+     *
+     * @param string $store
+     * @return mixed
+     */
+    public function getInStorePickupCity($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_CITY,$store);
+    }
+
+    /**
+     * Get Post Code
+     *
+     * @param string $store
+     * @return mixed
+     */
+    public function getInStorePickupPostcode($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_STORE_PICKUP_POSTCODE,$store);
+    }
+
 }

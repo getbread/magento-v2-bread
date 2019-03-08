@@ -239,6 +239,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 $address->setShippingMethod($data['selectedShippingOption']['typeId']);
             }
 
+            if($this->helper->isInStorePickup($address->getShippingMethod())){
+                $storeAddress = $this->helper->getStoreAddressData();
+                $address->addData($storeAddress);
+            }
+
             $this->totalsCollector->collectAddressTotals($quote, $address);
             $quote->setTotalsCollectedFlag(false)->collectTotals();
             $this->quoteRepository->save($quote);

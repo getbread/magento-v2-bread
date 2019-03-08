@@ -182,7 +182,13 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $this->logger->log(['SHIPPING CONTACT' => $shippingContact, 'BILLING CONTACT' => $billingContact]);
 
         $billingAddress = $quote->getBillingAddress()->addData($billingContact);
-        $shippingAddress = $quote->getShippingAddress()->addData($shippingContact)->setCollectShippingRates(true);
+        if($this->helper->isInStorePickup($data['shippingMethodCode'])){
+            $storeAddress = $this->helper->getStoreAddressData($billingContact['firstname'],$billingContact['lastname']);
+            $shippingAddress = $quote->getShippingAddress()->addData($storeAddress)->setCollectShippingRates(true);
+        } else {
+            $shippingAddress = $quote->getShippingAddress()->addData($shippingContact)->setCollectShippingRates(true);
+        }
+
 
         if (!isset($data['shippingMethodCode'])) {
             $this->logger->log('Shipping Method Code Is Not Set On The Response');

@@ -12,6 +12,8 @@ class Checkout extends Quote
 {
     const BREAD_AMOUNT = "bread_transaction_amount";
 
+    public $regionFactory;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -22,8 +24,10 @@ class Checkout extends Quote
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
+        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Magento\Directory\Model\RegionFactory $regionFactory
     ) {
+        $this->regionFactory = $regionFactory;
         parent::__construct(
             $helperContext,
             $context,
@@ -79,5 +83,52 @@ class Checkout extends Quote
         }
 
         return (bool) ($breadAmount == $quoteTotal);
+    }
+
+    /**
+     * Check if is in store pickup
+     *
+     * @param $method
+     * @return bool
+     */
+    public function isInStorePickup($method)
+    {
+        return $this->inStorePickupEnabled() && ($method === $this->getInStorePickupMethod());
+    }
+
+    /**
+     * Get Store Information Array
+     *
+     * @return array
+     */
+    public function getStoreAddressData($firstName = '',$lastName = '')
+    {
+
+        $telephone  = $this->getInStorePickupTelephone();
+        $country    = $this->getInStorePickupCountry();
+        $regionId   = $this->getInStorePickupRegionId();
+        $postcode   = $this->getInStorePickupPostcode();
+        $street     = $this->getInStorePickupStreet();
+        $city       = $this->getInStorePickupCity();
+
+        $region     = $this->regionFactory->create()->load($regionId);
+
+
+        $storeAddress = [
+            'street'    => $street,
+            'city'      => $city,
+            'postcode'  => $postcode,
+            'telephone' => $telephone,
+            'country_id' => $country,
+            'region'    => $region->getCode(),
+            'region_id' => $regionId,
+        ];
+
+        if(!empty($firstName) && !empty($lastName)){
+            $storeAddress['firstname'] = $firstName;
+            $storeAddress['lastname'] = $lastName;
+        }
+
+        return $storeAddress;
     }
 }
