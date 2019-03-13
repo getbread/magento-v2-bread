@@ -454,4 +454,13 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         return $this->jsonHelper->jsonEncode($data);
     }
 
+    /**
+     * Is downloadable type
+     * @return bool
+     */
+    public function isDownloadable()
+    {
+        return $this->getProduct()->getTypeId() === \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE;
+    }
+
 }
