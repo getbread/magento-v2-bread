@@ -79,7 +79,6 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     {
         if (!$bypass) {
             $this->setBlockCode($this->getBlockCode());
-            $this->setAdditionalData(['product_id' => $this->getProduct()->getId()]);
         }
         parent::_construct();
     }

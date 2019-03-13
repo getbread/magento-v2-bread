@@ -93,7 +93,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     {
         if (!$bypass) {
             $this->setBlockCode($this->getBlockCode());
-            $this->setAdditionalData(['product_id' => $this->getProduct()->getId()]);
         }
         parent::_construct();
     }
