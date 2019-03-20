@@ -533,7 +533,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $showPerMonth = $this->helper->showPerMonthCalculation();
 
         if ($this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST && $showPerMonth) {
-            $data = $this->quoteHelper->submitQuote();
+            $data = $this->quoteHelper->submitQuote(null,false);
             if (isset($data['asLowAs']) && isset($data['asLowAs']['amount'])) {
                 $title .= ' ' . sprintf(__('as low as %s/month*'), $data['asLowAs']['amount']);
             }
