@@ -450,7 +450,7 @@ class Quote extends Data
         $quoteResult = $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
 
         if(empty($quoteResult)){
-            $quoteResult = $this->submitQuote();
+            $quoteResult = $this->submitQuote(null,false);
         }
 
         if($quoteResult && array_key_exists('asLowAs',$quoteResult)){
