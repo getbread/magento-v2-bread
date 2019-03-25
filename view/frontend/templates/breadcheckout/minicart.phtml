@@ -1,0 +1,181 @@
+<?php /** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
+<?php  echo $block->getBeforeHtml(); ?>
+<div id="bread-btn-cntnr-minicart">
+    <div id="bread-checkout-btn-minicart" title="Bread Checkout" class="button" <?php /* @noEscape */ echo $block->getIsDefaultSize(); ?>>
+        <span>
+            <span><?php /* @noEscape */ echo __('Bread Checkout'); ?></span>
+        </span>
+    </div>
+    <div class="button-prevent" id="button-prevent">
+        <span class="buy_error_tip override_tip" data-content="<?= $block->productTypeErrorMessage() ?>">&nbsp;</span>
+    </div>
+</div>
+
+<script type="text/javascript">
+    require(['jquery', 'jquery/validate', 'mage/validation'], function($){
+
+        var validateProductTypes = Boolean(<?= $block->validateAllowedProductTypes() ?>);
+        if(validateProductTypes === false){
+            var buttonPrevent = $('#button-prevent');
+            buttonPrevent.css('width','100%');
+            buttonPrevent.css('height','100%');
+            buttonPrevent.show();
+        }
+
+        document.configureButton = function (items) {
+            var address             = <?php /* @noEscape */ echo $block->getShippingAddressData(); ?>;
+            var billingAddress      = <?php /* @noEscape */ echo $block->getBillingAddressData(); ?>;
+            var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
+            var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
+            var cartSizeFinancing   = <?php /* @noEscape */ echo $block->getCartSizeFinancingJson(); ?>;
+            var total = 0;
+            for(var i = 0; i < items.length; i++){
+                total += items[i]['price'] * items[i]['quantity'];
+            }
+
+            var breadConfig = {
+                buttonId: "bread-checkout-btn-minicart",
+                asLowAs: <?php /* @noEscape */ echo $block->getAsLowAs(); ?>,
+                actAsLabel: false,
+                <?php if (!$this->isHealthcare()) : ?>
+                items: items,
+                <?php else : ?>
+                customTotal: total,
+                <?php endif; ?>
+                allowCheckout: <?php /* @noEscape */ echo $this->getAllowCheckout(); ?>,
+                buttonLocation: '<?php /* @noEscape */ echo $this->getCartSummaryLocation(); ?>',
+
+                done: function (err, tx_token) {
+                    if (tx_token !== undefined) {
+                        var i = document.createElement('input');
+                        var k = document.createElement('input');
+                        i.type = 'hidden';
+                        i.name = 'token';
+                        i.value = tx_token;
+                        k.type = 'hidden';
+                        k.name = 'form_key';
+                        k.value = $.cookie('form_key');
+                        var f = document.createElement('form');
+                        f.action = '<?php /* @noEscape */ echo $block->getValidateOrderUrl(); ?>';
+                        f.method = 'POST';
+                        f.appendChild(i);
+                        f.appendChild(k);
+                        document.body.appendChild(f);
+                        f.submit();
+                    }
+
+                    return;
+                },
+
+                /**
+                 * Calculate tax value callback
+                 *
+                 * @param shippingAddress
+                 * @param callback
+                 */
+                calculateTax: function (shippingAddress, callback) {
+                    shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
+
+                    $.ajax({
+                        url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
+                        data: {shippingInfo: JSON.stringify(shippingAddress)},
+                        type: 'post'
+                    }).done(function (response) {
+                        try {
+                            if (typeof response == 'object') {
+                                if (response.error) {
+                                    alert(response.message);
+                                } else {
+                                    callback(null, response.result);
+                                }
+                            }
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                },
+
+                /**
+                 * Calculate shipping cost callback
+                 *
+                 * @param shippingAddress
+                 * @param callback
+                 */
+                calculateShipping: function (shippingAddress, callback) {
+                    shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
+
+                    $.ajax({
+                        url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
+                        data: shippingAddress,
+                        type: 'post'
+                    }).done(function (response) {
+                        try {
+                            if (typeof response == 'object') {
+                                if (response.error) {
+                                    alert(response.message);
+                                } else {
+                                    callback(null, response.result);
+                                }
+                            }
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            };
+
+            if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
+                breadConfig.customCSS = buttonCss;
+            }
+            <?php if(!$this->isHealthcare()) : ?>
+            if (address !== false) {
+                breadConfig.shippingContact = address;
+            }
+
+            if (billingAddress !== false) {
+                breadConfig.billingContact = billingAddress;
+            }
+            <?php endif; ?>
+
+            if (buttonOnProduct === true) {
+                breadConfig.actAsLabel = false;
+            }
+
+            if(cartSizeFinancing.enabled){
+                var cartSizeFinancingId = cartSizeFinancing.id;
+                var cartSizeThreshold = cartSizeFinancing.threshold;
+                var items = document.minicartItems;
+                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            }
+
+            var discountAmount = <?= json_encode($this->quoteHelper->getDiscountData());?>;
+            if (discountAmount.length > 0) {
+                breadConfig.discounts = [{
+                    amount: discountAmount[0].amount,
+                    description: (discountAmount[0].description !== null) ?
+                        discountAmount[0].description :
+                        "Discount"
+                }];
+            }
+            bread.checkout(breadConfig);
+        };
+
+        document.round = function(value) {
+            return parseInt(Math.round(value * 100));
+        };
+
+        $(document).ready(function() {
+            var minicartItems       = <?php /* @noEscape */ echo $block->getProductDataJson(); ?>;
+            document.configureButton(minicartItems);
+        });
+    });
+</script>

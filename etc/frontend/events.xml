@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="shortcut_buttons_container">
+        <observer name="breadcheckout_minicart_shortcut" instance="Bread\BreadCheckout\Observer\AddBreadShortcutObserver"/>
+    </event>
+</config>
