@@ -43,6 +43,15 @@
     position: relative
 }
 
+#bread-btn-cntnr-minicart{
+    display: inline-block;
+    position: relative
+}
+
+#bread-checkout-btn-minicart {
+    margin-top: 20px;
+}
+
 .button-prevent:hover span.buy_error_tip {
     display: block;
 }

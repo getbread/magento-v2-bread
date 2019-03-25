@@ -184,29 +184,33 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="cart_size_targeted_financing" type="select" sortOrder="22" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowminicartcheckout" type="select" sortOrder="22" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allow checkout from mini cart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="cart_size_targeted_financing" type="select" sortOrder="23" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Targeted Financing based on Cart Size</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="cart_threshold" type="text" sortOrder="23" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cart_threshold" type="text" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-number required-entry</validate>
                     <label>Cart Size Threshold</label>
                     <depends>
                         <field id="cart_size_targeted_financing">1</field>
                     </depends>
                 </field>
-                <field id="cart_size_financing_program_id" type="text" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cart_size_financing_program_id" type="text" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-36 validate-length minimum-length-36 required-entry</validate>
                     <label>Financing Program Id</label>
                     <depends>
                         <field id="cart_size_targeted_financing">1</field>
                     </depends>
                 </field>
-                <field id="embedded" type="select" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="embedded" type="select" sortOrder="26" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="log_enabled" type="select" sortOrder="26" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="log_enabled" type="select" sortOrder="27" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Logging</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -217,7 +221,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="per_month" type="select" sortOrder="27" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="per_month" type="select" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label><![CDATA[Show "As Low As" price]]></label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -228,7 +232,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="product_type_msg" type="textarea" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="product_type_msg" type="textarea" sortOrder="29" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Invalid product type message</label>
                     <comment>
                         <![CDATA[
