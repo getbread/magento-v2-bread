@@ -13,7 +13,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
+    require(['jquery'], function($) {
         document.configureButton = function (items) {
             var buttonOnProduct     = <?php /* @noEscape */ echo $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?php /* @noEscape */ echo $block->getButtonDesign(); ?>';
@@ -189,7 +189,12 @@
             }
             else {
                 var price = document.calculatePrice();
-                sku = document.selectedSku + document.customOptions;
+
+                if(typeof document.customOptions !== "undefined"){
+                    sku = document.selectedSku + document.customOptions;
+                } else {
+                    sku = document.selectedSku;
+                }
 
                 if (sku != document.previousSku || price != document.previousPrice) {
                     document.previousSku                    = sku;
