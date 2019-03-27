@@ -28,7 +28,6 @@
                 <?php endif; ?>
                 discounts: <?php echo $this->getDiscountDataJson(); ?>,
                 allowCheckout: <?php echo $this->getAllowCheckout(); ?>,
-                <?php if($block->isDownloadable()):?>requireShippingContact:false,<?php endif;?>
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         var i = document.createElement('input');
