@@ -10,6 +10,9 @@ define([
     return function(config){
         var optionsData = config.optionsData;
         var productType = config.productType;
+
+        $('.button-prevent').show();
+
         /**
          * Returns SKU with custom options appended;
          * has side effect of updating the product price
@@ -38,10 +41,7 @@ define([
 
                     var val = $(this).val();
                     if (val) {
-                        var sku = (configOptions[val]) ?
-                            configOptions[val].sku : configOptions.sku;
-                        var identifier = (sku === null) ?
-                            'id~' + optionId : sku;
+                        var identifier = 'id~' + optionId;
                     }
 
                     var elType = $(this).attr('type');
@@ -99,7 +99,7 @@ define([
          * Validate the add to cart form when inputs are updated
          */
         $('#product_addtocart_form').on('change', function() {
-            $.mage.validation({errorPlacement:function () {},highlight:function () {}}, this);
+            $.mage.validation({errorPlacement:function () {},highlight:function () {}}, $(this));
 
             if(productType === 'configurable'){
 
