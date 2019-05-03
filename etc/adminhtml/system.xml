@@ -8,10 +8,10 @@
                 <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>
                 <comment>
                     <![CDATA[
-                            <div class="bread-brand">
+                            <div>
                                 <span class="bread-logo"></span>
                             Bread Payments by <a href="https://www.getbread.com/" target="_blank">getbread.com</a> - <b>Onsite Consumer Financing</b>.
-                            <br/> Developers API reference <a href="http://developers.getbread.com/" target="_blank">Bread Developer API Reference</a>
+                            <br/> Developers API reference: <a href="https://docs.getbread.com/docs/integration/magento-2/magento-2-overview/" target="_blank">Bread Developer API Reference</a>
                             </div>
                     ]]>
                 </comment>
