@@ -100,7 +100,7 @@ class Customer extends Data
         }
 
         $primaryData        = [
-            'fullName'      => $defaultShippingAddress->getName(),
+            'fullName'      => trim($defaultShippingAddress->getName()),
             'address'       => $defaultShippingAddress->getStreetLine(1) .
                 ($defaultShippingAddress->getStreetLine(2) == '' ?
                     '' : (' ' . $defaultShippingAddress->getStreetLine(2))),
