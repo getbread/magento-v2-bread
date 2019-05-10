@@ -428,7 +428,7 @@ class Customer extends Data
             }
         }
 
-        $fullName       = isset($contactData['fullName']) ? explode(' ', $contactData['fullName']) : '';
+        $fullName       = isset($contactData['fullName']) ? preg_split("/\s+/", trim($contactData['fullName']), 2) : '';
         $addressData    = [
             'firstname'     => isset($contactData['firstName']) ? $contactData['firstName'] : $fullName[0],
             'lastname'      => isset($contactData['lastName']) ?
