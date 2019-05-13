@@ -240,8 +240,8 @@ class Quote extends Data
             'zip'           => $billingAddress->getPostcode(),
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $billingAddress->getTelephone()), -10),
             'email'         => $billingAddress->getEmail(),
-            'firstName'     => $billingAddress->getFirstname(),
-            'lastName'      => $billingAddress->getLastname(),
+            'firstName'     => trim($billingAddress->getFirstname()),
+            'lastName'      => trim($billingAddress->getLastname()),
         ];
     }
 
@@ -264,7 +264,7 @@ class Quote extends Data
         }
 
         return [
-            'fullName'      => $shippingAddress->getName(),
+            'fullName'      => trim($shippingAddress->getName()),
             'address'       => $shippingAddress->getStreetLine(1) .
                 ($shippingAddress->getStreetLine(2) == '' ? '' : (' ' . $shippingAddress->getStreetLine(2))),
             'address2'      => $shippingAddress->getStreetLine(3) .
