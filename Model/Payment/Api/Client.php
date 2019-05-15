@@ -103,6 +103,26 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
     {
+
+        $validateAmount = $this->getInfo($breadTransactionId);
+
+        $breadAmount = trim($validateAmount['total']);
+        $amount = trim($amount);
+
+        if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
+            $this->logger->log(
+                [
+                    'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
+                    'BREAD AMOUNT'  =>(int)$breadAmount,
+                    'QUOTE AMOUNT'  =>(int)$amount,
+                    'RESULT'        =>$validateAmount
+                ]
+            );
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount)
+            );
+        }
+
         $data_array = ['type' => 'authorize'];
         if ($merchantOrderId != null) {
             $data_array['merchantOrderId'] = $merchantOrderId;
@@ -117,23 +137,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $this->logger->log(['ERROR'=>'AUTHORIZATION FAILED', 'RESULT'=>$result]);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Transaction authorize failed (current transaction status :' . $result->status . ')')
-            );
-        }
-
-        $breadAmount = trim($result['total']);
-        $amount = trim($amount);
-
-        if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
-            $this->logger->log(
-                [
-                    'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
-                    'BREAD AMOUNT'  =>(int)$breadAmount,
-                    'QUOTE AMOUNT'  =>(int)$amount,
-                    'RESULT'        =>$result
-                ]
-            );
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount)
             );
         }
 
