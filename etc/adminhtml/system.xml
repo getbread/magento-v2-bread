@@ -99,7 +99,7 @@
                     <comment>
                         <![CDATA[
                                     <div>
-                                        <p>If yes, no item information nor customer addresses will be sent to bread. Also, checkout from product and cart pages will be disabled.</p>
+                                        <p>If yes, no item information nor customer addresses will be sent to Bread. Also, checkout from product and cart pages will be disabled.</p>
                                     </div>
                                 ]]>
                     </comment>
