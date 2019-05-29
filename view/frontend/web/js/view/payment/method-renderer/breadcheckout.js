@@ -158,12 +158,17 @@ define(
                                     this.validateTotals()
                                 ).done(
                                     $.proxy(function () {
+                                        // Resets id in case placeOrder call below fails, so user can retry placing it.
+                                        // If it succeeds we redirect so setting to null doesn't matter.
+                                        // No better way to track errors coming from placeOrder unfortunately, so just have to do this
+                                        this.setBreadTransactionId(null);
+
                                         return Component.prototype.placeOrder.call(this, this.data, this.event);
                                     }, this)
                                 ).fail(
                                     $.proxy(function (response) {
+                                        this.setBreadTransactionId(null);
                                         errorProcessor.process(response, this.messageContainer);
-                                        this.setBreadTransactionId(null)
                                     }, this)
                                 );
                             }
