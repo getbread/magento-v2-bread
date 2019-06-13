@@ -101,7 +101,7 @@ define([
         $('#product_addtocart_form').on('change', function() {
 
             $.mage.validation({errorPlacement:function () {},highlight:function () {}}, $(this));
-            $.fx.off = true;
+            $.fx.off = true; // temporary fix for offset.top issue happening with validation on magento v2.3.1 caused scroll lock
 
             if(productType === 'configurable'){
 
@@ -124,7 +124,7 @@ define([
                 document.customOptions = document.getSkuForOptions(selectedOptions);
                 $('.button-prevent').hide();
                 document.resetPriceAndSku(true);
-                $.fx.off = false;
+                $.fx.off = false; // after form is valid we can switch back
             } else {
                 $('.button-prevent').show();
             }
