@@ -99,7 +99,9 @@ define([
          * Validate the add to cart form when inputs are updated
          */
         $('#product_addtocart_form').on('change', function() {
+
             $.mage.validation({errorPlacement:function () {},highlight:function () {}}, $(this));
+            $.fx.off = true;
 
             if(productType === 'configurable'){
 
@@ -122,6 +124,7 @@ define([
                 document.customOptions = document.getSkuForOptions(selectedOptions);
                 $('.button-prevent').hide();
                 document.resetPriceAndSku(true);
+                $.fx.off = false;
             } else {
                 $('.button-prevent').show();
             }
