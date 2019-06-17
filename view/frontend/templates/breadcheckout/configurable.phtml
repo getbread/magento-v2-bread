@@ -33,6 +33,7 @@
                  * Validate add to cart form
                  */
                 $.mage.validation({errorPlacement:function () {},highlight:function () {}}, form);
+                $.fx.off = true; // temporary fix for offset.top issue happening with validation on magento v2.3.1 caused scroll lock
 
                 if ($(form).valid() && validSuperAttribute) {
                     $('.button-prevent').hide();
@@ -43,6 +44,7 @@
                         document.selectedSku = document.baseProductSku + "///" +
                             document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
+                        $.fx.off = false; // after form is valid we can switch back
                     }
                 } else {
                     $('.button-prevent').show();
