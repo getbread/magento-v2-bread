@@ -38,6 +38,7 @@ class ValidateCredentials extends \Magento\Backend\App\Action
     private function testCredentials($apiMode,$username,$password)
     {
         $dummy = [];
+        $dummy['expiration'] = date('Y-m-d');
         $dummy['options'] = [];
         $dummy['options']['customTotal'] = 10000;
 
