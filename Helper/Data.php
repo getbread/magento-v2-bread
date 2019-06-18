@@ -62,7 +62,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_EMBEDDED_CHECKOUT              = 'payment/breadcheckout/embedded';
     const XML_CONFIG_PRODUCT_TYPE_MSG               = 'payment/breadcheckout/product_type_msg';
     const XML_CONFIG_ORDER_SHIPPED                  = 'payment/breadcheckout/order_shipped';
-    const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
+    const XML_CONFIG_DELETE_QUOTE_AFTER             = 'checkout/cart/delete_quote_after';
+    const XML_CONFIG_AUTO_CANCEL                    = 'payment/breadcheckout/split_auto_cancel';
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
@@ -837,5 +838,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool)$this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
+    }
+
+    /**
+     * Get auto cancel on split payment declined order
+     *
+     * @param string $store
+     * @return bool
+     */
+    public function cancelSplitPaymentDeclined($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
     }
 }

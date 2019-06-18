@@ -105,6 +105,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
 
         $validateAmount = $this->getInfo($breadTransactionId);
+        $this->setBreadTransactionId($breadTransactionId); // set transaction id so it can be fetched for split payment cancel
 
         $breadAmount = trim($validateAmount['total']);
         $amount = trim($amount);
@@ -292,6 +293,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
 
                 if ($isSplitPayDecline) {
+
+                    if($this->helper->cancelSplitPaymentDeclined()){
+                        $this->cancel($this->getBreadTransactionId());
+                    }
+
                     $errorMessage = 'The credit/debit card portion of your transaction was declined. '
                         . 'Please use a different card or contact your bank. Otherwise, you can still check out with '
                         . 'an amount covered by your Bread loan capacity.';
