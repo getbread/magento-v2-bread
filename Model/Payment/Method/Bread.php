@@ -463,6 +463,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if(!$this->aboveThreshold($quote)){
+            return false;
+        }
+
         if ($quote === null || !$quote->getBreadTransactionId()) {
             return true;
         }
@@ -549,5 +553,17 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     public function getBaseTitle()
     {
         return parent::getTitle();
+    }
+
+    /**
+     * Above threshold wrapper
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @return bool
+     */
+    public function aboveThreshold($quote)
+    {
+        $price = $quote->getGrandTotal();
+        return $this->helper->aboveThreshold($price);
     }
 }

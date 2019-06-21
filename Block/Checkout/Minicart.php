@@ -126,7 +126,8 @@ class Minicart extends Overview implements ShortcutInterface
     {
         return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
             $this->helperData->allowMinicartCheckout() &&
-            !$this->isCartView();
+            !$this->isCartView() &&
+            $this->quoteHelper->aboveThreshold($this->quoteHelper->getGrandTotal()/100);
     }
 
     /**

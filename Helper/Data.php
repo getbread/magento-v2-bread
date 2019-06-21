@@ -63,6 +63,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_PRODUCT_TYPE_MSG               = 'payment/breadcheckout/product_type_msg';
     const XML_CONFIG_ORDER_SHIPPED                  = 'payment/breadcheckout/order_shipped';
     const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
+    const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/threshold_amount';
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
@@ -837,5 +838,33 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool)$this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
+    }
+
+    /**
+     * Get threshold amount below which if set bread button or checkout won't be enabled
+     *
+     * @param string $store
+     * @return int
+     */
+    public function getThresholdAmount($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (int)$this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
+    }
+
+    /**
+     * Check if cost of item/cart total is equal or greater than set threshold amount
+     *
+     * @param float $cost
+     * @return bool
+     */
+    public function aboveThreshold($cost)
+    {
+        $aboveThreshold = true;
+
+        if($thresholdAmount = $this->getThresholdAmount()){
+            $aboveThreshold = (int)$cost >= (int)$thresholdAmount;
+        }
+
+        return $aboveThreshold;
     }
 }
