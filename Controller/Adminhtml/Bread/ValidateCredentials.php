@@ -40,6 +40,7 @@ class ValidateCredentials extends \Magento\Backend\App\Action
         $dummy = [];
         $dummy['expiration'] = date('Y-m-d');
         $dummy['options'] = [];
+        $dummy['options']['cartName'] = 'API Key Validation';
         $dummy['options']['customTotal'] = 10000;
 
         $url = (bool)$apiMode ? self::API_LIVE_URI : self::API_SANDBOX_URI;
