@@ -1,6 +1,7 @@
 require([
         'jquery',
-        'Magento_Ui/js/modal/alert'
+        'Magento_Ui/js/modal/alert',
+        'domReady!'
     ],
     function($, alert){
         var apiMode = $("#payment_us_breadcheckout_api_mode").val(),
