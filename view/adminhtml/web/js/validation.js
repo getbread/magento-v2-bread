@@ -17,7 +17,9 @@ require([
             var key = apiMode === "1" ? $(prodKey).val() : $(sandKey).val();
             var secret = apiMode === "1" ? $(prodSecret).val() : $(sandSecret).val();
 
-            if(secret.indexOf('*') === -1){
+            var secretKeyEntered = secret.indexOf('*') === -1;
+
+            if(secretKeyEntered){
                 $.ajax(validationUrl,{
                     type: "post",
                     data: {
