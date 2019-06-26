@@ -199,7 +199,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
             $this->orderSender->send($order);
         } catch (\Exception $e) {
             $this->logger->critical($e);
-            $this->checkoutSession->setBreadItemAddedToQuote(false);
+            $this->customerSession->setBreadItemAddedToQuote(false);
         }
 
         if ($customer->getId()) {
@@ -209,8 +209,8 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
         $this->checkoutSession->setLastOrderId($order->getId())
              ->setLastRealOrderId($order->getIncrementId())
-             ->setLastOrderStatus($order->getStatus())
-             ->setBreadItemAddedToQuote(false);
+             ->setLastOrderStatus($order->getStatus());
+        $this->customerSession->setBreadItemAddedToQuote(false);
 
         $cart = $this->cartHelper->getCart();
         $cart->truncate()->save();

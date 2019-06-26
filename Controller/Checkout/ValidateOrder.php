@@ -229,7 +229,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $this->orderSender->send($order);
         } catch (\Exception $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
-            $this->checkoutSession->setBreadItemAddedToQuote(false);
+            $this->customerSession->setBreadItemAddedToQuote(false);
         }
 
         if ($customer->getId()) {
@@ -238,8 +238,8 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
         $this->checkoutSession->setLastOrderId($order->getId())
             ->setLastRealOrderId($order->getIncrementId())
-            ->setLastOrderStatus($order->getStatus())
-            ->setBreadItemAddedToQuote(false);
+            ->setLastOrderStatus($order->getStatus());
+        $this->customerSession->setBreadItemAddedToQuote(false);
 
         // Empty shopping cart
         $cart = $this->cartHelper->getCart();

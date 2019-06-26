@@ -241,7 +241,10 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
             $this->totalsCollector->collectAddressTotals($quote, $address);
             $quote->setTotalsCollectedFlag(false)->collectTotals();
-            $this->quoteRepository->save($quote);
+
+            if($data['block_key'] !== \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW){
+                $this->quoteRepository->save($quote);
+            }
 
             return $address;
         } catch (\Exception $e) {
@@ -285,11 +288,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
                 $quote = $this->checkoutSession->getQuote();
 
-                if (!$this->checkoutSession->getBreadItemAddedToQuote() && $removeItems) {
+                if (!$this->customerSession->getBreadItemAddedToQuote() && $removeItems) {
                     $quote->removeAllItems(); // Reset items in quote
                 }
 
-                if (!$this->checkoutSession->getBreadItemAddedToQuote() || !$quote->getAllVisibleItems()) {
+                if (!$this->customerSession->getBreadItemAddedToQuote() || !$quote->getAllVisibleItems()) {
 
                     if(array_key_exists('product_type',$data) &&
                         $data['product_type'] === \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
@@ -333,7 +336,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         // Qty always 1 when checking out from product view
         $this->addItemToQuote($quote, $simpleProduct, $mainProduct, $buyRequest, $customOptionPieces, 1);
         // Flag to prevent same item from getting added to quote many times
-        $this->checkoutSession->setBreadItemAddedToQuote(true);
+        $this->customerSession->setBreadItemAddedToQuote(true);
     }
 
     /**
@@ -348,6 +351,6 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             $simpleProduct = $this->catalogProductFactory->create()->loadByAttribute('sku',$item['sku']);
             $this->addItemToQuote($quote,$simpleProduct,$simpleProduct,[],[],$item['quantity']);
         }
-        $this->checkoutSession->setBreadItemAddedToQuote(true);
+        $this->customerSession->setBreadItemAddedToQuote(true);
     }
 }
