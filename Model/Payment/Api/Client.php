@@ -294,7 +294,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
                 if ($isSplitPayDecline) {
 
-                    if($this->helper->cancelSplitPaymentDeclined()){
+                    if($this->helper->isSplitPayAutoDecline()){
                         $this->cancel($this->getBreadTransactionId());
                     }
 

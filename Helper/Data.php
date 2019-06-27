@@ -846,7 +846,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $store
      * @return bool
      */
-    public function cancelSplitPaymentDeclined($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
     }
