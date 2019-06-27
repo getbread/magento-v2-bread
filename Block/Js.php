@@ -56,9 +56,10 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     protected function generateJsIncludeString()
     {
-
-        $code       = '<script src="%s" data-api-key="%s"  m2-module-version="%s"></script>';
-        $html       = sprintf($code, $this->getJsLibLocation(), $this->getPublicApiKey(), $this->getModuleVersion());
+        $moduleVersionComment   = '<!-- BreadCheckout Module Version: %s -->';
+        $breadJsScriptTag       = '<script src="%s" data-api-key="%s"></script>';
+        $html                   = sprintf($moduleVersionComment . $breadJsScriptTag, $this->getModuleVersion(),
+            $this->getJsLibLocation(), $this->getPublicApiKey());
       
         return $html;
     }
