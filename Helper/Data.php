@@ -841,17 +841,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get threshold amount below which if set bread button or checkout won't be enabled
-     *
-     * @param string $store
-     * @return int
-     */
-    public function getThresholdAmount($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (int)$this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
-    }
-
-    /**
      * Check if cost of item/cart total is equal or greater than set threshold amount
      *
      * @param float $cost
@@ -860,9 +849,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function aboveThreshold($cost)
     {
         $aboveThreshold = true;
+        $thresholdAmount = (int)$this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
 
-        if($thresholdAmount = $this->getThresholdAmount()){
-            $aboveThreshold = (int)$cost >= (int)$thresholdAmount;
+        if($thresholdAmount){
+            $aboveThreshold = (int)$cost >= $thresholdAmount;
         }
 
         return $aboveThreshold;

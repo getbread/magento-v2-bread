@@ -248,6 +248,7 @@
                 </field>
                 <field id="threshold_amount" type="text" sortOrder="32" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Cart threshold amount</label>
+                    <validate>validate-number</validate>
                     <comment>
                         <![CDATA[
 				                <div>
