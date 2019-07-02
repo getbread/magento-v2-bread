@@ -463,12 +463,15 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if ($quote === null) {
+            return true;
+        }
 
         if(!$this->helper->aboveThreshold($quote->getGrandTotal())){
             return false;
         }
 
-        if ($quote === null || !$quote->getBreadTransactionId()) {
+        if (!$quote->getBreadTransactionId()) {
             return true;
         }
 
