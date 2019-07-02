@@ -8,7 +8,7 @@ namespace Bread\BreadCheckout\Helper;
  */
 class Log extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const XML_CONFIG_LOG_ENABLED = 'payment/breadcheckout/log_enabled';
+    const XML_CONFIG_LOG_ENABLED = 'payment/breadcheckout/bread_advanced/log_enabled';
 
     /**
      * @var \Bread\BreadCheckout\Log\BreadLogger
