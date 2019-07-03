@@ -38,7 +38,7 @@ class ListProductPlugin
     /**
      * @param $subject
      * @param callable $proceed
-     * @param \Magento\Catalog\Model\Product $product
+     * @param $product
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -51,13 +51,8 @@ class ListProductPlugin
         /** @var \Magento\Framework\View\Layout $layout */
         $layout = $subject->getLayout();
 
-        $price = $product->getPriceInfo()->getPrice('final_price')->getValue();
-        $aboveThreshold = $this->categoryHelper->aboveThreshold($price);
-
         if ($this->categoryHelper->isEnabledForCategory($category)
-            && $this->categoryHelper->allowedProductType($product->getTypeId())
-            && $aboveThreshold
-        ) {
+            && $this->categoryHelper->allowedProductType($product->getTypeId())) {
             /** @var \Bread\BreadCheckout\Block\Product\Category $block */
             $block = $layout->createBlock(\Bread\BreadCheckout\Block\Product\Category::class);
             $block->setProduct($product);

@@ -17,11 +17,9 @@
                 <allowspecific>1</allowspecific>
                 <specificcountry>US</specificcountry>
                 <create_order_before>1</create_order_before>
+                <log_enabled>0</log_enabled>
                 <product_type_msg>Gift cards cannot be purchased with financing. Please remove any gift cards from your cart and try again.</product_type_msg>
                 <order_shipped>1</order_shipped>
-                <bread_advanced>
-                    <log_enabled>0</log_enabled>
-                </bread_advanced>
             </breadcheckout>
         </payment>
     </default>

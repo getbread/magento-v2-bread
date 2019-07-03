@@ -60,19 +60,6 @@ class Category extends \Magento\Framework\View\Element\Template
         $this->moduleList     = $moduleList;
     }
 
-    public function _toHtml()
-    {
-        $output = '';
-        if($this->categoryHelper->aboveThreshold(
-            $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
-        )){
-            $output = parent::_toHtml();
-        }
-
-        return $output;
-
-    }
-
     /**
      * @return mixed
      */

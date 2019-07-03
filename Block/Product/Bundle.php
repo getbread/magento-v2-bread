@@ -75,20 +75,6 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         );
     }
 
-    public function toHtml()
-    {
-        $aboveThreshold = $this->dataHelper->aboveThreshold(
-            $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
-        );
-
-        $output = '';
-        if($aboveThreshold){
-            $output = parent::toHtml();
-        }
-
-        return $output;
-    }
-
     protected function _construct($bypass = false)
     {
         if (!$bypass) {
