@@ -65,7 +65,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
     const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/bread_advanced/threshold_amount';
 
-    const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/bread_advanced/cart_size_targeted_financing';
+    const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/bread_advanced/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/bread_advanced/cart_threshold';
     const XML_CONFIG_CART_SIZE_FINANCING_ID         = 'payment/breadcheckout/bread_advanced/cart_size_financing_program_id';
 
