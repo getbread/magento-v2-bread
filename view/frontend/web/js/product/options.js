@@ -120,23 +120,15 @@ define([
             if(productType === 'configurable'){
 
                 var selectedOptions = {};
-                var validSuperAttribute = '';
                 $('[name^="super_attribute"]').each(function() {
                     var attributeId = $(this).attr('name').match(/\[(\d+)\]/)[1];
                     selectedOptions[attributeId] = $(this).val();
-                    validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
                 });
-                validSuperAttribute =  Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
-
-                document.customOptions = document.getSkuForOptions(selectedOptions);
-                document.resetPriceAndSku(true);
-
-            }else{
-
-                document.customOptions = document.getSkuForOptions(selectedOptions);
-                document.resetPriceAndSku(true);
 
             }
+
+            document.customOptions = document.getSkuForOptions(selectedOptions);
+            document.resetPriceAndSku(true);
         });
     };
 });

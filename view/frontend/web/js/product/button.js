@@ -5,22 +5,23 @@ define([
 
     return function (config) {
 
-        $(config.buttonId).on('mouseover',function (e) {
+        $(config.buttonId).on('mouseenter',function (e) {
 
-            var radioAndCheckbox = {};
+            var radioAndCheckboxElements = {};
             var inputElements = [];
 
-            $.each($('.product-options-wrapper [aria-required="true"]'),function () {
+            $.each($(config.productConfigAndOptionsSelector),function () {
 
+                /** skip swatch clearfix elements and hidden elements */
                 if(typeof $(this).prop("name") === "undefined" || $(this).attr("type") === "hidden"){
                     return;
                 }
 
                 if($(this).attr("type") === "radio" || $(this).attr("type") === "checkbox"){
 
-                    String($(this).attr("name")) in radioAndCheckbox ?
-                        radioAndCheckbox[$(this).attr("name")].push($(this).is(':checked'))
-                        : radioAndCheckbox[$(this).attr("name")] = [$(this).is(':checked')]
+                    String($(this).attr("name")) in radioAndCheckboxElements ?
+                        radioAndCheckboxElements[$(this).attr("name")].push($(this).is(':checked'))
+                        : radioAndCheckboxElements[$(this).attr("name")] = [$(this).is(':checked')]
                     ;
 
                 } else {
@@ -29,21 +30,20 @@ define([
                 }
             });
 
-            inputElements = _.every(inputElements);
+            var inputElementsSet = _.every(inputElements);
 
-            $.each(radioAndCheckbox,function (i,el) {
-                _.contains(el,true) ? radioAndCheckbox[i] = true : radioAndCheckbox[i] = false;
-
+            $.each(radioAndCheckboxElements,function (name,valueSet) {
+                _.contains(valueSet,true) ? radioAndCheckboxElements[name] = true : radioAndCheckboxElements[name] = false;
             });
 
-            radioAndCheckbox = _.every(_.values(radioAndCheckbox)) ? true : false;
+            var radioAndCheckboxElementsSet = _.every(_.values(radioAndCheckboxElements)) ? true : false;
 
-            var isValid = inputElements && radioAndCheckbox;
+            var isValid = inputElementsSet && radioAndCheckboxElementsSet;
 
             if(isValid){
                 $('.button-prevent').hide();
             }else{
-                $('.button-prevent').show().fadeOut(5000);
+                $('.button-prevent').show();
             }
 
         });

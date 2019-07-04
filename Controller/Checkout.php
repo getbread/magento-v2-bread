@@ -241,10 +241,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
             $this->totalsCollector->collectAddressTotals($quote, $address);
             $quote->setTotalsCollectedFlag(false)->collectTotals();
-
-            if($data['block_key'] !== \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW){
-                $this->quoteRepository->save($quote);
-            }
+            $this->quoteRepository->save($quote);
 
             return $address;
         } catch (\Exception $e) {
@@ -305,11 +302,10 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
                 }
                 break;
         }
-        
+
         $address    = $quote->getShippingAddress();
         $this->totalsCollector->collectAddressTotals($quote, $address);
         $quote->setTotalsCollectedFlag(false)->collectTotals();
-        $this->quoteRepository->save($quote);
         return $quote;
     }
 
