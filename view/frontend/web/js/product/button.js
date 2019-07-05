@@ -10,7 +10,7 @@ define([
             var radioAndCheckboxElements = {};
             var inputElements = [];
 
-            $.each($(config.productConfigAndOptionsSelector),function () {
+            $.each($(config.requiredOptionsSelector),function () {
 
                 /** skip swatch clearfix elements and hidden elements */
                 if(typeof $(this).prop("name") === "undefined" || $(this).attr("type") === "hidden"){
@@ -30,15 +30,15 @@ define([
                 }
             });
 
-            var inputElementsSet = _.every(inputElements);
+            var areInputElementsSet = _.every(inputElements);
 
             $.each(radioAndCheckboxElements,function (name,valueSet) {
                 _.contains(valueSet,true) ? radioAndCheckboxElements[name] = true : radioAndCheckboxElements[name] = false;
             });
 
-            var radioAndCheckboxElementsSet = _.every(_.values(radioAndCheckboxElements)) ? true : false;
+            var areRadioAndCheckboxElementsSet = _.every(_.values(radioAndCheckboxElements)) ? true : false;
 
-            var isValid = inputElementsSet && radioAndCheckboxElementsSet;
+            var isValid = areInputElementsSet && areRadioAndCheckboxElementsSet;
 
             if(isValid){
                 $('.button-prevent').hide();
