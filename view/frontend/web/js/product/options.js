@@ -11,8 +11,6 @@ define([
         var optionsData = config.optionsData;
         var productType = config.productType;
 
-        $('.button-prevent').show();
-
         /**
          * Returns SKU with custom options appended;
          * has side effect of updating the product price
@@ -27,6 +25,8 @@ define([
             } else {
                 var price = document.round(document.basePrice);
             }
+
+            var skipIds = [];
 
             $('.product-custom-option').each(function(u) {
 
@@ -59,9 +59,26 @@ define([
                             break;
                         case 'select':
                             if (val && $(this).hasClass('datetime-picker')) {
+
                                 var role = $(this).data('calendar-role');
                                 skuSuffix += '***' + identifier + '===' + role + '===' + val;
-                                price += document.round(configOptions.price)
+
+                                if(!skipIds.includes(optionId)){
+
+                                    var dateSelected = true;
+                                    $('[id^=options_' + optionId + '_]').each(function () {
+                                        if($(this).val() === ''){
+                                            dateSelected = false;
+                                        }
+                                    });
+
+                                    if(dateSelected){
+                                        price += document.round(configOptions.price);
+                                    }
+
+                                    skipIds[optionId] = optionId;
+                                }
+
                             } else if (val) {
                                 skuSuffix += '***' + identifier + '===' + val;
                                 price += document.round(configOptions[val].price);
@@ -99,32 +116,19 @@ define([
          * Validate the add to cart form when inputs are updated
          */
         $('#product_addtocart_form').on('change', function() {
-            $.mage.validation({errorPlacement:function () {},highlight:function () {}}, $(this));
 
             if(productType === 'configurable'){
 
                 var selectedOptions = {};
-                var validSuperAttribute = '';
                 $('[name^="super_attribute"]').each(function() {
                     var attributeId = $(this).attr('name').match(/\[(\d+)\]/)[1];
                     selectedOptions[attributeId] = $(this).val();
-                    validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
                 });
-                validSuperAttribute =  Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
 
-                var isValid = $(this).valid() && validSuperAttribute;
-
-            }else{
-                var isValid = $(this).valid();
             }
 
-            if (isValid) {
-                document.customOptions = document.getSkuForOptions(selectedOptions);
-                $('.button-prevent').hide();
-                document.resetPriceAndSku(true);
-            } else {
-                $('.button-prevent').show();
-            }
+            document.customOptions = document.getSkuForOptions(selectedOptions);
+            document.resetPriceAndSku(true);
         });
     };
 });

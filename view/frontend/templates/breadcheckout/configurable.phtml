@@ -3,14 +3,15 @@
     document.Skus = {};
     spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
 
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
+
+
+    require(['jquery'], function($) {
         $(document).ready(function () {
 
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
              */
-            $('.button-prevent').show();
 
             $('#product_addtocart_form').on('change', function() {
                 spConfig.updateButton(this);
@@ -29,13 +30,9 @@
                     validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
                 });
                 validSuperAttribute =  Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
-                /**
-                 * Validate add to cart form
-                 */
-                $.mage.validation({errorPlacement:function () {},highlight:function () {}}, form);
 
-                if ($(form).valid() && validSuperAttribute) {
-                    $('.button-prevent').hide();
+                if (validSuperAttribute) {
+
                     var newProductId = spConfig.getIdOfSelectedProduct(selectedOptions);
                     if (newProductId !== null) {
                         /** Reconfigure Bread button if we narrowed it down to 1 product */
@@ -44,8 +41,6 @@
                             document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
                     }
-                } else {
-                    $('.button-prevent').show();
                 }
             };
 

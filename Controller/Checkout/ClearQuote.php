@@ -53,7 +53,7 @@ class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
         $quote = $this->checkoutSession->getQuote();
         
         try {
-            $this->checkoutSession->setBreadItemAddedToQuote(false);
+            $this->customerSession->setBreadItemAddedToQuote(false);
             $quote->removeAllItems(); // Reset items in quote
             $this->quoteRepository->save($quote);
             $result = true;
