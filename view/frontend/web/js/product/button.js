@@ -19,10 +19,11 @@ define([
 
                 if($(this).attr("type") === "radio" || $(this).attr("type") === "checkbox"){
 
-                    String($(this).attr("name")) in radioAndCheckboxElements ?
+                    if(String($(this).attr("name")) in radioAndCheckboxElements){
                         radioAndCheckboxElements[$(this).attr("name")].push($(this).is(':checked'))
-                        : radioAndCheckboxElements[$(this).attr("name")] = [$(this).is(':checked')]
-                    ;
+                    } else {
+                        radioAndCheckboxElements[$(this).attr("name")] = [$(this).is(':checked')]
+                    }
 
                 } else {
 
@@ -36,7 +37,7 @@ define([
                 _.contains(valueSet,true) ? radioAndCheckboxElements[name] = true : radioAndCheckboxElements[name] = false;
             });
 
-            var areRadioAndCheckboxElementsSet = _.every(_.values(radioAndCheckboxElements)) ? true : false;
+            var areRadioAndCheckboxElementsSet = _.every(_.values(radioAndCheckboxElements));
 
             var isValid = areInputElementsSet && areRadioAndCheckboxElementsSet;
 
