@@ -43,7 +43,7 @@ class Js extends \Magento\Framework\View\Element\Text
     protected function _toHtml()
     {
         if ($this->isActive()) {
-            return $this->generateJsIncludeString();
+            return $this->getJsScriptsString();
         }
 
         return '';
@@ -54,14 +54,17 @@ class Js extends \Magento\Framework\View\Element\Text
      *
      * @return string
      */
-    protected function generateJsIncludeString()
+    protected function getJsScriptsString()
     {
-        $moduleVersionComment   = '<!-- BreadCheckout Module Version: %s -->';
-        $breadJsScriptTag       = '<script src="%s" data-api-key="%s"></script>';
-        $html                   = sprintf($moduleVersionComment . $breadJsScriptTag, $this->getModuleVersion(),
-            $this->getJsLibLocation(), $this->getPublicApiKey());
-      
-        return $html;
+        $moduleVersionComment = sprintf('<!-- BreadCheckout Module Version: %s -->', $this->getModuleVersion());
+
+        $sentryScripts = sprintf('<script src="https://browser.sentry-cdn.com/5.4.3/bundle.min.js" crossorigin="anonymous"></script>'
+            . '<script src="%s"></script>',
+            $this->getViewFileUrl('Bread_BreadCheckout/js/sentry-config.js'));
+
+        $breadJsScript = sprintf('<script src="%s" data-api-key="%s"></script>', $this->getJsLibLocation(), $this->getPublicApiKey());
+
+        return $moduleVersionComment . $sentryScripts . $breadJsScript;
     }
 
     /**

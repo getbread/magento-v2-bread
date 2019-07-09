@@ -41,7 +41,7 @@ define(
 
             breadTransactionId: ko.observable(window.checkoutConfig.payment.breadcheckout.transactionId),
 
-            initialize: function () {
+            initialize: function() {
                 this._super();
                 return this;
             },
@@ -49,7 +49,7 @@ define(
             /**
              * Payment code
              */
-            getCode: function () {
+            getCode: function() {
                 return 'breadcheckout';
             },
 
@@ -106,7 +106,7 @@ define(
             initComplete: function () {
                 var data = window.checkoutConfig.payment[this.getCode()].breadConfig;
 
-                if (typeof bread != 'undefined') {
+                if (typeof bread !== 'undefined') {
                     button.configure(data, this);
 
                     if(data.embeddedCheckout){
@@ -126,21 +126,24 @@ define(
                 this.data = data;
                 this.event = event;
 
-                if(additionalValidators.validate()){
+                if(additionalValidators.validate()) {
 
                     if (!this.breadTransactionId()) {
                         button.setCouponDiscounts();
                         button.init();
                         return false;
                     }
+                } else {
+                    // TODO: ask in PR about what context everyone thinks would be useful
+                    handleError('Unable to properly validate order', [{ key: 'Bread Config', value: window.checkoutConfig.payment[this.getCode()].breadConfig }]);
                 }
-
             },
 
             buttonCallback: function (token) {
                 this.setBreadTransactionId(token);
+                var paymentUrl = window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl;
                 $.ajax({
-                    url: window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl,
+                    url: paymentUrl,
                     data: {token: token},
                     type: 'post',
                     context: this,
@@ -166,17 +169,20 @@ define(
                                         return Component.prototype.placeOrder.call(this, this.data, this.event);
                                     }, this)
                                 ).fail(
-                                    $.proxy(function (response) {
-                                        this.setBreadTransactionId(null);
-                                        errorProcessor.process(response, this.messageContainer);
+                                    $.proxy(function(error) {
+                                        errorProcessor.process(error, this.messageContainer);
+                                        handleError(error.responseText);
+                                        this.setBreadTransactionId(null)
                                     }, this)
                                 );
                             }
                             fullScreenLoader.stopLoader();
                         }
                     } catch (e) {
-                        console.log(e);
+                        handleError(e.message);
                     }
+                }).fail(function(error) {
+                    handleError('Error code returned when calling ' + paymentUrl + ', with status: ' + error.statusText);
                 });
             },
 
@@ -217,8 +223,9 @@ define(
              */
             validateTotals: function () {
                 var deferred = $.Deferred();
+                var validateTotalsUrl = window.checkoutConfig.payment[this.getCode()].validateTotalsUrl;
                 $.ajax({
-                    url: window.checkoutConfig.payment[this.getCode()].validateTotalsUrl,
+                    url: validateTotalsUrl,
                     data: {bread_transaction_id: this.breadTransactionId()},
                     type: 'post',
                     context: this
@@ -228,7 +235,10 @@ define(
                     } else {
                         deferred.reject(response);
                     }
+                }).fail(function(error) {
+                    handleError('Error code returned when calling ' + validateTotalsUrl + ', with status: ' + error.statusText);
                 });
+
                 return deferred;
             },
 

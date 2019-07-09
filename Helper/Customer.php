@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Helper;
 
+use Bread\BreadCheckout\Log\SentryLogger;
+
 class Customer extends Data
 {
     /** @var \Magento\Store\Model\StoreManagerInterface */
@@ -229,7 +231,8 @@ class Customer extends Data
                 $this->customerSession->setCustomer($customer);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            SentryLogger::sendError($e);
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
         }
 

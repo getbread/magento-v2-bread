@@ -4,3 +4,7 @@
     'Bread_BreadCheckout',
     __DIR__
 );
+
+use Bread\BreadCheckout\Log\SentryLogger;
+
+SentryLogger::init();

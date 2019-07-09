@@ -21,17 +21,19 @@ define([
                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
                 disableEditShipping: true,
                 requireShippingContact: !quote.isVirtual(),
-                onShowCheckoutError: function(message){
+                onShowCheckoutError: function(message) {
+                    handleError('onShowCheckoutError triggered, ' + message.data);
 
                     alert({
                         content: message.data
                     });
-
                 },
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         context.buttonCallback(tx_token);
+                    } else {
+                        handleError('tx_token undefined in done callback');
                     }
                 }
             };
@@ -74,7 +76,7 @@ define([
         /**
          * Public init method, sets shipping information
          */
-        init: function () {
+        init: function() {
             this.setShippingInformation(false);
         },
 
@@ -83,7 +85,7 @@ define([
          *
          * @private
          */
-        _init: function(){
+        _init: function() {
 
             var self = this;
 
@@ -91,23 +93,31 @@ define([
 
                 if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false){
 
-                    bread.showCheckout(this.breadConfig);
+                    if (typeof bread !== 'undefined') {
+                        bread.showCheckout(this.breadConfig);
+                    }
 
                 } else if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()){
 
                     this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
-                    bread.showCheckout(this.breadConfig);
-
+                    if (typeof bread !== 'undefined') {
+                        bread.showCheckout(this.breadConfig);
+                    }
                 } else {
                     /* ocs save selected shipping method */
+                    var shippingOptionUrl = window.checkoutConfig.payment.breadcheckout.shippingOptionUrl;
                     $.ajax({
-                        url: window.checkoutConfig.payment.breadcheckout.shippingOptionUrl,
+                        url: shippingOptionUrl,
                         type: 'post',
                         context: this
                     }).done(function (data) {
                         self.breadConfig.shippingOptions = [data];
                         self.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
-                        bread.showCheckout(self.breadConfig);
+                        if (typeof bread !== 'undefined') {
+                            bread.showCheckout(this.breadConfig);
+                        }
+                    }).fail(function(error) {
+                        handleError('Error code returned when calling ' + shippingOptionUrl + ', with status: ' + error.statusText);
                     });
                 }
 
@@ -130,7 +140,9 @@ define([
          */
         _initEmbedded: function(){
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                bread.checkout(this.breadConfig);
+                if (typeof bread !== 'undefined') {
+                    bread.checkout(breadConfig);
+                }
             }
         },
 
@@ -138,9 +150,9 @@ define([
          * Get updated quote data and initialize
          */
         setShippingInformation: function (isEmbedded) {
-            
+            var configDataUrl = window.checkoutConfig.payment.breadcheckout.configDataUrl;
             $.ajax({
-                url: window.checkoutConfig.payment.breadcheckout.configDataUrl,
+                url: configDataUrl,
                 type: 'post',
                 context: this,
                 beforeSend: function () {
@@ -170,6 +182,8 @@ define([
                     this._initEmbedded();
                 }
 
+            }).fail(function(error) {
+                handleError('Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
             });
         },
 

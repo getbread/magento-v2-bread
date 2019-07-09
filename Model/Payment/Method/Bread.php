@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Model\Payment\Method;
 
+use Bread\BreadCheckout\Log\SentryLogger;
+
 class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
@@ -450,7 +452,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             $payment->unsLastTransId();
 
             return $payment;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            SentryLogger::sendError($e);
             $this->logger->log(['ERROR'=>$e->getMessage(),'TRACE'=>$e->getTraceAsString()]);
         }
     }

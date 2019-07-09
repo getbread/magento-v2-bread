@@ -7,6 +7,8 @@
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
+use Bread\BreadCheckout\Log\SentryLogger;
+
 class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
 {
     public function __construct(
@@ -57,7 +59,8 @@ class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
             $quote->removeAllItems(); // Reset items in quote
             $this->quoteRepository->save($quote);
             $result = true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            SentryLogger::sendError($e);
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $result = false;
         }

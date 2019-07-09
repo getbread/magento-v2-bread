@@ -62,9 +62,9 @@
                         f.appendChild(k);
                         document.body.appendChild(f);
                         f.submit();
+                    } else {
+                        handleError('tx_token undefined in done callback');
                     }
-
-                    return;
                 },
 
                 /**
@@ -77,8 +77,9 @@
                     shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
+                    var taxEstimationUrl = '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>';
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
+                        url: taxEstimationUrl,
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
                     }).done(function (response) {
@@ -92,10 +93,10 @@
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            handleError(e.message);
                         }
-                    }).fail(function (error) {
-                        console.log(error);
+                    }).fail(function(error) {
+                        handleError('Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -109,8 +110,9 @@
                     shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
+                    var shippingAddressEstimationUrl = '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>';
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
+                        url: shippingAddressEstimationUrl,
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
@@ -124,10 +126,10 @@
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            handleError(e.message);
                         }
-                    }).fail(function (error) {
-                        console.log(error);
+                    }).fail(function(error) {
+                        handleError('Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
                     });
                 }
             };
@@ -165,7 +167,10 @@
                         "Discount"
                 }];
             }
-            bread.checkout(breadConfig);
+
+            if (typeof bread !== 'undefined') {
+                bread.checkout(breadConfig);
+            }
         };
 
         document.round = function(value) {

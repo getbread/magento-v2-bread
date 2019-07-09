@@ -85,10 +85,6 @@ class GroupedItems extends \Magento\Framework\App\Action\Action
         }
 
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-            ->setData([
-                'success' => empty($items) ? false : true,
-                'data'    => empty($items) ? null  : $items
-            ]);
-
+            ->setData(['items' => empty($items) ? null  : $items]);
     }
 }

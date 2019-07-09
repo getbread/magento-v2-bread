@@ -54,9 +54,9 @@
                         f.appendChild(k);
                         document.body.appendChild(f);
                         f.submit();
+                    } else {
+                        handleError('tx_token undefined in done callback');
                     }
-
-                    return;
                 },
 
                 /**
@@ -72,8 +72,9 @@
                     shippingAddress.items                           = breadConfig.items;
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
+                    var taxEstimationUrl = '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>';
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
+                        url: taxEstimationUrl,
                         data: {shippingInfo: JSON.stringify(shippingAddress)},
                         type: 'post'
                     }).done(function (response) {
@@ -87,8 +88,10 @@
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            handleError(e.message);
                         }
+                    }).fail(function(error) {
+                        handleError('Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -105,8 +108,9 @@
                     shippingAddress.items                           = breadConfig.items;
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
+                    var shippingAddressEstimationUrl = '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>';
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
+                        url: shippingAddressEstimationUrl,
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
@@ -120,8 +124,10 @@
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            handleError(e.message);
                         }
+                    }).fail(function(error) {
+                        handleError('Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -146,29 +152,34 @@
             if(cartSizeFinancing.enabled){
                 var cartSizeFinancingId = cartSizeFinancing.id;
                 var cartSizeThreshold = cartSizeFinancing.threshold;
-                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity }, 0) / 100;
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
+            var configDataUrl = '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>';
             $.ajax({
-                url: '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>',
+                url: configDataUrl,
                 type: 'post',
                 context: this
             }).done(function(data) {
-                if (data.shippingContact != false) {
+                if (data.shippingContact !== false) {
                     breadConfig.shippingContact = data.shippingContact;
                 }
 
-                if (data.billingContact != false) {
+                if (data.billingContact !== false) {
                     breadConfig.billingContact = data.billingContact;
                 }
 
-                bread.checkout(breadConfig);
+                if (typeof bread !== 'undefined') {
+                    bread.checkout(breadConfig);
+                }
+            }).fail(function(error) {
+                handleError('Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
             });
 
         };
 
-        $(document).ready(function () {
+        $(document).ready(function() {
 
             /**
              * Overlay element onto bread button to prevent
@@ -185,22 +196,23 @@
             <?php endif; ?>
         });
 
-        document.updateButton = function(form){
-            if($(form).valid()){
+        document.updateButton = function(form) {
+            if ($(form).valid()) {
                 $('.button-prevent').hide();
 
+                var groupedButtonUpdateUrl = '<?php echo $block->getGroupedButtonUpdate()?>';
                 $.ajax({
-                    url: '<?php echo $block->getGroupedButtonUpdate()?>',
+                    url: groupedButtonUpdateUrl,
                     data: $(form).serialize(),
                     type: 'post',
-                    context:this
-                }).done(function (response) {
-
-                    if(response.success === true){
-                        document.configureButton(response.data);
+                    context: this
+                }).done(function(response) {
+                    if (response.items) {
+                        document.configureButton(response.items);
                     }
-
-                })
+                }).fail(function(error) {
+                    handleError('Error code returned when calling ' + groupedButtonUpdateUrl + ', with status: ' + error.statusText);
+                });
             }
         };
 
