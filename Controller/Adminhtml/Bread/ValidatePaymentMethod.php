@@ -10,6 +10,8 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
 
 
+use Bread\BreadCheckout\Log\SentryLogger;
+
 class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
@@ -64,16 +66,15 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
                     $result     = true;
                 }
             }
-        } catch (\Exception $e) {
+            $response = ['result' => $result];
+        } catch (\Throwable $e) {
+            SentryLogger::sendError($e);
             $this->logger->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __(
-                    'Something went wrong processing the Bread payment. 
-                    Please select a different payment method to complete checkout.'
-                )
-            );
+
+            $response = ['error' => 'Something went wrong processing the Bread payment. '
+                . 'Please select a different payment method to complete checkout.'];
         }
 
-        return $this->resultJsonFactory->create()->setData(['result' => $result]);
+        return $this->resultJsonFactory->create()->setData($response);
     }
 }

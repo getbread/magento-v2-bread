@@ -49,22 +49,21 @@ $code = $block->escapeHtml($block->getMethodCode());
         'Bread_BreadCheckout/js/breadcheckout'
     ], function($, bread) {
         var getQuoteData = function() {
+            var quoteDataUrl = '<?php /* @noEscape */ echo $block->getQuoteDataUrl(); ?>';
             $.ajax({
-                url: '<?php /* @noEscape */ echo $block->getQuoteDataUrl(); ?>',
+                url: quoteDataUrl,
                 type: 'get',
                 context: bread
-            }).done(function (response) {
-                try {
-                    if (response !== null && typeof response === 'object') {
-                        this.configureButton(response);
-                    }
-                } catch (e) {
-                    console.log(e);
+            }).done(function(response) {
+                if (response !== null && typeof response === 'object') {
+                    this.configureButton(response);
                 }
+            }).fail(function(error) {
+                handleError('Error code returned when calling ' + quoteDataUrl + ', with status: ' + error.statusText);
             });
         };
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             if ($('#edit_form').find(':radio[name="payment[method]"]:checked').val() == '<?php /* @noEscape */ echo $code; ?>') {
                 getQuoteData();
             }
@@ -86,8 +85,9 @@ $code = $block->escapeHtml($block->getMethodCode());
             $(".bread-api-mail").hide();
             $(".bread-send-sms").hide();
 
+            var generateCartUrl = '<?php echo $block->getGenerateCartUrl(); ?>';
             $.ajax({
-                url: '<?php echo $block->getGenerateCartUrl(); ?>',
+                url: generateCartUrl,
                 type: 'post',
                 data: {
                     form_key: window.FORM_KEY
@@ -106,8 +106,9 @@ $code = $block->escapeHtml($block->getMethodCode());
                         .on("click", function(e) {
                             jQuery('body').loader().loader("show");
 
+                            var sendMailUrl = '<?php echo $block->getSendMailUrl(); ?>';
                             $.ajax({
-                                url: '<?php echo $block->getSendMailUrl(); ?>',
+                                url: sendMailUrl,
                                 type: 'post',
                                 data: {
                                     form_key: window.FORM_KEY,
@@ -128,6 +129,8 @@ $code = $block->escapeHtml($block->getMethodCode());
                                         $("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + row + '</div>');
                                     });
                                 }
+                            }).fail(function(error) {
+                                handleError('Error code returned when calling ' + sendMailUrl + ', with status: ' + error.statusText);
                             }).complete(function() {
                                 jQuery('body').loader().loader("hide");
                             });
@@ -138,8 +141,9 @@ $code = $block->escapeHtml($block->getMethodCode());
                         .on("click", function(e) {
                             jQuery('body').loader().loader("show");
 
+                            var sendBreadMailUrl = '<?php echo $block->getSendBreadMail(); ?>';
                             $.ajax({
-                                url: '<?php echo $block->getSendBreadMail(); ?>',
+                                url: sendBreadMailUrl,
                                 type: 'post',
                                 data: {
                                     form_key: window.FORM_KEY,
@@ -160,6 +164,8 @@ $code = $block->escapeHtml($block->getMethodCode());
                                         $("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + row + '</div>');
                                     });
                                 }
+                            }).fail(function(error) {
+                                handleError('Error code returned when calling ' + sendBreadMailUrl + ', with status: ' + error.statusText);
                             }).complete(function() {
                                 jQuery('body').loader().loader("hide");
                             });
@@ -170,8 +176,9 @@ $code = $block->escapeHtml($block->getMethodCode());
                         .on("click", function(e) {
                             jQuery('body').loader().loader("show");
 
+                            var sendSmsUrl = '<?php echo $block->getSendSmsUrl(); ?>';
                             $.ajax({
-                                url: '<?php echo $block->getSendSmsUrl(); ?>',
+                                url: sendSmsUrl,
                                 type: 'post',
                                 data: {
                                     form_key: window.FORM_KEY,
@@ -192,6 +199,8 @@ $code = $block->escapeHtml($block->getMethodCode());
                                         $("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + row + '</div>');
                                     });
                                 }
+                            }).fail(function(error) {
+                                handleError('Error code returned when calling ' + sendSmsUrl + ', with status: ' + error.statusText);
                             }).complete(function() {
                                 jQuery('body').loader().loader("hide");
                             });
@@ -220,6 +229,8 @@ $code = $block->escapeHtml($block->getMethodCode());
                 $(response.errorRows).each(function(k, v) {
                     $("#bread-checkout-error-message").append('<div data-ui-id="message-message-error">' + v + '</div>');
                 });
+
+                handleError('Error code returned when calling ' + generateCartUrl + ', with status: ' + error.statusText);
             }).complete(function() {
                 jQuery('body').loader().loader("hide");
             });

@@ -2,6 +2,7 @@
 
 namespace Bread\BreadCheckout\Observer;
 
+use Bread\BreadCheckout\Log\SentryLogger;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Model\Order;
 
@@ -100,7 +101,8 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
                     )
                 );
 
-            } catch (\Exception $e){
+            } catch (\Throwable $e){
+                SentryLogger::sendError($e);
                 $this->logger->log($e->getMessage());
             }
         }

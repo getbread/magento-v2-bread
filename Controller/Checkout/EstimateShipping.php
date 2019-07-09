@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
+use Bread\BreadCheckout\Log\SentryLogger;
+
 class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Magento\Framework\Controller\ResultFactory */
@@ -91,8 +93,9 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
                     ];
                 }
             }
-            $response = $methods;
-        } catch (\Exception $e) {
+            $response = ['result' => $methods];
+        } catch (\Throwable $e) {
+            SentryLogger::sendError($e);
             $this->logger->log(['ERROR' => $e->getMessage(),'PARAMS'=> $this->getRequest()->getParams()]);
             $this->messageManager->addErrorMessage(
                 __(
@@ -101,11 +104,11 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
                 )
             );
             $response = ['error' => 1,
-                         'text'  => 'Internal error'];
+                         'message'  => 'There was an error calculating the available shipping methods'];
         }
 
         return $this->resultFactory
                     ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-                    ->setData(['result' => $response]);
+                    ->setData($response);
     }
 }

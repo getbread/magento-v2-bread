@@ -37,20 +37,22 @@ define(
                                         timeout: false
                                     });
                                 }
-                            }).done(function (response) {
-                                try {
-                                    if (typeof response.result !== 'undefined' && response.result === true) {
-                                        $('#bread-checkout-btn').hide();
-                                        var approved = "<p><strong>You have been approved for financing.<br/>"+
-                                            "Please continue with the checkout to complete your order.</strong></p>";
-                                        $('#bread_feedback').html(approved);
-                                        $('body').trigger('hideLoadingPopup');
-                                    }
-                                } catch (e) {
-                                    console.log(e);
+                            }).done(function(response) {
+                                if (response.error) {
+                                    alert(response.error);
+                                } else if (response.result && response.result === true) {
+                                    $('#bread-checkout-btn').hide();
+                                    var approved = "<p><strong>You have been approved for financing.<br/>"+
+                                        "Please continue with the checkout to complete your order.</strong></p>";
+                                    $('#bread_feedback').html(approved);
                                     $('body').trigger('hideLoadingPopup');
                                 }
+                            }).fail(function(error) {
+                                handleError('Error code returned when calling ' + data.paymentUrl + ', with status: ' + error.statusText);
+                                $('body').trigger('hideLoadingPopup');
                             });
+                        } else {
+                            handleError('tx_token undefined in done callback');
                         }
                     }
                 };
@@ -87,7 +89,9 @@ define(
                  * Call the checkout method from bread.js
                  */
                 $('#bread-checkout-btn').show();
-                bread.checkout(breadConfig);
+                if (typeof bread !== 'undefined') {
+                    bread.checkout(breadConfig);
+                }
             }
         }
     }

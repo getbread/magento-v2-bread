@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Controller;
 
+use Bread\BreadCheckout\Log\SentryLogger;
+
 abstract class Checkout extends \Magento\Framework\App\Action\Action
 {
     /** @var \Magento\Catalog\Model\ResourceModel\ProductFactory */
@@ -244,7 +246,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             $this->quoteRepository->save($quote);
 
             return $address;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            SentryLogger::sendError($e);
             $this->logger->log(['MESSAGE' => $e->getMessage(),'TRACE' => $e->getTraceAsString()]);
             return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
                 'result' => ['error' => 1, 'text'  => 'Internal error']
