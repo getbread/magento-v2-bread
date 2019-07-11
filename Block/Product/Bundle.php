@@ -165,13 +165,16 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      */
     public function getProductDataJson()
     {
-        $product        = $this->getProduct();
-        $selectedPrice  = $this->getSelectedProductPrice();
-        $bundlePrice    = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice();
+        $product = $this->getProduct();
+        $basePrice = $product->getPrice();
 
-        if ((int)$product->getPriceType() !== \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC) {
-            $bundlePrice = $product->getPrice();
+        if ((int)$product->getPriceType() === \Magento\Bundle\Model\Product\Price::PRICE_TYPE_FIXED) {
+            $selectedPrice = $basePrice + $this->getSelectedProductPrice();
+        } else {
+            $selectedPrice = $this->getSelectedProductPrice();
         }
+
+        $bundlePrice = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice();
 
         $data = [$this->catalogHelper->getProductDataArray($product, null, 1, $bundlePrice)];
 
@@ -193,7 +196,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
             'bundleId'      => $product->getId(),
             'sku'           => $product->getSku(),
             'name'          => $product->getName(),
-            'price'         => $product->getPrice(),
+            'basePrice'     => floatval($product->getPrice()),
             'selectedPrice' => 0,
             'options'       => array()
         );
@@ -235,11 +238,11 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
             }
         }
 
-        $bundlePrice = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice();
-
-        if ((int)$product->getPriceType() !== \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC) {
-            $bundlePrice = $product->getPrice();
+        if ((int)$product->getPriceType() === \Magento\Bundle\Model\Product\Price::PRICE_TYPE_FIXED) {
+            $selectedPrice += $data['basePrice'];
         }
+
+        $bundlePrice = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice();
 
         $data['selectedPrice'] = $bundlePrice * 100;
 
