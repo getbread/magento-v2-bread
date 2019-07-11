@@ -28,26 +28,7 @@ require([
             bundleButtonMainConSel:     '.product-info-main',
             bundleButtonDetailsContSel: '.bundle-info .product-details',
             bundleButtonSel:            '#bread-btn-cntnr',
-            bundleButtonPreventSel:     '.button-prevent',
         };
-
-        $(document).ready(function() {
-            /**
-             * Overlay element onto bread button to prevent
-             * it from being clicked until options are selected
-             */
-            $(bundleConfig.bundleButtonPreventSel).show();
-
-            $(bundleConfig.buttonPrimaryCustom).on('click', function() {
-                $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonDetailsContSel);
-                $(bundleConfig.addToCartForm).bundleBread();
-            });
-
-            $(bundleConfig.buttonBackCustom).on('click', function() {
-                $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonMainConSel);
-                $(bundleConfig.bundleButtonPreventSel).show();
-            });
-        });
 
         /**
          * Widget Bread bundle product:
@@ -226,21 +207,15 @@ require([
              */
             updateBread: function updateBread(changes) {
                 this.cache.currentElementCount             = 0;
-                this.cache.currentElement.selectedPrice    = 0;
+                this.cache.currentElement.selectedPrice    = this.options.optionConfigBundle.basePrice;
                 this.cache.currentElement.selectedSku      = this.options.optionConfigBundle.sku + '///';
 
                 $.each(this.cache.currentElement.selected, $.proxy(this._renderOption, this));
                 //$.each(this.cache.currentElement.selectedCustom, $.proxy(this._renderCustomOption, this));
                 this.cache.currentElement.selectedSku = this.cache.currentElement.selectedSku.slice(0, -1);
 
-                if($(bundleConfig.addToCartForm).valid()) {
-                    $(bundleConfig.bundleButtonPreventSel).hide();
-                } else {
-                    $(bundleConfig.bundleButtonPreventSel).show();
-                }
-
-                if((this.cache.currentElement.previousPrice != this.cache.currentElement.selectedPrice)
-                    || (this.cache.currentElement.previousSku != this.cache.currentElement.selectedSku)) {
+                if((this.cache.currentElement.previousPrice !== this.cache.currentElement.selectedPrice)
+                    || (this.cache.currentElement.previousSku !== this.cache.currentElement.selectedSku)) {
 
                     this.cache.currentElement.previousPrice = this.cache.currentElement.selectedPrice;
                     this.cache.currentElement.previousSku = this.cache.currentElement.selectedSku;
@@ -253,6 +228,22 @@ require([
                     }
                 }
             },
+        });
+
+        $(document).ready(function() {
+            /**
+             * Overlay element onto bread button to prevent
+             * it from being clicked until options are selected
+             */
+            $(bundleConfig.addToCartForm).bundleBread();
+
+            $(bundleConfig.buttonPrimaryCustom).on('click', function() {
+                $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonDetailsContSel);
+            });
+
+            $(bundleConfig.buttonBackCustom).on('click', function() {
+                $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonMainConSel);
+            });
         });
 
         return $.mage.bundleBread;
