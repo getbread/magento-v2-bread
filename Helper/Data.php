@@ -64,6 +64,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_ORDER_SHIPPED                  = 'payment/breadcheckout/bread_advanced/order_shipped';
     const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
     const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/bread_advanced/threshold_amount';
+    const XML_CONFIG_AUTO_CANCEL                    = 'payment/breadcheckout/split_auto_cancel';
 
     const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/bread_advanced/cart_size_targeted_financing';
     const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/bread_advanced/cart_threshold';
@@ -851,10 +852,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $aboveThreshold = true;
         $thresholdAmount = (int)$this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
 
-        if($thresholdAmount){
+        if ($thresholdAmount) {
             $aboveThreshold = (int)$cost >= $thresholdAmount;
         }
 
         return $aboveThreshold;
+    }
+
+    /**
+     * Get auto cancel on split payment declined order
+     *
+     * @param string $store
+     * @return bool
+     */
+    public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
     }
 }

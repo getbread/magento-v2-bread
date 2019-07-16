@@ -115,12 +115,20 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
                 $this->processOrder($data);
             }
         } catch (\Exception $e) {
-            $this->logger->log(['MESSAGE' => $e->getMessage()]);
+            $errorMessage = $e->getMessage();
+
+            $this->logger->log(['MESSAGE' => $errorMessage]);
+
+            //TODO: rewrite this when API is updated to better handle errors, instead of searching through error message string
+
+            $isNotSplitPayDecline = strpos($errorMessage, "The credit/debit card portion of your transaction was declined.") === false;
+
+            if ($isNotSplitPayDecline) {
+                $errorMessage .= ' Try to checkout by going through the standard checkout process and selecting Pay Over Time as your payment method.';
+            }
+
             $this->messageManager->addErrorMessage(
-                __(
-                    'Checkout With Financing On Product Page Error, Please Contact Store Owner. 
-                    You may checkout by adding to cart and providing a payment in the checkout process.'
-                )
+                __($errorMessage)
             );
 
             $resultRedirect = $this->resultRedirectFactory

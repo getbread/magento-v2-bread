@@ -105,6 +105,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
 
         $validateAmount = $this->getInfo($breadTransactionId);
+        $this->setBreadTransactionId($breadTransactionId); // set transaction id so it can be fetched for split payment cancel
 
         $breadAmount = trim($validateAmount['total']);
         $amount = trim($amount);
@@ -119,7 +120,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 ]
             );
             throw new \Magento\Framework\Exception\LocalizedException(
-                __('Bread authorized amount ' . $breadAmount . ' but transaction expected ' . $amount)
+                __('There was a mismatch between the Bread amount and the transaction amount, Please contact '
+                    . 'the store owner.')
             );
         }
 
@@ -136,7 +138,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         if ($result['status'] != self::STATUS_AUTHORIZED) {
             $this->logger->log(['ERROR'=>'AUTHORIZATION FAILED', 'RESULT'=>$result]);
             throw new \Magento\Framework\Exception\LocalizedException(
-                __('Transaction authorize failed (current transaction status :' . $result->status . ')')
+                __('Transaction authorize failed (current transaction status : ' . $result['status'] . ').')
             );
         }
 
@@ -284,8 +286,27 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
             if ($status != 200) {
                 $this->logger->log(curl_error($curl));
+
+                //TODO: rewrite this when API is updated to better handle errors, instead of searching through the description string
+
+                // Need to explicitly say !== false instead of === true or something similar because of what strpos returns
+                $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
+
+                if ($isSplitPayDecline) {
+
+                    if($this->helper->isSplitPayAutoDecline()){
+                        $this->cancel($this->getBreadTransactionId());
+                    }
+
+                    $errorMessage = 'The credit/debit card portion of your transaction was declined. '
+                        . 'Please use a different card or contact your bank. Otherwise, you can still check out with '
+                        . 'an amount covered by your Bread loan capacity.';
+                } else {
+                    $errorMessage = 'Call to Bread API failed.';
+                }
+
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Call to Bread API failed.  Error: '. $result)
+                    __($errorMessage)
                 );
             }
         } catch (\Exception $e) {
