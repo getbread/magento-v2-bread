@@ -4,9 +4,6 @@
         <css src="Bread_BreadCheckout::bread/css/bread.css" />
     </head>
     <body>
-        <referenceContainer name="after.body.start">
-            <block class="Bread\BreadCheckout\Block\Js" as="breadcheckout.prod.js" name="breadcheckout.prod.js"/>
-        </referenceContainer>
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">

@@ -4,9 +4,6 @@
         <css src="Bread_BreadCheckout::bread/css/bread.css" />
     </head>
     <body>
-        <referenceContainer name="content">
-            <block class="Bread\BreadCheckout\Block\Js" as="breadcheckout.prod.js" name="breadcheckout.prod.js"/>
-        </referenceContainer>
         <referenceContainer name="product.info.extrahint">
             <block template="Bread_BreadCheckout::breadcheckout/view.phtml" class="Bread\BreadCheckout\Block\Product\View" as="breadcheckout.prod.view" name="breadcheckout.prod.view"/>
         </referenceContainer>
