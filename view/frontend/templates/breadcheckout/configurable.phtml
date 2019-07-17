@@ -5,7 +5,7 @@
 
 
 
-    require(['jquery'], function($) {
+    require(['jquery', 'underscore'], function($, _) {
         $(document).ready(function () {
 
             /**
@@ -57,6 +57,24 @@
                     return null;
                 }
 
+                var productsIndex = this.index;
+
+                if (!productsIndex || productsIndex === []) {
+                    return null;
+                }
+
+                var selectedProductId = Object.keys(productsIndex).find(function(productId) {
+                    var currentProductOptions = productsIndex[productId];
+
+                    return _.isEqual(currentProductOptions, selectedOptions);
+                });
+
+                return selectedProductId || this.getIdOfSelectedProductOLDVERSION(selectedOptions);
+            };
+
+            spConfig.getIdOfSelectedProductOLDVERSION = function(selectedOptions) {
+                //todo: add sentry info log here to determine if/when this is hit
+
                 $.each(this.attributes, function(attrId, attrVal) {
                     var optionId = selectedOptions[attrId];
 
@@ -83,7 +101,6 @@
                 } else {
                     return null;
                 }
-
             };
 
             <?php
