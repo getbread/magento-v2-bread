@@ -108,7 +108,10 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     protected function _toHtml()
     {
-        if ($this->quoteHelper->isEnabledOnCOP()) {
+
+        $aboveThreshold = $this->quoteHelper->aboveThreshold($this->quoteHelper->getSessionQuote()->getGrandTotal());
+
+        if ($this->quoteHelper->isEnabledOnCOP() && $aboveThreshold) {
             return parent::_toHtml();
         }
 

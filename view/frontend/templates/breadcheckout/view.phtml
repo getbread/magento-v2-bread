@@ -12,6 +12,17 @@
     </div>
 </div>
 
+<script type="text/x-magento-init">
+    {
+        "*": {
+             "Bread_BreadCheckout/js/product/button": {
+                "buttonId": "#bread-checkout-btn, #button-prevent",
+                "requiredOptionsSelector": ".product-options-wrapper [aria-required=\"true\"]"
+             }
+        }
+    }
+</script>
+
 <script type="text/javascript">
     require(['jquery'], function($) {
         document.configureButton = function (items) {
@@ -147,24 +158,30 @@
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
-            $.ajax({
-                url: '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>',
-                type: 'post',
-                context: this
-            }).done(function(data) {
-                <?php if(!$this->isHealthcare()) : ?>
-                if (data.shippingContact != false) {
-                    breadConfig.shippingContact = data.shippingContact;
-                }
+            if (!document.hasCheckedConfigData) {
 
-                if (data.billingContact != false) {
-                    breadConfig.billingContact = data.billingContact;
-                }
-                <?php endif; ?>
+                $.ajax({
+                    url: '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>',
+                    type: 'post',
+                    context: this
+                }).done(function(data) {
+                    document.hasCheckedConfigData = true;
+                    <?php if(!$this->isHealthcare()) : ?>
+                    if (data.shippingContact !== false) {
+                        breadConfig.shippingContact = data.shippingContact;
+                    }
 
+                    if (data.billingContact !== false) {
+                        breadConfig.billingContact = data.billingContact;
+                    }
+                    <?php endif; ?>
+
+                    bread.checkout(breadConfig);
+                });
+
+            } else {
                 bread.checkout(breadConfig);
-            });
-                   
+            }
         };
 
         /**

@@ -210,6 +210,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         if ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW
             && $this->catalogHelper->isEnabledOnPDP()
             && $this->catalogHelper->allowedProductType($this->getProduct()->getTypeId())
+            && $this->dataHelper->aboveThreshold($this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue())
         ) {
             return parent::_toHtml();
         } elseif ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW

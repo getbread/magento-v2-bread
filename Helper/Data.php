@@ -56,17 +56,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_BUTTON_DESIGN                  = 'payment/breadcheckout/button_design';
     const XML_CONFIG_API_MODE                       = 'payment/breadcheckout/api_mode';
     const XML_CONFIG_DEFAULT_BUTTON_SIZE            = 'payment/breadcheckout/use_default_button_size';
-    const XML_CONFIG_CREATE_CUSTOMER                = 'payment/breadcheckout/create_customer_account';
+    const XML_CONFIG_CREATE_CUSTOMER                = 'payment/breadcheckout/bread_advanced/create_customer_account';
     const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
     const XML_CONFIG_ALLOW_CHECKOUT_CART            = 'payment/breadcheckout/allowcheckoutcart';
     const XML_CONFIG_EMBEDDED_CHECKOUT              = 'payment/breadcheckout/embedded';
     const XML_CONFIG_PRODUCT_TYPE_MSG               = 'payment/breadcheckout/product_type_msg';
-    const XML_CONFIG_ORDER_SHIPPED                  = 'payment/breadcheckout/order_shipped';
+    const XML_CONFIG_ORDER_SHIPPED                  = 'payment/breadcheckout/bread_advanced/order_shipped';
     const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
+    const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/bread_advanced/threshold_amount';
+    const XML_CONFIG_AUTO_CANCEL                    = 'payment/breadcheckout/split_auto_cancel';
 
-    const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/cart_size_targeted_financing';
-    const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/cart_threshold';
-    const XML_CONFIG_CART_SIZE_FINANCING_ID         = 'payment/breadcheckout/cart_size_financing_program_id';
+    const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/bread_advanced/cart_size_targeted_financing';
+    const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/bread_advanced/cart_threshold';
+    const XML_CONFIG_CART_SIZE_FINANCING_ID         = 'payment/breadcheckout/bread_advanced/cart_size_financing_program_id';
 
     const XML_CONFIG_CATEGORY_GROUP                 = 'payment/breadcheckout/bread_category';
     const XML_CONFIG_CAT_AS_LOW_AS                  = 'payment/breadcheckout/bread_category/as_low_as';
@@ -837,5 +839,34 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool)$this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
+    }
+
+    /**
+     * Check if cost of item/cart total is equal or greater than set threshold amount
+     *
+     * @param float $cost
+     * @return bool
+     */
+    public function aboveThreshold($cost)
+    {
+        $aboveThreshold = true;
+        $thresholdAmount = (int)$this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
+
+        if ($thresholdAmount) {
+            $aboveThreshold = (int)$cost >= $thresholdAmount;
+        }
+
+        return $aboveThreshold;
+    }
+
+    /**
+     * Get auto cancel on split payment declined order
+     *
+     * @param string $store
+     * @return bool
+     */
+    public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
     }
 }

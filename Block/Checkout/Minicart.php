@@ -124,9 +124,13 @@ class Minicart extends Overview implements ShortcutInterface
      */
     public function isActive()
     {
+
+        $aboveThreshold = $this->quoteHelper->aboveThreshold($this->quoteHelper->getGrandTotal()/100);
+
         return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
             $this->helperData->allowMinicartCheckout() &&
-            !$this->isCartView();
+            !$this->isCartView() &&
+            $aboveThreshold;
     }
 
     /**

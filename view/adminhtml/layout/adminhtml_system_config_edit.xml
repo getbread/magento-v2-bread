@@ -6,6 +6,9 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <link src="Bread_BreadCheckout::js/validation.js"/>
+    </head>
     <body>
         <referenceContainer name="content">
             <block class="Magento\Backend\Block\Template" template="Bread_BreadCheckout::breadcheckout/css.phtml"/>
