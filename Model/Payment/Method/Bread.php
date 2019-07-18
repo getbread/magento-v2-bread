@@ -103,7 +103,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Bread\BreadCheckout\Helper\Log $breadLogger,
         \Magento\Payment\Model\Method\Logger $logger,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
