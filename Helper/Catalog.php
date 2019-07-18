@@ -23,7 +23,7 @@ class Catalog extends Data
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
         \Magento\Catalog\Block\Product\View $productViewBlock,
-        \Magento\Framework\App\Request\Http\Proxy $request,
+        \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Catalog\Api\ProductRepositoryInterfaceFactory $productRepositoryFactory,

@@ -16,4 +16,108 @@
         </arguments>
     </type>
 
+
+    <type name="Bread\BreadCheckout\Controller\Checkout\EstimateTax">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Controller\Checkout">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Controller\Checkout\ClearQuote">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Controller\Checkout\ValidatePaymentMethod">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Controller\Checkout\DiscountsData">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Controller\Checkout\ValidateOrder">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Controller\Checkout\EstimateShipping">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Controller\Checkout\ValidateTotals">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+
+    <type name="Bread\BreadCheckout\Helper\Data">
+        <arguments>
+            <argument name="request" xsi:type="object">\Magento\Framework\App\Request\Http\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Helper\Url">
+        <arguments>
+            <argument name="request" xsi:type="object">\Magento\Framework\App\Request\Http\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Helper\Catalog">
+        <arguments>
+            <argument name="request" xsi:type="object">\Magento\Framework\App\Request\Http\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Helper\Quote">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="request" xsi:type="object">\Magento\Framework\App\Request\Http\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Helper\Checkout">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+            <argument name="request" xsi:type="object">\Magento\Framework\App\Request\Http\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Bread\BreadCheckout\Helper\Customer">
+        <arguments>
+            <argument name="request" xsi:type="object">\Magento\Framework\App\Request\Http\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">\Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+
+    <type name="Bread\BreadCheckout\Model\Payment\Method\Bread">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
 </config>

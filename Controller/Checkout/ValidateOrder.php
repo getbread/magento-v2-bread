@@ -52,11 +52,11 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Checkout\Helper\Cart $cartHelper,
         \Bread\BreadCheckout\Helper\Log $logger,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Magento\Customer\Model\Session\Proxy $customerSession,
+        \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
