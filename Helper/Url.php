@@ -13,7 +13,7 @@ class Url extends Data
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
-        \Magento\Framework\App\Request\Http\Proxy $request,
+        \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Framework\Url $urlHelper
