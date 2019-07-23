@@ -43,8 +43,8 @@ class ConfigData extends \Magento\Framework\App\Action\Action
     {
         // @codingStandardsIgnoreStart
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
-            'shippingContact' => ($this->dataHelper->isHealthcare()) ? false : $this->quoteHelper->getShippingAddressData(),
-            'billingContact' => ($this->dataHelper->isHealthcare())? false : $this->getBillingAddressData()
+            'shippingContact' => $this->quoteHelper->getShippingAddressData(),
+            'billingContact' => $this->getBillingAddressData()
         ]);
         // @codingStandardsIgnoreEnd
     }

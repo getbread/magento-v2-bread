@@ -65,7 +65,7 @@ define([
                 this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
-            if (typeof data.billingContact !== 'undefined' && data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+            if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
                 this.breadConfig.billingContact = data.billingContact;
             }
 
@@ -147,11 +147,11 @@ define([
                     fullScreenLoader.startLoader();
                 }
             }).done(function (data) {
-                if (data.shippingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                if (data.shippingContact != false) {
                     this.breadConfig.shippingContact = data.shippingContact;
                 }
 
-                if (data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                if (data.billingContact != false) {
                     this.breadConfig.billingContact = data.billingContact;
                     this.breadConfig.billingContact.email = (data.billingContact.email) ?
                         data.billingContact.email :
