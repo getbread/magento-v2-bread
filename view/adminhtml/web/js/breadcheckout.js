@@ -39,6 +39,13 @@ define(
                                 }
                             }).done(function(response) {
                                 if (response.error) {
+                                    errorInfo = {
+                                        bread_config: breadConfig,
+                                        response: response,
+                                        tx_id: tx_token,
+                                    };
+                                    document.logIssue('error', errorInfo, 'Error validating payment method');
+
                                     alert(response.error);
                                 } else if (response.result && response.result === true) {
                                     $('#bread-checkout-btn').hide();
@@ -48,11 +55,20 @@ define(
                                     $('body').trigger('hideLoadingPopup');
                                 }
                             }).fail(function(error) {
-                                handleError('Error code returned when calling ' + data.paymentUrl + ', with status: ' + error.statusText);
+                                var errorInfo = {
+                                    bread_config: breadConfig,
+                                    tx_id: tx_token,
+                                };
+                                document.logIssue('error', errorInfo,
+                                    'Error code returned when calling ' + paymentUrl + ', with status: ' + error.statusText);
                                 $('body').trigger('hideLoadingPopup');
                             });
                         } else {
-                            handleError('tx_token undefined in done callback');
+                            var errorInfo = {
+                                bread_config: breadConfig,
+                                err: err
+                            };
+                            document.logIssue('error', errorInfo, 'tx_token undefined in done callback');
                         }
                     }
                 };

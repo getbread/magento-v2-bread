@@ -57,10 +57,12 @@
                         document.body.appendChild(f);
                         f.submit();
                     } else {
-                        handleError('tx_token undefined in done callback');
+                        var errorInfo = {
+                            bread_config: breadConfig,
+                            err: err
+                        };
+                        document.logIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
-
-                    return;
                 },
 
                 /**
@@ -71,6 +73,7 @@
                  */
                 calculateTax: function (shippingAddress, callback) {
                     var productForm = $('#product_addtocart_form');
+                    var errorInfo;
 
                     shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
@@ -80,14 +83,22 @@
                     shippingAddress.buy_request                     = productForm.serialize();
 
                     var taxEstimationUrl = '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>';
+                    var shippingString = JSON.stringify(shippingAddress);
+
                     $.ajax({
                         url: taxEstimationUrl,
-                        data: {shippingInfo: JSON.stringify(shippingAddress)},
+                        data: { shippingInfo: shippingString },
                         type: 'post'
-                    }).done(function (response) {
+                    }).done(function(response) {
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
+                                    errorInfo = {
+                                        response: response,
+                                        shipping_info: shippingString,
+                                    };
+                                    document.logIssue('error', errorInfo, 'Error estimating tax');
+
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
@@ -95,10 +106,18 @@
                             }
                         }
                         catch (e) {
-                            handleError(e.message);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingString,
+                            };
+                            document.logIssue('error', errorInfo, e);
                         }
                     }).fail(function(error) {
-                        handleError('Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
+                        errorInfo = {
+                            shipping_info: shippingString,
+                        };
+                        document.logIssue('error', errorInfo,
+                            'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -110,6 +129,7 @@
                  */
                 calculateShipping: function (shippingAddress, callback) {
                     var productForm = $('#product_addtocart_form');
+                    var errorInfo;
 
                     shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
@@ -127,6 +147,12 @@
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
+                                    errorInfo = {
+                                        response: response,
+                                        shipping_info: shippingAddress,
+                                    };
+                                    document.logIssue('error', errorInfo, 'Error calculating shipping');
+
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
@@ -134,10 +160,18 @@
                             }
                         }
                         catch (e) {
-                            handleError(e.message);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingAddress,
+                            };
+                            document.logIssue('error', errorInfo, e);
                         }
                     }).fail(function(error) {
-                        handleError('Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
+                        errorInfo = {
+                            shipping_info: shippingAddress,
+                        };
+                        document.logIssue('error', errorInfo,
+                            'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -166,28 +200,37 @@
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
-            var configDataUrl = '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>';
-            $.ajax({
-                url: configDataUrl,
-                type: 'post',
-                context: this
-            }).done(function(data) {
-                <?php if(!$this->isHealthcare()) : ?>
-                if (data.shippingContact !== false) {
-                    breadConfig.shippingContact = data.shippingContact;
-                }
+            if (!document.hasCheckedConfigData) {
 
-                if (data.billingContact !== false) {
-                    breadConfig.billingContact = data.billingContact;
-                }
-                <?php endif; ?>
+                var configDataUrl = '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>';
+                $.ajax({
+                    url: configDataUrl,
+                    type: 'post',
+                    context: this
+                }).done(function(data) {
+                    document.hasCheckedConfigData = true;
 
-                if (typeof bread !== 'undefined') {
-                    bread.checkout(breadConfig);
-                }
-            }).fail(function(error) {
-                handleError('Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
-            });
+                    <?php if (!$this->isHealthcare()) : ?>
+                    if (data.shippingContact !== false) {
+                        breadConfig.shippingContact = data.shippingContact;
+                    }
+
+                    if (data.billingContact !== false) {
+                        breadConfig.billingContact = data.billingContact;
+                    }
+                    <?php endif; ?>
+
+                    if (typeof bread !== 'undefined') {
+                        bread.checkout(breadConfig);
+                    }
+                }).fail(function(error) {
+                    document.logIssue('error', {},
+                        'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
+                });
+
+            } else {
+                bread.checkout(breadConfig);
+            }
         };
 
         /**
@@ -199,7 +242,8 @@
             $.ajax({
                 url: clearQuoteUrl
             }).fail(function(error) {
-                handleError('Error code returned when calling ' + clearQuoteUrl + ', with status: ' + error.statusText);
+                document.logIssue('error', {},
+                    'Error code returned when calling ' + clearQuoteUrl + ', with status: ' + error.statusText);
             });
         };
 

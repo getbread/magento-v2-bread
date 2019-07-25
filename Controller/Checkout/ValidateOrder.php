@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
@@ -117,7 +115,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
                 $this->processOrder($data);
             }
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log(['MESSAGE' => $e->getMessage()]);
             $this->messageManager->addErrorMessage(
                 __(
@@ -219,7 +216,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $order = $this->quoteManagement->submit($quote);
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log(['ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage()]);
             throw $e;
         }
@@ -232,7 +228,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $this->orderSender->send($order);
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $this->customerSession->setBreadItemAddedToQuote(false);
         }

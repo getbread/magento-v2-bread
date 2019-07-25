@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Model\Payment\Api;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class Client extends \Magento\Framework\Model\AbstractModel
 {
     const STATUS_AUTHORIZED     = 'AUTHORIZED';
@@ -291,7 +289,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 );
             }
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log([
                 'USER'      => $username,
                 'PASSWORD'  => $password,
@@ -420,7 +417,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
         try {
             $this->jsonHelper->jsonDecode($string);
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log($e->getMessage());
             return false;
         }

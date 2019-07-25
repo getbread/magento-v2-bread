@@ -2,8 +2,6 @@
 
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class SendBreadEmail extends \Magento\Backend\App\Action
 {
     /**
@@ -59,7 +57,6 @@ class SendBreadEmail extends \Magento\Backend\App\Action
             $this->paymentApiClient->sendEmail($cartId, $email, $name);
             $ret['successRows'][] = __('Email was successfully sent to your customer.');
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $ret['error'] = true;
             $ret['errorRows'][] = __('An error occurred while sending email:');
             $ret['errorRows'][] = $e->getMessage();

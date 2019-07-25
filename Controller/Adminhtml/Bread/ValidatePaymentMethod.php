@@ -8,10 +8,6 @@
  */
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-
-
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */

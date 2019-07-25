@@ -2,8 +2,6 @@
 
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class SendSms extends \Magento\Backend\App\Action
 {
     /**
@@ -57,7 +55,6 @@ class SendSms extends \Magento\Backend\App\Action
             $this->paymentApiClient->sendSms($cartId,$phone);
             $ret['successRows'][] = __('SMS was successfully sent to your customer.');
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $ret['error'] = true;
             $ret['errorRows'][] = __('An error occurred while sending sms:');
             $ret['errorRows'][] = $e->getMessage();

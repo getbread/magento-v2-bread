@@ -58,13 +58,25 @@ class Js extends \Magento\Framework\View\Element\Text
     {
         $moduleVersionComment = sprintf('<!-- BreadCheckout Module Version: %s -->', $this->getModuleVersion());
 
-        $sentryScripts = sprintf('<script src="https://browser.sentry-cdn.com/5.4.3/bundle.min.js" crossorigin="anonymous"></script>'
-            . '<script src="%s"></script>',
-            $this->getViewFileUrl('Bread_BreadCheckout/js/sentry-config.js'));
+        $sentrySdkScript = '<script src="https://browser.sentry-cdn.com/5.4.3/bundle.min.js" crossorigin="anonymous"></script>';
+        $sentryConfigScript =
+            '<script type="text/x-magento-init">
+                {
+                    "*": {
+                        "Bread_BreadCheckout/js/helper/sentry-config": {
+                            "pluginVersion": "%s",
+                            "apiKey": "%s",
+                            "isSentryEnabled": %b
+                        }
+                    }
+                }
+            </script>';
+
+        $sentryScript = sprintf($sentrySdkScript . $sentryConfigScript, $this->getModuleVersion(), $this->getPublicApiKey(), $this->isSentryEnabled());
 
         $breadJsScript = sprintf('<script src="%s" data-api-key="%s"></script>', $this->getJsLibLocation(), $this->getPublicApiKey());
 
-        return $moduleVersionComment . $sentryScripts . $breadJsScript;
+        return $moduleVersionComment . $sentryScript . $breadJsScript;
     }
 
     /**
@@ -95,6 +107,16 @@ class Js extends \Magento\Framework\View\Element\Text
     protected function getJsLibLocation()
     {
         return $this->helper->getJsLibLocation();
+    }
+
+    /**
+     * Get Sentry Enabled
+     *
+     * @return mixed
+     */
+    protected function isSentryEnabled()
+    {
+        return $this->helper->isSentryEnabled();
     }
 
     /**

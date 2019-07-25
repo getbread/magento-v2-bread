@@ -2,9 +2,6 @@
 
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class GenerateCart extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
@@ -108,7 +105,6 @@ class GenerateCart extends \Magento\Backend\App\Action
             $ret['cartUrl'] = $result['url'];
             $ret['id'] = $result['id'];
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $ret['error'] = true;
             $ret['errorRows'][] = __('There was an error in cart creation:');
             $ret['errorRows'][] = $e->getMessage();

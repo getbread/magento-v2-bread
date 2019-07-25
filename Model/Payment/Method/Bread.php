@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Model\Payment\Method;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 {
 

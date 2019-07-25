@@ -249,12 +249,23 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
                     <field id="log_enabled" type="select" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Enable Logging</label>
+                        <label>Enable Logging Locally</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>
                             <![CDATA[
                                 <div>
                                     <p>Enable Extra Logging.</p>
+                                </div>
+                        ]]>
+                        </comment>
+                    </field>
+                    <field id="sentry_enabled" type="select" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Send Error Information to Bread</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                <div>
+                                    <p>Proactively sends information about any Bread related issues</p>
                                 </div>
                         ]]>
                         </comment>

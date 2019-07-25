@@ -7,7 +7,7 @@ define([
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/checkout-data',
     'Magento_Ui/js/modal/alert'
-], function ($, fullScreenLoader, quote, checkout,alert) {
+], function ($, fullScreenLoader, quote, checkout, alert) {
 
     return {
         breadConfig: undefined,
@@ -22,7 +22,10 @@ define([
                 disableEditShipping: true,
                 requireShippingContact: !quote.isVirtual(),
                 onShowCheckoutError: function(message) {
-                    handleError('onShowCheckoutError triggered, ' + message.data);
+                    var errorInfo = {
+                        bread_config: window.checkoutConfig.payment.breadcheckout.breadConfig,
+                    };
+                    document.logIssue('error', errorInfo, 'onShowCheckoutError triggered');
 
                     alert({
                         content: message.data
@@ -33,7 +36,11 @@ define([
                     if (tx_token !== undefined) {
                         context.buttonCallback(tx_token);
                     } else {
-                        handleError('tx_token undefined in done callback');
+                        var errorInfo = {
+                            err: err,
+                            bread_config: window.checkoutConfig.payment.breadcheckout.breadConfig
+                        };
+                        document.logIssue('error', errorInfo,  'tx_token undefined in done callback');
                     }
                 }
             };
@@ -117,7 +124,11 @@ define([
                             bread.showCheckout(this.breadConfig);
                         }
                     }).fail(function(error) {
-                        handleError('Error code returned when calling ' + shippingOptionUrl + ', with status: ' + error.statusText);
+                        var errorInfo = {
+                            bread_config: self.breadConfig
+                        };
+                        document.logIssue('error', errorInfo,
+                            'Error code returned when calling ' + shippingOptionUrl + ', with status: ' + error.statusText);
                     });
                 }
 
@@ -183,7 +194,11 @@ define([
                 }
 
             }).fail(function(error) {
-                handleError('Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
+                var errorInfo = {
+                    bread_config: this.breadConfig
+                };
+                document.logIssue('error', errorInfo,
+                    'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
             });
         },
 
@@ -192,6 +207,7 @@ define([
          */
         setCouponDiscounts: function(){
 
+            //todo ask aleksa about =-, why not -=, is this a bug?
             var discountAmount =- this.round(quote.getTotals()._latestValue.discount_amount);
             if (discountAmount > 0) {
                 this.breadConfig.discounts = [{
