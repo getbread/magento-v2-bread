@@ -135,7 +135,7 @@
             if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
                 breadConfig.customCSS = buttonCss;
             }
-            <?php if(!$this->isHealthcare()) : ?>
+
             if (address !== false) {
                 breadConfig.shippingContact = address;
             }
@@ -143,7 +143,6 @@
             if (billingAddress !== false) {
                 breadConfig.billingContact = billingAddress;
             }
-            <?php endif; ?>
 
             if (buttonOnProduct === true) {
                 breadConfig.actAsLabel = false;
