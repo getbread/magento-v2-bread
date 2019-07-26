@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Magento\Framework\Controller\ResultFactory */
@@ -95,7 +93,6 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
             }
             $response = ['result' => $methods];
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log(['ERROR' => $e->getMessage(),'PARAMS'=> $this->getRequest()->getParams()]);
             $this->messageManager->addErrorMessage(
                 __(

@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Magento\Framework\Controller\ResultFactory  */
@@ -73,9 +71,7 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
 
             $result             = round($shippingAddress->getTaxAmount() * 100);
             $response           = ['result' => $result];
-            throw new \Exception('asdf');
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log(['EXCEPTION IN TAX ESTIMATE ACTION' => $e->getMessage()]);
             $response = ['error' => 1,
                          'message'  => 'There was an error calculating the estimated tax'];

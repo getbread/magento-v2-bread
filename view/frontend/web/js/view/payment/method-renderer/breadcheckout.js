@@ -134,26 +134,38 @@ define(
                         return false;
                     }
                 } else {
-                    // TODO: ask in PR about what context everyone thinks would be useful
-                    handleError('Unable to properly validate order', [{ key: 'Bread Config', value: window.checkoutConfig.payment[this.getCode()].breadConfig }]);
+                    var errorInfo = {
+                        bread_config: window.checkoutConfig.payment[this.getCode()].breadConfig,
+                    };
+                    document.logIssue('error', errorInfo, 'Unable to properly validate order');
                 }
             },
 
             buttonCallback: function (token) {
                 this.setBreadTransactionId(token);
                 var paymentUrl = window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl;
+                var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
+
                 $.ajax({
                     url: paymentUrl,
-                    data: {token: token},
+                    data: { token: token },
                     type: 'post',
                     context: this,
                     beforeSend: function () {
                         fullScreenLoader.startLoader();
                     }
-                }).done(function (response) {
+                }).done(function(response) {
+                    var errorInfo;
                     try {
                         if (response !== null && typeof response === 'object') {
                             if (response.error) {
+                                errorInfo = {
+                                    bread_config: breadConfig,
+                                    response: response,
+                                    tx_id: token,
+                                };
+                                document.logIssue('error', errorInfo, 'Error validating payment method');
+
                                 alert(response.error);
                             } else {
                                 $.when(
@@ -171,7 +183,14 @@ define(
                                 ).fail(
                                     $.proxy(function(error) {
                                         errorProcessor.process(error, this.messageContainer);
-                                        handleError(error.responseText);
+
+                                        errorInfo = {
+                                            bread_config: breadConfig,
+                                            error: error,
+                                            tx_id: token,
+                                        };
+                                        document.logIssue('error', errorInfo, 'Error updating address or validating totals');
+
                                         this.setBreadTransactionId(null)
                                     }, this)
                                 );
@@ -179,10 +198,20 @@ define(
                             fullScreenLoader.stopLoader();
                         }
                     } catch (e) {
-                        handleError(e.message);
+                        errorInfo = {
+                            response: response,
+                            tx_id: token,
+                            bread_config: breadConfig,
+                        };
+                        document.logIssue('error', errorInfo, e);
                     }
                 }).fail(function(error) {
-                    handleError('Error code returned when calling ' + paymentUrl + ', with status: ' + error.statusText);
+                    var errorInfo = {
+                        bread_config: breadConfig,
+                        tx_id: token,
+                    };
+                    document.logIssue('error', errorInfo,
+                        'Error code returned when calling ' + paymentUrl + ', with status: ' + error.statusText);
                 });
             },
 
@@ -224,9 +253,12 @@ define(
             validateTotals: function () {
                 var deferred = $.Deferred();
                 var validateTotalsUrl = window.checkoutConfig.payment[this.getCode()].validateTotalsUrl;
+                var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                var tx_id = this.breadTransactionId();
+
                 $.ajax({
                     url: validateTotalsUrl,
-                    data: {bread_transaction_id: this.breadTransactionId()},
+                    data: { bread_transaction_id: tx_id },
                     type: 'post',
                     context: this
                 }).done(function (response) {
@@ -236,7 +268,12 @@ define(
                         deferred.reject(response);
                     }
                 }).fail(function(error) {
-                    handleError('Error code returned when calling ' + validateTotalsUrl + ', with status: ' + error.statusText);
+                    var errorInfo = {
+                        bread_config: breadConfig,
+                        tx_id: tx_id,
+                    };
+                    document.logIssue('error', errorInfo,
+                        'Error code returned when calling ' + validateTotalsUrl + ', with status: ' + error.statusText);
                 });
 
                 return deferred;

@@ -1,8 +1,6 @@
 <?php
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class SendMail extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Helper\Quote */
@@ -51,7 +49,6 @@ class SendMail extends \Magento\Backend\App\Action
             $this->customerHelper->sendCartActivationEmailToCustomer($quote->getCustomer(), $url, $items);
             $response['successRows'][] = __('Email was successfully sent to your customer.');
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $response['error'] = true;
             $response['errorRows'][] = __('An error occurred while sending email:');
             $response['errorRows'][] = $e->getMessage();

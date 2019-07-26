@@ -8,8 +8,6 @@
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
@@ -81,7 +79,6 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 
             $result = $newData;
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $result = ['error' => (string) __('Error: Unable to process transaction.')];
         }

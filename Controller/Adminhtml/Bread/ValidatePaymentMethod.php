@@ -8,10 +8,6 @@
  */
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-
-
-use Bread\BreadCheckout\Log\SentryLogger;
-
 class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
@@ -68,7 +64,6 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
             }
             $response = ['result' => $result];
         } catch (\Throwable $e) {
-            SentryLogger::sendError($e);
             $this->logger->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
 
             $response = ['error' => 'Something went wrong processing the Bread payment. '

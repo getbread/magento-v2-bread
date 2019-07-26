@@ -55,7 +55,11 @@
                         document.body.appendChild(f);
                         f.submit();
                     } else {
-                        handleError('tx_token undefined in done callback');
+                        var errorInfo = {
+                            bread_config: breadConfig,
+                            err: err
+                        };
+                        document.logIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
                 },
 
@@ -73,14 +77,23 @@
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
                     var taxEstimationUrl = '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>';
+                    var shippingString = JSON.stringify(shippingAddress);
+                    var errorInfo;
+
                     $.ajax({
                         url: taxEstimationUrl,
-                        data: {shippingInfo: JSON.stringify(shippingAddress)},
+                        data: { shippingInfo: shippingString },
                         type: 'post'
                     }).done(function (response) {
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
+                                    errorInfo = {
+                                        response: response,
+                                        shipping_info: shippingString,
+                                    };
+                                    document.logIssue('error', errorInfo, 'Error estimating tax');
+
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
@@ -88,10 +101,18 @@
                             }
                         }
                         catch (e) {
-                            handleError(e.message);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingString,
+                            };
+                            document.logIssue('error', errorInfo, e);
                         }
                     }).fail(function(error) {
-                        handleError('Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
+                        errorInfo = {
+                            shipping_info: shippingString,
+                        };
+                        document.logIssue('error', errorInfo,
+                            'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -109,6 +130,8 @@
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
                     var shippingAddressEstimationUrl = '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>';
+                    var errorInfo;
+
                     $.ajax({
                         url: shippingAddressEstimationUrl,
                         data: shippingAddress,
@@ -117,6 +140,12 @@
                         try {
                             if (typeof response == 'object') {
                                 if (response.error) {
+                                    errorInfo = {
+                                        response: response,
+                                        shipping_info: shippingAddress,
+                                    };
+                                    document.logIssue('error', errorInfo, 'Error calculating shipping');
+
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
@@ -124,10 +153,18 @@
                             }
                         }
                         catch (e) {
-                            handleError(e.message);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingAddress,
+                            };
+                            document.logIssue('error', errorInfo, e);
                         }
                     }).fail(function(error) {
-                        handleError('Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
+                        errorInfo = {
+                            shipping_info: shippingAddress,
+                        };
+                        document.logIssue('error', errorInfo,
+                            'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -174,7 +211,8 @@
                     bread.checkout(breadConfig);
                 }
             }).fail(function(error) {
-                handleError('Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
+                document.logIssue('error', {},
+                    'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
             });
 
         };
@@ -201,9 +239,11 @@
                 $('.button-prevent').hide();
 
                 var groupedButtonUpdateUrl = '<?php echo $block->getGroupedButtonUpdate()?>';
+                var serializedForm = $(form).serialize();
+
                 $.ajax({
                     url: groupedButtonUpdateUrl,
-                    data: $(form).serialize(),
+                    data: serializedForm,
                     type: 'post',
                     context: this
                 }).done(function(response) {
@@ -211,7 +251,11 @@
                         document.configureButton(response.items);
                     }
                 }).fail(function(error) {
-                    handleError('Error code returned when calling ' + groupedButtonUpdateUrl + ', with status: ' + error.statusText);
+                    var errorInfo = {
+                        data: serializedForm,
+                    };
+                    document.logIssue('error', errorInfo,
+                        'Error code returned when calling ' + groupedButtonUpdateUrl + ', with status: ' + error.statusText);
                 });
             }
         };
