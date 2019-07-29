@@ -65,7 +65,7 @@ define([
                 this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
-            if (typeof data.billingContact !== 'undefined' && data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+            if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
                 this.breadConfig.billingContact = data.billingContact;
             }
 

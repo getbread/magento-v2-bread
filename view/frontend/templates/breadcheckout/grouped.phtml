@@ -155,7 +155,6 @@
                 type: 'post',
                 context: this
             }).done(function(data) {
-                <?php if(!$this->isHealthcare()) : ?>
                 if (data.shippingContact != false) {
                     breadConfig.shippingContact = data.shippingContact;
                 }
@@ -163,7 +162,6 @@
                 if (data.billingContact != false) {
                     breadConfig.billingContact = data.billingContact;
                 }
-                <?php endif; ?>
 
                 bread.checkout(breadConfig);
             });
