@@ -220,7 +220,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $quote->getPayment()->importData(['method' => 'breadcheckout']);
         $quote->getPayment()->setTransactionId($data['breadTransactionId']);
         $quote->getPayment()->setAdditionalData('BREAD CHECKOUT DATA', json_encode($data));
-        
+
         try {
             $order = $this->quoteManagement->submit($quote);
         } catch (\Throwable $e) {

@@ -56,7 +56,6 @@ class GroupedItems extends \Magento\Framework\App\Action\Action
         $product = $this->productRepository->getById($params['product']);
         $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
 
-
         $superGroup = $params['super_group'];
         $items = [];
 

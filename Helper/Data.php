@@ -16,6 +16,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const JS_SANDBOX_URI                            = 'https://checkout-sandbox.getbread.com/bread.js';
     const JS_LIVE_URI                               = 'https://checkout.getbread.com/bread.js';
 
+    const URL_LAMBDA_SENTRY_DSN                     = 'https://oapavh9uvh.execute-api.us-east-1.amazonaws.com/prod/sentrydsn?platform=magento2';
+
     const URL_VALIDATE_PAYMENT                      = 'bread/checkout/validatepaymentmethod';
     const URL_VALIDATE_ORDER                        = 'bread/checkout/validateorder';
     const URL_VALIDATE_TOTALS                       = 'bread/checkout/validatetotals';

@@ -20,14 +20,29 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     private $packageInfo;
 
+    /** @var \Magento\Framework\App\CacheInterface */
+    public $cache;
+
+    /** @var \Magento\Framework\HTTP\Client\Curl */
+    protected $curl;
+
+    /** @var \Psr\Log\LoggerInterface */
+    public $logger;
+
     public function __construct(
         \Magento\Framework\View\Element\Context $context,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Framework\Module\PackageInfo $packageInfo,
+        \Magento\Framework\App\CacheInterface $cache,
+        \Magento\Framework\HTTP\Client\Curl $curl,
+        \Bread\BreadCheckout\Helper\Log $logger,
         array $data = []
     ) {
         $this->helper = $helper;
         $this->packageInfo = $packageInfo;
+        $this->cache = $cache;
+        $this->curl = $curl;
+        $this->logger = $logger;
 
         parent::__construct(
             $context,
@@ -64,6 +79,7 @@ class Js extends \Magento\Framework\View\Element\Text
                 {
                     "*": {
                         "Bread_BreadCheckout/js/helper/sentry-config": {
+                            "dsn": "%s",
                             "pluginVersion": "%s",
                             "apiKey": "%s",
                             "isSentryEnabled": %b
@@ -72,9 +88,16 @@ class Js extends \Magento\Framework\View\Element\Text
                 }
             </script>';
 
-        $sentryScript = sprintf($sentrySdkScript . $sentryConfigScript, $this->getModuleVersion(), $this->getPublicApiKey(), $this->isSentryEnabled());
+        $dsn = $this->getSentryDSN();
 
-        $breadJsScript = sprintf('<script src="%s" data-api-key="%s"></script>', $this->getJsLibLocation(), $this->getPublicApiKey());
+        // Don't enable Sentry if dsn can't be retrieved
+        $isSentryEnabled = $this->isSentryEnabled() && $dsn;
+
+        $sentryScript = sprintf($sentrySdkScript . $sentryConfigScript, $dsn, $this->getModuleVersion(),
+            $this->getPublicApiKey(), $isSentryEnabled);
+
+        $breadJsScript = sprintf('<script src="%s" data-api-key="%s"></script>',
+            $this->getJsLibLocation(), $this->getPublicApiKey());
 
         return $moduleVersionComment . $sentryScript . $breadJsScript;
     }
@@ -127,5 +150,63 @@ class Js extends \Magento\Framework\View\Element\Text
     private function getModuleVersion()
     {
         return $this->packageInfo->getVersion('Bread_BreadCheckout');
+    }
+
+    /**
+     * Get Sentry DSN for magento 2
+     *
+     * @return string
+     */
+    private function getSentryDSN()
+    {
+        $sentryDSNIdentifier = 'sentry_dsn';
+
+        $dsn = $this->cache->load($sentryDSNIdentifier);
+
+        if ($dsn) {
+            return $dsn;
+        }
+
+        try {
+            $this->curl->setCredentials($this->getUsername(), $this->getPassword());
+            $this->curl->get($this->helper::URL_LAMBDA_SENTRY_DSN);
+
+            $response = json_decode($this->curl->getBody(), true);
+
+            if (isset($response['error']) || !isset($response['dsn'])) {
+                $errorMessage = isset($response['error']) ? $response['error']
+                    : 'Incorrect Response Format: ' . json_encode($response);
+                $this->logger->log(['ERROR WHEN GETTING SENTRY DSN' => $errorMessage]);
+                return null;
+            }
+
+            $dsn = $response['dsn'];
+            $this->cache->save($dsn, $sentryDSNIdentifier, [], 60 * 60);
+
+            return $dsn;
+        } catch (\Throwable $e) {
+            $this->logger->log(['EXCEPTION WHEN GETTING SENTRY DSN' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Get public api key to use as username for dsn request
+     *
+     * @return string
+     */
+    private function getUsername()
+    {
+        return $this->helper->getApiPublicKey();
+    }
+
+    /**
+     * Get private api key to use as password for dsn request
+     *
+     * @return string
+     */
+    private function getPassword()
+    {
+        return $this->helper->getApiSecretKey();
     }
 }

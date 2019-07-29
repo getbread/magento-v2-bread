@@ -1,9 +1,5 @@
 define([], function() {
 
-    //todo setup lambda - need API Gateway access
-
-    //todo test sentry config admin setting
-
     return function(config) {
 
         var TRACKED_TAG_KEYS = [
@@ -26,22 +22,26 @@ define([], function() {
             }
         };
 
-        Sentry.init({
-            dsn: 'https://a832bffb9c574aaa9e4a113b61f90e9e@sentry.io/1263830',
-            beforeSend(event) {
-                var isBreadIssue = event.extra && Object.values(event.extra).includes('BreadIssue');
+        if (config.isSentryEnabled) {
 
-                if (!isBreadIssue) {
-                    return null;
+            Sentry.init({
+                dsn: config.dsn,
+                beforeSend(event) {
+                    var isBreadIssue = event.extra && Object.values(event.extra).includes('BreadIssue');
+
+                    if (!isBreadIssue) {
+                        return null;
+                    }
+                    return event;
                 }
-                return event;
-            }
-        });
+            });
 
-        Sentry.configureScope(function(scope) {
-            scope.setTag('plugin_version', config.pluginVersion);
-            scope.setTag('merchant_api_key', config.apiKey);
-        });
+            Sentry.configureScope(function(scope) {
+                scope.setTag('plugin_version', config.pluginVersion);
+                scope.setTag('merchant_api_key', config.apiKey);
+            });
+
+        }
 
         document.logIssue = function(level, issueInfo, issue) {
 
