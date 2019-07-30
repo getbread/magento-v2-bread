@@ -157,15 +157,14 @@ define(
                 }).done(function(response) {
                     var errorInfo;
                     try {
+                        errorInfo = {
+                            bread_config: breadConfig,
+                            response: response,
+                            tx_id: token,
+                        };
                         if (response !== null && typeof response === 'object') {
                             if (response.error) {
-                                errorInfo = {
-                                    bread_config: breadConfig,
-                                    response: response,
-                                    tx_id: token,
-                                };
                                 document.logIssue('error', errorInfo, 'Error validating payment method');
-
                                 alert(response.error);
                             } else {
                                 $.when(
@@ -196,6 +195,8 @@ define(
                                 );
                             }
                             fullScreenLoader.stopLoader();
+                        } else {
+                            document.logIssue('error', errorInfo, 'Response from ' + paymentUrl + ' was not of type Object');
                         }
                     } catch (e) {
                         errorInfo = {

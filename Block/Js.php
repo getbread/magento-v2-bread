@@ -135,7 +135,7 @@ class Js extends \Magento\Framework\View\Element\Text
     /**
      * Get Sentry Enabled
      *
-     * @return mixed
+     * @return boolean
      */
     protected function isSentryEnabled()
     {

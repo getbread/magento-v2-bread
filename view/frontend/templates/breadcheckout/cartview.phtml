@@ -91,18 +91,19 @@
                         type: 'post'
                     }).done(function (response) {
                         try {
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingString,
+                            };
                             if (typeof response == 'object') {
                                 if (response.error) {
-                                    errorInfo = {
-                                        response: response,
-                                        shipping_info: shippingString,
-                                    };
                                     document.logIssue('error', errorInfo, 'Error estimating tax');
-
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
                                 }
+                            } else {
+                                document.logIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {
@@ -140,18 +141,19 @@
                         type: 'post'
                     }).done(function (response) {
                         try {
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingAddress,
+                            };
                             if (typeof response == 'object') {
                                 if (response.error) {
-                                    errorInfo = {
-                                        response: response,
-                                        shipping_info: shippingAddress,
-                                    };
                                     document.logIssue('error', errorInfo, 'Error calculating shipping');
-
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
                                 }
+                            } else {
+                                document.logIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {

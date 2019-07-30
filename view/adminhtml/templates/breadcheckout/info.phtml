@@ -57,6 +57,11 @@ $code = $block->escapeHtml($block->getMethodCode());
             }).done(function(response) {
                 if (response !== null && typeof response === 'object') {
                     this.configureButton(response);
+                } else {
+                    var errorInfo = {
+                        response: response,
+                    };
+                    document.logIssue('error', errorInfo, 'Response from ' + quoteDataUrl + ' was not of type Object');
                 }
             }).fail(function(error) {
                 document.logIssue('error', {},
