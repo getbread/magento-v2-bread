@@ -95,7 +95,7 @@
                                 response: response,
                                 shipping_info: shippingString,
                             };
-                            if (typeof response == 'object') {
+                            if (response !== null && typeof response === 'object') {
                                 if (response.error) {
                                     document.logIssue('error', errorInfo, 'Error estimating tax');
                                     alert(response.message);
@@ -145,7 +145,7 @@
                                 response: response,
                                 shipping_info: shippingAddress,
                             };
-                            if (typeof response == 'object') {
+                            if (response !== null && typeof response === 'object') {
                                 if (response.error) {
                                     document.logIssue('error', errorInfo, 'Error calculating shipping');
                                     alert(response.message);
