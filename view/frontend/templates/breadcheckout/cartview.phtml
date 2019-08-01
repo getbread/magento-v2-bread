@@ -67,7 +67,7 @@
                             bread_config: breadConfig,
                             err: err
                         };
-                        document.logIssue('error', errorInfo, 'tx_token undefined in done callback');
+                        document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
                 },
 
@@ -97,13 +97,13 @@
                             };
                             if (response !== null && typeof response === 'object') {
                                 if (response.error) {
-                                    document.logIssue('error', errorInfo, 'Error estimating tax');
+                                    document.logBreadIssue('error', errorInfo, 'Error estimating tax');
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
                                 }
                             } else {
-                                document.logIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
+                                document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {
@@ -111,13 +111,13 @@
                                 response: response,
                                 shipping_info: shippingString,
                             };
-                            document.logIssue('error', errorInfo, e);
+                            document.logBreadIssue('error', errorInfo, e);
                         }
                     }).fail(function(error) {
                         errorInfo = {
                             shipping_info: shippingString,
                         };
-                        document.logIssue('error', errorInfo,
+                        document.logBreadIssue('error', errorInfo,
                             'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
@@ -147,13 +147,13 @@
                             };
                             if (response !== null && typeof response === 'object') {
                                 if (response.error) {
-                                    document.logIssue('error', errorInfo, 'Error calculating shipping');
+                                    document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
                                 }
                             } else {
-                                document.logIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
+                                document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {
@@ -161,13 +161,13 @@
                                 response: response,
                                 shipping_info: shippingAddress,
                             };
-                            document.logIssue('error', errorInfo, e);
+                            document.logBreadIssue('error', errorInfo, e);
                         }
                     }).fail(function(error) {
                         errorInfo = {
                             shipping_info: shippingAddress,
                         };
-                        document.logIssue('error', errorInfo,
+                        document.logBreadIssue('error', errorInfo,
                             'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
                     });
                 }

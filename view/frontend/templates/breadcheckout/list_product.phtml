@@ -54,7 +54,7 @@ $productId = $product->getId();
                             bread_config: breadConfig,
                             err: err
                         };
-                        document.logIssue('error', errorInfo, 'tx_token undefined in done callback');
+                        document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
                 },
 

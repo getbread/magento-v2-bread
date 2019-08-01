@@ -43,7 +43,7 @@ define([], function() {
 
         }
 
-        document.logIssue = function(level, issueInfo, issue) {
+        document.logBreadIssue = function(level, issueInfo, issue) {
 
             getConsoleFunc(level)(issue);
 

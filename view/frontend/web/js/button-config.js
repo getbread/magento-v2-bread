@@ -25,7 +25,7 @@ define([
                     var errorInfo = {
                         bread_config: window.checkoutConfig.payment.breadcheckout.breadConfig,
                     };
-                    document.logIssue('error', errorInfo, 'onShowCheckoutError triggered');
+                    document.logBreadIssue('error', errorInfo, 'onShowCheckoutError triggered');
 
                     alert({
                         content: message.data
@@ -40,7 +40,7 @@ define([
                             err: err,
                             bread_config: window.checkoutConfig.payment.breadcheckout.breadConfig
                         };
-                        document.logIssue('error', errorInfo,  'tx_token undefined in done callback');
+                        document.logBreadIssue('error', errorInfo,  'tx_token undefined in done callback');
                     }
                 }
             };
@@ -127,7 +127,7 @@ define([
                         var errorInfo = {
                             bread_config: self.breadConfig
                         };
-                        document.logIssue('error', errorInfo,
+                        document.logBreadIssue('error', errorInfo,
                             'Error code returned when calling ' + shippingOptionUrl + ', with status: ' + error.statusText);
                     });
                 }
@@ -197,7 +197,7 @@ define([
                 var errorInfo = {
                     bread_config: this.breadConfig
                 };
-                document.logIssue('error', errorInfo,
+                document.logBreadIssue('error', errorInfo,
                     'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
             });
         },

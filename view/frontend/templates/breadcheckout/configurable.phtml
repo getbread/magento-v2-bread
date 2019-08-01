@@ -78,7 +78,7 @@
                     attributes: this.attributes,
                     selected_options: selectedOptions
                 };
-                document.logIssue('info', logInfo, 'Using old version of getIdOfSelectedProduct');
+                document.logBreadIssue('info', logInfo, 'Using old version of getIdOfSelectedProduct');
 
                 $.each(this.attributes, function(attrId, attrVal) {
                     var optionId = selectedOptions[attrId];

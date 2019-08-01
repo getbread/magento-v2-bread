@@ -61,10 +61,10 @@ $code = $block->escapeHtml($block->getMethodCode());
                     var errorInfo = {
                         response: response,
                     };
-                    document.logIssue('error', errorInfo, 'Response from ' + quoteDataUrl + ' was not of type Object');
+                    document.logBreadIssue('error', errorInfo, 'Response from ' + quoteDataUrl + ' was not of type Object');
                 }
             }).fail(function(error) {
-                document.logIssue('error', {},
+                document.logBreadIssue('error', {},
                     'Error code returned when calling ' + quoteDataUrl + ', with status: ' + error.statusText);
             });
         };
@@ -142,14 +142,14 @@ $code = $block->escapeHtml($block->getMethodCode());
                                         form_key: window.FORM_KEY,
                                         url: response.cartUrl,
                                     };
-                                    document.logIssue('error', errorInfo, 'Error sending mail url');
+                                    document.logBreadIssue('error', errorInfo, 'Error sending mail url');
                                 }
                             }).fail(function(error) {
                                 errorInfo = {
                                     form_key: window.FORM_KEY,
                                     url: response.cartUrl,
                                 };
-                                document.logIssue('error', errorInfo,
+                                document.logBreadIssue('error', errorInfo,
                                     'Error code returned when calling ' + sendMailUrl + ', with status: ' + error.statusText);
                             }).complete(function() {
                                 jQuery('body').loader().loader("hide");
@@ -189,14 +189,14 @@ $code = $block->escapeHtml($block->getMethodCode());
                                         form_key: window.FORM_KEY,
                                         id: response.id
                                     };
-                                    document.logIssue('error', errorInfo, 'Error sending Bread mail url');
+                                    document.logBreadIssue('error', errorInfo, 'Error sending Bread mail url');
                                 }
                             }).fail(function(error) {
                                 errorInfo = {
                                     form_key: window.FORM_KEY,
                                     id: response.id
                                 };
-                                document.logIssue('error', errorInfo,
+                                document.logBreadIssue('error', errorInfo,
                                     'Error code returned when calling ' + sendBreadMailUrl + ', with status: ' + error.statusText);
                             }).complete(function() {
                                 jQuery('body').loader().loader("hide");
@@ -236,14 +236,14 @@ $code = $block->escapeHtml($block->getMethodCode());
                                         form_key: window.FORM_KEY,
                                         id: response.id
                                     };
-                                    document.logIssue('error', errorInfo, 'Error sending sms url');
+                                    document.logBreadIssue('error', errorInfo, 'Error sending sms url');
                                 }
                             }).fail(function(error) {
                                 errorInfo = {
                                     form_key: window.FORM_KEY,
                                     id: response.id
                                 };
-                                document.logIssue('error', errorInfo,
+                                document.logBreadIssue('error', errorInfo,
                                     'Error code returned when calling ' + sendSmsUrl + ', with status: ' + error.statusText);
                             }).complete(function() {
                                 jQuery('body').loader().loader("hide");
@@ -270,7 +270,7 @@ $code = $block->escapeHtml($block->getMethodCode());
                         response: response,
                         form_key: window.FORM_KEY
                     };
-                    document.logIssue('error', errorInfo, 'Error generating cart');
+                    document.logBreadIssue('error', errorInfo, 'Error generating cart');
 
                 }
             }).fail(function(response) {
@@ -284,7 +284,7 @@ $code = $block->escapeHtml($block->getMethodCode());
                     form_key: window.FORM_KEY,
                 };
 
-                document.logIssue('error', errorInfo,
+                document.logBreadIssue('error', errorInfo,
                     'Error code returned when calling ' + generateCartUrl + ', with status: ' + error.statusText);
             }).complete(function() {
                 jQuery('body').loader().loader("hide");

@@ -137,7 +137,7 @@ define(
                     var errorInfo = {
                         bread_config: window.checkoutConfig.payment[this.getCode()].breadConfig,
                     };
-                    document.logIssue('error', errorInfo, 'Unable to properly validate order');
+                    document.logBreadIssue('error', errorInfo, 'Unable to properly validate order');
                 }
             },
 
@@ -164,7 +164,7 @@ define(
                         };
                         if (response !== null && typeof response === 'object') {
                             if (response.error) {
-                                document.logIssue('error', errorInfo, 'Error validating payment method');
+                                document.logBreadIssue('error', errorInfo, 'Error validating payment method');
                                 alert(response.error);
                             } else {
                                 $.when(
@@ -188,7 +188,7 @@ define(
                                             error: error,
                                             tx_id: token,
                                         };
-                                        document.logIssue('error', errorInfo, 'Error updating address or validating totals');
+                                        document.logBreadIssue('error', errorInfo, 'Error updating address or validating totals');
 
                                         this.setBreadTransactionId(null)
                                     }, this)
@@ -196,7 +196,7 @@ define(
                             }
                             fullScreenLoader.stopLoader();
                         } else {
-                            document.logIssue('error', errorInfo, 'Response from ' + paymentUrl + ' was not of type Object');
+                            document.logBreadIssue('error', errorInfo, 'Response from ' + paymentUrl + ' was not of type Object');
                         }
                     } catch (e) {
                         errorInfo = {
@@ -204,14 +204,14 @@ define(
                             tx_id: token,
                             bread_config: breadConfig,
                         };
-                        document.logIssue('error', errorInfo, e);
+                        document.logBreadIssue('error', errorInfo, e);
                     }
                 }).fail(function(error) {
                     var errorInfo = {
                         bread_config: breadConfig,
                         tx_id: token,
                     };
-                    document.logIssue('error', errorInfo,
+                    document.logBreadIssue('error', errorInfo,
                         'Error code returned when calling ' + paymentUrl + ', with status: ' + error.statusText);
                 });
             },
@@ -273,7 +273,7 @@ define(
                         bread_config: breadConfig,
                         tx_id: tx_id,
                     };
-                    document.logIssue('error', errorInfo,
+                    document.logBreadIssue('error', errorInfo,
                         'Error code returned when calling ' + validateTotalsUrl + ', with status: ' + error.statusText);
                 });
 
