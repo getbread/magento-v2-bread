@@ -100,7 +100,7 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
                     )
                 );
 
-            } catch (\Exception $e){
+            } catch (\Throwable $e){
                 $this->logger->log($e->getMessage());
             }
         }

@@ -54,7 +54,7 @@ class SendSms extends \Magento\Backend\App\Action
         try {
             $this->paymentApiClient->sendSms($cartId,$phone);
             $ret['successRows'][] = __('SMS was successfully sent to your customer.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $ret['error'] = true;
             $ret['errorRows'][] = __('An error occurred while sending sms:');
             $ret['errorRows'][] = $e->getMessage();

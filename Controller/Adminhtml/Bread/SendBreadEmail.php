@@ -56,7 +56,7 @@ class SendBreadEmail extends \Magento\Backend\App\Action
         try {
             $this->paymentApiClient->sendEmail($cartId, $email, $name);
             $ret['successRows'][] = __('Email was successfully sent to your customer.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $ret['error'] = true;
             $ret['errorRows'][] = __('An error occurred while sending email:');
             $ret['errorRows'][] = $e->getMessage();

@@ -1,6 +1,5 @@
 <?php /** @var \Bread\BreadCheckout\Block\Product\Category $block */ ?>
 
-<!-- Bread Checkout extension version: <?php echo $block->getModuleVersion(); ?> -->
 <?php
 $product   = $block->getProduct();
 $productId = $product->getId();
@@ -50,9 +49,13 @@ $productId = $product->getId();
                         f.appendChild(i);
                         document.body.appendChild(f);
                         f.submit();
+                    } else {
+                        var errorInfo = {
+                            bread_config: breadConfig,
+                            err: err
+                        };
+                        document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
-
-                    return;
                 },
 
             };
@@ -73,7 +76,9 @@ $productId = $product->getId();
                 breadConfig.actAsLabel = false;
             }
 
-            bread.checkout(breadConfig);
+            if (typeof bread !== 'undefined') {
+                bread.checkout(breadConfig);
+            }
         };
 
         $(document).ready(function () {

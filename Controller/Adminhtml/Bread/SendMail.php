@@ -40,18 +40,19 @@ class SendMail extends \Magento\Backend\App\Action
         $url = $this->request->getParam('url');
 
         $items = $this->helper->getQuoteItemsData();
-        $ret = ['error'=>false,
-                     'successRows'=> [],
-                     'errorRows' => [],
+        $response = [
+            'error'=>false,
+            'successRows'=> [],
+            'errorRows' => [],
         ];
         try {
             $this->customerHelper->sendCartActivationEmailToCustomer($quote->getCustomer(), $url, $items);
-            $ret['successRows'][] = __('Email was successfully sent to your customer.');
-        } catch (\Exception $e) {
-            $ret['error'] = true;
-            $ret['errorRows'][] = __('An error occurred while sending email:');
-            $ret['errorRows'][] = $e->getMessage();
+            $response['successRows'][] = __('Email was successfully sent to your customer.');
+        } catch (\Throwable $e) {
+            $response['error'] = true;
+            $response['errorRows'][] = __('An error occurred while sending email:');
+            $response['errorRows'][] = $e->getMessage();
         }
-        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($ret);
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($response);
     }
 }

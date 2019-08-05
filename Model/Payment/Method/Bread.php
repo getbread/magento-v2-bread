@@ -450,7 +450,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             $payment->unsLastTransId();
 
             return $payment;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['ERROR'=>$e->getMessage(),'TRACE'=>$e->getTraceAsString()]);
         }
     }

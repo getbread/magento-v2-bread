@@ -56,9 +56,13 @@
                         f.appendChild(k);
                         document.body.appendChild(f);
                         f.submit();
+                    } else {
+                        var errorInfo = {
+                            bread_config: breadConfig,
+                            err: err
+                        };
+                        document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
-
-                    return;
                 },
 
                 /**
@@ -69,6 +73,7 @@
                  */
                 calculateTax: function (shippingAddress, callback) {
                     var productForm = $('#product_addtocart_form');
+                    var errorInfo;
 
                     shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
@@ -77,23 +82,43 @@
                     shippingAddress.main_product_id                 = document.productId;
                     shippingAddress.buy_request                     = productForm.serialize();
 
+                    var taxEstimationUrl = '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>';
+                    var shippingString = JSON.stringify(shippingAddress);
+
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
-                        data: {shippingInfo: JSON.stringify(shippingAddress)},
+                        url: taxEstimationUrl,
+                        data: { shippingInfo: shippingString },
                         type: 'post'
-                    }).done(function (response) {
+                    }).done(function(response) {
                         try {
-                            if (typeof response == 'object') {
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingString,
+                            };
+                            if (response !== null && typeof response === 'object') {
                                 if (response.error) {
-                                    alert(response.message);
+                                    document.logBreadIssue('error', errorInfo, 'Error estimating tax');
+                                    alert('Internal Error');
                                 } else {
                                     callback(null, response.result);
                                 }
+                            } else {
+                                document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingString,
+                            };
+                            document.logBreadIssue('error', errorInfo, e);
                         }
+                    }).fail(function(error) {
+                        errorInfo = {
+                            shipping_info: shippingString,
+                        };
+                        document.logBreadIssue('error', errorInfo,
+                            'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -105,6 +130,7 @@
                  */
                 calculateShipping: function (shippingAddress, callback) {
                     var productForm = $('#product_addtocart_form');
+                    var errorInfo;
 
                     shippingAddress.block_key                       = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data                 = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
@@ -113,23 +139,41 @@
                     shippingAddress.main_product_id                 = document.productId;
                     shippingAddress.buy_request                     = productForm.serialize();
 
+                    var shippingAddressEstimationUrl = '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>';
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
+                        url: shippingAddressEstimationUrl,
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
                         try {
-                            if (typeof response == 'object') {
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingAddress,
+                            };
+                            if (response !== null && typeof response === 'object') {
                                 if (response.error) {
-                                    alert(response.message);
+                                    document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
+                                    alert('Internal Error');
                                 } else {
                                     callback(null, response.result);
                                 }
+                            } else {
+                                document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingAddress,
+                            };
+                            document.logBreadIssue('error', errorInfo, e);
                         }
+                    }).fail(function(error) {
+                        errorInfo = {
+                            shipping_info: shippingAddress,
+                        };
+                        document.logBreadIssue('error', errorInfo,
+                            'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -154,18 +198,20 @@
             if(cartSizeFinancing.enabled){
                 var cartSizeFinancingId = cartSizeFinancing.id;
                 var cartSizeThreshold = cartSizeFinancing.threshold;
-                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
+                var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity; }, 0) / 100;
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             }
 
             if (!document.hasCheckedConfigData) {
 
+                var configDataUrl = '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>';
                 $.ajax({
-                    url: '<?php /* @noEscape */ echo $block->getConfigDataUrl(); ?>',
+                    url: configDataUrl,
                     type: 'post',
                     context: this
                 }).done(function(data) {
                     document.hasCheckedConfigData = true;
+
                     if (data.shippingContact !== false) {
                         breadConfig.shippingContact = data.shippingContact;
                     }
@@ -174,7 +220,12 @@
                         breadConfig.billingContact = data.billingContact;
                     }
 
-                    bread.checkout(breadConfig);
+                    if (typeof bread !== 'undefined') {
+                        bread.checkout(breadConfig);
+                    }
+                }).fail(function(error) {
+                    document.logBreadIssue('error', {},
+                        'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
                 });
 
             } else {
@@ -187,8 +238,12 @@
          * discount calculation
          */
         document.clearQuote = function() {
+            var clearQuoteUrl = '<?php /* @noEscape */ echo $block->getClearQuoteUrl(); ?>';
             $.ajax({
-                url: '<?php /* @noEscape */ echo $block->getClearQuoteUrl(); ?>'
+                url: clearQuoteUrl
+            }).fail(function(error) {
+                document.logBreadIssue('error', {},
+                    'Error code returned when calling ' + clearQuoteUrl + ', with status: ' + error.statusText);
             });
         };
 
@@ -228,28 +283,20 @@
          * @returns int
          */
         document.calculatePrice = function() {
-            var price;
+            var price = 0;
+            var customPrice = 0;
 
-            if (typeof document.priceWithOptions != 'undefined') {
-                var customPrice = document.priceWithOptions;
+            if (document.priceWithOptions) {
+                customPrice = document.priceWithOptions;
             }
 
-            if ((typeof spConfig != 'undefined') && (typeof spConfig.optionPrices[document.selectedSimpleProductId] != 'undefined')) {
-                price = parseInt(Math.round(spConfig.optionPrices[document.selectedSimpleProductId].finalPrice.amount * 100));
+            var selectedProductPrices = spConfig && spConfig.optionPrices[document.selectedSimpleProductId];
 
-                if ((typeof customPrice != 'undefined') &&
-                    (customPrice !== price)) {
-                    if (customPrice > price) {
-                        price = (customPrice - price) + price;
-                    } else {
-                        price = (price - customPrice) + customPrice;
-                    }
-                }
-            } else {
-                price = customPrice;
+            if (selectedProductPrices) {
+                price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
             }
 
-            return price;
+            return Math.max(price, customPrice);
         };
         <?php endif; ?>
         document.defaultItems       = <?php /* @noEscape */ echo $block->getProductDataJson(); ?>;

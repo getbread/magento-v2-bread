@@ -229,7 +229,7 @@ class Customer extends Data
                 $this->customerSession->setCustomer($customer);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
         }
 

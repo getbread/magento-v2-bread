@@ -62,9 +62,13 @@
                         f.appendChild(k);
                         document.body.appendChild(f);
                         f.submit();
+                    } else {
+                        var errorInfo = {
+                            bread_config: breadConfig,
+                            err: err
+                        };
+                        document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
-
-                    return;
                 },
 
                 /**
@@ -77,25 +81,44 @@
                     shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
+                    var taxEstimationUrl = '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>';
+                    var shippingString = JSON.stringify(shippingAddress);
+                    var errorInfo;
+
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getTaxEstimationUrl(); ?>',
-                        data: {shippingInfo: JSON.stringify(shippingAddress)},
+                        url: taxEstimationUrl,
+                        data: { shippingInfo: shippingString },
                         type: 'post'
                     }).done(function (response) {
                         try {
-                            if (typeof response == 'object') {
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingString,
+                            };
+                            if (response !== null && typeof response === 'object') {
                                 if (response.error) {
+                                    document.logBreadIssue('error', errorInfo, 'Error estimating tax');
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
                                 }
+                            } else {
+                                document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingString,
+                            };
+                            document.logBreadIssue('error', errorInfo, e);
                         }
-                    }).fail(function (error) {
-                        console.log(error);
+                    }).fail(function(error) {
+                        errorInfo = {
+                            shipping_info: shippingString,
+                        };
+                        document.logBreadIssue('error', errorInfo,
+                            'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
                     });
                 },
 
@@ -109,25 +132,43 @@
                     shippingAddress.block_key        = '<?php /* @noEscape */ echo $block->getBlockCode(); ?>';
                     shippingAddress.additional_data  = <?php /* @noEscape */ echo  $block->jsonEncode($block->setAdditionalData()); ?>;
 
+                    var shippingAddressEstimationUrl = '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>';
+                    var errorInfo;
+
                     $.ajax({
-                        url: '<?php /* @noEscape */ echo $block->getShippingAddressEstimationUrl(); ?>',
+                        url: shippingAddressEstimationUrl,
                         data: shippingAddress,
                         type: 'post'
                     }).done(function (response) {
                         try {
-                            if (typeof response == 'object') {
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingAddress,
+                            };
+                            if (response !== null && typeof response === 'object') {
                                 if (response.error) {
+                                    document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
                                     alert(response.message);
                                 } else {
                                     callback(null, response.result);
                                 }
+                            } else {
+                                document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
                             }
                         }
                         catch (e) {
-                            console.log(e);
+                            errorInfo = {
+                                response: response,
+                                shipping_info: shippingAddress,
+                            };
+                            document.logBreadIssue('error', errorInfo, e);
                         }
-                    }).fail(function (error) {
-                        console.log(error);
+                    }).fail(function(error) {
+                        errorInfo = {
+                            shipping_info: shippingAddress,
+                        };
+                        document.logBreadIssue('error', errorInfo,
+                            'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
                     });
                 }
             };
@@ -165,7 +206,9 @@
                         "Discount"
                 }];
             }
-            bread.checkout(breadConfig);
+            if (typeof bread !== 'undefined') {
+                bread.checkout(breadConfig);
+            }
         };
 
         document.round = function(value) {

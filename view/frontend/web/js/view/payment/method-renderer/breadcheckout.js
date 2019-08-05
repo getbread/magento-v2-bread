@@ -41,7 +41,7 @@ define(
 
             breadTransactionId: ko.observable(window.checkoutConfig.payment.breadcheckout.transactionId),
 
-            initialize: function () {
+            initialize: function() {
                 this._super();
                 return this;
             },
@@ -49,7 +49,7 @@ define(
             /**
              * Payment code
              */
-            getCode: function () {
+            getCode: function() {
                 return 'breadcheckout';
             },
 
@@ -106,7 +106,7 @@ define(
             initComplete: function () {
                 var data = window.checkoutConfig.payment[this.getCode()].breadConfig;
 
-                if (typeof bread != 'undefined') {
+                if (typeof bread !== 'undefined') {
                     button.configure(data, this);
 
                     if(data.embeddedCheckout){
@@ -126,31 +126,45 @@ define(
                 this.data = data;
                 this.event = event;
 
-                if(additionalValidators.validate()){
+                if(additionalValidators.validate()) {
 
                     if (!this.breadTransactionId()) {
                         button.setCouponDiscounts();
                         button.init();
                         return false;
                     }
+                } else {
+                    var errorInfo = {
+                        bread_config: window.checkoutConfig.payment[this.getCode()].breadConfig,
+                    };
+                    document.logBreadIssue('error', errorInfo, 'Unable to properly validate order');
                 }
-
             },
 
             buttonCallback: function (token) {
                 this.setBreadTransactionId(token);
+                var paymentUrl = window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl;
+                var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
+
                 $.ajax({
-                    url: window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl,
-                    data: {token: token},
+                    url: paymentUrl,
+                    data: { token: token },
                     type: 'post',
                     context: this,
                     beforeSend: function () {
                         fullScreenLoader.startLoader();
                     }
-                }).done(function (response) {
+                }).done(function(response) {
+                    var errorInfo;
                     try {
+                        errorInfo = {
+                            bread_config: breadConfig,
+                            response: response,
+                            tx_id: token,
+                        };
                         if (response !== null && typeof response === 'object') {
                             if (response.error) {
+                                document.logBreadIssue('error', errorInfo, 'Error validating payment method');
                                 alert(response.error);
                             } else {
                                 $.when(
@@ -166,17 +180,39 @@ define(
                                         return Component.prototype.placeOrder.call(this, this.data, this.event);
                                     }, this)
                                 ).fail(
-                                    $.proxy(function (response) {
-                                        this.setBreadTransactionId(null);
-                                        errorProcessor.process(response, this.messageContainer);
+                                    $.proxy(function(error) {
+                                        errorProcessor.process(error, this.messageContainer);
+
+                                        errorInfo = {
+                                            bread_config: breadConfig,
+                                            error: error,
+                                            tx_id: token,
+                                        };
+                                        document.logBreadIssue('error', errorInfo, 'Error updating address or validating totals');
+
+                                        this.setBreadTransactionId(null)
                                     }, this)
                                 );
                             }
                             fullScreenLoader.stopLoader();
+                        } else {
+                            document.logBreadIssue('error', errorInfo, 'Response from ' + paymentUrl + ' was not of type Object');
                         }
                     } catch (e) {
-                        console.log(e);
+                        errorInfo = {
+                            response: response,
+                            tx_id: token,
+                            bread_config: breadConfig,
+                        };
+                        document.logBreadIssue('error', errorInfo, e);
                     }
+                }).fail(function(error) {
+                    var errorInfo = {
+                        bread_config: breadConfig,
+                        tx_id: token,
+                    };
+                    document.logBreadIssue('error', errorInfo,
+                        'Error code returned when calling ' + paymentUrl + ', with status: ' + error.statusText);
                 });
             },
 
@@ -217,9 +253,13 @@ define(
              */
             validateTotals: function () {
                 var deferred = $.Deferred();
+                var validateTotalsUrl = window.checkoutConfig.payment[this.getCode()].validateTotalsUrl;
+                var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                var tx_id = this.breadTransactionId();
+
                 $.ajax({
-                    url: window.checkoutConfig.payment[this.getCode()].validateTotalsUrl,
-                    data: {bread_transaction_id: this.breadTransactionId()},
+                    url: validateTotalsUrl,
+                    data: { bread_transaction_id: tx_id },
                     type: 'post',
                     context: this
                 }).done(function (response) {
@@ -228,7 +268,15 @@ define(
                     } else {
                         deferred.reject(response);
                     }
+                }).fail(function(error) {
+                    var errorInfo = {
+                        bread_config: breadConfig,
+                        tx_id: tx_id,
+                    };
+                    document.logBreadIssue('error', errorInfo,
+                        'Error code returned when calling ' + validateTotalsUrl + ', with status: ' + error.statusText);
                 });
+
                 return deferred;
             },
 

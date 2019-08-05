@@ -133,7 +133,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
                 $this->_redirect('checkout/onepage/success');
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['ERROR' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $this->customerHelper->sendCustomerErrorReportToMerchant($e, "", $orderRef, $transactionId);
             $this->messageManager->addErrorMessage(
@@ -182,7 +182,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
         try {
             $order = $this->quoteManagement->submit($quote);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log([
                 'ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage(),
                 'TRACE' => $e->getTraceAsString()
@@ -197,7 +197,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
         try {
             $this->orderSender->send($order);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->critical($e);
             $this->customerSession->setBreadItemAddedToQuote(false);
         }

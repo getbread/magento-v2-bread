@@ -78,7 +78,7 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
             }
 
             $result = $newData;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $result = ['error' => (string) __('Error: Unable to process transaction.')];
         }

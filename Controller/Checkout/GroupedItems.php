@@ -56,7 +56,6 @@ class GroupedItems extends \Magento\Framework\App\Action\Action
         $product = $this->productRepository->getById($params['product']);
         $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
 
-
         $superGroup = $params['super_group'];
         $items = [];
 
@@ -85,10 +84,6 @@ class GroupedItems extends \Magento\Framework\App\Action\Action
         }
 
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-            ->setData([
-                'success' => empty($items) ? false : true,
-                'data'    => empty($items) ? null  : $items
-            ]);
-
+            ->setData(['items' => empty($items) ? null  : $items]);
     }
 }

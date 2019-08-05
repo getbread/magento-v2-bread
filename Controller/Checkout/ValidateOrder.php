@@ -114,7 +114,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
                 $data = $this->paymentApiClient->getInfo($token);
                 $this->processOrder($data);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $errorMessage = $e->getMessage();
 
             $this->logger->log(['MESSAGE' => $errorMessage]);
@@ -220,10 +220,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $quote->getPayment()->importData(['method' => 'breadcheckout']);
         $quote->getPayment()->setTransactionId($data['breadTransactionId']);
         $quote->getPayment()->setAdditionalData('BREAD CHECKOUT DATA', json_encode($data));
-        
+
         try {
             $order = $this->quoteManagement->submit($quote);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage()]);
             throw $e;
         }
@@ -232,6 +232,14 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             ->setLastQuoteId($quote->getId())
             ->setLastSuccessQuoteId($quote->getId())
             ->clearHelperData();
+
+
+        try {
+            $this->orderSender->send($order);
+        } catch (\Throwable $e) {
+            $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
+            $this->customerSession->setBreadItemAddedToQuote(false);
+        }
 
         if ($customer->getId()) {
             $this->customerSession->setCustomerAsLoggedIn($customer);

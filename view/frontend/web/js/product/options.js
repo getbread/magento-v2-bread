@@ -7,7 +7,7 @@ define([
 
     'use strict';
 
-    return function(config){
+    return function(config) {
         var optionsData = config.optionsData;
         var productType = config.productType;
 
@@ -17,23 +17,25 @@ define([
          */
         document.getSkuForOptions = function(selectedOptions) {
 
+            var price;
             var skuSuffix = '';
             var selected = (typeof spConfig !== 'undefined') ? spConfig.getIdOfSelectedProduct(selectedOptions) : null;
 
             if(productType === 'configurable' && selected !== null){
-                var price = document.round(spConfig.optionPrices[selected].finalPrice.amount * 100);
+                price = document.round(spConfig.optionPrices[selected].finalPrice.amount * 100);
             } else {
-                var price = document.round(document.basePrice);
+                price = document.round(document.basePrice);
             }
 
             var skipIds = [];
 
-            $('.product-custom-option').each(function(u) {
+            $('.product-custom-option').each(function() {
+                var optionId;
 
                 if($(this).attr('type') !== 'file'){
-                    var optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+                    optionId = $(this).attr('name').match(/\[(\d+)\]/)[1];
                 } else {
-                    var optionId = $(this).attr('name').match(/\_(\d+)\_/)[1];
+                    optionId = $(this).attr('name').match(/\_(\d+)\_/)[1];
                 }
 
                 if (optionsData[optionId]) {

@@ -57,7 +57,7 @@ class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
             $quote->removeAllItems(); // Reset items in quote
             $this->quoteRepository->save($quote);
             $result = true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $result = false;
         }
