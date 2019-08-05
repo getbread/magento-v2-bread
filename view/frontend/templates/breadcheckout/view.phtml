@@ -98,7 +98,7 @@
                             if (response !== null && typeof response === 'object') {
                                 if (response.error) {
                                     document.logBreadIssue('error', errorInfo, 'Error estimating tax');
-                                    alert(response.message);
+                                    alert('Internal Error');
                                 } else {
                                     callback(null, response.result);
                                 }
@@ -153,7 +153,7 @@
                             if (response !== null && typeof response === 'object') {
                                 if (response.error) {
                                     document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
-                                    alert(response.message);
+                                    alert('Internal Error');
                                 } else {
                                     callback(null, response.result);
                                 }
