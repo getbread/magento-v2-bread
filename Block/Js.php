@@ -73,12 +73,18 @@ class Js extends \Magento\Framework\View\Element\Text
     {
         $moduleVersionComment = sprintf('<!-- BreadCheckout Module Version: %s -->', $this->getModuleVersion());
 
-        $sentrySdkScript = '<script src="https://browser.sentry-cdn.com/5.4.3/bundle.min.js" crossorigin="anonymous"></script>';
+        $sentrySdkScript = '<script type="text/x-magento-init">
+                {
+                    "*": {
+                        "Bread_BreadCheckout/js/sentry/5.4.3/bundle.min": {}
+                    }
+                }
+            </script>';
         $sentryConfigScript =
             '<script type="text/x-magento-init">
                 {
                     "*": {
-                        "Bread_BreadCheckout/js/helper/sentry-config": {
+                        "Bread_BreadCheckout/js/sentry/sentry-config": {
                             "dsn": "%s",
                             "pluginVersion": "%s",
                             "apiKey": "%s",
