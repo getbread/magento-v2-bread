@@ -76,7 +76,7 @@ class Js extends \Magento\Framework\View\Element\Text
         $sentrySdkScript = '<script type="text/x-magento-init">
                 {
                     "*": {
-                        "Bread_BreadCheckout/js/sentry/5.4.3/bundle.min": {}
+                        "Bread_BreadCheckout/js/sentry/5.4.3-bundle.min": {}
                     }
                 }
             </script>';
