@@ -39,8 +39,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
     public $apiClient;
 
-    /** @var \Magento\Payment\Model\Method\Logger */
-    public $logger;
+    /** @var \Bread\BreadCheckout\Helper\Log */
+    public $breadLogger;
 
     /** @var \Bread\BreadCheckout\Helper\Data */
     public $helper;
@@ -112,7 +112,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     ) {
     
         $this->apiClient = $apiClient;
-        $this->logger = $breadLogger;
+        $this->breadLogger = $breadLogger;
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->_canUseCheckout = $this->helper->isPaymentMethodAtCheckout();
@@ -164,7 +164,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         if (!$this->canUseForCountry($billingCountry)) {
-            $this->logger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY'. $billingCountry);
+            $this->breadLogger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY'. $billingCountry);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('This financing program is available to US residents, please click the finance button 
                 and complete the application in order to complete your purchase with the financing payment method.')
@@ -173,7 +173,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
         $token = $this->getToken();
         if (empty($token)) {
-            $this->logger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
+            $this->breadLogger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('This financing program is unavailable, please complete the application. 
                 If the problem persists, please contact us.')
@@ -451,7 +451,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
             return $payment;
         } catch (\Throwable $e) {
-            $this->logger->log(['ERROR'=>$e->getMessage(),'TRACE'=>$e->getTraceAsString()]);
+            $this->breadLogger->log(['ERROR'=>$e->getMessage(),'TRACE'=>$e->getTraceAsString()]);
         }
     }
 
@@ -513,7 +513,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if (preg_match('/^[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/', $rawTransId, $matches)) {
             return $matches[0];
         } else {
-            $this->logger->log('INVALID TRANSACTION ID PROVIDED: '. $rawTransId);
+            $this->breadLogger->log('INVALID TRANSACTION ID PROVIDED: '. $rawTransId);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Unable to process request because an invalid transaction ID was provided.')
             );
