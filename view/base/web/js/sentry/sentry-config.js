@@ -1,4 +1,4 @@
-define([], function() {
+define(['sentryBundle'], function() {
 
     return function(config) {
 
