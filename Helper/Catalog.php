@@ -67,14 +67,13 @@ class Catalog extends Data
     
         $theProduct     = ($baseProduct == null) ? $product : $baseProduct;
         $skuString      = $this->getSkuString($product, $theProduct);
-        $price          = ($lineItemPrice !== null) ? $lineItemPrice * 100 : ( ( $baseProduct == null ) ?
-                $product->getFinalPrice() : $baseProduct->getFinalPrice() ) * 100;
+        $price          = $this->getPrice($lineItemPrice, $theProduct);
 
         $productData = [
-            'name'      => ( $baseProduct == null ) ? $product->getName() : $baseProduct->getName(),
+            'name'      => $theProduct->getName(),
             'price'     => $price,
             'sku'       => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'].'///'.$skuString),
-            'detailUrl' => ( $baseProduct == null ) ? $product->getProductUrl() : $baseProduct->getProductUrl(),
+            'detailUrl' => $theProduct->getProductUrl(),
             'quantity'  => $qty,
         ];
 
@@ -169,6 +168,35 @@ class Catalog extends Data
         // @codingStandardsIgnoreEnd
 
         return $skuString;
+    }
+
+    /**
+     * Get Price
+     *
+     * @param null $lineItemPrice
+     * @param \Magento\Catalog\Model\Product $theProduct
+     * @return float
+     */
+    protected function getPrice($lineItemPrice, \Magento\Catalog\Model\Product $theProduct)
+    {
+
+        if ($lineItemPrice !== null) {
+            $price = $lineItemPrice;
+        } else {
+            $price = $theProduct->getFinalPrice();
+
+            // For Bundled and Grouped products, final price comes through as 0, so need to use minimum price instead
+            if (floatval($price) === 0.0) {
+                $price = $theProduct->getMinimalPrice();
+                //If we can't grab the minimal price here, try to grab minimal price from the price model
+                if (!$price) {
+                    $priceModel = $theProduct->getPriceModel();
+                    $price = $priceModel ? $priceModel->getPrices($theProduct)[0] : null;
+                }
+            }
+        }
+
+        return round($price, 2) * 100;
     }
 
     /**
