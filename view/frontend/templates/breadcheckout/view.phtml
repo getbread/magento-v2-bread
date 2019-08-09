@@ -229,7 +229,9 @@
                 });
 
             } else {
-                bread.checkout(breadConfig);
+                if (typeof bread !== 'undefined') {
+                    bread.checkout(breadConfig);
+                }
             }
         };
 

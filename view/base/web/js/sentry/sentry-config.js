@@ -23,24 +23,26 @@ define([], function() {
         };
 
         if (config.isSentryEnabled) {
+            try {
+                Sentry.init({
+                    dsn: config.dsn,
+                    beforeSend(event) {
+                        var isBreadIssue = event.extra && Object.values(event.extra).includes('BreadIssue');
 
-            Sentry.init({
-                dsn: config.dsn,
-                beforeSend(event) {
-                    var isBreadIssue = event.extra && Object.values(event.extra).includes('BreadIssue');
-
-                    if (!isBreadIssue) {
-                        return null;
+                        if (!isBreadIssue) {
+                            return null;
+                        }
+                        return event;
                     }
-                    return event;
-                }
-            });
+                });
 
-            Sentry.configureScope(function(scope) {
-                scope.setTag('plugin_version', config.pluginVersion);
-                scope.setTag('merchant_api_key', config.apiKey);
-            });
-
+                Sentry.configureScope(function(scope) {
+                    scope.setTag('plugin_version', config.pluginVersion);
+                    scope.setTag('merchant_api_key', config.apiKey);
+                });
+            } catch (e) {
+                config.isSentryEnabled = false;
+            }
         }
 
         document.logBreadIssue = function(level, issueInfo, issue) {

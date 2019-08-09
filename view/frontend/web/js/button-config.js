@@ -121,7 +121,7 @@ define([
                         self.breadConfig.shippingOptions = [data];
                         self.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
                         if (typeof bread !== 'undefined') {
-                            bread.showCheckout(this.breadConfig);
+                            bread.showCheckout(self.breadConfig);
                         }
                     }).fail(function(error) {
                         var errorInfo = {
@@ -152,7 +152,7 @@ define([
         _initEmbedded: function(){
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                 if (typeof bread !== 'undefined') {
-                    bread.checkout(breadConfig);
+                    bread.checkout(this.breadConfig);
                 }
             }
         },

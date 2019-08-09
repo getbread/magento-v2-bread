@@ -243,7 +243,7 @@
                         <comment>
                             <![CDATA[
 				                <div>
-				                    <p>If value is set, bread checkout will be disabled for all items or orders below it</p>
+				                    <p>If value is set, Bread checkout will be disabled for all items or orders below the given dollar amount</p>
 				                </div>
 				            ]]>
                         </comment>
