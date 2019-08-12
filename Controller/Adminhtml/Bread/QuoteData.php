@@ -2,17 +2,21 @@
 /**
  * Get updated shipping, billing, and shipping option data
  *
- * @author  Bread   copyright 2016
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
 class QuoteData extends \Magento\Backend\App\Action
 {
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $helper;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helperData;
 
     public function __construct(
@@ -35,7 +39,8 @@ class QuoteData extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(
+            [
             'quoteItems' => $this->helper->getQuoteItemsData(),
             'shippingContact' => $this->helper->getShippingAddressData(),
             'billingContact' => $this->helper->getBillingAddressData(),
@@ -49,6 +54,7 @@ class QuoteData extends \Magento\Backend\App\Action
             'buttonCss' => $this->helper->getButtonDesign(),
             'buttonLocation' => $this->helperData->getOtherLocation(),
             'isHealthcare' => $this->helper->isHealthcare()
-        ]);
+            ]
+        );
     }
 }

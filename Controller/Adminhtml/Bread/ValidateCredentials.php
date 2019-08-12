@@ -4,6 +4,7 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
 /**
  * Class ValidateCredentials
+ *
  * @package Bread\BreadCheckout\Controller\Adminhtml
  */
 class ValidateCredentials extends \Magento\Backend\App\Action
@@ -20,8 +21,7 @@ class ValidateCredentials extends \Magento\Backend\App\Action
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Log $log
-    )
-    {
+    ) {
         $this->logger = $log;
         parent::__construct($context);
     }
@@ -30,12 +30,12 @@ class ValidateCredentials extends \Magento\Backend\App\Action
     {
 
         $params = $this->getRequest()->getParams();
-        $result = $this->testCredentials($params['apiMode'],$params['pubKey'],$params['secKey']);
+        $result = $this->testCredentials($params['apiMode'], $params['pubKey'], $params['secKey']);
 
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($result);
     }
 
-    private function testCredentials($apiMode,$username,$password)
+    private function testCredentials($apiMode, $username, $password)
     {
         $dummy = [];
         $dummy['expiration'] = date('Y-m-d');
@@ -51,11 +51,15 @@ class ValidateCredentials extends \Magento\Backend\App\Action
             curl_setopt($curl, CURLOPT_USERPWD, $username . ':' . $password);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
-
             curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen(json_encode($dummy))]);
+            curl_setopt(
+                $curl,
+                CURLOPT_HTTPHEADER,
+                [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen(json_encode($dummy))
+                ]
+            );
             curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($dummy));
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
@@ -70,14 +74,15 @@ class ValidateCredentials extends \Magento\Backend\App\Action
                 return true;
             }
         } catch (\Exception $e) {
-            $this->logger->log([
+            $this->logger->log(
+                [
                 'STATUS'    => 'BACKEND API KEYS TEST',
                 'RESULT'    => $result
 
-            ]);
+                ]
+            );
 
             curl_close($curl);
         }
-
     }
 }

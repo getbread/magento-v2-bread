@@ -11,8 +11,8 @@ require([
         'use strict';
 
         var globalConfig = {
-            optionConfig:               <?php /* @noEscape */ echo $block->getJsonConfig(); ?>,
-            optionConfigBundle:         <?php /* @noEscape */ echo $block->getBundleProductDataJson(); ?>,
+            optionConfig:               <?= /* @noEscape */ $block->getJsonConfig(); ?>,
+            optionConfigBundle:         <?= /* @noEscape */ $block->getBundleProductDataJson(); ?>,
             //optionCustomConfigBundle:   document.customOptionsBundleProduct,
             optionBundleSelector:       'input.bundle.option, select.bundle.option, textarea.bundle.option',
             optionBundleQtySelector:    'input.qty',

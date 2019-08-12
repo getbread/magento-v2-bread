@@ -26,9 +26,10 @@ class SendSms extends \Magento\Backend\App\Action
 
     /**
      * SendSms constructor.
-     * @param \Magento\Framework\App\Request\Http $request
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Bread\BreadCheckout\Helper\Quote $helper
+     *
+     * @param \Magento\Framework\App\Request\Http           $request
+     * @param \Magento\Backend\App\Action\Context           $context
+     * @param \Bread\BreadCheckout\Helper\Quote             $helper
      * @param \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
      */
     public function __construct(
@@ -52,7 +53,7 @@ class SendSms extends \Magento\Backend\App\Action
         $phone  = $quote->getShippingAddress()->getTelephone();
 
         try {
-            $this->paymentApiClient->sendSms($cartId,$phone);
+            $this->paymentApiClient->sendSms($cartId, $phone);
             $ret['successRows'][] = __('SMS was successfully sent to your customer.');
         } catch (\Throwable $e) {
             $ret['error'] = true;

@@ -4,7 +4,9 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
 class GenerateCart extends \Magento\Backend\App\Action
 {
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $helper;
     public $cart;
     public $config;
@@ -83,7 +85,7 @@ class GenerateCart extends \Magento\Backend\App\Action
             $arr['options']['shippingContact'] = $this->helper->getShippingAddressData();
             $arr['options']['billingContact'] = $this->helper->getBillingAddressData();
 
-            if(!$this->helper->isHealthcare()){
+            if (!$this->helper->isHealthcare()) {
                 $arr['options']['items'] = $this->helper->getQuoteItemsData();
             } else {
                 $arr['options']['customTotal'] = $quote->getGrandTotal() * 100;

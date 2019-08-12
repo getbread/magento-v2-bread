@@ -7,6 +7,7 @@ use Magento\Sales\Model\Order;
 
 /**
  * Class DispatchShipmentInfo
+ *
  * @package Bread\BreadCheckout\Observer
  */
 class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
@@ -58,34 +59,38 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
     /**
      * Sends api request to bread with shipment data
      *
-     * @param Observer $observer
+     * @param  Observer $observer
      * @return $this|void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Sales\Model\Order\Shipment\Track $shipmentTrack */
+        /**
+         * @var \Magento\Sales\Model\Order\Shipment\Track $shipmentTrack
+         */
         $shipmentTrack = $observer->getEvent()->getDataObject();
         $order = $shipmentTrack->getShipment()->getOrder();
         $payment = $order->getPayment();
 
-        /** this is to prevent code from triggering in case of programmatic changes done to tracking items later on */
-        if($order->getStatus() === Order::STATE_COMPLETE && $order->getState() == Order::STATE_COMPLETE){
+        /**
+         * this is to prevent code from triggering in case of programmatic changes done to tracking items later on
+         */
+        if ($order->getStatus() === Order::STATE_COMPLETE && $order->getState() == Order::STATE_COMPLETE) {
             return $this;
         }
 
         /**
          * At the time being, only send for first shipment
          */
-        if($order->getShipmentsCollection()->count() > 1){
+        if ($order->getShipmentsCollection()->count() > 1) {
             return $this;
         }
 
-        if($this->helper->dispatchShipmentData() && ($payment->getMethod() === $this->breadPayment->getMethodCode())){
+        if ($this->helper->dispatchShipmentData() && ($payment->getMethod() === $this->breadPayment->getMethodCode())) {
             $trackingNumber = $shipmentTrack->getNumber();
             $carrierCode = $shipmentTrack->getCarrierCode();
 
-            $transaction = $this->transactionFactory->create()->load($payment->getEntityId(),'payment_id');
+            $transaction = $this->transactionFactory->create()->load($payment->getEntityId(), 'payment_id');
 
             try {
 
@@ -95,12 +100,12 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
                     $carrierCode
                 );
                 $this->logger->log(
-                    array(
+                    [
                         'DISPATCH SHIPPING DETAILS'      => $data,
-                    )
+                    ]
                 );
 
-            } catch (\Throwable $e){
+            } catch (\Throwable $e) {
                 $this->logger->log($e->getMessage());
             }
         }

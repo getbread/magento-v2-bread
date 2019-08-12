@@ -1,8 +1,8 @@
 /**
  * Clears bread transaction token when changing coupon
  *
- * @author  Bread   copyright   2016
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Miranda @Mediotype
  */
 define(
     [
@@ -11,21 +11,23 @@ define(
     ],
     function ($, Discount) {
         'use strict';
-        return Discount.extend({
-            /**
-             * Coupon form validation
-             *
-             * @returns {boolean}
-             */
-            validate: function () {
-                if (Discount.prototype.validate.call(this)) { // Call parent method
-                    if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
-                        window.checkoutConfig.payment.breadcheckout.transactionId = null;
+        return Discount.extend(
+            {
+                /**
+                 * Coupon form validation
+                 *
+                 * @returns {boolean}
+                 */
+                validate: function () {
+                    if (Discount.prototype.validate.call(this)) { // Call parent method
+                        if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
+                            window.checkoutConfig.payment.breadcheckout.transactionId = null;
+                        }
+                        return true;
                     }
-                    return true;
+                    return false;
                 }
-                return false;
             }
-        });
+        );
     }
 );

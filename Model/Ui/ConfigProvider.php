@@ -2,8 +2,8 @@
 /**
  * Config provider for the payment method
  *
- * @author  Bread   copyright   2016
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Model\Ui;
 
@@ -13,10 +13,14 @@ class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'breadcheckout';
 
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $helper;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helperData;
 
     public function __construct(

@@ -2,9 +2,9 @@
 /**
  * Class Bread_BreadCheckout_Model_Payment_Api_Client
  *
- * @author  Bread   copyright   2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Model\Payment\Api;
 
@@ -17,13 +17,19 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
     public $order            = null;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
-    /** @var \Magento\Framework\Json\Helper\Data */
+    /**
+     * @var \Magento\Framework\Json\Helper\Data
+     */
     public $jsonHelper;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     public $storeResolver;
 
     public $logger;
@@ -55,9 +61,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Call API Cancel Method
      *
-     * @param $breadTransactionId
-     * @param int $amount
-     * @param array $lineItems
+     * @param  $breadTransactionId
+     * @param  int                $amount
+     * @param  array              $lineItems
      * @return mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -65,7 +71,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
         /* Check if already canceled in bread */
         $transaction = $this->getInfo($breadTransactionId);
-        if($transaction['status'] === self::STATUS_CANCELED){
+        if ($transaction['status'] === self::STATUS_CANCELED) {
             return $transaction;
         }
 
@@ -94,9 +100,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Call API Authorize Method
      *
-     * @param $breadTransactionId
-     * @param $amount
-     * @param null $merchantOrderId
+     * @param  $breadTransactionId
+     * @param  $amount
+     * @param  null               $merchantOrderId
      * @return mixed
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -105,7 +111,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
 
         $validateAmount = $this->getInfo($breadTransactionId);
-        $this->setBreadTransactionId($breadTransactionId); // set transaction id so it can be fetched for split payment cancel
+
+        // set transaction id so it can be fetched for split payment cancel
+        $this->setBreadTransactionId($breadTransactionId);
 
         $breadAmount = trim($validateAmount['total']);
         $amount = trim($amount);
@@ -120,8 +128,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 ]
             );
             throw new \Magento\Framework\Exception\LocalizedException(
-                __('There was a mismatch between the Bread amount and the transaction amount, Please contact '
-                    . 'the store owner.')
+                __(
+                    'There was a mismatch between the Bread amount and the transaction amount, Please contact '
+                    . 'the store owner.'
+                )
             );
         }
 
@@ -148,8 +158,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Call API Update Order Id
      *
-     * @param $breadTransactionId
-     * @param $merchantOrderId
+     * @param  $breadTransactionId
+     * @param  $merchantOrderId
      * @return mixed
      * @throws \Exception
      */
@@ -167,7 +177,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Call API Update Order Id Capture Authorized Transaction Method
      *
-     * @param $breadTransactionId
+     * @param  $breadTransactionId
      * @return mixed
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -191,9 +201,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Call API Refund Method
      *
-     * @param $breadTransactionId
-     * @param int $amount
-     * @param array $lineItems
+     * @param  $breadTransactionId
+     * @param  int                $amount
+     * @param  array              $lineItems
      * @return mixed
      * @throws \Exception
      */
@@ -215,7 +225,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Call API Get Info Method
      *
-     * @param $breadTransactionId
+     * @param  $breadTransactionId
      * @return mixed
      * @throws \Exception
      */
@@ -231,7 +241,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Submit cart data
      *
-     * @param $data
+     * @param  $data
      * @return mixed
      * @throws \Exception
      */
@@ -246,11 +256,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
     /**
      * Interact with the API
+     *
      * @TODO switch over to using \Magento\Framework\HTTP\Client\Curl
      *
-     * @param $url
-     * @param array $data
-     * @param string $method
+     * @param  $url
+     * @param  array  $data
+     * @param  string $method
      * @return mixed
      * @throws \Exception
      */
@@ -326,13 +337,15 @@ class Client extends \Magento\Framework\Model\AbstractModel
         curl_close($curl);
         // @codingStandardsIgnoreEnd
 
-        $this->logger->log([
+        $this->logger->log(
+            [
                 'USER'      => $username,
                 'PASSWORD'  => $password,
                 'URL'       => $url,
                 'DATA'      => $data,
                 'RESULT'    => $result
-            ]);
+            ]
+        );
 
         if (!$this->isJson($result)) {
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -354,8 +367,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function sendSms($cartId, $phone)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $sendSmsUrl = join('/', array(trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'text'));
-        $data = array('phone' => $phone);
+        $sendSmsUrl = join('/', [ trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'text' ]);
+        $data = [ 'phone' => $phone ];
         return $this->call(
             $sendSmsUrl,
             $data,
@@ -369,14 +382,14 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param  string $cartId
      * @param  string $email
      * @param  string $name
-     * @return  mixed
+     * @return mixed
      * @throws \Exception
      */
     public function sendEmail($cartId, $email, $name)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $sendEmailUrl = join('/', array(trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'email'));
-        $data = array('email' => $email, 'name' => $name);
+        $sendEmailUrl = join('/', [ trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'email' ]);
+        $data = [ 'email' => $email, 'name' => $name ];
         return $this->call(
             $sendEmailUrl,
             $data,
@@ -386,17 +399,20 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
     /**
      *
-     * @param $transactionId
-     * @param $trackingNumber
-     * @param $carrierName
+     * @param  $transactionId
+     * @param  $trackingNumber
+     * @param  $carrierName
      * @return mixed
      * @throws \Exception
      */
     public function setShippingDetails($transactionId, $trackingNumber, $carrierName)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $setShippingDetailsUrl = join('/', array(trim($baseUrl,'/'), 'transactions', trim($transactionId), 'shipment'));
-        $data = array('trackingNumber' => $trackingNumber, 'carrierName' => $carrierName);
+        $setShippingDetailsUrl = join(
+            '/',
+            [ trim($baseUrl, '/'), 'transactions', trim($transactionId), 'shipment' ]
+        );
+        $data = [ 'trackingNumber' => $trackingNumber, 'carrierName' => $carrierName ];
         return $this->call(
             $setShippingDetailsUrl,
             $data,
@@ -407,30 +423,34 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * Form transaction info URI string
      *
-     * @param $transactionId
+     * @param  $transactionId
      * @return string
      */
     protected function getTransactionInfoUrl($transactionId)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        return join('/', [trim($baseUrl, '/'), 'transactions', trim($transactionId, '/')]);
+        return join('/', [ trim($baseUrl, '/'), 'transactions', trim($transactionId, '/') ]);
     }
 
     /**
      * Form update transaction URI string
-     * @param $transactionId
+     *
+     * @param  $transactionId
      * @return string
      */
     protected function getUpdateTransactionUrl($transactionId)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        return join('/', [trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/')]);
+        return join(
+            '/',
+            [ trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/') ]
+        );
     }
 
     /**
      * Check a string to verify JSON format is valid
      *
-     * @param $string
+     * @param  $string
      * @return bool
      */
     protected function isJson($string)

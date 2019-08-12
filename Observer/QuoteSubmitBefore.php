@@ -27,16 +27,20 @@ class QuoteSubmitBefore implements \Magento\Framework\Event\ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param  \Magento\Framework\Event\Observer $observer
      * @return $this|void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        /** @var \Magento\Sales\Model\Order $order */
+        /**
+         * @var \Magento\Sales\Model\Order $order
+         */
         $order = $observer->getData('order');
 
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /**
+         * @var \Magento\Sales\Model\Order\Payment $payment
+         */
         $payment = $order->getPayment();
 
         if ($payment && $payment->getMethod() == $this->breadPayment->getMethodCode()) {

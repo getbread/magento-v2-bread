@@ -2,20 +2,26 @@
 /**
  * Get updated shipping, billing, and shipping option data
  *
- * @author  Bread   copyright 2016
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class DiscountsData extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $quoteHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Customer */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Customer
+     */
     public $customerHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $dataHelper;
 
     public function __construct(
@@ -70,8 +76,10 @@ class DiscountsData extends \Bread\BreadCheckout\Controller\Checkout
         $this->getQuote($params);
         $discounts = $this->quoteHelper->getDiscountData();
         
-        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(
+            [
             'discounts' =>  ($discounts)? $discounts : []
-        ]);
+            ]
+        );
     }
 }

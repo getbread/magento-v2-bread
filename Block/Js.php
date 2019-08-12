@@ -2,9 +2,9 @@
 /**
  * Class Bread_BreadCheckout_Block_Js
  *
- * @author  Bread   copyright   2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Block;
 
@@ -20,13 +20,19 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     private $packageInfo;
 
-    /** @var \Magento\Framework\App\CacheInterface */
+    /**
+     * @var \Magento\Framework\App\CacheInterface
+     */
     public $cache;
 
-    /** @var \Magento\Framework\HTTP\Client\Curl */
+    /**
+     * @var \Magento\Framework\HTTP\Client\Curl
+     */
     protected $curl;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
     public $logger;
 
     public function __construct(
@@ -92,11 +98,19 @@ class Js extends \Magento\Framework\View\Element\Text
         // Don't enable Sentry if dsn can't be retrieved
         $isSentryEnabled = $this->isSentryEnabled() && $dsn;
 
-        $sentryConfigScript = sprintf($sentryConfigScript, $dsn, $this->getModuleVersion(),
-            $this->getPublicApiKey(), $isSentryEnabled);
+        $sentryConfigScript = sprintf(
+            $sentryConfigScript,
+            $dsn,
+            $this->getModuleVersion(),
+            $this->getPublicApiKey(),
+            $isSentryEnabled
+        );
 
-        $breadJsScript = sprintf('<script src="%s" data-api-key="%s"></script>',
-            $this->getJsLibLocation(), $this->getPublicApiKey());
+        $breadJsScript = sprintf(
+            '<script src="%s" data-api-key="%s"></script>',
+            $this->getJsLibLocation(),
+            $this->getPublicApiKey()
+        );
 
         return $moduleVersionComment . $sentryConfigScript . $breadJsScript;
     }

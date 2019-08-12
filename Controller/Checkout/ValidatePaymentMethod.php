@@ -2,21 +2,27 @@
 /**
  * Add Token To Session Once Approved & Update Quote
  *
- * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
+    /**
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     */
     public $paymentApiClient;
 
-    /** @var \Magento\Checkout\Model\Session */
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     public $checkoutSession;
 
-    /** @var \Magento\Framework\Controller\ResultFactory */
+    /**
+     * @var \Magento\Framework\Controller\ResultFactory
+     */
     public $resultFactory;
 
     public function __construct(
@@ -89,7 +95,7 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     /**
      * Update quote with billing address from Bread checkout popup
      *
-     * @param string $token
+     * @param  string $token
      * @return array
      */
     protected function updateQuote($token)
@@ -108,7 +114,7 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     /**
      * Get address in correct format to add to Address object
      *
-     * @param array $data
+     * @param  array $data
      * @return array
      */
     protected function getFormattedAddress(array $data)

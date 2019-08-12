@@ -2,9 +2,9 @@
 /**
  * Functions for use specifically for validating Bread payment with Magento checkout
  *
- * @author  Bread       copyright   2016
- * @author  Dale        @Mediotype
- * @author  Miranda     @Mediotype
+ * @author Bread       copyright   2016
+ * @author Dale        @Mediotype
+ * @author Miranda     @Mediotype
  */
 namespace Bread\BreadCheckout\Helper;
 
@@ -41,7 +41,7 @@ class Checkout extends Quote
     /**
      * Save payment amount authorized by Bread to checkout session
      *
-     * @param int $amount
+     * @param  int $amount
      * @return void
      */
     public function setBreadTransactionAmount($amount)
@@ -64,7 +64,7 @@ class Checkout extends Quote
      * Verify that Magento's quote amount matches the amount
      * authorized by Bread
      *
-     * @param $transactionId
+     * @param  $transactionId
      * @return bool
      * @throws \Exception
      */

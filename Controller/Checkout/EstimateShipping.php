@@ -2,24 +2,32 @@
 /**
  * Get Shipping Method Prices
  *
- * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Magento\Framework\Controller\ResultFactory */
+    /**
+     * @var \Magento\Framework\Controller\ResultFactory
+     */
     public $resultFactory;
 
-    /** @var \Magento\Framework\Message\ManagerInterface */
+    /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
     public $messageManager;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
     public $logger;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
     public function __construct(
@@ -105,7 +113,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
         }
 
         return $this->resultFactory
-                    ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-                    ->setData($response);
+            ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+            ->setData($response);
     }
 }

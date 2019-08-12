@@ -25,8 +25,8 @@ class Url extends Data
     /**
      * Get frontend url
      *
-     * @param string $routePath
-     * @param array $routeParams
+     * @param  string $routePath
+     * @param  array  $routeParams
      * @return string
      */
     public function getFrontendUrl($routePath, $routeParams)

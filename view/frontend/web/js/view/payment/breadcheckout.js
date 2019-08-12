@@ -14,7 +14,9 @@
                 component: 'Bread_BreadCheckout/js/view/payment/method-renderer/breadcheckout'
             }
         );
-        /** Add view logic here if needed */
+        /**
+    * Add view logic here if needed 
+    */
         return Component.extend({});
     }
 );
