@@ -73,13 +73,6 @@ class Js extends \Magento\Framework\View\Element\Text
     {
         $moduleVersionComment = sprintf('<!-- BreadCheckout Module Version: %s -->', $this->getModuleVersion());
 
-        $sentrySdkScript = '<script type="text/x-magento-init">
-                {
-                    "*": {
-                        "Bread_BreadCheckout/js/sentry/5.4.3-bundle.min": {}
-                    }
-                }
-            </script>';
         $sentryConfigScript =
             '<script type="text/x-magento-init">
                 {
@@ -99,13 +92,13 @@ class Js extends \Magento\Framework\View\Element\Text
         // Don't enable Sentry if dsn can't be retrieved
         $isSentryEnabled = $this->isSentryEnabled() && $dsn;
 
-        $sentryScript = sprintf($sentrySdkScript . $sentryConfigScript, $dsn, $this->getModuleVersion(),
+        $sentryConfigScript = sprintf($sentryConfigScript, $dsn, $this->getModuleVersion(),
             $this->getPublicApiKey(), $isSentryEnabled);
 
         $breadJsScript = sprintf('<script src="%s" data-api-key="%s"></script>',
             $this->getJsLibLocation(), $this->getPublicApiKey());
 
-        return $moduleVersionComment . $sentryScript . $breadJsScript;
+        return $moduleVersionComment . $sentryConfigScript . $breadJsScript;
     }
 
     /**
