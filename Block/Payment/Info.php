@@ -2,9 +2,9 @@
 /**
  * Payment Info Block
  *
- * @author  Bread   copyright   2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Block\Payment;
 
@@ -27,7 +27,7 @@ class Info extends \Magento\Payment\Block\Info
     /**
      * Display Information For Admin View
      *
-     * @param null $transport
+     * @param  null $transport
      * @return null|\Magento\Framework\DataObject
      */
     protected function _prepareSpecificInformation($transport = null)

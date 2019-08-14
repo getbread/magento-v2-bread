@@ -2,9 +2,9 @@
 /**
  * Payment Action Options (Magento Canonical)
  *
- * @author  Bread   copyright   2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Model\System\Config\Source;
 

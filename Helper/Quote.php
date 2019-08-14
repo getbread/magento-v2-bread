@@ -2,9 +2,9 @@
 /**
  * Helps Integration With Session Quote
  *
- * @author      Bread   copyright   2016
- * @author      Joel    @Mediotype
- * @author      Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Helper;
 
@@ -13,19 +13,29 @@ class Quote extends Data
     const BREAD_SESSION_QUOTE_RESULT_KEY  = "bread_quote_result";
     const BREAD_SESSION_QUOTE_UPDATED_KEY = "bread_quote_updated_at";
 
-    /** @var \Magento\Sales\Model\Quote */
+    /**
+     * @var \Magento\Sales\Model\Quote
+     */
     public $quote = null;
 
-    /** @var \Magento\Checkout\Model\Session */
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     public $checkoutSession;
 
-    /** @var Bread\BreadCheckout\Helper\Catalog */
+    /**
+     * @var Bread\BreadCheckout\Helper\Catalog
+     */
     public $helperCatalog;
 
-    /** @var \Magento\Sales\Model\AdminOrder\Create */
+    /**
+     * @var \Magento\Sales\Model\AdminOrder\Create
+     */
     public $orderCreateModel;
 
-    /** @var \Magento\Framework\Pricing\PriceCurrencyInterface */
+    /**
+     * @var \Magento\Framework\Pricing\PriceCurrencyInterface
+     */
     public $priceCurrency;
     /**
      * @var \Bread\BreadCheckout\Model\Payment\Api\Client
@@ -371,7 +381,7 @@ class Quote extends Data
     }
 
     /**
-     * @param null $quote
+     * @param  null $quote
      * @return mixed
      * @throws \Exception
      */
@@ -384,7 +394,7 @@ class Quote extends Data
         $session = $this->getSession();
         if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
 
-            if($fullRequest){
+            if ($fullRequest) {
                 $arr = [];
                 $arr["expiration"]                 = date('Y-m-d', strtotime("+" . $this->getQuoteExpiration() . "days"));
                 $arr["options"]                    = [];
@@ -421,7 +431,7 @@ class Quote extends Data
      * Check if Product Type is allowed in the Cart
      *
      * @deprecated
-     * @return bool
+     * @return     bool
      */
     public function isProductsAllowedInCart()
     {
@@ -449,14 +459,13 @@ class Quote extends Data
         $session = $this->getSession();
         $quoteResult = $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
 
-        if(empty($quoteResult)){
-            $quoteResult = $this->submitQuote(null,false);
+        if (empty($quoteResult)) {
+            $quoteResult = $this->submitQuote(null, false);
         }
 
-        if($quoteResult && array_key_exists('asLowAs',$quoteResult)){
+        if ($quoteResult && array_key_exists('asLowAs', $quoteResult)) {
             return $quoteResult['asLowAs']['asLowAsText'];
         }
-
     }
 
     /**
@@ -470,7 +479,7 @@ class Quote extends Data
         $items = $quote->getAllVisibleItems();
 
         foreach ($items as $item) {
-            if($this->allowedProductType($item->getProductType()) === false){
+            if ($this->allowedProductType($item->getProductType()) === false) {
                 return false;
             }
         }

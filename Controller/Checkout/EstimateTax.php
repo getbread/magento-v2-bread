@@ -2,21 +2,27 @@
 /**
  * Get Tax Estimate
  *
- * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Magento\Framework\Controller\ResultFactory  */
+    /**
+     * @var \Magento\Framework\Controller\ResultFactory
+     */
     public $resultFactory;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
     public $logger;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
     public function __construct(

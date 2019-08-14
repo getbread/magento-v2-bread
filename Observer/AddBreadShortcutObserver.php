@@ -7,6 +7,7 @@ use Magento\Framework\Event\ObserverInterface;
 
 /**
  * Class AddBreadShortcutObserver
+ *
  * @package Bread\BreadCheckout\Observer
  */
 class AddBreadShortcutObserver implements ObserverInterface

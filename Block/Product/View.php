@@ -2,9 +2,9 @@
 /**
  * Handles Product View Block
  *
- * @copyright   Bread   2016
- * @author      Joel    @Mediotype
- * @author      Miranda @Mediotype
+ * @copyright Bread   2016
+ * @author    Joel    @Mediotype
+ * @author    Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Block\Product;
 
@@ -12,44 +12,59 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 {
     public $_product;
 
-    /** @var \Magento\Framework\Registry */
+    /**
+     * @var \Magento\Framework\Registry
+     */
     public $registry;
 
-    /** @var \Magento\Framework\Json\Helper\Data */
+    /**
+     * @var \Magento\Framework\Json\Helper\Data
+     */
     public $jsonHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Catalog */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Catalog
+     */
     public $catalogHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $dataHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Customer */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Customer
+     */
     public $customerHelper;
 
-    /** @var \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory */
+    /**
+     * @var \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory
+     */
     public $configurableProductFactory;
 
-    /** @var \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory */
+    /**
+     * @var \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory
+     */
     public $configurableBlockFactory;
 
     /**
      * View constructor.
-     * @param \Magento\Catalog\Block\Product\Context $context
-     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
-     * @param \Bread\BreadCheckout\Helper\Catalog $catalogHelper
-     * @param \Bread\BreadCheckout\Helper\Customer $customerHelper
-     * @param \Bread\BreadCheckout\Helper\Data $dataHelper
-     * @param \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory
+     *
+     * @param \Magento\Catalog\Block\Product\Context                                   $context
+     * @param \Magento\Framework\Json\Helper\Data                                      $jsonHelper
+     * @param \Bread\BreadCheckout\Helper\Catalog                                      $catalogHelper
+     * @param \Bread\BreadCheckout\Helper\Customer                                     $customerHelper
+     * @param \Bread\BreadCheckout\Helper\Data                                         $dataHelper
+     * @param \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory      $configurableProductFactory
      * @param \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory
-     * @param \Magento\Framework\Stdlib\ArrayUtils $arrayUtils
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
-     * @param \Magento\ConfigurableProduct\Helper\Data $configurableHelper
-     * @param \Magento\Catalog\Helper\Product $catalogProductHelper
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData
-     * @param array $data
+     * @param \Magento\Framework\Stdlib\ArrayUtils                                     $arrayUtils
+     * @param \Magento\Framework\Json\EncoderInterface                                 $jsonEncoder
+     * @param \Magento\ConfigurableProduct\Helper\Data                                 $configurableHelper
+     * @param \Magento\Catalog\Helper\Product                                          $catalogProductHelper
+     * @param \Magento\Customer\Helper\Session\CurrentCustomer                         $currentCustomer
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface                        $priceCurrency
+     * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData             $configurableAttributeData
+     * @param array                                                                    $data
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
@@ -135,7 +150,6 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         $data    = [$this->catalogHelper->getGroupedProductDataArray($product)];
 
         return $this->jsonEncode($data);
-
     }
 
     /**
@@ -210,11 +224,14 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         if ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW
             && $this->catalogHelper->isEnabledOnPDP()
             && $this->catalogHelper->allowedProductType($this->getProduct()->getTypeId())
-            && $this->dataHelper->aboveThreshold($this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue())
+            && $this->dataHelper->aboveThreshold(
+                $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
+            )
         ) {
             return parent::_toHtml();
         } elseif ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW
-                  && $this->catalogHelper->isEnabledOnCOP()){
+            && $this->catalogHelper->isEnabledOnCOP()
+        ) {
             return parent::_toHtml();
         }
 
@@ -374,7 +391,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /**
      * Get product IDs from related products collection
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $product
      * @return array
      */
     public function getChildProductIds(\Magento\Catalog\Model\Product $product)
@@ -395,7 +412,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /**
      * Get SKU and price data for custom options on product
      *
-     * @param $options
+     * @param  $options
      * @return string
      */
     public function getCustomOptionsData($options)
@@ -493,7 +510,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /**
      * Publicly accessible json encoder
      *
-     * @param $data
+     * @param  $data
      * @return string
      */
     public function jsonEncode($data)
@@ -503,6 +520,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 
     /**
      * Is downloadable type
+     *
      * @return bool
      */
     public function isDownloadable()

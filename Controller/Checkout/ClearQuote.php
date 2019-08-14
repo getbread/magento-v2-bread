@@ -2,8 +2,8 @@
 /**
  * Get updated shipping, billing, and shipping option data
  *
- * @author  Bread   copyright 2016
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
@@ -61,8 +61,10 @@ class ClearQuote extends \Bread\BreadCheckout\Controller\Checkout
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $result = false;
         }
-        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(
+            [
             'result' =>  $result
-        ]);
+            ]
+        );
     }
 }

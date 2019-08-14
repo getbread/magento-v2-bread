@@ -2,21 +2,27 @@
 /**
  * Helps Integration With Catalog
  *
- * @author  Bread   copyright   2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Helper;
 
 class Catalog extends Data
 {
-    /** @var \Magento\Catalog\Block\Product\View */
+    /**
+     * @var \Magento\Catalog\Block\Product\View
+     */
     public $productViewBlock;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     public $storeManager;
 
-    /** @var \Magento\Catalog\Api\ProductRepositoryInterfaceFactory  */
+    /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterfaceFactory
+     */
     public $productRepositoryFactory;
 
     public function __construct(
@@ -52,10 +58,10 @@ class Catalog extends Data
     /**
      * Get Formatted Product Data Array
      *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param \Magento\Catalog\Model\Product $baseProduct
-     * @param int $qty
-     * @param null $lineItemPrice
+     * @param  \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $baseProduct
+     * @param  int                            $qty
+     * @param  null                           $lineItemPrice
      * @return array
      */
     public function getProductDataArray(
@@ -89,7 +95,7 @@ class Catalog extends Data
      * Get formatted product data for grouped product
      * based on lowest price associated item
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $product
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -98,7 +104,7 @@ class Catalog extends Data
         $grouped = $product->getTypeInstance();
         $associatedProductsCollection = $grouped->getAssociatedProductCollection($product)
             ->addAttributeToSelect('name')
-            ->addAttributeToSort('price','ASC');
+            ->addAttributeToSort('price', 'ASC');
         $item = $associatedProductsCollection->getFirstItem();
 
         $productData = [
@@ -120,8 +126,8 @@ class Catalog extends Data
     /**
      * Return Product SKU Or Formatted SKUs for Products With Options
      *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param \Magento\Catalog\Model\Product $theProduct
+     * @param  \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $theProduct
      * @return string
      */
     protected function getSkuString(
@@ -173,8 +179,8 @@ class Catalog extends Data
     /**
      * Get Price
      *
-     * @param null $lineItemPrice
-     * @param \Magento\Catalog\Model\Product $theProduct
+     * @param  null                           $lineItemPrice
+     * @param  \Magento\Catalog\Model\Product $theProduct
      * @return float
      */
     protected function getPrice($lineItemPrice, \Magento\Catalog\Model\Product $theProduct)
@@ -202,7 +208,7 @@ class Catalog extends Data
     /**
      * Get Img Src Value
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $product
      * @return null|string
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */

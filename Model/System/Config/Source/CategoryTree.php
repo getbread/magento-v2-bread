@@ -66,9 +66,9 @@ class CategoryTree extends \Magento\Framework\App\Config\Value
         }
 
         $categories->addAttributeToSelect('name')
-                   ->addAttributeToSort('path', 'asc')
-                   ->addFieldToFilter('is_active', ['eq' => '1'])
-                   ->load();
+            ->addAttributeToSort('path', 'asc')
+            ->addFieldToFilter('is_active', ['eq' => '1'])
+            ->load();
 
         return $categories;
     }
@@ -97,7 +97,9 @@ class CategoryTree extends \Magento\Framework\App\Config\Value
             }
         }
 
-        /** @var \Magento\Catalog\Model\Category $category */
+        /**
+         * @var \Magento\Catalog\Model\Category $category
+         */
         foreach ($categoriesTreeView as $category) {
             $catName  = $category->getName();
             $catId    = $category->getId();

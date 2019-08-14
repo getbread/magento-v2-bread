@@ -4,31 +4,31 @@
 $product   = $block->getProduct();
 $productId = $product->getId();
 ?>
-<div id="bread-btn-cntnr-<?php echo $productId; ?>">
-    <div id='bread-checkout-btn-<?php echo $productId; ?>' title="Bread Checkout"
-         class="button" <?php echo $block->useDefaultButtonSizeCategory(); ?>>
+<div id="bread-btn-cntnr-<?= /* @noEscape */ $productId; ?>">
+    <div id='bread-checkout-btn-<?= /* @noEscape */ $productId; ?>' title="Bread Checkout"
+         class="button" <?= /* @noEscape */ $block->useDefaultButtonSizeCategory(); ?>>
         <span>
-            <span><?php echo __('Bread Checkout'); ?></span>
+            <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
         </span>
     </div>
     <div class='button-prevent'
          id='button-prevent'>
-        <span class="buy_error_tip override_tip" data-content="<?= __('Please complete product configuration') ?>">&nbsp;</span>
+        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
     </div>
 </div>
 
 <script type="text/javascript">
     require(['jquery'], function ($) {
-        document.configureButton<?php echo $productId;?> = function (items) {
-            var address = <?php echo $block->getShippingAddressData(); ?>;
-            var billingAddress = <?php echo $block->getBillingAddressData(); ?>;
-            var labelOnly = <?php  echo $block->isLabelOnlyOnCategories(); ?>;
-            var buttonCss = '<?php echo $block->getCATButtonDesign(); ?>';
+        document.configureButton<?= /* @noEscape */ $productId;?> = function (items) {
+            var address = <?= /* @noEscape */ $block->getShippingAddressData(); ?>;
+            var billingAddress = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
+            var labelOnly = <?= /* @noEscape */ $block->isLabelOnlyOnCategories(); ?>;
+            var buttonCss = '<?= /* @noEscape */ $block->getCATButtonDesign(); ?>';
 
             var breadConfig = {
-                buttonId: 'bread-checkout-btn-<?php echo $productId;?>',
-                asLowAs: <?php echo $block->isAsLowAsCAT(); ?>,
-                showInWindow: <?php echo $block->getShowInWindowCAT()?>,
+                buttonId: 'bread-checkout-btn-<?= /* @noEscape */ $productId;?>',
+                asLowAs: <?= /* @noEscape */ $block->isAsLowAsCAT(); ?>,
+                showInWindow: <?= /* @noEscape */ $block->getShowInWindowCAT()?>,
                 <?php if (!$block->isHealthcare()) : ?>
                 items: items,
                 <?php else : ?>
@@ -36,7 +36,7 @@ $productId = $product->getId();
                 <?php endif; ?>
                 discounts: [],
                 allowCheckout: false,
-                buttonLocation: '<?php echo $block->getCategoryPageLocation(); ?>',
+                buttonLocation: '<?= /* @noEscape */ $block->getCategoryPageLocation(); ?>',
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
                         var i = document.createElement('input');
@@ -44,7 +44,7 @@ $productId = $product->getId();
                         i.name = 'token';
                         i.value = tx_token;
                         var f = document.createElement('form');
-                        f.action = '<?php echo $block->getValidateOrderURL(); ?>';
+                        f.action = '<?= /* @noEscape */ $block->getValidateOrderURL(); ?>';
                         f.method = 'POST';
                         f.appendChild(i);
                         document.body.appendChild(f);
@@ -85,14 +85,14 @@ $productId = $product->getId();
             <?php
             $data = $block->getProductDataJson($product);
             ?>
-            var product = <?php echo $data; ?>;
+            var product = <?= /* @noEscape */ $data; ?>;
             var originalPrice = product.price;
 
-            document.configureButton<?php echo $productId; ?>([product]);
-            $("[data-role=priceBox][data-product-id=<?php echo $productId;?>]").on("updatePrice", function (event, data) {
+            document.configureButton<?= /* @noEscape */ $productId; ?>([product]);
+            $("[data-role=priceBox][data-product-id=<?= /* @noEscape */ $productId;?>]").on("updatePrice", function (event, data) {
                 if (data) {
                     product.price = Math.round(originalPrice + data.prices.finalPrice.amount * 100);
-                    document.configureButton<?php echo $productId; ?>([product]);
+                    document.configureButton<?= /* @noEscape */ $productId; ?>([product]);
                 }
             });
 

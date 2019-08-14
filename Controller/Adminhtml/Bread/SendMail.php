@@ -3,7 +3,9 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
 class SendMail extends \Magento\Backend\App\Action
 {
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $request;
     public $helper;
     public $config;
