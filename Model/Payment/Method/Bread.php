@@ -586,4 +586,5 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     {
         return parent::getTitle();
     }
+
 }

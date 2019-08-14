@@ -111,6 +111,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
 
         $validateAmount = $this->getInfo($breadTransactionId);
+        $this->setBreadTransactionId($breadTransactionId); // set transaction id so it can be fetched for split payment cancel
 
         // set transaction id so it can be fetched for split payment cancel
         $this->setBreadTransactionId($breadTransactionId);
