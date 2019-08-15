@@ -2,21 +2,27 @@
 /**
  * Get Tax Estimate
  *
- * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Magento\Framework\Controller\ResultFactory  */
+    /**
+     * @var \Magento\Framework\Controller\ResultFactory
+     */
     public $resultFactory;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
     public $logger;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
     public function __construct(
@@ -68,16 +74,15 @@ class EstimateTax extends \Bread\BreadCheckout\Controller\Checkout
                     __('Shipping address is not an instance of Magento\Quote\Model\Quote\Address')
                 );
             }
-            
+
             $result             = round($shippingAddress->getTaxAmount() * 100);
-            $response           = $result;
-        } catch (\Exception $e) {
+            $response           = ['result' => $result];
+        } catch (\Throwable $e) {
             $this->logger->log(['EXCEPTION IN TAX ESTIMATE ACTION' => $e->getMessage()]);
             $response = ['error' => 1,
-                         'text'  => 'Internal error'];
+                         'message'  => 'There was an error calculating the estimated tax'];
         }
-        return $this->resultFactory->create(
-            \Magento\Framework\Controller\ResultFactory::TYPE_JSON
-        )->setData(['result' => $response]);
+
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($response);
     }
 }

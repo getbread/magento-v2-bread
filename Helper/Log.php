@@ -4,6 +4,7 @@ namespace Bread\BreadCheckout\Helper;
 
 /**
  * Class Log
+ *
  * @package Bread\BreadCheckout\Helper
  */
 class Log extends \Magento\Framework\App\Helper\AbstractHelper
@@ -17,14 +18,14 @@ class Log extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Log constructor.
+     *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Bread\BreadCheckout\Log\BreadLogger $breadLogger
+     * @param \Bread\BreadCheckout\Log\BreadLogger  $breadLogger
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Bread\BreadCheckout\Log\BreadLogger $breadLogger
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->breadLogger = $breadLogger;
     }

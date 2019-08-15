@@ -2,29 +2,37 @@
 /**
  * Validate Payment Method In Admin
  *
- * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 
-
-
 class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
-    /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
+    /**
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     */
     public $paymentApiClient;
 
-    /** @var \Magento\Framework\Controller\Result\JsonFactory */
+    /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
     public $resultJsonFactory;
 
-    /** @var \Bread\BreadCheckout\Helper\Log */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Log
+     */
     public $logger;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
-    /** @var \Magento\Sales\Model\AdminOrder\Create */
+    /**
+     * @var \Magento\Sales\Model\AdminOrder\Create
+     */
     public $orderCreateModel;
 
     public function __construct(
@@ -64,16 +72,14 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
                     $result     = true;
                 }
             }
-        } catch (\Exception $e) {
+            $response = ['result' => $result];
+        } catch (\Throwable $e) {
             $this->logger->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __(
-                    'Something went wrong processing the Bread payment. 
-                    Please select a different payment method to complete checkout.'
-                )
-            );
+
+            $response = ['error' => 'Something went wrong processing the Bread payment. '
+                . 'Please select a different payment method to complete checkout.'];
         }
 
-        return $this->resultJsonFactory->create()->setData(['result' => $result]);
+        return $this->resultJsonFactory->create()->setData($response);
     }
 }

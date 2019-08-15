@@ -2,5 +2,5 @@
 /* @var $block \Magento\Catalog\Block\Product\View\Options */
 ?>
 <script type="text/javascript">
-    document.customOptionsBundleProduct = <?php echo $block->getJsonConfig(); ?>;
+    document.customOptionsBundleProduct = <?= /* @noEscape */ $block->getJsonConfig(); ?>;
 </script>

@@ -51,6 +51,12 @@
 
         <!-- /ko -->
 
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
         <!-- ko ifnot: isCartValid() -->
         <div class="checkout_error_tip">
             <span data-bind="text: getCheckoutMessage()"></span>

@@ -2,9 +2,9 @@
 /**
  * Handles Config & Basic Shared Helper Functionality
  *
- * @author  Bread   copyright   2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Helper;
 
@@ -15,6 +15,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const JS_SANDBOX_URI                            = 'https://checkout-sandbox.getbread.com/bread.js';
     const JS_LIVE_URI                               = 'https://checkout.getbread.com/bread.js';
+
+    const URL_LAMBDA_SENTRY_DSN                     = 'https://oapavh9uvh.execute-api.us-east-1.amazonaws.com/prod/sentrydsn?platform=magento2';
 
     const URL_VALIDATE_PAYMENT                      = 'bread/checkout/validatepaymentmethod';
     const URL_VALIDATE_ORDER                        = 'bread/checkout/validateorder';
@@ -81,6 +83,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_CP_BUTTON_DESIGN               = 'payment/breadcheckout/bread_cartpage/button_design';
     const XML_CONFIG_PDP_BUTTON_DESIGN              = 'payment/breadcheckout/bread_productdetail/button_design';
 
+    const XML_SENTRY_LOG_ENABLED                    = 'payment/breadcheckout/bread_advanced/sentry_enabled';
+
     const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
 
@@ -94,19 +98,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const BUTTON_LOCATION_OTHER                     = 'other';
     const API_CART_EXTENSION                        = 'carts/';
 
-    /** @var \Magento\Framework\Model\Context */
+    /**
+     * @var \Magento\Framework\Model\Context
+     */
     public $context;
 
-    /** @var \Magento\Framework\App\Request\Http */
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
     public $request;
 
-    /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
     public $scopeConfig;
 
-    /** @var \Magento\Framework\Encryption\Encryptor */
+    /**
+     * @var \Magento\Framework\Encryption\Encryptor
+     */
     public $encryptor;
 
-    /** @var \Magento\Framework\UrlInterfaceFactory */
+    /**
+     * @var \Magento\Framework\UrlInterfaceFactory
+     */
     public $urlInterfaceFactory;
 
     public function __construct(
@@ -129,7 +143,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Is module active?
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -140,7 +154,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check product type against allowed product type list
      *
-     * @param string $typeId
+     * @param  string $typeId
      * @return bool
      */
     public function allowedProductType($typeId)
@@ -153,13 +167,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
             \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
         ];
-        return in_array($typeId,$allowedProductTypes);
+        return in_array($typeId, $allowedProductTypes);
     }
 
     /**
      * Return custom message for non supported product type
      *
-     * @param string $store
+     * @param  string $store
      * @return mixed
      */
     public function getProductTypeMessage($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -170,10 +184,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Is Logging Enabled
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
-/*    public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    /*    public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_LOG_ENABLED, $store);
     }*/
@@ -181,7 +195,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get API Pub Key
      *
-     * @param null $store
+     * @param  null $store
      * @return mixed
      */
     public function getApiPublicKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -196,7 +210,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get API Secret Key
      *
-     * @param null $store
+     * @param  null $store
      * @return string
      */
     public function getApiSecretKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -215,7 +229,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get JS Lib Location
      *
-     * @param null $store
+     * @param  null $store
      * @return mixed
      */
     public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -230,7 +244,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get API Url
      *
-     * @param null $store
+     * @param  null $store
      * @return mixed
      */
     public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -277,7 +291,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get Shipping Address Estimate URL
-     *
      */
     public function getShippingEstimateUrl()
     {
@@ -423,7 +436,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Auth or Auth & Settle
      *
-     * @param null $store
+     * @param  null $store
      * @return string
      */
     public function getPaymentAction($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -434,7 +447,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Payment Method Title During Checkout
      *
-     * @param null $store
+     * @param  null $store
      * @return string
      */
     public function getPaymentMethodTitle($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -442,11 +455,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (string) $this->__("" . $this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_TITLE, $store));
     }
 
-
     /**
      * Show per month calculation next to payment method title on checkout
      *
-     * @param $store
+     * @param  $store
      * @return string
      */
     public function showPerMonthCalculation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -457,7 +469,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Is Customer Account Created During Bread Work Flow?
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isAutoCreateCustomerAccountEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -469,7 +481,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Is button on product page?
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isButtonOnProducts($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -480,7 +492,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Is block enabled on product page?
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isEnabledOnPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -492,7 +504,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Enable button view on cart page
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isEnabledOnCOP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -504,7 +516,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Use Bread As Payment Method In Checkout?
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isPaymentMethodAtCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -516,7 +528,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Is Healthcare mode?
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isHealthcare($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -529,7 +541,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Use As Low As Pricing View?
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function isAsLowAs($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -540,7 +552,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Allow Checkout From Bread Pop Up on PDP
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function getAllowCheckoutPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -552,7 +564,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Allow Checkout From Bread On Cart Page
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function getAllowCheckoutCP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -615,7 +627,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Custom Button Design
      *
-     * @param null $store
+     * @param  null $store
      * @return mixed
      */
     public function getButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -626,7 +638,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Checkout Cart Button Design
      *
-     * @param null $store
+     * @param  null $store
      * @return mixed
      */
     public function getCartButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -637,7 +649,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get PDP Button Design
      *
-     * @param null $store
+     * @param  null $store
      * @return mixed
      */
     public function getPDPButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -648,7 +660,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check If Default Button Size Is Used
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function useDefaultButtonSize($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -660,7 +672,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Incomplete Checkout Message For Payment Method Form
      *
-     * @param string $store
+     * @param  string $store
      * @return string
      */
     public function getIncompleteCheckoutMsg($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -671,7 +683,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check if embedded checkout is enabled
      *
-     * @param string $store
+     * @param  string $store
      * @return int
      */
     public function embeddedCheckoutEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -682,12 +694,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Dispatch order shipment details to Bread
      *
-     * @param null $store
+     * @param  null $store
      * @return bool
      */
     public function dispatchShipmentData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_ORDER_SHIPPED,$store);
+        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_ORDER_SHIPPED, $store);
+    }
+
+    /**
+     * Dispatch order shipment details to Bread
+     *
+     * @param  null $store
+     * @return bool
+     */
+    public function isSentryEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (bool)$this->scopeConfig->getValue(self::XML_SENTRY_LOG_ENABLED, $store);
     }
 
     /**
@@ -822,7 +845,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get cart API Url
      *
-     * @param null $store
+     * @param  null $store
      * @return mixed
      */
     public function getCartCreateApiUrl($store = null)
@@ -833,7 +856,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Allow Mini cart checkout
      *
-     * @param string $store
+     * @param  string $store
      * @return bool
      */
     public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -844,7 +867,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check if cost of item/cart total is equal or greater than set threshold amount
      *
-     * @param float $cost
+     * @param  float $cost
      * @return bool
      */
     public function aboveThreshold($cost)
@@ -862,7 +885,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get auto cancel on split payment declined order
      *
-     * @param string $store
+     * @param  string $store
      * @return bool
      */
     public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)

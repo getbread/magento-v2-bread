@@ -2,9 +2,9 @@
 /**
  * Handles Product View Block
  *
- * @copyright   Bread   2016
- * @author      Joel    @Mediotype
- * @author      Miranda @Mediotype
+ * @copyright Bread   2016
+ * @author    Joel    @Mediotype
+ * @author    Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Block\Product;
 
@@ -12,37 +12,50 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
 {
     public $_product;
 
-    /** @var \Magento\Framework\Registry */
+    /**
+     * @var \Magento\Framework\Registry
+     */
     public $registry;
 
-    /** @var Magento\Framework\Json\Helper\Data */
+    /**
+     * @var Magento\Framework\Json\Helper\Data
+     */
     public $jsonHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Catalog */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Catalog
+     */
     public $catalogHelper;
 
-    /** @var \Magento\Catalog\Helper\Product */
+    /**
+     * @var \Magento\Catalog\Helper\Product
+     */
     public $catalogProduct;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $dataHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Customer */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Customer
+     */
     public $customerHelper;
 
     /**
      * Bundle constructor.
-     * @param \Magento\Catalog\Block\Product\Context $context
-     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
-     * @param \Bread\BreadCheckout\Helper\Catalog $catalogHelper
-     * @param \Magento\Catalog\Helper\Product $catalogProduct
-     * @param \Bread\BreadCheckout\Helper\Customer $customerHelper
-     * @param \Bread\BreadCheckout\Helper\Data $dataHelper
-     * @param \Magento\Framework\Stdlib\ArrayUtils $arrayUtils
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
+     *
+     * @param \Magento\Catalog\Block\Product\Context     $context
+     * @param \Magento\Framework\Json\Helper\Data        $jsonHelper
+     * @param \Bread\BreadCheckout\Helper\Catalog        $catalogHelper
+     * @param \Magento\Catalog\Helper\Product            $catalogProduct
+     * @param \Bread\BreadCheckout\Helper\Customer       $customerHelper
+     * @param \Bread\BreadCheckout\Helper\Data           $dataHelper
+     * @param \Magento\Framework\Stdlib\ArrayUtils       $arrayUtils
+     * @param \Magento\Framework\Json\EncoderInterface   $jsonEncoder
      * @param \Magento\Bundle\Model\Product\PriceFactory $productPrice
-     * @param \Magento\Framework\Locale\FormatInterface $localeFormat
-     * @param array $data
+     * @param \Magento\Framework\Locale\FormatInterface  $localeFormat
+     * @param array                                      $data
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
@@ -82,7 +95,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         );
 
         $output = '';
-        if($aboveThreshold){
+        if ($aboveThreshold) {
             $output = parent::toHtml();
         }
 
@@ -192,14 +205,14 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         $product = $this->getProduct();
         $customOptions = $this->getCustomOptionsData($product->getOptions());
 
-        $data = array(
+        $data = [
             'bundleId'      => $product->getId(),
             'sku'           => $product->getSku(),
             'name'          => $product->getName(),
             'basePrice'     => floatval($product->getPrice()),
             'selectedPrice' => 0,
-            'options'       => array()
-        );
+            'options'       => []
+        ];
 
         $selectionCollection = $product->getTypeInstance(true)
             ->getSelectionsCollection(
@@ -268,7 +281,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     /**
      * Get SKU and price data for custom options on product
      *
-     * @param $options
+     * @param  $options
      * @return string
      */
     public function getCustomOptionsData($options)
@@ -381,20 +394,20 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     }
 
      /**
-     * Get Discounts Data URL
-     *
-     * @return string
-     */
+      * Get Discounts Data URL
+      *
+      * @return string
+      */
     public function getDiscountsDataUrl()
     {
         return $this->catalogHelper->getDiscountsDataUrl();
     }
 
      /**
-     * Get Clear Quote Data URL
-     *
-     * @return string
-     */
+      * Get Clear Quote Data URL
+      *
+      * @return string
+      */
     public function getClearQuoteUrl()
     {
         return $this->catalogHelper->getClearQuoteUrl();
@@ -463,7 +476,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     /**
      * Publicly accessible json encoder
      *
-     * @param $data
+     * @param  $data
      * @return string
      */
     public function jsonEncode($data)
@@ -473,11 +486,11 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
 
     /**
      * Is downloadable type
+     *
      * @return bool
      */
     public function isDownloadable()
     {
         return $this->getProduct()->getTypeId() === \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE;
     }
-
 }

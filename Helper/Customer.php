@@ -2,48 +2,72 @@
 /**
  * Helps Integration With Customer
  *
- * @copyright   Bread   copyright   2016
- * @author      Joel    @Mediotype
- * @author      Miranda @Mediotype
+ * @copyright Bread   copyright   2016
+ * @author    Joel    @Mediotype
+ * @author    Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Helper;
 
 class Customer extends Data
 {
-    /** @var \Magento\Store\Model\StoreManagerInterface */
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     public $storeManager;
 
-    /** @var \Magento\Customer\Model\Session */
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     public $customerSession;
 
-    /** @var \Magento\Customer\Model\CustomerFactory */
+    /**
+     * @var \Magento\Customer\Model\CustomerFactory
+     */
     public $customerFactory;
 
-    /** @var \Magento\Customer\Model\AddressFactory */
+    /**
+     * @var \Magento\Customer\Model\AddressFactory
+     */
     public $customerAddressFactory;
 
-    /** @var \Magento\Framework\Json\Helper\Data */
+    /**
+     * @var \Magento\Framework\Json\Helper\Data
+     */
     public $jsonHelper;
 
-    /** @var \Magento\Framework\Math\Random */
+    /**
+     * @var \Magento\Framework\Math\Random
+     */
     public $random;
 
-    /** @var \Magento\Framework\Mail\Template\TransportBuilder */
+    /**
+     * @var \Magento\Framework\Mail\Template\TransportBuilder
+     */
     public $_transportBuilder;
 
-    /** @var \Magento\Framework\Translate\Inline\StateInterface */
+    /**
+     * @var \Magento\Framework\Translate\Inline\StateInterface
+     */
     public $inlineTranslation;
 
-    /** @var \Magento\Directory\Model\RegionFactory */
+    /**
+     * @var \Magento\Directory\Model\RegionFactory
+     */
     public $regionFactory;
 
-    /** @var \Magento\Customer\Api\CustomerRepositoryInterface */
+    /**
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     */
     public $customerRepository;
 
-    /** @var \Magento\Customer\Api\AddressRepositoryInterface */
+    /**
+     * @var \Magento\Customer\Api\AddressRepositoryInterface
+     */
     public $addressRepository;
 
-    /** @var Log  */
+    /**
+     * @var Log
+     */
     public $logger;
 
     public function __construct(
@@ -156,10 +180,10 @@ class Customer extends Data
     /**
      * Create Customer Called From Order Place Process
      *
-     * @param $quote
-     * @param $billingContact
-     * @param $shippingContact
-     * @param $createCartsOrder
+     * @param  $quote
+     * @param  $billingContact
+     * @param  $shippingContact
+     * @param  $createCartsOrder
      * @return \Magento\Customer\Model\Customer
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -173,7 +197,10 @@ class Customer extends Data
         $quote->setCustomerLastname($billingContact['lastname']);
         $quote->setCustomerFirstname($billingContact['firstname']);
 
-        $customer   = $this->customerFactory->create(); /** @var \Magento\Customer\Model\CustomerFactory */
+        /**
+         * @var \Magento\Customer\Model\CustomerFactory
+         */
+        $customer   = $this->customerFactory->create();
         if ($this->isAutoCreateCustomerAccountEnabled() == false) {
             return $customer;
         }
@@ -206,14 +233,14 @@ class Customer extends Data
 
             $billingAddressDataObject = $billingAddress->getDataModel();
             $billingAddressDataObject->setIsDefaultBilling(true);
-            if($billingContact == $shippingContact){
+            if ($billingContact == $shippingContact) {
                 $billingAddressDataObject->setIsDefaultShipping(true);
             }
             $billingAddressDataObject->setCustomerId($customerInterface->getId());
 
             $this->addressRepository->save($billingAddressDataObject);
 
-            if($billingContact !== $shippingContact){
+            if ($billingContact !== $shippingContact) {
 
                 $shippingAddressDataObject = $shippingAddress->getDataModel();
                 $shippingAddressDataObject->setIsDefaultShipping(true);
@@ -225,11 +252,11 @@ class Customer extends Data
 
             $customer->sendNewAccountEmail('registered', '', $customerInterface->getStoreId());
 
-            if($createCartsOrder){
+            if ($createCartsOrder) {
                 $this->customerSession->setCustomer($customer);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
         }
 
@@ -301,7 +328,7 @@ class Customer extends Data
     /**
      * Generate random password during automatic customer account creation
      *
-     * @param $length int
+     * @param  $length int
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -312,9 +339,10 @@ class Customer extends Data
 
     /**
      * Send activation link to customer
-     * @param \Magento\Customer\Model\Customer customer
-     * @param url
-     * @param Array items
+     *
+     * @param  \Magento\Customer\Model\Customer customer
+     * @param  url
+     * @param  Array items
      * @ignore
      */
     public function sendCartActivationEmailToCustomer($customer, $url, $items)
@@ -360,6 +388,7 @@ class Customer extends Data
 
     /**
      * Send error report to merchant
+     *
      * @param Exception exception
      * @param response
      * @param quoteId
@@ -368,7 +397,10 @@ class Customer extends Data
      */
     public function sendCustomerErrorReportToMerchant($exception, $response = "", $quoteId = "", $transactionId = null)
     {
-        $templateOptions = ['area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId()];
+        $templateOptions = [
+            'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
+            'store' => $this->storeManager->getStore()->getId()
+        ];
 
         $from = [
             'name' => $this->scopeConfig->getValue(
@@ -414,14 +446,17 @@ class Customer extends Data
     /**
      * Format Address Data
      *
-     * @param array $contactData
+     * @param  array $contactData
      * @return array
      */
     public function processAddress($contactData)
     {
         $regionId   = null;
         if (isset($contactData['state'])) {
-            $region     = $this->regionFactory->create();      /** @var \Magento\Directory\Model\RegionFactory */
+            /**
+             * @var \Magento\Directory\Model\RegionFactory
+             */
+            $region = $this->regionFactory->create();
             $region->loadByCode($contactData['state'], $this->getDefaultCountry());
             if ($region->getId()) {
                 $regionId   = $region->getId();

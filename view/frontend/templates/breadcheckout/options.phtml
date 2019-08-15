@@ -14,11 +14,10 @@
         {
             "*": {
                 "Bread_BreadCheckout/js/product/options": {
-                    "optionsData": <?= $block->getCustomOptionsData($_options); ?>,
-                    "productType": "<?= $block->getProduct()->getTypeId()?>"
+                    "optionsData": <?= /* @noEscape */ $block->getCustomOptionsData($_options); ?>,
+                    "productType": "<?= /* @noEscape */ $block->getProduct()->getTypeId()?>"
                 }
             }
         }
     </script>
 <?php endif; ?>
-

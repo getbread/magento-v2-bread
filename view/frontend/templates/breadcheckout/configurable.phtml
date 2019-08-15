@@ -1,7 +1,7 @@
 <?php /** @var $this Bread\BreadCheckout\Block\Product\View */ ?>
 <script>
     document.Skus = {};
-    spConfig = <?php /* @noEscape */ echo $block->getJsonConfig(); ?>;
+    spConfig = <?= /* @noEscape */ $block->getJsonConfig(); ?>;
 
 
 
@@ -73,7 +73,12 @@
             };
 
             spConfig.getIdOfSelectedProductOLDVERSION = function(selectedOptions) {
-                //todo: add sentry info log here to determine if/when this is hit
+                var logInfo = {
+                    index: this.index,
+                    attributes: this.attributes,
+                    selected_options: selectedOptions
+                };
+                document.logBreadIssue('info', logInfo, 'Using old version of getIdOfSelectedProduct');
 
                 $.each(this.attributes, function(attrId, attrVal) {
                     var optionId = selectedOptions[attrId];

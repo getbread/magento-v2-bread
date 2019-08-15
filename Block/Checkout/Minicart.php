@@ -37,12 +37,13 @@ class Minicart extends Overview implements ShortcutInterface
 
     /**
      * Minicart constructor.
-     * @param Context $context
+     *
+     * @param Context           $context
      * @param ResolverInterface $localeResolver
-     * @param Session $checkoutSession
-     * @param MethodInterface $payment
-     * @param Data $helperData
-     * @param array $data
+     * @param Session           $checkoutSession
+     * @param MethodInterface   $payment
+     * @param Data              $helperData
+     * @param array             $data
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
@@ -64,8 +65,7 @@ class Minicart extends Overview implements ShortcutInterface
         MethodInterface $payment,
         Data $helperData,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct(
             $context,
             $jsonHelper,
@@ -96,7 +96,7 @@ class Minicart extends Overview implements ShortcutInterface
      */
     public function _toHtml()
     {
-        if($this->isActive()){
+        if ($this->isActive()) {
             return parent::_toHtml();
         }
         return '';
@@ -139,6 +139,6 @@ class Minicart extends Overview implements ShortcutInterface
      */
     private function isCartView()
     {
-        return in_array('checkout_cart_index',$this->getLayout()->getUpdate()->getHandles());
+        return in_array('checkout_cart_index', $this->getLayout()->getUpdate()->getHandles());
     }
 }

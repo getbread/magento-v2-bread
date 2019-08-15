@@ -26,9 +26,10 @@ class SendBreadEmail extends \Magento\Backend\App\Action
 
     /**
      * SendBreadEmail constructor.
-     * @param \Magento\Framework\App\Request\Http $request
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Bread\BreadCheckout\Helper\Quote $helper
+     *
+     * @param \Magento\Framework\App\Request\Http           $request
+     * @param \Magento\Backend\App\Action\Context           $context
+     * @param \Bread\BreadCheckout\Helper\Quote             $helper
      * @param \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
      */
     public function __construct(
@@ -56,7 +57,7 @@ class SendBreadEmail extends \Magento\Backend\App\Action
         try {
             $this->paymentApiClient->sendEmail($cartId, $email, $name);
             $ret['successRows'][] = __('Email was successfully sent to your customer.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $ret['error'] = true;
             $ret['errorRows'][] = __('An error occurred while sending email:');
             $ret['errorRows'][] = $e->getMessage();

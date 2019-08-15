@@ -2,41 +2,48 @@
 /**
  * Handles Checkout Overview Block
  *
- * @copyright   Bread   2016
- * @author      Joel    @Mediotype
- * @author      Miranda @Mediotype
+ * @copyright Bread   2016
+ * @author    Joel    @Mediotype
+ * @author    Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Block\Checkout;
 
 class Overview extends \Bread\BreadCheckout\Block\Product\View
 {
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $quoteHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Customer */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Customer
+     */
     public $customerHelper;
 
-    /** @var \Magento\Framework\Json\Helper\Data */
+    /**
+     * @var \Magento\Framework\Json\Helper\Data
+     */
     public $jsonHelper;
 
     /**
      * Overview constructor.
-     * @param \Magento\Catalog\Block\Product\Context $context
-     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
-     * @param \Bread\BreadCheckout\Helper\Catalog $catalogHelper
-     * @param \Bread\BreadCheckout\Helper\Customer $customerHelper
-     * @param \Bread\BreadCheckout\Helper\Data $dataHelper
-     * @param \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory
+     *
+     * @param \Magento\Catalog\Block\Product\Context                                   $context
+     * @param \Magento\Framework\Json\Helper\Data                                      $jsonHelper
+     * @param \Bread\BreadCheckout\Helper\Catalog                                      $catalogHelper
+     * @param \Bread\BreadCheckout\Helper\Customer                                     $customerHelper
+     * @param \Bread\BreadCheckout\Helper\Data                                         $dataHelper
+     * @param \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory      $configurableProductFactory
      * @param \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory
-     * @param \Bread\BreadCheckout\Helper\Quote $quoteHelper
-     * @param \Magento\Framework\Stdlib\ArrayUtils $arrayUtils
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
-     * @param \Magento\ConfigurableProduct\Helper\Data $configurableHelper
-     * @param \Magento\Catalog\Helper\Product $catalogProductHelper
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData
-     * @param array $data
+     * @param \Bread\BreadCheckout\Helper\Quote                                        $quoteHelper
+     * @param \Magento\Framework\Stdlib\ArrayUtils                                     $arrayUtils
+     * @param \Magento\Framework\Json\EncoderInterface                                 $jsonEncoder
+     * @param \Magento\ConfigurableProduct\Helper\Data                                 $configurableHelper
+     * @param \Magento\Catalog\Helper\Product                                          $catalogProductHelper
+     * @param \Magento\Customer\Helper\Session\CurrentCustomer                         $currentCustomer
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface                        $priceCurrency
+     * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData             $configurableAttributeData
+     * @param array                                                                    $data
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,

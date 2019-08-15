@@ -2,21 +2,27 @@
 /**
  * Helps Integration With Catalog
  *
- * @author  Bread   copyright   2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright   2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Helper;
 
 class Catalog extends Data
 {
-    /** @var \Magento\Catalog\Block\Product\View */
+    /**
+     * @var \Magento\Catalog\Block\Product\View
+     */
     public $productViewBlock;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     public $storeManager;
 
-    /** @var \Magento\Catalog\Api\ProductRepositoryInterfaceFactory  */
+    /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterfaceFactory
+     */
     public $productRepositoryFactory;
 
     public function __construct(
@@ -52,10 +58,10 @@ class Catalog extends Data
     /**
      * Get Formatted Product Data Array
      *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param \Magento\Catalog\Model\Product $baseProduct
-     * @param int $qty
-     * @param null $lineItemPrice
+     * @param  \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $baseProduct
+     * @param  int                            $qty
+     * @param  null                           $lineItemPrice
      * @return array
      */
     public function getProductDataArray(
@@ -67,14 +73,13 @@ class Catalog extends Data
     
         $theProduct     = ($baseProduct == null) ? $product : $baseProduct;
         $skuString      = $this->getSkuString($product, $theProduct);
-        $price          = ($lineItemPrice !== null) ? $lineItemPrice * 100 : ( ( $baseProduct == null ) ?
-                $product->getFinalPrice() : $baseProduct->getFinalPrice() ) * 100;
+        $price          = $this->getPrice($lineItemPrice, $theProduct);
 
         $productData = [
-            'name'      => ( $baseProduct == null ) ? $product->getName() : $baseProduct->getName(),
+            'name'      => $theProduct->getName(),
             'price'     => $price,
             'sku'       => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'].'///'.$skuString),
-            'detailUrl' => ( $baseProduct == null ) ? $product->getProductUrl() : $baseProduct->getProductUrl(),
+            'detailUrl' => $theProduct->getProductUrl(),
             'quantity'  => $qty,
         ];
 
@@ -90,7 +95,7 @@ class Catalog extends Data
      * Get formatted product data for grouped product
      * based on lowest price associated item
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $product
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -99,7 +104,7 @@ class Catalog extends Data
         $grouped = $product->getTypeInstance();
         $associatedProductsCollection = $grouped->getAssociatedProductCollection($product)
             ->addAttributeToSelect('name')
-            ->addAttributeToSort('price','ASC');
+            ->addAttributeToSort('price', 'ASC');
         $item = $associatedProductsCollection->getFirstItem();
 
         $productData = [
@@ -121,8 +126,8 @@ class Catalog extends Data
     /**
      * Return Product SKU Or Formatted SKUs for Products With Options
      *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param \Magento\Catalog\Model\Product $theProduct
+     * @param  \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $theProduct
      * @return string
      */
     protected function getSkuString(
@@ -172,9 +177,38 @@ class Catalog extends Data
     }
 
     /**
+     * Get Price
+     *
+     * @param  null                           $lineItemPrice
+     * @param  \Magento\Catalog\Model\Product $theProduct
+     * @return float
+     */
+    protected function getPrice($lineItemPrice, \Magento\Catalog\Model\Product $theProduct)
+    {
+
+        if ($lineItemPrice !== null) {
+            $price = $lineItemPrice;
+        } else {
+            $price = $theProduct->getFinalPrice();
+
+            // For Bundled and Grouped products, final price comes through as 0, so need to use minimum price instead
+            if (floatval($price) === 0.0) {
+                $price = $theProduct->getMinimalPrice();
+                //If we can't grab the minimal price here, try to grab minimal price from the price model
+                if (!$price) {
+                    $priceModel = $theProduct->getPriceModel();
+                    $price = $priceModel ? $priceModel->getPrices($theProduct)[0] : null;
+                }
+            }
+        }
+
+        return round($price, 2) * 100;
+    }
+
+    /**
      * Get Img Src Value
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $product
      * @return null|string
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -189,7 +223,7 @@ class Catalog extends Data
 
         try {
             return (string) $this->productViewBlock->getImage($product, 'product_small_image')->getImageUrl();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }

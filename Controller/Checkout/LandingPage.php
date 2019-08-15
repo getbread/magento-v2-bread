@@ -4,52 +4,84 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class LandingPage extends \Magento\Framework\App\Action\Action
 {
 
-    /** @var \Magento\Framework\App\Request\Http */
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
     public $request;
 
-    /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
+    /**
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     */
     public $paymentApiClient;
 
-    /** @var \Magento\Customer\Model\Customer */
+    /**
+     * @var \Magento\Customer\Model\Customer
+     */
     public $customer;
 
-    /** @var \Magento\Customer\Model\Session */
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     public $customerSession;
 
-    /** @var \Magento\Checkout\Model\Session */
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     public $checkoutSession;
 
-    /** @var \Magento\Quote\Api\CartRepositoryInterface */
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
     public $quoteRepository;
 
-    /** @var \Magento\Quote\Model\QuoteManagement */
+    /**
+     * @var \Magento\Quote\Model\QuoteManagement
+     */
     public $quoteManagement;
 
-    /** @var \Bread\BreadCheckout\Helper\Checkout */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Checkout
+     */
     public $helper;
 
-    /** @var \Bread\BreadCheckout\Helper\Log */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Log
+     */
     public $logger;
 
-    /** @var \Magento\Customer\Model\CustomerFactory */
+    /**
+     * @var \Magento\Customer\Model\CustomerFactory
+     */
     public $customerFactory;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     public $storeManager;
 
-    /** @var \Magento\Quote\Model\QuoteFactory */
+    /**
+     * @var \Magento\Quote\Model\QuoteFactory
+     */
     public $quoteFactory;
 
-    /** @var \Magento\Checkout\Helper\Cart */
+    /**
+     * @var \Magento\Checkout\Helper\Cart
+     */
     public $cartHelper;
 
-    /** @var \Magento\Sales\Model\Order\Email\Sender\OrderSender */
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
     public $orderSender;
 
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $quoteHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Customer */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Customer
+     */
     public $customerHelper;
 
     public function __construct(
@@ -105,14 +137,12 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         if ($transactionId && $orderRef && !$this->request->getParam("error")) {
             $this->validateBackendOrder($transactionId, $orderRef);
         } else {
-            $this->messageManager->addErrorMessage(__('There was an error with your financing program'));
             $this->_redirect("/");
         }
     }
 
     /**
      * Create Magento Order From Backend Quote
-     *
      */
     public function validateBackendOrder($transactionId, $orderRef)
     {
@@ -125,7 +155,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
                 $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
                 $customer->loadByEmail($data["billingContact"]["email"]);
 
-                if($customer->getId()){
+                if ($customer->getId()) {
                     $this->customerSession->setCustomerAsLoggedIn($customer);
                 }
 
@@ -133,7 +163,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
                 $this->_redirect('checkout/onepage/success');
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['ERROR' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $this->customerHelper->sendCustomerErrorReportToMerchant($e, "", $orderRef, $transactionId);
             $this->messageManager->addErrorMessage(
@@ -143,11 +173,11 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         }
     }
 
-
     /**
      * Process Order Placed From Bread Pop Up
-     * @param $orderRef
-     * @param $data
+     *
+     * @param  $orderRef
+     * @param  $data
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function processBackendOrder($orderRef, $data)
@@ -161,7 +191,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
             $shippingAddress['email'] = $billingAddress['email'];
         }
 
-        $customer = $this->customerHelper->createCustomer($quote,$billingAddress,$shippingAddress,true);
+        $customer = $this->customerHelper->createCustomer($quote, $billingAddress, $shippingAddress, true);
 
         $this->checkoutSession->setBreadTransactionId($data['breadTransactionId']);
 
@@ -182,22 +212,24 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
         try {
             $order = $this->quoteManagement->submit($quote);
-        } catch (\Exception $e) {
-            $this->logger->log([
+        } catch (\Throwable $e) {
+            $this->logger->log(
+                [
                 'ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage(),
                 'TRACE' => $e->getTraceAsString()
-            ]);
+                ]
+            );
             throw $e;
         }
 
         $this->checkoutSession
-             ->setLastQuoteId($quote->getId())
-             ->setLastSuccessQuoteId($quote->getId())
-             ->clearHelperData();
+            ->setLastQuoteId($quote->getId())
+            ->setLastSuccessQuoteId($quote->getId())
+            ->clearHelperData();
 
         try {
             $this->orderSender->send($order);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->critical($e);
             $this->customerSession->setBreadItemAddedToQuote(false);
         }
@@ -208,8 +240,8 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         }
 
         $this->checkoutSession->setLastOrderId($order->getId())
-             ->setLastRealOrderId($order->getIncrementId())
-             ->setLastOrderStatus($order->getStatus());
+            ->setLastRealOrderId($order->getIncrementId())
+            ->setLastOrderStatus($order->getStatus());
         $this->customerSession->setBreadItemAddedToQuote(false);
 
         $cart = $this->cartHelper->getCart();

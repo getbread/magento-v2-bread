@@ -2,15 +2,17 @@
 /**
  * Validate Transaction Total with Quote Total
  *
- * @author  Bread   copyright 2016
- * @author  Dale    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Dale    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Magento\Framework\Json\EncoderInterface */
+    /**
+     * @var \Magento\Framework\Json\EncoderInterface
+     */
     public $jsonEncoder;
 
     public function __construct(
@@ -61,8 +63,10 @@ class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
             if ($this->helper->validateTransactionAmount($params['bread_transaction_id'])) {
                 $result['valid'] = true;
             } else {
-                $errorMsg = __('Your order total does not match the amount authorized by Bread.
-                Please complete checkout again before placing the order.');
+                $errorMsg = __(
+                    'Your order total does not match the amount authorized by Bread.
+                Please complete checkout again before placing the order.'
+                );
             }
         } else {
             $errorMsg = __('Please complete the Bread checkout form before placing the order.');

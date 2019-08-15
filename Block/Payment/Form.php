@@ -3,10 +3,14 @@ namespace Bread\BreadCheckout\Block\Payment;
 
 class Form extends \Magento\Payment\Block\Form
 {
-    /** Admin checkout form template @var string */
+    /**
+     * Admin checkout form template @var string
+     */
     public $_template = 'Bread_BreadCheckout::breadcheckout/info.phtml';
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
     /**
@@ -16,8 +20,7 @@ class Form extends \Magento\Payment\Block\Form
         \Magento\Framework\View\Element\Template\Context $context,
         \Bread\BreadCheckout\Helper\Catalog $helper,
         array $data = []
-    )
-    {
+    ) {
 
         $this->helper = $helper;
         parent::__construct($context, $data);

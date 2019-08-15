@@ -2,51 +2,77 @@
 /**
  * Create Magento Order From Bread Pop Up Order
  *
- * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 {
-    /** @var \Bread\BreadCheckout\Model\Payment\Api\Client */
+    /**
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     */
     public $paymentApiClient;
 
-    /** @var \Magento\Checkout\Model\Session */
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     public $checkoutSession;
 
-    /** @var \Magento\Checkout\Helper\Cart */
+    /**
+     * @var \Magento\Checkout\Helper\Cart
+     */
     public $cartHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Log */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Log
+     */
     public $logger;
 
-    /** @var \Magento\Framework\Message\ManagerInterface */
+    /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
     public $messageManager;
 
-    /** @var \Magento\Framework\Controller\Result\RedirectFactory */
+    /**
+     * @var \Magento\Framework\Controller\Result\RedirectFactory
+     */
     public $resultRedirectFactory;
 
-    /** @var \Magento\Customer\Model\Session */
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     public $customerSession;
 
-    /** @var \Magento\Quote\Model\QuoteManagement */
+    /**
+     * @var \Magento\Quote\Model\QuoteManagement
+     */
     public $quoteManagement;
 
-    /** @var \Magento\Catalog\Model\ProductFactory */
+    /**
+     * @var \Magento\Catalog\Model\ProductFactory
+     */
     public $catalogProductFactory;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     public $storeManager;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $helper;
 
-    /** @var \Bread\BreadCheckout\Helper\Customer */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Customer
+     */
     public $customerHelper;
 
-    /** @var \Magento\Sales\Model\Order\Email\Sender\OrderSender */
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
     public $orderSender;
 
     public function __construct(
@@ -108,23 +134,28 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $token = $this->getRequest()->getParam('token');
             if ($token) {
-                $this->logger->log([
+                $this->logger->log(
+                    [
                     'VALIDATE ORDER TOKEN' => $token,
-                ]);
+                    ]
+                );
                 $data = $this->paymentApiClient->getInfo($token);
                 $this->processOrder($data);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $errorMessage = $e->getMessage();
 
             $this->logger->log(['MESSAGE' => $errorMessage]);
 
-            //TODO: rewrite this when API is updated to better handle errors, instead of searching through error message string
+            //TODO: rewrite this when API is updated to better handle errors, instead of searching
+            //TODO: through error message string
 
-            $isNotSplitPayDecline = strpos($errorMessage, "The credit/debit card portion of your transaction was declined.") === false;
+            $partOfDeclineMessage = "The credit/debit card portion of your transaction was declined.";
+            $isNotSplitPayDecline = strpos($errorMessage, $partOfDeclineMessage) === false;
 
             if ($isNotSplitPayDecline) {
-                $errorMessage .= ' Try to checkout by going through the standard checkout process and selecting Pay Over Time as your payment method.';
+                $errorMessage .= ' Try to checkout by going through the standard checkout process and'
+                    . ' selecting Pay Over Time as your payment method.';
             }
 
             $this->messageManager->addErrorMessage(
@@ -142,7 +173,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     /**
      * Process Order Placed From Bread Pop Up
      *
-     * @param $data
+     * @param  $data
      * @throws \Exception
      */
     protected function processOrder($data)
@@ -220,10 +251,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         $quote->getPayment()->importData(['method' => 'breadcheckout']);
         $quote->getPayment()->setTransactionId($data['breadTransactionId']);
         $quote->getPayment()->setAdditionalData('BREAD CHECKOUT DATA', json_encode($data));
-        
+
         try {
             $order = $this->quoteManagement->submit($quote);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage()]);
             throw $e;
         }
@@ -233,9 +264,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             ->setLastSuccessQuoteId($quote->getId())
             ->clearHelperData();
 
+
         try {
             $this->orderSender->send($order);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $this->customerSession->setBreadItemAddedToQuote(false);
         }

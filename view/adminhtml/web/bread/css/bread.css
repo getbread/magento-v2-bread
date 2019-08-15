@@ -3,3 +3,7 @@
     position: relative;
     padding-top: 10px;
 }
+
+.admin__payment-method-wrapper {
+    width: 75%;
+}

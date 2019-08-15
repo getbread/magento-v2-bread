@@ -2,20 +2,26 @@
 /**
  * Get updated shipping, billing, and shipping option data
  *
- * @author  Bread   copyright 2016
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
 class ConfigData extends \Magento\Framework\App\Action\Action
 {
-    /** @var \Bread\BreadCheckout\Helper\Quote */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
     public $quoteHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Customer */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Customer
+     */
     public $customerHelper;
 
-    /** @var \Bread\BreadCheckout\Helper\Data */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
     public $dataHelper;
 
     public function __construct(
@@ -43,8 +49,8 @@ class ConfigData extends \Magento\Framework\App\Action\Action
     {
         // @codingStandardsIgnoreStart
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
-            'shippingContact' => ($this->dataHelper->isHealthcare()) ? false : $this->quoteHelper->getShippingAddressData(),
-            'billingContact' => ($this->dataHelper->isHealthcare())? false : $this->getBillingAddressData()
+            'shippingContact' => $this->quoteHelper->getShippingAddressData(),
+            'billingContact' => $this->getBillingAddressData()
         ]);
         // @codingStandardsIgnoreEnd
     }

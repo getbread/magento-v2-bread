@@ -2,48 +2,72 @@
 /**
  * Handles Checking Out From The Product Page
  *
- * @author  Bread   copyright 2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @author Bread   copyright 2016
+ * @author Joel    @Mediotype
+ * @author Miranda @Mediotype
  */
 namespace Bread\BreadCheckout\Controller;
 
 abstract class Checkout extends \Magento\Framework\App\Action\Action
 {
-    /** @var \Magento\Catalog\Model\ResourceModel\ProductFactory */
+    /**
+     * @var \Magento\Catalog\Model\ResourceModel\ProductFactory
+     */
     public $catalogResourceModelProductFactory;
     
-    /** @var \Magento\Framework\DataObjectFactory */
+    /**
+     * @var \Magento\Framework\DataObjectFactory
+     */
     public $dataObjectFactory;
 
-    /** @var \Magento\Checkout\Model\Cart */
+    /**
+     * @var \Magento\Checkout\Model\Cart
+     */
     public $checkoutSession;
 
-    /** @var \Magento\Quote\Model\QuoteFactory */
+    /**
+     * @var \Magento\Quote\Model\QuoteFactory
+     */
     public $quoteFactory;
 
-    /** @var \Magento\Catalog\Model\ProductFactory */
+    /**
+     * @var \Magento\Catalog\Model\ProductFactory
+     */
     public $catalogProductFactory;
 
-    /** @var \Bread\BreadCheckout\Helper\Log */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Log
+     */
     public $logger;
 
-    /** @var \Bread\BreadCheckout\Helper\Checkout */
+    /**
+     * @var \Bread\BreadCheckout\Helper\Checkout
+     */
     public $helper;
 
-    /** @var \Magento\Framework\Controller\ResultFactory */
+    /**
+     * @var \Magento\Framework\Controller\ResultFactory
+     */
     public $resultFactory;
 
-    /** @var \Magento\Quote\Model\Quote\TotalsCollector */
+    /**
+     * @var \Magento\Quote\Model\Quote\TotalsCollector
+     */
     public $totalsCollector;
 
-    /** @var \Magento\Quote\Api\CartRepositoryInterface */
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
     public $quoteRepository;
 
-    /** @var \Magento\Customer\Model\Session */
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     public $customerSession;
 
-    /** @var \Magento\Quote\Model\QuoteManagement */
+    /**
+     * @var \Magento\Quote\Model\QuoteManagement
+     */
     public $quoteManagement;
 
     public function __construct(
@@ -79,11 +103,11 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /**
      * Add Item To Quote
      *
-     * @param \Magento\Quote\Model\Quote $quote
-     * @param \Magento\Catalog\Model\Product $product
-     * @param \Magento\Catalog\Model\Product $baseProduct
-     * @param array $customOptionPieces
-     * @param $quantity
+     * @param  \Magento\Quote\Model\Quote     $quote
+     * @param  \Magento\Catalog\Model\Product $product
+     * @param  \Magento\Catalog\Model\Product $baseProduct
+     * @param  array                          $customOptionPieces
+     * @param  $quantity
      * @throws \Magento\Framework\Exception\LocalizedException
      *
      * @return void
@@ -102,7 +126,9 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $buyInfo            = ['qty' =>  $quantity];
 
         if ($baseProductId != $productId) {
-        /** @var $catalogResource \Magento\Catalog\Model\ResourceModel\ProductFactory */
+            /**
+             * @var $catalogResource \Magento\Catalog\Model\ResourceModel\ProductFactory
+             */
             $catalogResource            = $this->catalogResourceModelProductFactory->create();
             $options                    = [];
             $productAttributeOptions    = $baseProduct
@@ -125,7 +151,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         }
 
         if (!empty($buyRequest['bundle_option'])) {
-            $bundleOptionQty = isset($buyRequest['bundle_option_qty']) ? $buyRequest['bundle_option_qty'] : array();
+            $bundleOptionQty = isset($buyRequest['bundle_option_qty']) ? $buyRequest['bundle_option_qty'] : [];
             $buyInfo['product']                     = $baseProductId;
             $buyInfo['selected_configurable_option']= $buyRequest['selected_configurable_option'];
             $buyInfo['related_product']             = $buyRequest['related_product'];
@@ -192,8 +218,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      * Compare selected option ID or SKU to current option
      * in loop
      *
-     * @param $optionData
-     * @param $optionValue
+     * @param  $optionData
+     * @param  $optionValue
      * @return bool
      */
     protected function compareOptions($optionData, $optionValue)
@@ -208,7 +234,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /**
      * Collect Totals Tax and Shipping Estimate Actions
      *
-     * @param array $data
+     * @param  array $data
      * @return \Magento\Quote\Model\Quote\Address
      */
     protected function getShippingAddressForQuote(array $data)
@@ -216,14 +242,14 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         try {
             $quote      = $this->getQuote($data);
 
-            if($quote->getIsVirtual()){
+            if ($quote->getIsVirtual()) {
                 return $quote->getBillingAddress();
             }
 
             $address    = $quote->getShippingAddress();
 
             $regionId   = $address->getRegionModel()
-                ->loadByCode($data['state'],$this->helper->getDefaultCountry())
+                ->loadByCode($data['state'], $this->helper->getDefaultCountry())
                 ->getId();
 
             $address->setCountryId($this->helper->getDefaultCountry())
@@ -244,18 +270,20 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             $this->quoteRepository->save($quote);
 
             return $address;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(),'TRACE' => $e->getTraceAsString()]);
-            return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData([
+            return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(
+                [
                 'result' => ['error' => 1, 'text'  => 'Internal error']
-            ]);
+                ]
+            );
         }
     }
 
     /**
      * Get existing or generate new quote from supplied data
      *
-     * @param array $data
+     * @param  array $data
      * @return \Magento\Quote\Model\Quote
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -268,7 +296,6 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
             case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW:
                 $quote      = $this->checkoutSession->getQuote();
                 break;
-
             case \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW:
                 $removeItems = true;
 
@@ -291,14 +318,13 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
                 if (!$this->customerSession->getBreadItemAddedToQuote() || !$quote->getAllVisibleItems()) {
 
-                    if(array_key_exists('product_type',$data) &&
-                        $data['product_type'] === \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
-                    ){
-                        $this->processGroupedItems($quote,$data);
+                    if (array_key_exists('product_type', $data)
+                        && $data['product_type'] === \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
+                    ) {
+                        $this->processGroupedItems($quote, $data);
                     } else {
                         $this->processOrderItem($quote, $data);
                     }
-
                 }
                 break;
         }
@@ -312,8 +338,8 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     /**
      * Add product to quote when checking out from product view page
      *
-     * @param $quote
-     * @param array $data
+     * @param  $quote
+     * @param  array $data
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function processOrderItem($quote, array $data)
@@ -321,7 +347,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         $selectedProductId  = $data['selected_simple_product_id'];
         $mainProductId      = $data['main_product_id'];
         $customOptionPieces = explode('***', $data['selected_sku']);
-        $buyRequest         = array();
+        $buyRequest         = [];
 
         if (isset($data['buy_request'])) {
             parse_str($data['buy_request'], $buyRequest);
@@ -339,13 +365,13 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
      * Add product to quote when checking out from product view page with grouped product
      *
      * @param $quote \Magento\Quote\Model\Quote
-     * @param array $data
+     * @param array                            $data
      */
-    protected function processGroupedItems($quote,array $data)
+    protected function processGroupedItems($quote, array $data)
     {
-        foreach ($data['items'] as $item){
-            $simpleProduct = $this->catalogProductFactory->create()->loadByAttribute('sku',$item['sku']);
-            $this->addItemToQuote($quote,$simpleProduct,$simpleProduct,[],[],$item['quantity']);
+        foreach ($data['items'] as $item) {
+            $simpleProduct = $this->catalogProductFactory->create()->loadByAttribute('sku', $item['sku']);
+            $this->addItemToQuote($quote, $simpleProduct, $simpleProduct, [], [], $item['quantity']);
         }
         $this->customerSession->setBreadItemAddedToQuote(true);
     }
