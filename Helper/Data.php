@@ -68,9 +68,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/bread_advanced/threshold_amount';
     const XML_CONFIG_AUTO_CANCEL                    = 'payment/breadcheckout/split_auto_cancel';
 
-    const XML_CONFIG_ENABLE_CART_SIZE_FINANCING     = 'payment/breadcheckout/bread_advanced/cart_size_targeted_financing';
-    const XML_CONFIG_CART_SIZE_THRESHOLD            = 'payment/breadcheckout/bread_advanced/cart_threshold';
-    const XML_CONFIG_CART_SIZE_FINANCING_ID         = 'payment/breadcheckout/bread_advanced/cart_size_financing_program_id';
+    const XML_CONFIG_ENABLE_TARGETED_FINANCING      = 'payment/breadcheckout/bread_advanced/targeted_financing';
+    const XML_CONFIG_TARGETED_FINANCING_ID          = 'payment/breadcheckout/bread_advanced/financing_program_id';
+    const XML_CONFIG_FINANCING_THRESHOLD            = 'payment/breadcheckout/bread_advanced/financing_threshold';
+    const XML_CONFIG_FINANCING_SKU                  = 'payment/breadcheckout/bread_advanced/financing_sku';
+
 
     const XML_CONFIG_CATEGORY_GROUP                 = 'payment/breadcheckout/bread_category';
     const XML_CONFIG_CAT_AS_LOW_AS                  = 'payment/breadcheckout/bread_category/as_low_as';
@@ -578,20 +580,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return bool
      */
-    public function isCartSizeTargetedFinancing($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function isTargetedFinancing($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool) ($this->isActive($store)
-            && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_CART_SIZE_FINANCING, $store));
-    }
-
-    /**
-     * Get cart size over which targeted financing is enabled
-     *
-     * @return string
-     */
-    public function getCartSizeThreshold($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_CART_SIZE_THRESHOLD, $store);
+            && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store));
     }
 
     /**
@@ -599,9 +591,44 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getCartSizeFinancingId($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getFinancingId($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_CART_SIZE_FINANCING_ID, $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_TARGETED_FINANCING_ID, $store);
+    }
+
+    /**
+     * Get cart size over which targeted financing is enabled
+     *
+     * @return string
+     */
+    public function getTargetedFinancingThreshold($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store);
+    }
+
+    /**
+     * Return list of SKU's for which financing is enabled
+     *
+     * @param string $store
+     * @return array
+     */
+    public function getTargetedFinancingSku($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store);
+        $list = preg_replace('/\s/', '', $list);
+
+        return explode(',',$list);
+    }
+
+    /**
+     * Return financing mode
+     *
+     * @param string $store
+     * @return int
+     */
+    public function getTargetedFinancingMode($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        return (int)$this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING,$store);
     }
 
     /**
@@ -740,12 +767,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getCartSizeFinancingData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getFinancingData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return [
-            "enabled" => $this->isCartSizeTargetedFinancing($store),
-            "id" => $this->getCartSizeFinancingId($store),
-            "threshold" => $this->getCartSizeThreshold(),
+            "enabled" => $this->isTargetedFinancing($store),
+            "mode" => $this->getTargetedFinancingMode($store),
+            "id" => $this->getFinancingId($store),
+            "threshold" => $this->getTargetedFinancingThreshold($store),
+            "sku_limit" => $this->getTargetedFinancingSku($store)
         ];
     }
 

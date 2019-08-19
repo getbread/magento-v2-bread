@@ -27,7 +27,7 @@
             var billingAddress      = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var cartSizeFinancing   = <?= /* @noEscape */ $block->getCartSizeFinancingJson(); ?>;
+            var isFinancing         = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var total = 0;
             for (var i = 0; i < items.length; i++) {
                 total += items[i]['price'] * items[i]['quantity'];
@@ -189,13 +189,15 @@
                 breadConfig.actAsLabel = false;
             }
 
-            if(cartSizeFinancing.enabled){
-                var cartSizeFinancingId = cartSizeFinancing.id;
-                var cartSizeThreshold = cartSizeFinancing.threshold;
-                var items = document.defaultItems;
+            <?php if($block->isTargetedFinancing() && $block->getTargetedFinancingMode() === 1):?>
+                var cartSizeFinancingId = isFinancing.id;
+                var cartSizeThreshold = isFinancing.threshold;
+                var items = document.minicartItems;
                 var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            }
+            <?php elseif ($block->isTargetedFinancing() && $block->getTargetedFinancingMode() === 2 && $block->isFinancingBySku()):?>
+                breadConfig.financingProgramId = isFinancing.id;
+            <?php endif;?>
 
             var discountAmount =- document.round(window.checkoutConfig.totalsData.discount_amount);
             if (discountAmount > 0) {
