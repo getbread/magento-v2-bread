@@ -391,11 +391,12 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /**
      * Wrapper for get financing mode
      *
+     * @param string $mode
      * @return int
      */
-    public function getTargetedFinancingMode()
+    public function checkFinancingMode($mode)
     {
-        return $this->dataHelper->getTargetedFinancingMode();
+        return $this->dataHelper->checkFinancingMode($mode);
     }
 
     /**

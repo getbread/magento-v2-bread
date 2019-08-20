@@ -501,7 +501,7 @@ class Quote extends Data
     public function isFinancingBySku()
     {
         $quote = $this->getSessionQuote();
-        $financingAllowedSkus = $this->getTargetedFinancingSku();
+        $financingAllowedSkus = $this->getTargetedFinancingSkus();
 
         $items = $quote->getAllItems();
         $allowed = [];

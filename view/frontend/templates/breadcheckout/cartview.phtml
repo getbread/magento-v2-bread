@@ -189,13 +189,13 @@
                 breadConfig.actAsLabel = false;
             }
 
-            <?php if($block->isTargetedFinancing() && $block->getTargetedFinancingMode() === 1):?>
+            <?php if($block->isTargetedFinancing() && $block->checkFinancingMode('cart')):?>
                 var cartSizeFinancingId = isFinancing.id;
                 var cartSizeThreshold = isFinancing.threshold;
                 var items = document.minicartItems;
                 var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            <?php elseif ($block->isTargetedFinancing() && $block->getTargetedFinancingMode() === 2 && $block->isFinancingBySku()):?>
+            <?php elseif ($block->isTargetedFinancing() && $block->checkFinancingMode('sku') && $block->isFinancingBySku()):?>
                 breadConfig.financingProgramId = isFinancing.id;
             <?php endif;?>
 

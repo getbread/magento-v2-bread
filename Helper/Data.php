@@ -612,7 +612,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $store
      * @return array
      */
-    public function getTargetedFinancingSku($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getTargetedFinancingSkus($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store);
         $list = preg_replace('/\s/', '', $list);
@@ -623,12 +623,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Return financing mode
      *
+     * @param string $mode
      * @param string $store
      * @return int
      */
-    public function getTargetedFinancingMode($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function checkFinancingMode($mode, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (int)$this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING,$store);
+        $configVal = (int)$this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store);
+        $output = null;
+
+        switch ($mode){
+            case 'cart':
+                $output = ($configVal === 1);
+                break;
+            case 'sku':
+                $output = ($configVal === 2);
+                break;
+        }
+
+        return $output;
     }
 
     /**
@@ -771,10 +784,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return [
             "enabled" => $this->isTargetedFinancing($store),
-            "mode" => $this->getTargetedFinancingMode($store),
+            "mode" => ['cart'=>$this->checkFinancingMode('cart'), 'sku'=>$this->checkFinancingMode('sku')],
             "id" => $this->getFinancingId($store),
             "threshold" => $this->getTargetedFinancingThreshold($store),
-            "sku_limit" => $this->getTargetedFinancingSku($store)
+            "sku_limit" => $this->getTargetedFinancingSkus($store)
         ];
     }
 

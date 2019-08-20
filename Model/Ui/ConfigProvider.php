@@ -57,7 +57,7 @@ class ConfigProvider implements ConfigProviderInterface
                         'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,
                         'items' => $this->helper->getQuoteItemsData(),
                         'discounts' => $this->helper->getDiscountData(),
-                        'isFinancing' => $this->helper->getFinancingData(),
+                        'financingInfo' => $this->helper->getFinancingData(),
                         'financingBySkuAllowed' => $this->helper->isFinancingBySku(),
                         'asLowAs' => $this->helper->isAsLowAs(),
                         'paymentUrl' => $this->helper->getPaymentUrl(),

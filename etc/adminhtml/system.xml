@@ -240,7 +240,13 @@
                     </field>
                     <field id="financing_sku" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Allow financing on SKU</label>
-                        <comment>Comma separated list of SKU on which targeted financing will be used</comment>
+                        <comment>
+                            <![CDATA[
+				                <div>
+				                    <p>Comma separated list of SKU on which targeted financing will be used (example: <strong>sku1,sku2,sku3</strong>)</p>
+				                </div>
+				            ]]>
+                            </comment>
                         <validate>required-entry</validate>
                         <depends>
                             <field id="targeted_financing">2</field>

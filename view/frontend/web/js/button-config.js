@@ -67,9 +67,9 @@ define(
                     this.breadConfig.items = data.items;
                 }
 
-                if (data.isFinancing.enabled && data.isFinancing.mode === 1) {
-                    var cartSizeFinancingId = data.isFinancing.id;
-                    var cartSizeThreshold = data.isFinancing.threshold;
+                if (data.financingInfo.enabled && data.financingInfo.mode.cart) {
+                    var cartSizeFinancingId = data.financingInfo.id;
+                    var cartSizeThreshold = data.financingInfo.threshold;
                     var items = data.items;
                     var itemsPriceSum = items.reduce(
                         function (sum, item) {
@@ -77,8 +77,8 @@ define(
                         }, 0
                     ) / 100;
                     this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-                } else if(data.isFinancing.enabled && data.isFinancing.mode === 2 && data.financingBySkuAllowed){
-                    this.breadConfig.financingProgramId = data.isFinancing.id;
+                } else if(data.financingInfo.enabled && data.financingInfo.mode.sku && data.financingBySkuAllowed){
+                    this.breadConfig.financingProgramId = data.financingInfo.id;
                 }
 
                 if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
