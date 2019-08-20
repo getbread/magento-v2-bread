@@ -33,6 +33,11 @@ class Category extends \Magento\Framework\View\Element\Template
     private $moduleList;
 
     /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
+    private $quoteHelper;
+
+    /**
      * Category constructor.
      *
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -41,6 +46,7 @@ class Category extends \Magento\Framework\View\Element\Template
      * @param \Bread\BreadCheckout\Helper\Catalog              $catalogHelper
      * @param \Magento\Framework\Module\ModuleListInterface    $moduleList
      * @param \Magento\Framework\Json\Helper\Data              $jsonHelper
+     * @param \Bread\BreadCheckout\Helper\Quote                $quoteHelper
      * @param array                                            $data
      */
     public function __construct(
@@ -50,6 +56,7 @@ class Category extends \Magento\Framework\View\Element\Template
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -58,14 +65,16 @@ class Category extends \Magento\Framework\View\Element\Template
         $this->catalogHelper  = $catalogHelper;
         $this->jsonHelper     = $jsonHelper;
         $this->moduleList     = $moduleList;
+        $this->quoteHelper    = $quoteHelper;
     }
 
     public function _toHtml()
     {
         $output = '';
-        if ($this->categoryHelper->aboveThreshold(
-            $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
-        )
+        $product = $this->getProduct();
+
+        if ($this->categoryHelper->aboveThreshold($product->getPriceInfo()->getPrice('final_price')->getValue())
+            && !$this->quoteHelper->checkDisabledForSku($product->getSku(),false)
         ) {
             $output = parent::_toHtml();
         }

@@ -43,6 +43,11 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public $customerHelper;
 
     /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
+    public $quoteHelper;
+
+    /**
      * Bundle constructor.
      *
      * @param \Magento\Catalog\Block\Product\Context     $context
@@ -55,6 +60,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      * @param \Magento\Framework\Json\EncoderInterface   $jsonEncoder
      * @param \Magento\Bundle\Model\Product\PriceFactory $productPrice
      * @param \Magento\Framework\Locale\FormatInterface  $localeFormat
+     * @param \Bread\BreadCheckout\Helper\Quote          $quoteHelper
      * @param array                                      $data
      */
     public function __construct(
@@ -68,6 +74,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Magento\Bundle\Model\Product\PriceFactory $productPrice,
         \Magento\Framework\Locale\FormatInterface $localeFormat,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         array $data = []
     ) {
         $this->registry = $context->getRegistry();
@@ -76,6 +83,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         $this->customerHelper = $customerHelper;
         $this->dataHelper = $dataHelper;
         $this->catalogProduct = $catalogProduct;
+        $this->quoteHelper = $quoteHelper;
 
         parent::__construct(
             $context,
@@ -93,9 +101,10 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         $aboveThreshold = $this->dataHelper->aboveThreshold(
             $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
         );
+        $disabledSku = !$this->quoteHelper->checkDisabledForSku($this->getProduct()->getSku(),false);
 
         $output = '';
-        if ($aboveThreshold) {
+        if ($aboveThreshold && $disabledSku) {
             $output = parent::toHtml();
         }
 

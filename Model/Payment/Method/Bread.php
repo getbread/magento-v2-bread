@@ -498,6 +498,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             return false;
         }
 
+        if($this->quoteHelper->checkDisabledForSku('',true)){
+            return false;
+        }
+
         if (!$quote->getBreadTransactionId()) {
             return true;
         }

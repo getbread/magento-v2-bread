@@ -82,6 +82,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
             $currentCustomer,
             $priceCurrency,
             $configurableAttributeData,
+            $quoteHelper,
             $data
         );
     }
@@ -117,8 +118,9 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     {
 
         $aboveThreshold = $this->quoteHelper->aboveThreshold($this->quoteHelper->getSessionQuote()->getGrandTotal());
+        $disabledSkus = !$this->quoteHelper->checkDisabledForSku('',true);
 
-        if ($this->quoteHelper->isEnabledOnCOP() && $aboveThreshold) {
+        if ($this->quoteHelper->isEnabledOnCOP() && $aboveThreshold && $disabledSkus) {
             return parent::_toHtml();
         }
 

@@ -281,6 +281,10 @@
                         ]]>
                         </comment>
                     </field>
+                    <field id="disabled_skus" type="textarea" sortOrder="10" translate="label" showInStore="1" showInWebsite="1" showInDefault="1">
+                        <label>Disable bread checkout for skus</label>
+                        <comment><![CDATA[<div><p>Enter sku list separated by comma with skus of products for which bread checkout should not be used or available</p></div>]]></comment>
+                    </field>
                 </group>
 
                 <group id="bread_category" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
