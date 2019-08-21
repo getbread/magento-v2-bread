@@ -264,14 +264,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             ->setLastSuccessQuoteId($quote->getId())
             ->clearHelperData();
 
-
-        try {
-            $this->orderSender->send($order);
-        } catch (\Throwable $e) {
-            $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
-            $this->customerSession->setBreadItemAddedToQuote(false);
-        }
-
         if ($customer->getId()) {
             $this->customerSession->setCustomerAsLoggedIn($customer);
         }
