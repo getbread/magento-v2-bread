@@ -109,7 +109,7 @@ class Catalog extends Data
 
         $productData = [
             'name'      => $item->getName(),
-            'price'     => $item->getFinalPrice() * 100,
+            'price'     => round($item->getFinalPrice() * 100),
             'sku'       => $item->getSku(),
             'detailUrl' => $item->getProductUrl(),
             'quantity'  => 1,
@@ -202,7 +202,7 @@ class Catalog extends Data
             }
         }
 
-        return round($price, 2) * 100;
+        return round($price * 100);
     }
 
     /**

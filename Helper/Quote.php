@@ -99,7 +99,7 @@ class Quote extends Data
             $grandTotal = $quote->getGrandTotal();
         }
 
-        return $grandTotal * 100;
+        return round($grandTotal * 100);
     }
 
     /**
@@ -124,7 +124,7 @@ class Quote extends Data
             $taxAmount = $quote->getShippingAddress()->getTaxAmount();
         }
 
-        return $taxAmount * 100;
+        return round($taxAmount * 100);
     }
 
     /**
@@ -337,7 +337,7 @@ class Quote extends Data
 
         return ['type'   => $shippingAddress->getShippingDescription(),
                 'typeId' => $shippingAddress->getShippingMethod(),
-                'cost'   => $shippingAddress->getShippingAmount() * 100];
+                'cost'   => round($shippingAddress->getShippingAmount() * 100)];
     }
 
     /**
