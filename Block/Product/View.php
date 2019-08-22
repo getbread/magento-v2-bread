@@ -178,9 +178,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return string
      */
-    public function getCartSizeFinancingJson()
+    public function getFinancingJson()
     {
-        $data     = $this->catalogHelper->getCartSizeFinancingData();
+        $data     = $this->catalogHelper->getFinancingData();
         return $this->jsonEncode($data);
     }
 
@@ -363,9 +363,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return bool
      */
-    public function isCartSizeTargetedFinancing()
+    public function isTargetedFinancing()
     {
-        return $this->dataHelper->isCartSizeTargetedFinancing();
+        return $this->dataHelper->isTargetedFinancing();
     }
 
     /**
@@ -373,9 +373,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return string
      */
-    public function getCartSizeThreshold()
+    public function getTargetedFinancingThreshold()
     {
-        return $this->dataHelper->getCartSizeThreshold();
+        return $this->dataHelper->getTargetedFinancingThreshold();
     }
 
     /**
@@ -383,9 +383,20 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return string
      */
-    public function getCartSizeFinancingId()
+    public function getFinancingId()
     {
-        return $this->dataHelper->getCartSizeFinancingId();
+        return $this->dataHelper->getFinancingId();
+    }
+
+    /**
+     * Wrapper for get financing mode
+     *
+     * @param string $mode
+     * @return int
+     */
+    public function checkFinancingMode($mode)
+    {
+        return $this->dataHelper->checkFinancingMode($mode);
     }
 
     /**

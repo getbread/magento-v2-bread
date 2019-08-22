@@ -21,7 +21,7 @@
         document.configureButton = function (items) {
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var cartSizeFinancing   = <?= /* @noEscape */ $block->getCartSizeFinancingJson(); ?>;
+            var financingInfo       = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var total = 0;
             for(var i = 0; i < items.length; i++){
                 total += items[i]['price'] * items[i]['quantity'];
@@ -188,11 +188,16 @@
                 breadConfig.actAsLabel = false;
             }
 
-            if(cartSizeFinancing.enabled){
-                var cartSizeFinancingId = cartSizeFinancing.id;
-                var cartSizeThreshold = cartSizeFinancing.threshold;
+            if(financingInfo.enabled && financingInfo.mode.cart){
+                var cartSizeFinancingId = financingInfo.id;
+                var cartSizeThreshold = financingInfo.threshold;
                 var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity }, 0) / 100;
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+            } else if(financingInfo.enabled && financingInfo.mode.sku){
+                var productSku = "<?= $block->getProduct()->getSku(); ?>";
+                if(financingInfo.sku_limit.includes(productSku) === true){
+                    breadConfig.financingProgramId = financingInfo.id;
+                }
             }
 
             var configDataUrl = '<?= /* @noEscape */ $block->getConfigDataUrl(); ?>';

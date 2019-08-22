@@ -323,9 +323,9 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      *
      * @return string
      */
-    public function getCartSizeFinancingJson()
+    public function getFinancingJson()
     {
-        $data     = $this->catalogHelper->getCartSizeFinancingData();
+        $data     = $this->catalogHelper->getFinancingData();
         return $this->jsonEncode($data);
     }
 

@@ -67,9 +67,9 @@ define(
                     this.breadConfig.items = data.items;
                 }
 
-                if (data.cartSizeFinancing.enabled) {
-                    var cartSizeFinancingId = data.cartSizeFinancing.id;
-                    var cartSizeThreshold = data.cartSizeFinancing.threshold;
+                if (data.financingInfo.enabled && data.financingInfo.mode.cart) {
+                    var cartSizeFinancingId = data.financingInfo.id;
+                    var cartSizeThreshold = data.financingInfo.threshold;
                     var items = data.items;
                     var itemsPriceSum = items.reduce(
                         function (sum, item) {
@@ -77,6 +77,8 @@ define(
                         }, 0
                     ) / 100;
                     this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+                } else if(data.financingInfo.enabled && data.financingInfo.mode.sku && data.financingBySkuAllowed){
+                    this.breadConfig.financingProgramId = data.financingInfo.id;
                 }
 
                 if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {

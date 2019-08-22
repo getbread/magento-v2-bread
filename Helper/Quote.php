@@ -42,6 +42,8 @@ class Quote extends Data
      */
     public $paymentApiClient;
 
+    public $productRepository;
+
     /**
      * Quote constructor.
      *
@@ -55,6 +57,7 @@ class Quote extends Data
      * @param \Magento\Sales\Model\AdminOrder\Create            $orderCreateModel
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param \Bread\BreadCheckout\Model\Payment\Api\Client     $paymentApiClient
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -66,13 +69,15 @@ class Quote extends Data
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
+        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->helperCatalog = $helperCatalog;
         $this->orderCreateModel = $orderCreateModel;
         $this->priceCurrency = $priceCurrency;
         $this->paymentApiClient = $paymentApiClient;
+        $this->productRepository = $productRepository;
 
         parent::__construct(
             $helperContext,
@@ -485,5 +490,43 @@ class Quote extends Data
         }
 
         return true;
+    }
+
+    /**
+     * Check if items in quote match
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isFinancingBySku()
+    {
+        $quote = $this->getSessionQuote();
+        $financingAllowedSkus = $this->getTargetedFinancingSkus();
+
+        $items = $quote->getAllItems();
+        $allowed = [];
+
+        /** @var \Magento\Quote\Model\Quote\Item $item */
+        foreach ($items as $item){
+            $parentItem = $item->getParentItem();
+
+            if(!$parentItem && ($item->getProductType() === 'configurable' || $item->getProductType() === 'bundle')){
+                continue;
+            } else if($parentItem){
+
+                $product = $this->productRepository->getById($parentItem->getProduct()->getId());
+                if(in_array($product->getSku(),$financingAllowedSkus)){
+                    $allowed[$product->getSku()] = true;
+                }
+
+            } else {
+                if(in_array($item->getSku(),$financingAllowedSkus)){
+                    $allowed[$item->getSku()] = true;
+                }
+            }
+        }
+
+        return $quote->getItemsCount() === count($allowed);
+
     }
 }
