@@ -188,7 +188,7 @@
                 breadConfig.actAsLabel = false;
             }
 
-            if(isFinancing.enabled && isFinancing.mode.cart){
+            if(financingInfo.enabled && financingInfo.mode.cart){
                 var cartSizeFinancingId = financingInfo.id;
                 var cartSizeThreshold = financingInfo.threshold;
                 var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity }, 0) / 100;

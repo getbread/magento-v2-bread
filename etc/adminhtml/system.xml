@@ -231,7 +231,7 @@
                         </depends>
                     </field>
                     <field id="financing_threshold" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Cart Size Threshold</label>
+                        <label>Targeted Financing Threshold</label>
                         <comment>Cart Size (USD) over which a targeted financing program will be used</comment>
                         <validate>validate-number required-entry</validate>
                         <depends>
