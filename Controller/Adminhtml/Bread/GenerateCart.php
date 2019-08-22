@@ -88,7 +88,7 @@ class GenerateCart extends \Magento\Backend\App\Action
             if (!$this->helper->isHealthcare()) {
                 $arr['options']['items'] = $this->helper->getQuoteItemsData();
             } else {
-                $arr['options']['customTotal'] = $quote->getGrandTotal() * 100;
+                $arr['options']['customTotal'] = round($quote->getGrandTotal() * 100);
             }
 
             $arr['options']['discounts'] = $this->helper->getDiscountData() ? $this->helper->getDiscountData() : [];

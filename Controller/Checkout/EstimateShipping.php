@@ -95,7 +95,7 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
                     $methods[] = [
                         'type'   => $rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle(),
                         'typeId' => $rate->getCode(),
-                        'cost'   => $rate->getPrice() * 100,
+                        'cost'   => round($rate->getPrice() * 100),
                     ];
                 }
             }

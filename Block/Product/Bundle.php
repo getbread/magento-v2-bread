@@ -257,7 +257,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
 
         $bundlePrice = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice();
 
-        $data['selectedPrice'] = $bundlePrice * 100;
+        $data['selectedPrice'] = round($bundlePrice * 100);
 
         return $this->jsonEncode($data);
     }
