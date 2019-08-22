@@ -118,9 +118,9 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     {
 
         $aboveThreshold = $this->quoteHelper->aboveThreshold($this->quoteHelper->getSessionQuote()->getGrandTotal());
-        $disabledSkus = !$this->quoteHelper->checkDisabledForSku('',true);
+        $isDisabledSkus = !$this->quoteHelper->checkDisabledForSku();
 
-        if ($this->quoteHelper->isEnabledOnCOP() && $aboveThreshold && $disabledSkus) {
+        if ($this->quoteHelper->isEnabledOnCOP() && $aboveThreshold && $isDisabledSkus) {
             return parent::_toHtml();
         }
 

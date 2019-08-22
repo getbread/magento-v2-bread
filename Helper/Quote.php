@@ -499,11 +499,11 @@ class Quote extends Data
      * Check if for given sku bread checkout is disabled
      *
      * @param string $sku
-     * @param bool $getSkusFromQuote
      * @param string $store
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function checkDisabledForSku($sku = '', $getSkusFromQuote = false, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function checkDisabledForSku($sku = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         $disabledSkus = $this->scopeConfig->getValue(self::XML_CONFIG_DISABLED_FOR_SKUS, $store);
         $disabledSkus = preg_replace('/\s/', '', $disabledSkus);
@@ -511,9 +511,9 @@ class Quote extends Data
         $disabledSkus = explode(',',$disabledSkus);
         $output = false;
 
-        if(!empty($sku) && !$getSkusFromQuote){
+        if($sku !== null){
             $output = in_array($sku,$disabledSkus);
-        } elseif ($getSkusFromQuote){
+        } else {
             $skus = $this->getParentSkus();
             foreach ($skus as $sku){
                 if(in_array($sku,$disabledSkus)){

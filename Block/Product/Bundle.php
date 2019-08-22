@@ -101,7 +101,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         $aboveThreshold = $this->dataHelper->aboveThreshold(
             $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
         );
-        $disabledSku = !$this->quoteHelper->checkDisabledForSku($this->getProduct()->getSku(),false);
+        $disabledSku = !$this->quoteHelper->checkDisabledForSku($this->getProduct()->getSku());
 
         $output = '';
         if ($aboveThreshold && $disabledSku) {

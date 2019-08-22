@@ -74,7 +74,7 @@ class Category extends \Magento\Framework\View\Element\Template
         $product = $this->getProduct();
 
         if ($this->categoryHelper->aboveThreshold($product->getPriceInfo()->getPrice('final_price')->getValue())
-            && !$this->quoteHelper->checkDisabledForSku($product->getSku(),false)
+            && !$this->quoteHelper->checkDisabledForSku($product->getSku())
         ) {
             $output = parent::_toHtml();
         }
