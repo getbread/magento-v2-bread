@@ -353,7 +353,7 @@ class Customer extends Data
         ];
 
         $templateVars = [
-            'subject' => __("Financing Confirmation"),
+            'subject' => __('Complete your checkout at ' . $this->storeManager->getStore()->getName() . ' with financing'),
             'url' => $url,
             'email' => $customer->getEmail(),
             'firstName' => $customer->getFirstname(),
