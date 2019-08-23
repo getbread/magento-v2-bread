@@ -71,7 +71,7 @@ class GroupedItems extends \Magento\Framework\App\Action\Action
 
             $productData = [
                 'name'      => $associatedProduct->getName(),
-                'price'     => $associatedProduct->getFinalPrice() * 100,
+                'price'     => round($associatedProduct->getFinalPrice() * 100),
                 'sku'       => $associatedProduct->getSku(),
                 'detailUrl' => $product->getProductUrl(),
                 'quantity'  => (int)$qty,

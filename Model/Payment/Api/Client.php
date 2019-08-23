@@ -255,6 +255,26 @@ class Client extends \Magento\Framework\Model\AbstractModel
         );
     }
 
+
+    /**
+     * Use the “As low as” endpoint to calculate an “as low as” amount with compliant
+     * financing disclosure based on your default or alternate financing program.
+     *
+     * @param array $data
+     * @return mixed
+     * @throws Exception
+     */
+    public function getAsLowAs($data)
+    {
+        $baseUrl = $this->getTransactionApiUrl($this->getStoreId());
+        $asLowAsUrl = join('/',array(trim($baseUrl,'/'), 'aslowas'));
+        return $this->call(
+            $asLowAsUrl,
+            $data,
+            Zend_Http_Client::POST
+        );
+    }
+
     /**
      * Interact with the API
      *

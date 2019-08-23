@@ -42,6 +42,8 @@ class Quote extends Data
      */
     public $paymentApiClient;
 
+    public $productRepository;
+
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
@@ -107,7 +109,7 @@ class Quote extends Data
             $grandTotal = $quote->getGrandTotal();
         }
 
-        return $grandTotal * 100;
+        return round($grandTotal * 100);
     }
 
     /**
@@ -132,7 +134,7 @@ class Quote extends Data
             $taxAmount = $quote->getShippingAddress()->getTaxAmount();
         }
 
-        return $taxAmount * 100;
+        return round($taxAmount * 100);
     }
 
     /**
@@ -345,7 +347,7 @@ class Quote extends Data
 
         return ['type'   => $shippingAddress->getShippingDescription(),
                 'typeId' => $shippingAddress->getShippingMethod(),
-                'cost'   => $shippingAddress->getShippingAmount() * 100];
+                'cost'   => round($shippingAddress->getShippingAmount() * 100)];
     }
 
     /**
@@ -393,7 +395,7 @@ class Quote extends Data
      * @return mixed
      * @throws \Exception
      */
-    public function submitQuote($quote = null, $fullRequest = true)
+    public function submitQuote($quote = null)
     {
         if (!$quote) {
             $quote = $this->getSessionQuote();
@@ -402,29 +404,11 @@ class Quote extends Data
         $session = $this->getSession();
         if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
 
-            if ($fullRequest) {
-                $arr = [];
-                $arr["expiration"]                 = date('Y-m-d', strtotime("+" . $this->getQuoteExpiration() . "days"));
-                $arr["options"]                    = [];
-                $arr["options"]["orderRef"]        = $quote->getId();
-                $arr["options"]["shippingOptions"] = [$this->getShippingOptions()];
-                $arr["options"]["shippingContact"] = $this->getShippingAddressData();
-                $arr["options"]["billingContact"]  = $this->getBillingAddressData();
-                $arr["options"]["items"]           = $this->getQuoteItemsData();
-                $arr["options"]["discounts"]       = $this->getDiscountData() ? $this->getDiscountData() : [];
-                $arr["options"]["tax"]             = $this->getTaxValue(false);
-
-            } else {
-
-                $grandTotal = (int)(floatval($quote->getGrandTotal()) * 100);
-
-                $arr = [];
-                $arr['options'] = [];
-                $arr['options']['customTotal'] = $grandTotal;
-            }
+            $arr = [];
+            $arr['customTotal'] = (int)(floatval($quote->getGrandTotal()) * 100);
 
             try {
-                $result = $this->paymentApiClient->submitCartData($arr);
+                $result = $this->paymentApiClient->getAsLowAs($arr);
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 $result = [];
             }
@@ -468,7 +452,7 @@ class Quote extends Data
         $quoteResult = $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
 
         if (empty($quoteResult)) {
-            $quoteResult = $this->submitQuote(null, false);
+            $quoteResult = $this->submitQuote(null);
         }
 
         if ($quoteResult && array_key_exists('asLowAs', $quoteResult)) {
@@ -553,5 +537,43 @@ class Quote extends Data
         }
 
         return $parentSkus;
+    }
+
+    /**
+     * Check if items in quote match
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isFinancingBySku()
+    {
+        $quote = $this->getSessionQuote();
+        $financingAllowedSkus = $this->getTargetedFinancingSkus();
+
+        $items = $quote->getAllItems();
+        $allowed = [];
+
+        /** @var \Magento\Quote\Model\Quote\Item $item */
+        foreach ($items as $item){
+            $parentItem = $item->getParentItem();
+
+            if(!$parentItem && ($item->getProductType() === 'configurable' || $item->getProductType() === 'bundle')){
+                continue;
+            } else if($parentItem){
+
+                $product = $this->productRepository->getById($parentItem->getProduct()->getId());
+                if(in_array($product->getSku(),$financingAllowedSkus)){
+                    $allowed[$product->getSku()] = true;
+                }
+
+            } else {
+                if(in_array($item->getSku(),$financingAllowedSkus)){
+                    $allowed[$item->getSku()] = true;
+                }
+            }
+        }
+
+        return $quote->getItemsCount() === count($allowed);
+
     }
 }

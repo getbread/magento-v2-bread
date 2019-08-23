@@ -177,4 +177,15 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     {
         return $this->_escaper->escapeHtml($this->catalogHelper->getProductTypeMessage());
     }
+
+    /**
+     * Check financing by sku
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isFinancingBySku()
+    {
+        return $this->quoteHelper->isFinancingBySku();
+    }
 }

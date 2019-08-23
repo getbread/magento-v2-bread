@@ -266,7 +266,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
 
         $bundlePrice = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice();
 
-        $data['selectedPrice'] = $bundlePrice * 100;
+        $data['selectedPrice'] = round($bundlePrice * 100);
 
         return $this->jsonEncode($data);
     }
@@ -332,9 +332,9 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      *
      * @return string
      */
-    public function getCartSizeFinancingJson()
+    public function getFinancingJson()
     {
-        $data     = $this->catalogHelper->getCartSizeFinancingData();
+        $data     = $this->catalogHelper->getFinancingData();
         return $this->jsonEncode($data);
     }
 

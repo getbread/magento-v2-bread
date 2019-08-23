@@ -219,25 +219,42 @@
                 </field>
                 <group id="bread_advanced" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>Bread Advanced Settings</label>
-                    <field id="cart_size_targeted_financing" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="targeted_financing" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Enable Targeted Financing based on Cart Size</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Bread\BreadCheckout\Model\System\Config\Source\TargetedFinancing</source_model>
                     </field>
-                    <field id="cart_threshold" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <validate>validate-number required-entry</validate>
-                        <label>Cart Size Threshold</label>
-                        <depends>
-                            <field id="cart_size_targeted_financing">1</field>
-                        </depends>
-                    </field>
-                    <field id="cart_size_financing_program_id" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="financing_program_id" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <validate>validate-length maximum-length-36 validate-length minimum-length-36 required-entry</validate>
                         <label>Financing Program Id</label>
                         <depends>
-                            <field id="cart_size_targeted_financing">1</field>
+                            <field id="targeted_financing" separator=",">1,2</field>
                         </depends>
                     </field>
-                    <field id="threshold_amount" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="financing_threshold" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Targeted Financing Threshold</label>
+                        <comment>Cart Size (USD) over which a targeted financing program will be used</comment>
+                        <validate>validate-number required-entry</validate>
+                        <depends>
+                            <field id="targeted_financing">1</field>
+                        </depends>
+                    </field>
+                    <field id="financing_sku" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Allow financing on SKU</label>
+                        <comment>
+                            <![CDATA[
+				                <div>
+				                    <p>Comma separated list of SKU on which targeted financing will be used (example: <strong>sku1,sku2,sku3</strong>)</p>
+				                </div>
+				            ]]>
+                            </comment>
+                        <validate>required-entry</validate>
+                        <depends>
+                            <field id="targeted_financing">2</field>
+                        </depends>
+                    </field>
+
+                    <!-- threshold_amount is a global threshold not to be confused with financing -->
+                    <field id="threshold_amount" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Cart threshold amount</label>
                         <validate>validate-number</validate>
                         <comment>
@@ -248,18 +265,18 @@
 				            ]]>
                         </comment>
                     </field>
-                    <field id="create_customer_account" type="select" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="create_customer_account" type="select" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Auto-create customer account</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <depends>
                             <field id="active">1</field>
                         </depends>
                     </field>
-                    <field id="order_shipped" type="select" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="order_shipped" type="select" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Send shipping details</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
-                    <field id="log_enabled" type="select" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="log_enabled" type="select" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Enable Logging Locally</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>
@@ -270,7 +287,7 @@
                         ]]>
                         </comment>
                     </field>
-                    <field id="sentry_enabled" type="select" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="sentry_enabled" type="select" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Send Error Information to Bread</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>
