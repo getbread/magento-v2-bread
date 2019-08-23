@@ -68,11 +68,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/bread_advanced/threshold_amount';
     const XML_CONFIG_AUTO_CANCEL                    = 'payment/breadcheckout/split_auto_cancel';
 
+
     const XML_CONFIG_ENABLE_TARGETED_FINANCING      = 'payment/breadcheckout/bread_advanced/targeted_financing';
     const XML_CONFIG_TARGETED_FINANCING_ID          = 'payment/breadcheckout/bread_advanced/financing_program_id';
     const XML_CONFIG_FINANCING_THRESHOLD            = 'payment/breadcheckout/bread_advanced/financing_threshold';
     const XML_CONFIG_FINANCING_SKU                  = 'payment/breadcheckout/bread_advanced/financing_sku';
-
+    const XML_CONFIG_DISABLED_FOR_SKUS              = 'payment/breadcheckout/bread_advanced/disabled_skus';
 
     const XML_CONFIG_CATEGORY_GROUP                 = 'payment/breadcheckout/bread_category';
     const XML_CONFIG_CAT_AS_LOW_AS                  = 'payment/breadcheckout/bread_category/as_low_as';

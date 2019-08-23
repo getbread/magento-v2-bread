@@ -45,6 +45,11 @@ class Quote extends Data
     public $productRepository;
 
     /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     */
+    public $productRepository;
+
+    /**
      * Quote constructor.
      *
      * @param \Magento\Framework\App\Helper\Context             $helperContext
@@ -472,6 +477,66 @@ class Quote extends Data
         }
 
         return true;
+    }
+
+    /**
+     * Check if for given sku bread checkout is disabled
+     *
+     * @param string $sku
+     * @param string $store
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function checkDisabledForSku($sku = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        $disabledSkus = $this->scopeConfig->getValue(self::XML_CONFIG_DISABLED_FOR_SKUS, $store);
+        $disabledSkus = preg_replace('/\s/', '', $disabledSkus);
+
+        $disabledSkus = explode(',',$disabledSkus);
+        $output = false;
+
+        if($sku !== null){
+            $output = in_array($sku,$disabledSkus);
+        } else {
+            $skus = $this->getParentSkus();
+            foreach ($skus as $sku){
+                if(in_array($sku,$disabledSkus)){
+                    $output = true;
+                    break;
+                }
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Find all top level skus for quote items
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getParentSkus()
+    {
+        $quoteItems = $this->getSessionQuote()->getAllItems();
+        $parentSkus = [];
+
+        foreach ($quoteItems as $item){
+
+            $parentItem = $item->getParentItem();
+            $skipItem = !$parentItem && in_array($item->getProductType(),['configurable','bundle']);
+
+            if($skipItem){
+                continue;
+            } else if($parentItem){
+                $product = $this->productRepository->getById($parentItem->getProduct()->getId());
+                $parentSkus[] = $product->getSku();
+            } else {
+                $parentSkus[] = $item->getSku();
+            }
+        }
+
+        return $parentSkus;
     }
 
     /**

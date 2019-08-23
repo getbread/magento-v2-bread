@@ -48,6 +48,11 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public $configurableBlockFactory;
 
     /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
+    public $quoteHelper;
+
+    /**
      * View constructor.
      *
      * @param \Magento\Catalog\Block\Product\Context                                   $context
@@ -64,6 +69,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      * @param \Magento\Customer\Helper\Session\CurrentCustomer                         $currentCustomer
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface                        $priceCurrency
      * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData             $configurableAttributeData
+     * @param \Bread\BreadCheckout\Helper\Quote                                        $quoteHelper
      * @param array                                                                    $data
      */
     public function __construct(
@@ -81,6 +87,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         array $data = []
     ) {
         $this->registry = $context->getRegistry();
@@ -90,6 +97,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         $this->dataHelper = $dataHelper;
         $this->configurableProductFactory = $configurableProductFactory;
         $this->configurableBlockFactory = $configurableBlockFactory;
+        $this->quoteHelper = $quoteHelper;
 
         parent::__construct(
             $context,
@@ -227,6 +235,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
             && $this->dataHelper->aboveThreshold(
                 $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
             )
+            && !$this->quoteHelper->checkDisabledForSku($this->getProduct()->getSku())
         ) {
             return parent::_toHtml();
         } elseif ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW
