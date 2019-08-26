@@ -528,6 +528,7 @@ class Quote extends Data
                 continue;
             } else if($parentItem){
                 $product = $this->productRepository->getById($parentItem->getProduct()->getId());
+                // using sku as key to avoid having multiple values set from child items
                 $parentSkus[$product->getSku()] = null;
             } else {
                 $parentSkus[$item->getSku()] = null;
