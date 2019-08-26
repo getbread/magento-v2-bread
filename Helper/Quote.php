@@ -153,9 +153,11 @@ class Quote extends Data
             $couponTitle = $quote->getCouponCode();
         }
 
+        $discount = round($discount * 100);
+
         if ($discount > 0) {
             $discount = [
-                'amount'      => (int)($this->priceCurrency->round($discount) * 100),
+                'amount'      => $discount,
                 'description' => ($couponTitle) ? $couponTitle : __('Discount')
             ];
         } else {
