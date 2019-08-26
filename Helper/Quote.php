@@ -42,8 +42,6 @@ class Quote extends Data
      */
     public $paymentApiClient;
 
-    public $productRepository;
-
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
@@ -530,13 +528,13 @@ class Quote extends Data
                 continue;
             } else if($parentItem){
                 $product = $this->productRepository->getById($parentItem->getProduct()->getId());
-                $parentSkus[] = $product->getSku();
+                $parentSkus[$product->getSku()] = null;
             } else {
-                $parentSkus[] = $item->getSku();
+                $parentSkus[$item->getSku()] = null;
             }
         }
 
-        return $parentSkus;
+        return array_keys($parentSkus);
     }
 
     /**
@@ -550,27 +548,15 @@ class Quote extends Data
         $quote = $this->getSessionQuote();
         $financingAllowedSkus = $this->getTargetedFinancingSkus();
 
-        $items = $quote->getAllItems();
+        $parentItems = $this->getParentSkus();
         $allowed = [];
 
-        /** @var \Magento\Quote\Model\Quote\Item $item */
-        foreach ($items as $item){
-            $parentItem = $item->getParentItem();
+        foreach ($parentItems as $itemSku){
 
-            if(!$parentItem && ($item->getProductType() === 'configurable' || $item->getProductType() === 'bundle')){
-                continue;
-            } else if($parentItem){
-
-                $product = $this->productRepository->getById($parentItem->getProduct()->getId());
-                if(in_array($product->getSku(),$financingAllowedSkus)){
-                    $allowed[$product->getSku()] = true;
-                }
-
-            } else {
-                if(in_array($item->getSku(),$financingAllowedSkus)){
-                    $allowed[$item->getSku()] = true;
-                }
+            if(in_array($itemSku,$financingAllowedSkus)){
+                $allowed[] = $itemSku;
             }
+
         }
 
         return $quote->getItemsCount() === count($allowed);

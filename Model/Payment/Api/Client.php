@@ -271,7 +271,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         return $this->call(
             $asLowAsUrl,
             $data,
-            Zend_Http_Client::POST
+            \Zend_Http_Client::POST
         );
     }
 
