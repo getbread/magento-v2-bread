@@ -194,11 +194,33 @@ class Category extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get targeted financing configuration
+     *
+     * @return string
+     */
+    public function getFinancingJson()
+    {
+        $data     = $this->catalogHelper->getFinancingData();
+        return $this->jsonEncode($data);
+    }
+
+    /**
      * @return string
      */
     public function getModuleVersion()
     {
         $module = $this->moduleList->getOne($this->getModuleName());
         return isset($module["setup_version"]) ? $module["setup_version"] : "";
+    }
+
+    /**
+     * Publicly accessible json encoder
+     *
+     * @param  $data
+     * @return string
+     */
+    public function jsonEncode($data)
+    {
+        return $this->jsonHelper->jsonEncode($data);
     }
 }
