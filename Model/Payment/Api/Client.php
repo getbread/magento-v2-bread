@@ -266,7 +266,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function getAsLowAs($data)
     {
-        $baseUrl = $this->getTransactionApiUrl($this->getStoreId());
+        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
         $asLowAsUrl = join('/',array(trim($baseUrl,'/'), 'aslowas'));
         return $this->call(
             $asLowAsUrl,

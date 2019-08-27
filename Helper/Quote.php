@@ -407,6 +407,12 @@ class Quote extends Data
             $arr = [];
             $arr['customTotal'] = (int)(floatval($quote->getGrandTotal()) * 100);
 
+            $targetedFinancingStatus = $this->getTargetedFinancingStatus();
+
+            if ($targetedFinancingStatus['shouldUseFinancingId']) {
+                $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+            }
+
             try {
                 $result = $this->paymentApiClient->getAsLowAs($arr);
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
@@ -562,7 +568,33 @@ class Quote extends Data
 
         }
 
-        return $quote->getItemsCount() === count($allowed);
+        return (int)$quote->getItemsCount() === count($allowed);
 
+    }
+
+    public function getTargetedFinancingStatus() {
+        $financingInfo = $this->getFinancingData();
+
+        return [
+            'shouldUseFinancingId' => $this->shouldUseFinancingId($financingInfo),
+            'id' => $financingInfo['id']
+        ];
+    }
+
+    private function shouldUseFinancingId($financingInfo) {
+        if (!$financingInfo['enabled']) {
+            return false;
+        }
+
+        if ($financingInfo['mode']['cart']) {
+            $quoteGrandTotal = round($this->getSessionQuote()->getGrandTotal(), 2);
+            return $quoteGrandTotal > $financingInfo['threshold'];
+        }
+
+        if ($financingInfo['mode']['sku']) {
+            return $this->isFinancingBySku();
+        }
+
+        return false;
     }
 }

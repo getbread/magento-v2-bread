@@ -604,7 +604,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getTargetedFinancingThreshold($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store);
+        return round($this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store), 2);
     }
 
     /**
