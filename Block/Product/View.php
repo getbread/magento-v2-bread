@@ -182,7 +182,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
     /**
-     * Get cart size financing configuration
+     * Get targeted financing configuration
      *
      * @return string
      */
