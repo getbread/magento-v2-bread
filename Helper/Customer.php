@@ -119,7 +119,7 @@ class Customer extends Data
 
         $defaultShippingAddress     = $customer->getPrimaryShippingAddress();
 
-        if (!$defaultShippingAddress->getStreetLine(1)) {
+        if (!$defaultShippingAddress || !$defaultShippingAddress->getStreetLine(1)) {
             return [];
         }
 
