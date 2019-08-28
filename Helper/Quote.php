@@ -572,6 +572,12 @@ class Quote extends Data
 
     }
 
+    /**
+     * Returns targeted financing program id and if it should be used or not
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getTargetedFinancingStatus() {
         $financingInfo = $this->getFinancingData();
 
@@ -581,6 +587,13 @@ class Quote extends Data
         ];
     }
 
+    /**
+     * Checks if we should use alternate financing program Id
+     *
+     * @param array $financingInfo
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     private function shouldUseFinancingId($financingInfo) {
         if (!$financingInfo['enabled']) {
             return false;
@@ -588,7 +601,7 @@ class Quote extends Data
 
         if ($financingInfo['mode']['cart']) {
             $quoteGrandTotal = round($this->getSessionQuote()->getGrandTotal(), 2);
-            return $quoteGrandTotal > $financingInfo['threshold'];
+            return $quoteGrandTotal >= $financingInfo['threshold'];
         }
 
         if ($financingInfo['mode']['sku']) {
