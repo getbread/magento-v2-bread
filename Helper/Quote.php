@@ -43,6 +43,11 @@ class Quote extends Data
     public $paymentApiClient;
 
     /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     */
+    public $productRepository;
+
+    /**
      * Quote constructor.
      *
      * @param \Magento\Framework\App\Helper\Context             $helperContext
@@ -55,6 +60,7 @@ class Quote extends Data
      * @param \Magento\Sales\Model\AdminOrder\Create            $orderCreateModel
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param \Bread\BreadCheckout\Model\Payment\Api\Client     $paymentApiClient
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -66,13 +72,15 @@ class Quote extends Data
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
+        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->helperCatalog = $helperCatalog;
         $this->orderCreateModel = $orderCreateModel;
         $this->priceCurrency = $priceCurrency;
         $this->paymentApiClient = $paymentApiClient;
+        $this->productRepository = $productRepository;
 
         parent::__construct(
             $helperContext,
@@ -99,7 +107,7 @@ class Quote extends Data
             $grandTotal = $quote->getGrandTotal();
         }
 
-        return $grandTotal * 100;
+        return round($grandTotal * 100);
     }
 
     /**
@@ -124,7 +132,7 @@ class Quote extends Data
             $taxAmount = $quote->getShippingAddress()->getTaxAmount();
         }
 
-        return $taxAmount * 100;
+        return round($taxAmount * 100);
     }
 
     /**
@@ -145,9 +153,11 @@ class Quote extends Data
             $couponTitle = $quote->getCouponCode();
         }
 
+        $discount = round($discount * 100);
+
         if ($discount > 0) {
             $discount = [
-                'amount'      => (int)($this->priceCurrency->round($discount) * 100),
+                'amount'      => $discount,
                 'description' => ($couponTitle) ? $couponTitle : __('Discount')
             ];
         } else {
@@ -337,7 +347,7 @@ class Quote extends Data
 
         return ['type'   => $shippingAddress->getShippingDescription(),
                 'typeId' => $shippingAddress->getShippingMethod(),
-                'cost'   => $shippingAddress->getShippingAmount() * 100];
+                'cost'   => round($shippingAddress->getShippingAmount() * 100)];
     }
 
     /**
@@ -385,7 +395,7 @@ class Quote extends Data
      * @return mixed
      * @throws \Exception
      */
-    public function submitQuote($quote = null, $fullRequest = true)
+    public function submitQuote($quote = null)
     {
         if (!$quote) {
             $quote = $this->getSessionQuote();
@@ -394,29 +404,17 @@ class Quote extends Data
         $session = $this->getSession();
         if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
 
-            if ($fullRequest) {
-                $arr = [];
-                $arr["expiration"]                 = date('Y-m-d', strtotime("+" . $this->getQuoteExpiration() . "days"));
-                $arr["options"]                    = [];
-                $arr["options"]["orderRef"]        = $quote->getId();
-                $arr["options"]["shippingOptions"] = [$this->getShippingOptions()];
-                $arr["options"]["shippingContact"] = $this->getShippingAddressData();
-                $arr["options"]["billingContact"]  = $this->getBillingAddressData();
-                $arr["options"]["items"]           = $this->getQuoteItemsData();
-                $arr["options"]["discounts"]       = $this->getDiscountData() ? $this->getDiscountData() : [];
-                $arr["options"]["tax"]             = $this->getTaxValue(false);
+            $arr = [];
+            $arr['customTotal'] = (int)(floatval($quote->getGrandTotal()) * 100);
 
-            } else {
+            $targetedFinancingStatus = $this->getTargetedFinancingStatus();
 
-                $grandTotal = (int)(floatval($quote->getGrandTotal()) * 100);
-
-                $arr = [];
-                $arr['options'] = [];
-                $arr['options']['customTotal'] = $grandTotal;
+            if ($targetedFinancingStatus['shouldUseFinancingId']) {
+                $arr['financingProgramId'] = $targetedFinancingStatus['id'];
             }
 
             try {
-                $result = $this->paymentApiClient->submitCartData($arr);
+                $result = $this->paymentApiClient->getAsLowAs($arr);
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 $result = [];
             }
@@ -460,7 +458,7 @@ class Quote extends Data
         $quoteResult = $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
 
         if (empty($quoteResult)) {
-            $quoteResult = $this->submitQuote(null, false);
+            $quoteResult = $this->submitQuote(null);
         }
 
         if ($quoteResult && array_key_exists('asLowAs', $quoteResult)) {
@@ -485,5 +483,132 @@ class Quote extends Data
         }
 
         return true;
+    }
+
+    /**
+     * Check if for given sku bread checkout is disabled
+     *
+     * @param string $sku
+     * @param string $store
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function checkDisabledForSku($sku = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    {
+        $disabledSkus = $this->scopeConfig->getValue(self::XML_CONFIG_DISABLED_FOR_SKUS, $store);
+        $disabledSkus = preg_replace('/\s/', '', $disabledSkus);
+
+        $disabledSkus = explode(',', $disabledSkus);
+        $output = false;
+
+        if ($sku !== null) {
+            $output = in_array($sku, $disabledSkus);
+        } else {
+            $skus = $this->getParentSkus();
+            foreach ($skus as $sku) {
+                if (in_array($sku, $disabledSkus)) {
+                    $output = true;
+                    break;
+                }
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Find all top level skus for quote items
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getParentSkus()
+    {
+        $quoteItems = $this->getSessionQuote()->getAllItems();
+        $parentSkus = [];
+
+        foreach ($quoteItems as $item) {
+
+            $parentItem = $item->getParentItem();
+            $skipItem = !$parentItem && in_array($item->getProductType(), ['configurable','bundle']);
+
+            if ($skipItem) {
+                continue;
+            } elseif ($parentItem) {
+                $product = $this->productRepository->getById($parentItem->getProduct()->getId());
+                // using sku as key to avoid having multiple values set from child items
+                $parentSkus[$product->getSku()] = null;
+            } else {
+                $parentSkus[$item->getSku()] = null;
+            }
+        }
+
+        return array_keys($parentSkus);
+    }
+
+    /**
+     * Check if items in quote match
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isFinancingBySku()
+    {
+        $quote = $this->getSessionQuote();
+        $financingAllowedSkus = $this->getTargetedFinancingSkus();
+
+        $parentItems = $this->getParentSkus();
+        $allowed = [];
+
+        foreach ($parentItems as $itemSku) {
+
+            if (in_array($itemSku, $financingAllowedSkus)) {
+                $allowed[] = $itemSku;
+            }
+
+        }
+
+        return (int)$quote->getItemsCount() === count($allowed);
+    }
+
+    /**
+     * Returns targeted financing program id and if it should be used or not
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getTargetedFinancingStatus()
+    {
+        $financingInfo = $this->getFinancingData();
+
+        return [
+            'shouldUseFinancingId' => $this->shouldUseFinancingId($financingInfo),
+            'id' => $financingInfo['id']
+        ];
+    }
+
+    /**
+     * Checks if we should use alternate financing program Id
+     *
+     * @param array $financingInfo
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function shouldUseFinancingId($financingInfo)
+    {
+        if (!$financingInfo['enabled']) {
+            return false;
+        }
+
+        if ($financingInfo['mode']['cart']) {
+            $quoteGrandTotal = round($this->getSessionQuote()->getGrandTotal(), 2);
+            return $quoteGrandTotal >= $financingInfo['threshold'];
+        }
+
+        if ($financingInfo['mode']['sku']) {
+            return $this->isFinancingBySku();
+        }
+
+        return false;
     }
 }

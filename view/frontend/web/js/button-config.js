@@ -67,16 +67,8 @@ define(
                     this.breadConfig.items = data.items;
                 }
 
-                if (data.cartSizeFinancing.enabled) {
-                    var cartSizeFinancingId = data.cartSizeFinancing.id;
-                    var cartSizeThreshold = data.cartSizeFinancing.threshold;
-                    var items = data.items;
-                    var itemsPriceSum = items.reduce(
-                        function (sum, item) {
-                            return sum + item.price * item.quantity
-                        }, 0
-                    ) / 100;
-                    this.breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+                if (data.targetedFinancingStatus.shouldUseFinancingId) {
+                    this.breadConfig.financingProgramId = data.targetedFinancingStatus.id;
                 }
 
                 if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {

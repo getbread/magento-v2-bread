@@ -47,7 +47,7 @@ class QuoteData extends \Magento\Backend\App\Action
             'shippingOptions' => $this->helper->getShippingOptions(),
             'tax' => $this->helper->getTaxValue(),
             'discounts' => $this->helper->getDiscountData(),
-            'cartSizeFinancing' => $this->helper->getCartSizeFinancingData(),
+            'cartSizeFinancing' => $this->helper->getFinancingData(),
             'grandTotal' => $this->helper->getGrandTotal(),
             'asLowAs' => $this->helper->isAsLowAs(),
             'paymentUrl' => $this->helper->getAdminPaymentUrl(),

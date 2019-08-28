@@ -82,6 +82,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
             $currentCustomer,
             $priceCurrency,
             $configurableAttributeData,
+            $quoteHelper,
             $data
         );
     }
@@ -109,6 +110,17 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     }
 
     /**
+     * Get Targeted Financing Status From Quote Items
+     *
+     * @return string
+     */
+    public function getTargetedFinancingStatusJson()
+    {
+        $status = $this->quoteHelper->getTargetedFinancingStatus();
+        return $this->jsonEncode($status);
+    }
+
+    /**
      * Checks Settings For Show On Checkout Overview Page During Output
      *
      * @return string
@@ -117,8 +129,9 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     {
 
         $aboveThreshold = $this->quoteHelper->aboveThreshold($this->quoteHelper->getSessionQuote()->getGrandTotal());
+        $isDisabledSkus = !$this->quoteHelper->checkDisabledForSku();
 
-        if ($this->quoteHelper->isEnabledOnCOP() && $aboveThreshold) {
+        if ($this->quoteHelper->isEnabledOnCOP() && $aboveThreshold && $isDisabledSkus) {
             return parent::_toHtml();
         }
 
@@ -174,5 +187,16 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     public function productTypeErrorMessage()
     {
         return $this->_escaper->escapeHtml($this->catalogHelper->getProductTypeMessage());
+    }
+
+    /**
+     * Check financing by sku
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isFinancingBySku()
+    {
+        return $this->quoteHelper->isFinancingBySku();
     }
 }

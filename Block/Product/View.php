@@ -48,6 +48,11 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public $configurableBlockFactory;
 
     /**
+     * @var \Bread\BreadCheckout\Helper\Quote
+     */
+    public $quoteHelper;
+
+    /**
      * View constructor.
      *
      * @param \Magento\Catalog\Block\Product\Context                                   $context
@@ -64,6 +69,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      * @param \Magento\Customer\Helper\Session\CurrentCustomer                         $currentCustomer
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface                        $priceCurrency
      * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData             $configurableAttributeData
+     * @param \Bread\BreadCheckout\Helper\Quote                                        $quoteHelper
      * @param array                                                                    $data
      */
     public function __construct(
@@ -81,6 +87,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
+        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         array $data = []
     ) {
         $this->registry = $context->getRegistry();
@@ -90,6 +97,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         $this->dataHelper = $dataHelper;
         $this->configurableProductFactory = $configurableProductFactory;
         $this->configurableBlockFactory = $configurableBlockFactory;
+        $this->quoteHelper = $quoteHelper;
 
         parent::__construct(
             $context,
@@ -174,13 +182,13 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
     /**
-     * Get cart size financing configuration
+     * Get targeted financing configuration
      *
      * @return string
      */
-    public function getCartSizeFinancingJson()
+    public function getFinancingJson()
     {
-        $data     = $this->catalogHelper->getCartSizeFinancingData();
+        $data     = $this->catalogHelper->getFinancingData();
         return $this->jsonEncode($data);
     }
 
@@ -227,6 +235,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
             && $this->dataHelper->aboveThreshold(
                 $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
             )
+            && !$this->quoteHelper->checkDisabledForSku($this->getProduct()->getSku())
         ) {
             return parent::_toHtml();
         } elseif ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW
@@ -363,9 +372,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return bool
      */
-    public function isCartSizeTargetedFinancing()
+    public function isTargetedFinancing()
     {
-        return $this->dataHelper->isCartSizeTargetedFinancing();
+        return $this->dataHelper->isTargetedFinancing();
     }
 
     /**
@@ -373,9 +382,9 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return string
      */
-    public function getCartSizeThreshold()
+    public function getTargetedFinancingThreshold()
     {
-        return $this->dataHelper->getCartSizeThreshold();
+        return $this->dataHelper->getTargetedFinancingThreshold();
     }
 
     /**
@@ -383,9 +392,20 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return string
      */
-    public function getCartSizeFinancingId()
+    public function getFinancingId()
     {
-        return $this->dataHelper->getCartSizeFinancingId();
+        return $this->dataHelper->getFinancingId();
+    }
+
+    /**
+     * Wrapper for get financing mode
+     *
+     * @param string $mode
+     * @return int
+     */
+    public function checkFinancingMode($mode)
+    {
+        return $this->dataHelper->checkFinancingMode($mode);
     }
 
     /**
