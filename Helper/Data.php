@@ -68,7 +68,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/bread_advanced/threshold_amount';
     const XML_CONFIG_AUTO_CANCEL                    = 'payment/breadcheckout/split_auto_cancel';
 
-
     const XML_CONFIG_ENABLE_TARGETED_FINANCING      = 'payment/breadcheckout/bread_advanced/targeted_financing';
     const XML_CONFIG_TARGETED_FINANCING_ID          = 'payment/breadcheckout/bread_advanced/financing_program_id';
     const XML_CONFIG_FINANCING_THRESHOLD            = 'payment/breadcheckout/bread_advanced/financing_threshold';
@@ -618,7 +617,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store);
         $list = preg_replace('/\s/', '', $list);
 
-        return explode(',',$list);
+        return explode(',', $list);
     }
 
     /**
@@ -633,7 +632,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $configVal = (int)$this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store);
         $output = null;
 
-        switch ($mode){
+        switch ($mode) {
             case 'cart':
                 $output = ($configVal === 1);
                 break;

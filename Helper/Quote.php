@@ -498,15 +498,15 @@ class Quote extends Data
         $disabledSkus = $this->scopeConfig->getValue(self::XML_CONFIG_DISABLED_FOR_SKUS, $store);
         $disabledSkus = preg_replace('/\s/', '', $disabledSkus);
 
-        $disabledSkus = explode(',',$disabledSkus);
+        $disabledSkus = explode(',', $disabledSkus);
         $output = false;
 
-        if($sku !== null){
-            $output = in_array($sku,$disabledSkus);
+        if ($sku !== null) {
+            $output = in_array($sku, $disabledSkus);
         } else {
             $skus = $this->getParentSkus();
-            foreach ($skus as $sku){
-                if(in_array($sku,$disabledSkus)){
+            foreach ($skus as $sku) {
+                if (in_array($sku, $disabledSkus)) {
                     $output = true;
                     break;
                 }
@@ -527,14 +527,14 @@ class Quote extends Data
         $quoteItems = $this->getSessionQuote()->getAllItems();
         $parentSkus = [];
 
-        foreach ($quoteItems as $item){
+        foreach ($quoteItems as $item) {
 
             $parentItem = $item->getParentItem();
-            $skipItem = !$parentItem && in_array($item->getProductType(),['configurable','bundle']);
+            $skipItem = !$parentItem && in_array($item->getProductType(), ['configurable','bundle']);
 
-            if($skipItem){
+            if ($skipItem) {
                 continue;
-            } else if($parentItem){
+            } elseif ($parentItem) {
                 $product = $this->productRepository->getById($parentItem->getProduct()->getId());
                 // using sku as key to avoid having multiple values set from child items
                 $parentSkus[$product->getSku()] = null;
@@ -560,16 +560,15 @@ class Quote extends Data
         $parentItems = $this->getParentSkus();
         $allowed = [];
 
-        foreach ($parentItems as $itemSku){
+        foreach ($parentItems as $itemSku) {
 
-            if(in_array($itemSku,$financingAllowedSkus)){
+            if (in_array($itemSku, $financingAllowedSkus)) {
                 $allowed[] = $itemSku;
             }
 
         }
 
         return (int)$quote->getItemsCount() === count($allowed);
-
     }
 
     /**
@@ -578,7 +577,8 @@ class Quote extends Data
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getTargetedFinancingStatus() {
+    public function getTargetedFinancingStatus()
+    {
         $financingInfo = $this->getFinancingData();
 
         return [
@@ -594,7 +594,8 @@ class Quote extends Data
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    private function shouldUseFinancingId($financingInfo) {
+    private function shouldUseFinancingId($financingInfo)
+    {
         if (!$financingInfo['enabled']) {
             return false;
         }

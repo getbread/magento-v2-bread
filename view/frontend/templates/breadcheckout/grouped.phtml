@@ -194,7 +194,7 @@
                 var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity }, 0) / 100;
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             } else if(financingInfo.enabled && financingInfo.mode.sku){
-                var productSku = "<?= $block->getProduct()->getSku(); ?>";
+                var productSku = "<?= /* @noEscape */ $block->getProduct()->getSku(); ?>";
                 if(financingInfo.sku_limit.includes(productSku) === true){
                     breadConfig.financingProgramId = financingInfo.id;
                 }

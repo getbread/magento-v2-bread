@@ -111,7 +111,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
 
         $validateAmount = $this->getInfo($breadTransactionId);
-        $this->setBreadTransactionId($breadTransactionId); // set transaction id so it can be fetched for split payment cancel
 
         // set transaction id so it can be fetched for split payment cancel
         $this->setBreadTransactionId($breadTransactionId);
@@ -255,7 +254,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
         );
     }
 
-
     /**
      * Use the “As low as” endpoint to calculate an “as low as” amount with compliant
      * financing disclosure based on your default or alternate financing program.
@@ -267,7 +265,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function getAsLowAs($data)
     {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $asLowAsUrl = join('/',array(trim($baseUrl,'/'), 'aslowas'));
+        $asLowAsUrl = join('/', [ trim($baseUrl, '/'), 'aslowas' ]);
         return $this->call(
             $asLowAsUrl,
             $data,
