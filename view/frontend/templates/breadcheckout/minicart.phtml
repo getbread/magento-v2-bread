@@ -189,16 +189,11 @@
                 breadConfig.actAsLabel = false;
             }
 
+            var targetedFinancingStatus = <?= /* @noEscape */ $block->getTargetedFinancingStatusJson(); ?>;
 
-            <?php if($block->isTargetedFinancing() && $block->checkFinancingMode('cart')):?>
-                var cartSizeFinancingId = financingInfo.id;
-                var cartSizeThreshold = financingInfo.threshold;
-                var items = document.minicartItems;
-                var itemsPriceSum = items.reduce(function(sum, item) {return sum + item.price * item.quantity}, 0) / 100;
-                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            <?php elseif ($block->isTargetedFinancing() && $block->checkFinancingMode('sku') && $block->isFinancingBySku()):?>
-                breadConfig.financingProgramId = financingInfo.id;
-            <?php endif;?>
+            if (targetedFinancingStatus.shouldUseFinancingId) {
+                breadConfig.financingProgramId = targetedFinancingStatus.id;
+            }
 
             var discountAmount = <?= /* @noEscape */ json_encode($block->quoteHelper->getDiscountData());?>;
             if (discountAmount.length > 0) {

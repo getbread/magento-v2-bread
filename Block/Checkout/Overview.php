@@ -110,6 +110,17 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
     }
 
     /**
+     * Get Targeted Financing Status From Quote Items
+     *
+     * @return string
+     */
+    public function getTargetedFinancingStatusJson()
+    {
+        $status = $this->quoteHelper->getTargetedFinancingStatus();
+        return $this->jsonEncode($status);
+    }
+
+    /**
      * Checks Settings For Show On Checkout Overview Page During Output
      *
      * @return string

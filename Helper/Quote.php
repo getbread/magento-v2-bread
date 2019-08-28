@@ -407,6 +407,12 @@ class Quote extends Data
             $arr = [];
             $arr['customTotal'] = (int)(floatval($quote->getGrandTotal()) * 100);
 
+            $targetedFinancingStatus = $this->getTargetedFinancingStatus();
+
+            if ($targetedFinancingStatus['shouldUseFinancingId']) {
+                $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+            }
+
             try {
                 $result = $this->paymentApiClient->getAsLowAs($arr);
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
@@ -562,7 +568,46 @@ class Quote extends Data
 
         }
 
-        return $quote->getItemsCount() === count($allowed);
+        return (int)$quote->getItemsCount() === count($allowed);
 
+    }
+
+    /**
+     * Returns targeted financing program id and if it should be used or not
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getTargetedFinancingStatus() {
+        $financingInfo = $this->getFinancingData();
+
+        return [
+            'shouldUseFinancingId' => $this->shouldUseFinancingId($financingInfo),
+            'id' => $financingInfo['id']
+        ];
+    }
+
+    /**
+     * Checks if we should use alternate financing program Id
+     *
+     * @param array $financingInfo
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function shouldUseFinancingId($financingInfo) {
+        if (!$financingInfo['enabled']) {
+            return false;
+        }
+
+        if ($financingInfo['mode']['cart']) {
+            $quoteGrandTotal = round($this->getSessionQuote()->getGrandTotal(), 2);
+            return $quoteGrandTotal >= $financingInfo['threshold'];
+        }
+
+        if ($financingInfo['mode']['sku']) {
+            return $this->isFinancingBySku();
+        }
+
+        return false;
     }
 }
