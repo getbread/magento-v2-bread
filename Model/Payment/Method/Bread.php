@@ -498,7 +498,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             return false;
         }
 
-        if($this->quoteHelper->checkDisabledForSku()){
+        if ($this->quoteHelper->checkDisabledForSku()) {
             return false;
         }
 
@@ -590,5 +590,4 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     {
         return parent::getTitle();
     }
-
 }
