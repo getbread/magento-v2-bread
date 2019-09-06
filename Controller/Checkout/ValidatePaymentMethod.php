@@ -25,6 +25,11 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
      */
     public $resultFactory;
 
+    /**
+     * @var \Magento\Directory\Model\RegionFactory
+     */
+    public $regionFactory;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
@@ -38,12 +43,14 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\Quote\Model\QuoteManagement $quoteManagement
+        \Magento\Quote\Model\QuoteManagement $quoteManagement,
+        \Magento\Directory\Model\RegionFactory $regionFactory
     ) {
     
         $this->paymentApiClient = $paymentApiClient;
         $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
+        $this->regionFactory = $regionFactory;
         parent::__construct(
             $context,
             $catalogResourceModelProductFactory,
@@ -105,8 +112,6 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 
         $quote = $this->checkoutSession->getQuote();
         $quote->getBillingAddress()->addData($billingData);
-        $quote->collectTotals();
-        $this->quoteRepository->save($quote);
 
         return ['billingAddress' => $quote->getBillingAddress()->getData()];
     }
@@ -120,6 +125,8 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     protected function getFormattedAddress(array $data)
     {
         $name = explode(' ', trim($data['fullName']));
+        $regionId = $this->regionFactory->create()->loadByCode($data['state'], 'US')->getId();
+
         return [
             'firstname' => $name[0],
             'lastname' => $name[1],
@@ -127,6 +134,7 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
             'city' => $data['city'],
             'country_id' => 'US',
             'region' => $data['state'],
+            'region_id' => $regionId,
             'postcode' => $data['zip'],
             'telephone' => $data['phone'],
             'save_in_address_book' => 1

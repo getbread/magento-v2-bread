@@ -274,7 +274,7 @@ class Customer extends Data
             return 'false';
         }
 
-        if ($this->hasBillingAddress() == false) {
+        if ($this->hasShippingAddress() == false) {
             return 'false';
         }
 
@@ -302,13 +302,27 @@ class Customer extends Data
     }
 
     /**
-     * Check if Customer has associated addresses
+     * Check if Customer has billing address
      *
      * @return bool
      */
     public function hasBillingAddress()
     {
         if ($this->customerSession->getCustomer()->getPrimaryBillingAddress() == false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if Customer has shipping address
+     *
+     * @return bool
+     */
+    public function hasShippingAddress()
+    {
+        if ($this->customerSession->getCustomer()->getPrimaryShippingAddress() == false) {
             return false;
         }
 
