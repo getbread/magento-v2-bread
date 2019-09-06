@@ -270,11 +270,7 @@ class Customer extends Data
       */
     public function getShippingAddressData()
     {
-        if ($this->isUserLoggedIn() == false) {
-            return 'false';
-        }
-
-        if ($this->hasShippingAddress() == false) {
+        if ($this->isUserLoggedIn() == false || $this->hasShippingAddress() == false) {
             return 'false';
         }
 
@@ -289,11 +285,7 @@ class Customer extends Data
      */
     public function getBillingAddressData()
     {
-        if ($this->isUserLoggedIn() == false) {
-            return 'false';
-        }
-
-        if ($this->hasBillingAddress() == false) {
+        if ($this->isUserLoggedIn() == false || $this->hasBillingAddress() == false) {
             return 'false';
         }
 
