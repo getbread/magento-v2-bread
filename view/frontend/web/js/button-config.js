@@ -21,7 +21,6 @@ define(
                     customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                     buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
                     disableEditShipping: true,
-                    requireShippingContact: !quote.isVirtual(),
                     onShowCheckoutError: function (message) {
                         var errorInfo = {
                             bread_config: window.checkoutConfig.payment.breadcheckout.breadConfig,
@@ -55,6 +54,8 @@ define(
                 if(!quote.isVirtual()) {
                     this.breadConfig.shippingOptions =  [data.shippingOptions];
                     this.breadConfig.tax = this.round(quote.getTotals()._latestValue.base_tax_amount);
+                } else {
+                    this.breadConfig.requireShippingContact = false;
                 }
 
                 if(data.embeddedCheckout) {
