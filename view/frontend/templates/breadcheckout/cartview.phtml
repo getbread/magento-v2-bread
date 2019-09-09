@@ -27,7 +27,7 @@
             var billingAddress      = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo         = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
+            var financingInfo       = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var total = 0;
             for (var i = 0; i < items.length; i++) {
                 total += items[i]['price'] * items[i]['quantity'];
