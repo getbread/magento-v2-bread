@@ -29,7 +29,17 @@ define(
                         {
                             dsn: config.dsn,
                             beforeSend(event) {
-                                var isBreadIssue = event.extra && Object.values(event.extra).includes('BreadIssue');
+                                if (!event.extra) {
+                                    return null;
+                                }
+
+                                var isBreadIssue = false;
+
+                                Object.keys(event.extra).map(function(key) {
+                                    if (event.extra[key] === 'BreadIssue') {
+                                        isBreadIssue = true;
+                                    }
+                                });
 
                                 if (!isBreadIssue) {
                                     return null;
