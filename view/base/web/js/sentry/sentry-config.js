@@ -33,18 +33,13 @@ define(
                                     return null;
                                 }
 
-                                var isBreadIssue = false;
-
                                 Object.keys(event.extra).map(function(key) {
                                     if (event.extra[key] === 'BreadIssue') {
-                                        isBreadIssue = true;
+                                        return event;
                                     }
                                 });
 
-                                if (!isBreadIssue) {
-                                    return null;
-                                }
-                                return event;
+                                return null;
                             }
                         }
                     );
