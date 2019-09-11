@@ -29,7 +29,7 @@ define(
                         {
                             dsn: config.dsn,
                             beforeSend(event) {
-                                if (!event.extra) {
+                                if (!event || !event.extra) {
                                     return null;
                                 }
 
