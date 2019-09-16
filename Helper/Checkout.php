@@ -12,6 +12,11 @@ class Checkout extends Quote
 {
     const BREAD_AMOUNT = "bread_transaction_amount";
 
+    /**
+     * @var \Bread\BreadCheckout\Helper\Log
+     */
+    public $logger;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -23,8 +28,10 @@ class Checkout extends Quote
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Bread\BreadCheckout\Helper\Log $logger
     ) {
+        $this->logger = $logger;
         parent::__construct(
             $helperContext,
             $context,
@@ -76,9 +83,16 @@ class Checkout extends Quote
         $quoteTotal = (int)($this->priceCurrency->round($this->getSessionQuote()->getGrandTotal() * 100));
 
         if ($breadAmount === 0) {
+            $this->logger->info('bread amount is 0');
             $info = $this->paymentApiClient->getInfo($transactionId);
             $this->setBreadTransactionAmount($info['adjustedTotal']);
         }
+
+        $this->logger->info([
+            'MESSAGE' => 'checking bread and quote tx amounts are same',
+            'BREAD' => $breadAmount,
+            'QUOTE' => $quoteTotal
+        ]);
 
         return (bool) ($breadAmount == $quoteTotal);
     }

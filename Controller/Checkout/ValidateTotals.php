@@ -60,15 +60,22 @@ class ValidateTotals extends \Bread\BreadCheckout\Controller\Checkout
         $result = ['valid' => false];
 
         if (isset($params['bread_transaction_id'])) {
+            $this->logger->info([
+                'MESSAGE' => 'tx_id is set',
+                'TX_ID' => $params['bread_transaction_id']
+            ]);
             if ($this->helper->validateTransactionAmount($params['bread_transaction_id'])) {
+                $this->logger->info(['MESSAGE' => 'tx amount is valid']);
                 $result['valid'] = true;
             } else {
                 $errorMsg = __(
                     'Your order total does not match the amount authorized by Bread.
                 Please complete checkout again before placing the order.'
                 );
+                $this->logger->info(['MESSAGE' => 'order total doesnt match amount authorized']);
             }
         } else {
+            $this->logger->info(['ERROR' => 'tx_id not set']);
             $errorMsg = __('Please complete the Bread checkout form before placing the order.');
         }
 
