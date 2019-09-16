@@ -84,6 +84,7 @@ class Checkout extends Quote
         $quoteTotal = (int)($this->priceCurrency->round($this->getSessionQuote()->getGrandTotal() * 100));
 
         if ($breadAmount === 0) {
+            $this->logger->info('bread amount is 0');
             $info = $this->paymentApiClient->getInfo($transactionId);
             $this->setBreadTransactionAmount($info['adjustedTotal']);
         }

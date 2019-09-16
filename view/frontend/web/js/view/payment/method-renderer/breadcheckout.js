@@ -175,7 +175,7 @@ define(
                                         alert(response.error);
                                     } else {
                                         $.when(
-                                            this.updateAddress(response),
+                                            this.updateAddress(response, errorInfo),
                                             this.validateTotals()
                                         ).done(
                                             $.proxy(
@@ -246,18 +246,25 @@ define(
                  *
                  * @return {jQuery.Deferred}
                  */
-                updateAddress: function (data) {
+                updateAddress: function (data, errorInfo) {
                     var self = this;
                     /**
                      * Billing address
                      */
+                    document.logBreadIssue('info', errorInfo, 'starting update address');
+
                     var billingAddressData = this.getAddressData(data.billingAddress);
+                    document.logBreadIssue('info', $.extend(true, {}, errorInfo, {billingAddressData: billingAddressData}), 'got billing address data');
                     var newBillingAddress = createBillingAddress(billingAddressData);
+                    document.logBreadIssue('info', $.extend(true, {}, errorInfo, {newBillingAddress: newBillingAddress}), 'got new billing address');
 
                     // New address must be selected as a billing address
                     selectBillingAddress(newBillingAddress);
+                    document.logBreadIssue('info', errorInfo, 'selected new billing address');
                     checkoutData.setSelectedBillingAddress(newBillingAddress.getKey());
+                    document.logBreadIssue('info', errorInfo, 'set selected billing address');
                     checkoutData.setNewCustomerBillingAddress(billingAddressData);
+                    document.logBreadIssue('info', errorInfo, 'set new customer billing address');
 
                     /**
                      * Reload checkout section & add bread token
@@ -265,7 +272,9 @@ define(
                     if(quote.isVirtual()) {
                         return defaultProcessor;
                     }
-                    return defaultProcessor.saveShippingInformation();
+                    var defaultProcessorSavedShipping = defaultProcessor.saveShippingInformation();
+                    document.logBreadIssue('info', $.extend(true, {}, errorInfo, {defaultProcessorSavedShipping: defaultProcessorSavedShipping}), 'default processor saved shipping info');
+                    return defaultProcessorSavedShipping;
                 },
 
                 /**
