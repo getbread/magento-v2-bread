@@ -168,34 +168,6 @@ class Quote extends Data
     }
 
     /**
-     * Get Quote Items Data in JSON Format for cart overview
-     *
-     * @return array
-     */
-    public function getCartOverviewItemsData()
-    {
-        $quote      = $this->getSessionQuote();
-        $itemsData  = [];
-
-        foreach ($quote->getAllVisibleItems() as $item) {
-            $baseProduct            = $item->getProduct();
-            $simpleProductItem      = $item->getOptionByCode('simple_product');
-            $thisProduct            = null;
-            if ($simpleProductItem == null) {
-                $thisProduct    = $baseProduct;
-                $baseProduct    = null;
-            } else {
-                $thisProduct    = $item->getOptionByCode('simple_product')->getProduct();
-            }
-
-            $itemsData[]   = $this->helperCatalog
-                ->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), null);
-        }
-
-        return $itemsData;
-    }
-
-    /**
      * Get Quote Items Data for checkout form
      *
      * @return array
@@ -215,7 +187,7 @@ class Quote extends Data
 
         $itemsData     = [];
         foreach ($quoteItems as $item) {
-            $price                  = $item->getPrice();
+            $price                  = $item->getCalculationPrice();
             $baseProduct            = $item->getProduct();
             $simpleProductItem      = $item->getOptionByCode('simple_product');
             $thisProduct            = null;
