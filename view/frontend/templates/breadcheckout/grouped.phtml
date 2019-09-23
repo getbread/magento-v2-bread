@@ -256,6 +256,8 @@
                 }).done(function(response) {
                     if (response.items) {
                         document.configureButton(response.items);
+                    } else {
+                        $('.button-prevent').show();
                     }
                 }).fail(function(error) {
                     var errorInfo = {

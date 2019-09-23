@@ -273,15 +273,6 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             ->setLastOrderStatus($order->getStatus());
         $this->customerSession->setBreadItemAddedToQuote(false);
 
-        // Empty shopping cart
-        $cart = $this->cartHelper->getCart();
-        $cart->truncate()->save();
-        $cartItems = $cart->getItems();
-        foreach ($cartItems as $item) {
-            $quote->removeItem($item->getId());
-        }
-
-        $this->quoteRepository->save($quote);
         $this->_redirect('checkout/onepage/success');
         // @codingStandardsIgnoreEnd
     }

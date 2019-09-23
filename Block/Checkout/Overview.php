@@ -105,7 +105,7 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     public function getProductDataJson()
     {
-        $itemsData      = $this->quoteHelper->getCartOverviewItemsData();
+        $itemsData = $this->quoteHelper->getQuoteItemsData();
         return $this->jsonEncode($itemsData);
     }
 

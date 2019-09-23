@@ -29,12 +29,23 @@ define(
                         {
                             dsn: config.dsn,
                             beforeSend(event) {
-                                var isBreadIssue = event.extra && Object.values(event.extra).includes('BreadIssue');
-
-                                if (!isBreadIssue) {
+                                if (!event || !event.extra) {
                                     return null;
                                 }
-                                return event;
+
+                                var isBreadIssue = null;
+
+                                Object.keys(event.extra).map(function(key) {
+                                    if (event.extra[key] === 'BreadIssue') {
+                                        isBreadIssue = true;
+                                    }
+                                });
+
+                                if (isBreadIssue) {
+                                    return event;
+                                }
+
+                                return null;
                             }
                         }
                     );
