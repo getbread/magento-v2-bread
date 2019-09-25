@@ -24,7 +24,6 @@ class GenerateCart extends \Magento\Backend\App\Action
         \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
         \Bread\BreadCheckout\Helper\Url $urlHelper
     ) {
-    
         $this->resultFactory = $context->getResultFactory();
         $this->helper = $helper;
         $this->config = $scopeConfig;
@@ -94,6 +93,18 @@ class GenerateCart extends \Magento\Backend\App\Action
             $arr['options']['discounts'] = $this->helper->getDiscountData() ? $this->helper->getDiscountData() : [];
 
             $arr['options']['tax'] = $this->helper->getTaxValue();
+
+            if ($this->helper->isTargetedFinancing() && $this->helper->checkFinancingMode('cart')) {
+                $financingId = $this->helper->getFinancingId();
+                $threshold = $this->helper->getTargetedFinancingThreshold();
+
+                $arr['options']['financingProgramId'] = $quote->getGrandTotal() >= $threshold ? $financingId : null;
+            } elseif ($this->helper->isTargetedFinancing()
+                && $this->helper->checkFinancingMode('sku')
+                && $this->helper->isFinancingBySku()
+            ) {
+                $arr['options']['financingProgramId'] = $this->helper->getFinancingId();
+            }
 
             $result = $this->paymentApiClient->submitCartData($arr);
 
