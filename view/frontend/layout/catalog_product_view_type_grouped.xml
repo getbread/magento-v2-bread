@@ -2,14 +2,15 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
 
-        <referenceBlock name="breadcheckout.prod.view" remove="true"/>
+        <referenceBlock name="breadcheckout.product.view" remove="true"/>
         <referenceBlock name="breadcheckout.checkout.options" remove="true"/>
 
         <referenceContainer name="product.info.extrahint">
-            <block template="Bread_BreadCheckout::breadcheckout/grouped.phtml"
-                   class="Bread\BreadCheckout\Block\Product\View"
-                   name="breadcheckout.checkout.grouped"
-            />
+            <block class="Magento\GroupedProduct\Block\Product\View\Type\Grouped" name="breadcheckout.checkout.grouped" template="Bread_BreadCheckout::breadcheckout/grouped.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Bread\BreadCheckout\ViewModel\Product\View</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

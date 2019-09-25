@@ -31,7 +31,7 @@ class Js extends \Magento\Framework\View\Element\Text
     protected $curl;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \Bread\BreadCheckout\Helper\Log
      */
     public $logger;
 
@@ -63,7 +63,7 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     protected function _toHtml()
     {
-        if ($this->isActive()) {
+        if ($this->helper->isActive()) {
             return $this->getJsScriptsString();
         }
 
@@ -96,63 +96,23 @@ class Js extends \Magento\Framework\View\Element\Text
         $dsn = $this->getSentryDSN();
 
         // Don't enable Sentry if dsn can't be retrieved
-        $isSentryEnabled = $this->isSentryEnabled() && $dsn;
+        $isSentryEnabled = $this->helper->isSentryEnabled() && $dsn;
 
         $sentryConfigScript = sprintf(
             $sentryConfigScript,
             $dsn,
             $this->getModuleVersion(),
-            $this->getPublicApiKey(),
+            $this->helper->getApiPublicKey(),
             $isSentryEnabled
         );
 
         $breadJsScript = sprintf(
             '<script src="%s" data-api-key="%s"></script>',
-            $this->getJsLibLocation(),
-            $this->getPublicApiKey()
+            $this->helper->getJsLibLocation(),
+            $this->helper->getApiPublicKey()
         );
 
         return $moduleVersionComment . $sentryConfigScript . $breadJsScript;
-    }
-
-    /**
-     * Check if extension is active
-     *
-     * @return bool
-     */
-    protected function isActive()
-    {
-        return (bool) $this->helper->isActive();
-    }
-
-    /**
-     * Get API Key
-     *
-     * @return mixed
-     */
-    protected function getPublicApiKey()
-    {
-        return $this->helper->getApiPublicKey();
-    }
-
-    /**
-     * Get JS URI
-     *
-     * @return mixed
-     */
-    protected function getJsLibLocation()
-    {
-        return $this->helper->getJsLibLocation();
-    }
-
-    /**
-     * Get Sentry Enabled
-     *
-     * @return boolean
-     */
-    protected function isSentryEnabled()
-    {
-        return $this->helper->isSentryEnabled();
     }
 
     /**
@@ -181,7 +141,7 @@ class Js extends \Magento\Framework\View\Element\Text
         }
 
         try {
-            $this->curl->setCredentials($this->getUsername(), $this->getPassword());
+            $this->curl->setCredentials($this->helper->getApiPublicKey(), $this->helper->getApiSecretKey());
             $this->curl->get($this->helper::URL_LAMBDA_SENTRY_DSN);
 
             $response = json_decode($this->curl->getBody(), true);
@@ -201,25 +161,5 @@ class Js extends \Magento\Framework\View\Element\Text
             $this->logger->log(['EXCEPTION WHEN GETTING SENTRY DSN' => $e->getMessage()]);
             return null;
         }
-    }
-
-    /**
-     * Get public api key to use as username for dsn request
-     *
-     * @return string
-     */
-    private function getUsername()
-    {
-        return $this->helper->getApiPublicKey();
-    }
-
-    /**
-     * Get private api key to use as password for dsn request
-     *
-     * @return string
-     */
-    private function getPassword()
-    {
-        return $this->helper->getApiSecretKey();
     }
 }

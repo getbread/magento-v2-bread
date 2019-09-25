@@ -1,14 +1,12 @@
 <?php
-/**
- * Handles Product View Block
- *
- * @copyright Bread   2016
- * @author    Joel    @Mediotype
- * @author    Miranda @Mediotype
- */
-namespace Bread\BreadCheckout\Block\Product;
 
-class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
+namespace Bread\BreadCheckout\ViewModel\Product\Type;
+
+use Magento\Framework\DataObject;
+use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\View\Element\Block\ArgumentInterface;
+
+class Bundle extends DataObject implements ArgumentInterface
 {
     public $_product;
 
@@ -18,9 +16,9 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public $registry;
 
     /**
-     * @var Magento\Framework\Json\Helper\Data
+     * @var Json
      */
-    public $jsonHelper;
+    public $serializer;
 
     /**
      * @var \Bread\BreadCheckout\Helper\Catalog
@@ -49,99 +47,59 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
 
     /**
      * Bundle constructor.
-     *
-     * @param \Magento\Catalog\Block\Product\Context     $context
-     * @param \Magento\Framework\Json\Helper\Data        $jsonHelper
-     * @param \Bread\BreadCheckout\Helper\Catalog        $catalogHelper
-     * @param \Magento\Catalog\Helper\Product            $catalogProduct
-     * @param \Bread\BreadCheckout\Helper\Customer       $customerHelper
-     * @param \Bread\BreadCheckout\Helper\Data           $dataHelper
-     * @param \Magento\Framework\Stdlib\ArrayUtils       $arrayUtils
-     * @param \Magento\Framework\Json\EncoderInterface   $jsonEncoder
-     * @param \Magento\Bundle\Model\Product\PriceFactory $productPrice
-     * @param \Magento\Framework\Locale\FormatInterface  $localeFormat
-     * @param \Bread\BreadCheckout\Helper\Quote          $quoteHelper
-     * @param array                                      $data
+     * @param \Magento\Catalog\Block\Product\Context $context
+     * @param Json $serializer
+     * @param \Bread\BreadCheckout\Helper\Catalog $catalogHelper
+     * @param \Magento\Catalog\Helper\Product $catalogProduct
+     * @param \Bread\BreadCheckout\Helper\Customer $customerHelper
+     * @param \Bread\BreadCheckout\Helper\Data $dataHelper
+     * @param \Bread\BreadCheckout\Helper\Quote $quoteHelper
+     * @param array $data
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        Json $serializer,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Magento\Catalog\Helper\Product $catalogProduct,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Bread\BreadCheckout\Helper\Data $dataHelper,
-        \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Magento\Bundle\Model\Product\PriceFactory $productPrice,
-        \Magento\Framework\Locale\FormatInterface $localeFormat,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         array $data = []
     ) {
         $this->registry = $context->getRegistry();
-        $this->jsonHelper = $jsonHelper;
+        $this->serializer = $serializer;
         $this->catalogHelper = $catalogHelper;
         $this->customerHelper = $customerHelper;
         $this->dataHelper = $dataHelper;
         $this->catalogProduct = $catalogProduct;
         $this->quoteHelper = $quoteHelper;
 
-        parent::__construct(
-            $context,
-            $arrayUtils,
-            $catalogProduct,
-            $productPrice,
-            $jsonEncoder,
-            $localeFormat,
-            $data
-        );
+        parent::__construct($data);
     }
 
-    public function toHtml()
+    public function isAllowedRender($product)
     {
+        $isAllowed = false;
+
         $aboveThreshold = $this->dataHelper->aboveThreshold(
-            $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
+            $product->getPriceInfo()->getPrice('final_price')->getValue()
         );
-        $disabledSku = !$this->quoteHelper->checkDisabledForSku($this->getProduct()->getSku());
+        $disabledSku = !$this->quoteHelper->checkDisabledForSku($product);
 
-        $output = '';
-        if ($aboveThreshold && $disabledSku) {
-            $output = parent::toHtml();
+        if ($this->catalogHelper->isEnabledOnPDP() && $aboveThreshold && $disabledSku) {
+            $isAllowed = true;
         }
 
-        return $output;
+        return $isAllowed;
     }
-
-    protected function _construct($bypass = false)
-    {
-        if (!$bypass) {
-            $this->setBlockCode($this->getBlockCode());
-        }
-        parent::_construct();
-    }
-
-    /**
-     * Get Current Product
-     *
-     * @return \Magento\Catalog\Model\Product
-     */
-    public function getProduct()
-    {
-        if (null === $this->_product) {
-            $this->_product = $this->registry->registry('product');
-        }
-
-        return $this->_product;
-    }
-
     /**
      * Get Minimal Product price
      *
      * @return int
      */
-    public function getMinPrice()
+    public function getMinPrice($product)
     {
-        return $this->getProduct()
-            ->getPriceInfo()
+        return $product->getPriceInfo()
             ->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
             ->getMinimalPrice()
             ->getValue();
@@ -152,10 +110,8 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      *
      * @return int
      */
-    public function getSelectedProductPrice()
+    public function getSelectedProductPrice($product)
     {
-        $product = $this->getProduct();
-
         $selectionCollection = $product->getTypeInstance(true)
             ->getSelectionsCollection(
                 $product->getTypeInstance(true)->getOptionsIds($product),
@@ -185,22 +141,21 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      *
      * @return string
      */
-    public function getProductDataJson()
+    public function getProductDataJson($product)
     {
-        $product = $this->getProduct();
         $basePrice = $product->getPrice();
 
         if ((int)$product->getPriceType() === \Magento\Bundle\Model\Product\Price::PRICE_TYPE_FIXED) {
-            $selectedPrice = $basePrice + $this->getSelectedProductPrice();
+            $selectedPrice = $basePrice + $this->getSelectedProductPrice($product);
         } else {
-            $selectedPrice = $this->getSelectedProductPrice();
+            $selectedPrice = $this->getSelectedProductPrice($product);
         }
 
-        $bundlePrice = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice();
+        $bundlePrice = ($selectedPrice > 0) ? $selectedPrice : $this->getMinPrice($product);
 
         $data = [$this->catalogHelper->getProductDataArray($product, null, 1, $bundlePrice)];
 
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -209,11 +164,8 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
      *
      * @return string
      */
-    public function getBundleProductDataJson()
+    public function getBundleProductDataJson($product)
     {
-        $product = $this->getProduct();
-        $customOptions = $this->getCustomOptionsData($product->getOptions());
-
         $data = [
             'bundleId'      => $product->getId(),
             'sku'           => $product->getSku(),
@@ -268,7 +220,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
 
         $data['selectedPrice'] = round($bundlePrice * 100);
 
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -324,7 +276,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public function getDiscountDataJson()
     {
         $data     = [];
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -335,7 +287,7 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public function getFinancingJson()
     {
         $data     = $this->catalogHelper->getFinancingData();
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -346,20 +298,6 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public function getAsLowAs()
     {
         return ($this->catalogHelper->isAsLowAs()) ? 'true' : 'false';
-    }
-
-    /**
-     * Checks Settings For Show On Product Detail Page During Output
-     *
-     * @return string
-     */
-    protected function _toHtml()
-    {
-        if ($this->catalogHelper->isEnabledOnPDP()) {
-            return parent::_toHtml();
-        }
-
-        return '';
     }
 
     /**
@@ -402,21 +340,21 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         return $this->catalogHelper->getConfigDataUrl();
     }
 
-     /**
-      * Get Discounts Data URL
-      *
-      * @return string
-      */
+    /**
+     * Get Discounts Data URL
+     *
+     * @return string
+     */
     public function getDiscountsDataUrl()
     {
         return $this->catalogHelper->getDiscountsDataUrl();
     }
 
-     /**
-      * Get Clear Quote Data URL
-      *
-      * @return string
-      */
+    /**
+     * Get Clear Quote Data URL
+     *
+     * @return string
+     */
     public function getClearQuoteUrl()
     {
         return $this->catalogHelper->getClearQuoteUrl();
@@ -480,17 +418,6 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public function getBlockCode()
     {
         return (string) $this->catalogHelper->getBlockCodeProductView();
-    }
-
-    /**
-     * Publicly accessible json encoder
-     *
-     * @param  $data
-     * @return string
-     */
-    public function jsonEncode($data)
-    {
-        return $this->jsonHelper->jsonEncode($data);
     }
 
     /**

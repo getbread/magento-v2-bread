@@ -1,4 +1,14 @@
-<?php /** @var $this Bread\BreadCheckout\Block\Product\View */ ?>
+<?php
+/**
+ * @var $block Magento\ConfigurableProduct\Block\Product\View\Type\Configurable
+ * @var $viewModel Bread\BreadCheckout\ViewModel\Product\View
+ */
+$viewModel = $block->getData('view_model');
+$product = $block->getProduct();
+if (!$viewModel->isAllowedRender($product)) {
+    return;
+}
+?>
 <script>
     document.Skus = {};
     spConfig = <?= /* @noEscape */ $block->getJsonConfig(); ?>;
@@ -109,7 +119,7 @@
             };
 
             <?php
-            $itemIds = $block->getChildProductIds($block->getProduct());
+            $itemIds = $block->getChildProductIds($product);
 
             if (!empty($itemIds)) {
                 foreach ($itemIds as $val) {

@@ -1,20 +1,20 @@
-<?php /** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
+<?php /** @var \Bread\BreadCheckout\Block\Checkout\Minicart $block */ ?>
 <?= /* @noEscape */ $block->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr-minicart">
-    <div id="bread-checkout-btn-minicart" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
+    <div id="bread-checkout-btn-minicart" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->catalogHelper->getDefaultButtonSizeHtml(); ?>>
         <span>
             <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
         </span>
     </div>
     <div class="button-prevent" id="button-prevent">
-        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ $block->productTypeErrorMessage() ?>">&nbsp;</span>
+        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ $block->escapeHtml($block->catalogHelper->getProductTypeMessage()) ?>">&nbsp;</span>
     </div>
 </div>
 
 <script type="text/javascript">
     require(['jquery', 'jquery/validate', 'mage/validation'], function($){
 
-        var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
+        var validateProductTypes = Boolean(<?= /* @noEscape */ $block->quoteHelper->validateAllowedProductTypes() ?>);
         if(validateProductTypes === false){
             var buttonPrevent = $('#button-prevent');
             buttonPrevent.css('width','100%');
@@ -23,11 +23,11 @@
         }
 
         document.configureButton = function (items) {
-            var address             = <?= /* @noEscape */ $block->getShippingAddressData(); ?>;
-            var billingAddress      = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
-            var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
+            var address             = <?= /* @noEscape */ $block->customerHelper->getShippingAddressData(); ?>;
+            var billingAddress      = <?= /* @noEscape */ $block->customerHelper->getBillingAddressData(); ?>;
+            var buttonOnProduct     = Boolean(<?= /* @noEscape */ $block->catalogHelper->isButtonOnProducts(); ?>);
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo         = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
+            var financingInfo       = <?= /* @noEscape */ json_encode($block->catalogHelper->getFinancingData()); ?>;
             var total = 0;
             for(var i = 0; i < items.length; i++){
                 total += items[i]['price'] * items[i]['quantity'];
@@ -35,15 +35,15 @@
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn-minicart",
-                asLowAs: <?= /* @noEscape */ $block->getAsLowAs(); ?>,
+                asLowAs: Boolean(<?= /* @noEscape */ $block->catalogHelper->isAsLowAs(); ?>),
                 actAsLabel: false,
-                <?php if (!$block->isHealthcare()) : ?>
+                <?php if (!$block->catalogHelper->isHealthcare()) : ?>
                 items: items,
                 <?php else : ?>
                 customTotal: total,
                 <?php endif; ?>
-                allowCheckout: <?= /* @noEscape */ $block->getAllowCheckout(); ?>,
-                buttonLocation: '<?= /* @noEscape */ $block->getCartSummaryLocation(); ?>',
+                allowCheckout: Boolean(<?= /* @noEscape */ $block->helperData->getAllowCheckoutCP(); ?>),
+                buttonLocation: '<?= /* @noEscape */ \Bread\BreadCheckout\Helper\Data::BUTTON_LOCATION_CART_SUMMARY; ?>',
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
@@ -56,7 +56,7 @@
                         k.name = 'form_key';
                         k.value = $.cookie('form_key');
                         var f = document.createElement('form');
-                        f.action = '<?= /* @noEscape */ $block->getValidateOrderUrl(); ?>';
+                        f.action = '<?= /* @noEscape */ $block->helperData->getValidateOrderUrl(); ?>';
                         f.method = 'POST';
                         f.appendChild(i);
                         f.appendChild(k);
@@ -78,10 +78,10 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+                    shippingAddress.block_key        = '<?= /* @noEscape */ \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW; ?>';
+                    shippingAddress.additional_data  = <?= /* @noEscape */ $block->serializer->serialize($block->setAdditionalData()); ?>;
 
-                    var taxEstimationUrl = '<?= /* @noEscape */ $block->getTaxEstimationUrl(); ?>';
+                    var taxEstimationUrl = '<?= /* @noEscape */ $block->helperData->getTaxEstimateUrl(); ?>';
                     var shippingString = JSON.stringify(shippingAddress);
                     var errorInfo;
 
@@ -129,10 +129,10 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+                    shippingAddress.block_key        = '<?= /* @noEscape */ \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW; ?>';
+                    shippingAddress.additional_data  = <?= /* @noEscape */ $block->serializer->serialize($block->setAdditionalData()); ?>;
 
-                    var shippingAddressEstimationUrl = '<?= /* @noEscape */ $block->getShippingAddressEstimationUrl(); ?>';
+                    var shippingAddressEstimationUrl = '<?= /* @noEscape */ $block->catalogHelper->getShippingEstimateUrl(); ?>';
                     var errorInfo;
 
                     $.ajax({
@@ -189,7 +189,7 @@
                 breadConfig.actAsLabel = false;
             }
 
-            var targetedFinancingStatus = <?= /* @noEscape */ $block->getTargetedFinancingStatusJson(); ?>;
+            var targetedFinancingStatus = <?= /* @noEscape */ json_encode($block->quoteHelper->getTargetedFinancingStatus()); ?>;
 
             if (targetedFinancingStatus.shouldUseFinancingId) {
                 breadConfig.financingProgramId = targetedFinancingStatus.id;
@@ -214,7 +214,7 @@
         };
 
         $(document).ready(function() {
-            var minicartItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+            var minicartItems       = <?= /* @noEscape */ json_encode($block->quoteHelper->getCartOverviewItemsData()); ?>;
             document.configureButton(minicartItems);
         });
     });

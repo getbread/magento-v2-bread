@@ -5,11 +5,13 @@ namespace Bread\BreadCheckout\Block\Checkout;
 use Magento\Catalog\Block\ShortcutInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Locale\ResolverInterface;
+use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Model\MethodInterface;
 use Bread\BreadCheckout\Helper\Data;
+use Magento\Framework\Serialize\Serializer\Json;
 
-class Minicart extends Overview implements ShortcutInterface
+class Minicart extends Template implements ShortcutInterface
 {
     const ALIAS_ELEMENT_INDEX = 'alias';
 
@@ -28,12 +30,18 @@ class Minicart extends Overview implements ShortcutInterface
     /**
      * @var Data
      */
-    private $helperData;
+    public $helperData;
 
     /**
      * @var \Bread\BreadCheckout\Helper\Quote
      */
     public $quoteHelper;
+
+    public $catalogHelper;
+
+    public $customerHelper;
+
+    public $serializer;
 
     /**
      * Minicart constructor.
@@ -50,45 +58,25 @@ class Minicart extends Overview implements ShortcutInterface
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
-        \Bread\BreadCheckout\Helper\Data $dataHelper,
-        \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
-        \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
+        \Bread\BreadCheckout\Helper\Data $helperData,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
-        \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Magento\ConfigurableProduct\Helper\Data $configurableHelper,
-        \Magento\Catalog\Helper\Product $catalogProductHelper,
-        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
-        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         Session $checkoutSession,
         MethodInterface $payment,
-        Data $helperData,
+        Json $serializer,
         array $data = []
     ) {
-        parent::__construct(
-            $context,
-            $jsonHelper,
-            $catalogHelper,
-            $customerHelper,
-            $dataHelper,
-            $configurableProductFactory,
-            $configurableBlockFactory,
-            $quoteHelper,
-            $arrayUtils,
-            $jsonEncoder,
-            $configurableHelper,
-            $catalogProductHelper,
-            $currentCustomer,
-            $priceCurrency,
-            $configurableAttributeData,
-            $data
-        );
-
         $this->checkoutSession = $checkoutSession;
         $this->payment = $payment;
         $this->helperData = $helperData;
         $this->quoteHelper = $quoteHelper;
+        $this->catalogHelper = $catalogHelper;
+        $this->customerHelper = $customerHelper;
+        $this->serializer = $serializer;
+
+        parent::__construct(
+            $context,
+            $data
+        );
     }
 
     /**
@@ -140,5 +128,16 @@ class Minicart extends Overview implements ShortcutInterface
     private function isCartView()
     {
         return in_array('checkout_cart_index', $this->getLayout()->getUpdate()->getHandles());
+    }
+
+    /**
+     * Get Extra Button Design CSS
+     *
+     * @return mixed
+     */
+    public function getButtonDesign()
+    {
+        $design = $this->escapeCss($this->catalogHelper->getCartButtonDesign());
+        return $design ? $design : $this->catalogHelper->getPDPButtonDesign();
     }
 }

@@ -1,19 +1,17 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+
+        <referenceBlock name="breadcheckout.product.view" remove="true"/>
+        <referenceBlock name="breadcheckout.checkout.options" remove="true"/>
+
         <referenceContainer name="product.info.extrahint">
-            <block template="Bread_BreadCheckout::breadcheckout/view.phtml"
-                class="Bread\BreadCheckout\Block\Product\Bundle" as="breadcheckout.prod.view" name="breadcheckout.prod.view"/>
+            <block class="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle" name="breadcheckout.bundle.view" template="Bread_BreadCheckout::breadcheckout/bundle.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Bread\BreadCheckout\ViewModel\Product\Type\Bundle</argument>
+                </arguments>
+            </block>
         </referenceContainer>
 
-        <referenceBlock name="product.info.options.wrapper">
-            <referenceBlock name="breadcheckout.checkout.options" remove="true"/>
-
-            <!-- <block template="Bread_BreadCheckout::breadcheckout/options_bundle.phtml"
-                class="Magento\Catalog\Block\Product\View\Options" name="breadcheckout.checkout.bundle.options"/> -->
-
-            <block template="Bread_BreadCheckout::breadcheckout/bundle.phtml"
-                class="Bread\BreadCheckout\Block\Product\Bundle" name="breadcheckout.checkout.bundle"/>
-        </referenceBlock>
     </body>
 </page>

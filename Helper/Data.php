@@ -180,7 +180,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductTypeMessage($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_PRODUCT_TYPE_MSG, $store);
+        return utf8_encode($this->scopeConfig->getValue(self::XML_CONFIG_PRODUCT_TYPE_MSG, $store));
     }
 
     /**
@@ -683,7 +683,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCartButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_CP_BUTTON_DESIGN, $store);
+        return utf8_encode($this->scopeConfig->getValue(self::XML_CONFIG_CP_BUTTON_DESIGN, $store));
     }
 
     /**

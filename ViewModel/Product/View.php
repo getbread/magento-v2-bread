@@ -1,150 +1,77 @@
 <?php
-/**
- * Handles Product View Block
- *
- * @copyright Bread   2016
- * @author    Joel    @Mediotype
- * @author    Miranda @Mediotype
- */
-namespace Bread\BreadCheckout\Block\Product;
 
-class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable
+namespace Bread\BreadCheckout\ViewModel\Product;
+
+use Bread\BreadCheckout\Helper\Catalog;
+use Bread\BreadCheckout\Helper\Customer;
+use Bread\BreadCheckout\Helper\Data;
+use Bread\BreadCheckout\Helper\Quote;
+use Magento\Framework\DataObject;
+use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\View\Element\Block\ArgumentInterface;
+
+class View extends DataObject implements ArgumentInterface
 {
-    public $_product;
 
     /**
-     * @var \Magento\Framework\Registry
+     * @var Json
      */
-    public $registry;
+    public $serializer;
 
     /**
-     * @var \Magento\Framework\Json\Helper\Data
-     */
-    public $jsonHelper;
-
-    /**
-     * @var \Bread\BreadCheckout\Helper\Catalog
+     * @var Catalog
      */
     public $catalogHelper;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Data
+     * @var Data
      */
     public $dataHelper;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Customer
+     * @var Customer
      */
     public $customerHelper;
 
     /**
-     * @var \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory
-     */
-    public $configurableProductFactory;
-
-    /**
-     * @var \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory
-     */
-    public $configurableBlockFactory;
-
-    /**
-     * @var \Bread\BreadCheckout\Helper\Quote
+     * @var Quote
      */
     public $quoteHelper;
 
     /**
      * View constructor.
-     *
-     * @param \Magento\Catalog\Block\Product\Context                                   $context
-     * @param \Magento\Framework\Json\Helper\Data                                      $jsonHelper
-     * @param \Bread\BreadCheckout\Helper\Catalog                                      $catalogHelper
-     * @param \Bread\BreadCheckout\Helper\Customer                                     $customerHelper
-     * @param \Bread\BreadCheckout\Helper\Data                                         $dataHelper
-     * @param \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory      $configurableProductFactory
-     * @param \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory
-     * @param \Magento\Framework\Stdlib\ArrayUtils                                     $arrayUtils
-     * @param \Magento\Framework\Json\EncoderInterface                                 $jsonEncoder
-     * @param \Magento\ConfigurableProduct\Helper\Data                                 $configurableHelper
-     * @param \Magento\Catalog\Helper\Product                                          $catalogProductHelper
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer                         $currentCustomer
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface                        $priceCurrency
-     * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData             $configurableAttributeData
-     * @param \Bread\BreadCheckout\Helper\Quote                                        $quoteHelper
-     * @param array                                                                    $data
+     * @param Catalog $catalogHelper
+     * @param Customer $customerHelper
+     * @param Quote $quoteHelper
+     * @param Data $dataHelper
+     * @param Json $serializer
      */
     public function __construct(
-        \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
-        \Bread\BreadCheckout\Helper\Customer $customerHelper,
-        \Bread\BreadCheckout\Helper\Data $dataHelper,
-        \Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory $configurableProductFactory,
-        \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory,
-        \Magento\Framework\Stdlib\ArrayUtils $arrayUtils,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Magento\ConfigurableProduct\Helper\Data $configurableHelper,
-        \Magento\Catalog\Helper\Product $catalogProductHelper,
-        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
-        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
-        \Bread\BreadCheckout\Helper\Quote $quoteHelper,
+        Catalog $catalogHelper,
+        Customer $customerHelper,
+        Quote $quoteHelper,
+        Data $dataHelper,
+        Json $serializer,
         array $data = []
     ) {
-        $this->registry = $context->getRegistry();
-        $this->jsonHelper = $jsonHelper;
         $this->catalogHelper = $catalogHelper;
         $this->customerHelper = $customerHelper;
-        $this->dataHelper = $dataHelper;
-        $this->configurableProductFactory = $configurableProductFactory;
-        $this->configurableBlockFactory = $configurableBlockFactory;
         $this->quoteHelper = $quoteHelper;
+        $this->dataHelper = $dataHelper;
+        $this->serializer = $serializer;
 
-        parent::__construct(
-            $context,
-            $arrayUtils,
-            $jsonEncoder,
-            $configurableHelper,
-            $catalogProductHelper,
-            $currentCustomer,
-            $priceCurrency,
-            $configurableAttributeData,
-            $data
-        );
-    }
-
-    protected function _construct($bypass = false)
-    {
-        if (!$bypass) {
-            $this->setBlockCode($this->getBlockCode());
-        }
-        parent::_construct();
+        parent::__construct($data);
     }
 
     /**
-     * Get Current Product
+     * Return product data in json format
      *
-     * @return \Magento\Catalog\Model\Product
+     * @param $product
+     * @return bool|false|string
      */
-    public function getProduct()
+    public function getProductDataJson($product)
     {
-        if (null === $this->_product) {
-            $this->_product     = $this->registry->registry('product');
-        }
-
-        return $this->_product;
-    }
-
-    /**
-     * Get Product Data as JSON
-     *
-     * @return string
-     */
-    public function getProductDataJson()
-    {
-        $product    = $this->getProduct();
-        $data       = [$this->catalogHelper->getProductDataArray($product, null)];
-
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize([$this->catalogHelper->getProductDataArray($product, null)]);
     }
 
     /**
@@ -152,12 +79,10 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      *
      * @return string
      */
-    public function getGroupedDataJson()
+    public function getGroupedDataJson($product)
     {
-        $product = $this->getProduct();
         $data    = [$this->catalogHelper->getGroupedProductDataArray($product)];
-
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -178,7 +103,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getDiscountDataJson()
     {
         $data     = [];
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -189,7 +114,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getFinancingJson()
     {
         $data     = $this->catalogHelper->getFinancingData();
-        return $this->jsonEncode($data);
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -223,28 +148,27 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     }
 
     /**
-     * Checks Settings For Show On Product Detail Page During Output
+     * Check if template should return output
      *
-     * @return string
+     * @param \Magento\Catalog\Model\Product $product
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function _toHtml()
+    public function isAllowedRender($product)
     {
-        if ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_PRODUCT_VIEW
-            && $this->catalogHelper->isEnabledOnPDP()
-            && $this->catalogHelper->allowedProductType($this->getProduct()->getTypeId())
+        $isAllowed = false;
+
+        if ($this->catalogHelper->isEnabledOnPDP()
+            && $this->catalogHelper->allowedProductType($product->getTypeId())
             && $this->dataHelper->aboveThreshold(
-                $this->getProduct()->getPriceInfo()->getPrice('final_price')->getValue()
+                $product->getPriceInfo()->getPrice('final_price')->getValue()
             )
-            && !$this->quoteHelper->checkDisabledForSku($this->getProduct()->getSku())
+            && !$this->quoteHelper->checkDisabledForSku($product)
         ) {
-            return parent::_toHtml();
-        } elseif ($this->getBlockCode() === \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW
-            && $this->catalogHelper->isEnabledOnCOP()
-        ) {
-            return parent::_toHtml();
+            $isAllowed = true;
         }
 
-        return '';
+        return $isAllowed;
     }
 
     /**
@@ -297,11 +221,11 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
         return $this->catalogHelper->getDiscountsDataUrl();
     }
 
-     /**
-      * Get Clear Quote Data URL
-      *
-      * @return string
-      */
+    /**
+     * Get Clear Quote Data URL
+     *
+     * @return string
+     */
     public function getClearQuoteUrl()
     {
         return $this->catalogHelper->getClearQuoteUrl();
@@ -324,7 +248,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      */
     public function getIsButtonOnProduct()
     {
-        return ( $this->catalogHelper->isButtonOnProducts() ) ? 'true' : 'false';
+        return ($this->catalogHelper->isButtonOnProducts()) ? 'true' : 'false';
     }
 
     /**
@@ -410,6 +334,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
 
     /**
      * Get product IDs from related products collection
+     * @todo separate view model for configurable
      *
      * @param  \Magento\Catalog\Model\Product $product
      * @return array
@@ -432,7 +357,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     /**
      * Get SKU and price data for custom options on product
      *
-     * @param  $options
+     * @param \Magento\Catalog\Api\Data\ProductCustomOptionInterface[] $options
      * @return string
      */
     public function getCustomOptionsData($options)
@@ -455,7 +380,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
             }
         }
 
-        return $this->jsonEncode($optionsData);
+        return $this->serializer->serialize($optionsData);
     }
 
     /**
@@ -527,23 +452,13 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     {
         return $this->dataHelper->getOtherLocation();
     }
-    /**
-     * Publicly accessible json encoder
-     *
-     * @param  $data
-     * @return string
-     */
-    public function jsonEncode($data)
-    {
-        return $this->jsonHelper->jsonEncode($data);
-    }
 
     /**
      * Is downloadable type
      *
      * @return bool
      */
-    public function isDownloadable()
+    public function isDownloadable($typeId)
     {
         return $this->getProduct()->getTypeId() === \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE;
     }

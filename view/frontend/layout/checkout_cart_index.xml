@@ -5,7 +5,11 @@
     </head>
     <body>
         <referenceContainer name="checkout.cart.methods">
-            <block template="Bread_BreadCheckout::breadcheckout/cartview.phtml" class="Bread\BreadCheckout\Block\Checkout\Overview" as="breadcheckout.checkout.view" name="breadcheckout.checkout.view"/>
+            <block class="Magento\Checkout\Block\Cart" name="breadcheckout.checkout.view" template="Bread_BreadCheckout::breadcheckout/cartview.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Bread\BreadCheckout\ViewModel\Cart\CartView</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

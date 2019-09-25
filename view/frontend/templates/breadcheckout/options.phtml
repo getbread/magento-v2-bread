@@ -1,21 +1,24 @@
 <?php
 /**
- *
- * @author  Bread   @copyright  2016
- * @author  Joel    @Mediotype
- * @author  Miranda @Mediotype
+ * @var $block Magento\Catalog\Block\Product\View\Options
+ * @var $viewModel Bread\BreadCheckout\ViewModel\Product\Options
+ * @var $product Magento\Catalog\Model\Product
  */
+$viewModel = $block->getData('view_model');
+$product = $block->getProduct();
 
-/** @var $block Bread\BreadCheckout\Block\Product\View */
+if (!$viewModel->isAllowedRender($product)) {
+    return;
+}
 ?>
-<?php $_options = $block->decorateArray($block->getProduct()->getOptions()); ?>
+<?php $_options = $block->decorateArray($product->getOptions()); ?>
 <?php if (!empty($_options)) : ?>
     <script type="text/x-magento-init">
         {
             "*": {
                 "Bread_BreadCheckout/js/product/options": {
-                    "optionsData": <?= /* @noEscape */ $block->getCustomOptionsData($_options); ?>,
-                    "productType": "<?= /* @noEscape */ $block->getProduct()->getTypeId()?>"
+                    "optionsData": <?= /* @noEscape */ $viewModel->getCustomOptionsData($_options); ?>,
+                    "productType": "<?= /* @noEscape */ $product->getTypeId()?>"
                 }
             }
         }
