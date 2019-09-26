@@ -10,6 +10,7 @@
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
     </div>
+    <div class="splitpay-clickable-button"></div>
 </div>
 
 <script type="text/x-magento-init">
@@ -24,7 +25,8 @@
 </script>
 
 <script type="text/javascript">
-    require(['jquery'], function($) {
+    require(['jquery', 'Bread_BreadCheckout/js/product/splitpay'], function($, splitpay) {
+
         document.configureButton = function (items) {
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
@@ -227,6 +229,7 @@
 
                     if (typeof bread !== 'undefined') {
                         bread.checkout(breadConfig);
+                        splitpay.setupSplitpay(breadConfig, '.splitpay-clickable-button', false);
                     }
                 }).fail(function(error) {
                     document.logBreadIssue('error', {},
@@ -236,6 +239,7 @@
             } else {
                 if (typeof bread !== 'undefined') {
                     bread.checkout(breadConfig);
+                    splitpay.setupSplitpay(breadConfig, '.splitpay-clickable-button', false);
                 }
             }
         };
