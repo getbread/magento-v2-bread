@@ -3,6 +3,7 @@
     <body>
 
         <referenceBlock name="breadcheckout.prod.view" remove="true"/>
+        <referenceBlock name="breadcheckout.prod.price" remove="true"/>
         <referenceBlock name="breadcheckout.checkout.options" remove="true"/>
 
         <referenceContainer name="product.info.extrahint">

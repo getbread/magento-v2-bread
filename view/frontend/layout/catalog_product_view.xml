@@ -10,5 +10,8 @@
         <referenceBlock name="product.info.options.wrapper">
             <block template="Bread_BreadCheckout::breadcheckout/options.phtml" class="Bread\BreadCheckout\Block\Product\View" name="breadcheckout.checkout.options"/>
         </referenceBlock>
+        <referenceBlock name="product.info.main">
+            <block template="Bread_BreadCheckout::breadcheckout/price.phtml" class="Bread\BreadCheckout\Block\Product\View" name="breadcheckout.prod.price" after="product.info.price"/>
+        </referenceBlock>
     </body>
 </page>
