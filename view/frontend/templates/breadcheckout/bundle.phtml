@@ -13,7 +13,6 @@ require([
         var globalConfig = {
             optionConfig:               <?= /* @noEscape */ $block->getJsonConfig(); ?>,
             optionConfigBundle:         <?= /* @noEscape */ $block->getBundleProductDataJson(); ?>,
-            //optionCustomConfigBundle:   document.customOptionsBundleProduct,
             optionBundleSelector:       'input.bundle.option, select.bundle.option, textarea.bundle.option',
             optionBundleQtySelector:    'input.qty',
             optionBundleCustomSelector: '.product-custom-option',
@@ -54,18 +53,14 @@ require([
                 var form = this.element,
                     options = $(this.options.optionBundleSelector, form),
                     qty = $(this.options.optionBundleQtySelector, form);
-                    //customOptions = $(this.options.optionBundleCustomSelector, form);
 
                 this.cache.currentElement                  = this.options.optionConfig;
-                //this.cache.currentElement.selectedCustom   = '';
                 this.cache.currentElementBundle            = this.options.optionConfigBundle;
-                //this.cache.currentElementCustomBundle      = this.options.optionCustomConfigBundle;
                 this.cache.currentElement.previousSku      = this.cache.currentElementBundle.sku;
                 this.cache.currentElement.previousPrice    = this.cache.currentElementBundle.selectedPrice;
 
                 options.on('change', this._onBundleOptionChanged.bind(this));
                 qty.on('change', this._onQtyFieldChanged.bind(this));
-                //customOptions.on('change', this._onBundleCustomOptionChanged.bind(this));
             },
 
             /**
@@ -211,7 +206,6 @@ require([
                 this.cache.currentElement.selectedSku      = this.options.optionConfigBundle.sku + '///';
 
                 $.each(this.cache.currentElement.selected, $.proxy(this._renderOption, this));
-                //$.each(this.cache.currentElement.selectedCustom, $.proxy(this._renderCustomOption, this));
                 this.cache.currentElement.selectedSku = this.cache.currentElement.selectedSku.slice(0, -1);
 
                 if((this.cache.currentElement.previousPrice !== this.cache.currentElement.selectedPrice)
@@ -231,14 +225,9 @@ require([
         });
 
         $(document).ready(function() {
-            /**
-             * Overlay element onto bread button to prevent
-             * it from being clicked until options are selected
-             */
-            $(bundleConfig.addToCartForm).bundleBread();
-
             $(bundleConfig.buttonPrimaryCustom).on('click', function() {
                 $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonDetailsContSel);
+                $(bundleConfig.addToCartForm).bundleBread();
             });
 
             $(bundleConfig.buttonBackCustom).on('click', function() {
