@@ -10,14 +10,16 @@
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
     </div>
+    <div class="splitpay-clickable-button"></div>
 </div>
 
 <script>
     require([
         'jquery',
+        'Bread_BreadCheckout/js/product/splitpay',
         'jquery/validate',
         'mage/validation'
-    ], function($) {
+    ], function($, splitpay) {
         document.configureButton = function (items) {
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
@@ -216,6 +218,7 @@
 
                 if (typeof bread !== 'undefined') {
                     bread.checkout(breadConfig);
+                    splitpay.setupSplitpay(breadConfig, '.splitpay-clickable-button', false);
                 }
             }).fail(function(error) {
                 document.logBreadIssue('error', {},
