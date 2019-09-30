@@ -25,7 +25,7 @@
 </script>
 
 <script type="text/javascript">
-    require(['jquery', 'Bread_BreadCheckout/js/product/splitpay'], function($, splitpay) {
+    require(['jquery', 'splitpay'], function($, splitpay) {
 
         document.configureButton = function (items) {
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
