@@ -13,7 +13,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'Bread_BreadCheckout/js/product/splitpay', 'jquery/validate', 'mage/validation', '!domReady'], function($, splitpay) {
+    require(['jquery', 'splitpay', 'jquery/validate', 'mage/validation', '!domReady'], function($, splitpay) {
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
         if (validateProductTypes === false) {
