@@ -6,10 +6,6 @@ define([], function () {
     var ERROR_PREFIX = 'Bread Integration Error: Could not setup promotional label for SplitPay. Reason: ';
     var INTEGRATION_ERROR = 'Could not create Bread SplitPay Promotional Label within 5 seconds. Please verify that the provided selector is valid';
 
-    var retryCount = 0;
-
-    var retry;
-
     var splitpayPromo = function (opts, selector, includeInstallments) {
         if (window.bread === undefined || window.bread.ldflags['multipay-enable'] === false) {
             return;
@@ -43,7 +39,9 @@ define([], function () {
 
     return {
         setupSplitpay: function (breadConfig, selector, includeInstallments) {
-            retry = window.setInterval(() => {
+            var retryCount = 0;
+
+            var retry = window.setInterval(() => {
                 try {
                     if (window.bread && window.bread.ldflags && window.bread.ldflags._isReady) {
                         window.clearInterval(retry);
