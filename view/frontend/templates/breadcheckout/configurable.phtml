@@ -78,7 +78,6 @@
                     attributes: this.attributes,
                     selected_options: selectedOptions
                 };
-                document.logBreadIssue('info', logInfo, 'Using old version of getIdOfSelectedProduct');
 
                 $.each(this.attributes, function(attrId, attrVal) {
                     var optionId = selectedOptions[attrId];
@@ -102,6 +101,7 @@
                 });
 
                 if (this.productIds.length === 1) {
+                    document.logBreadIssue('info', logInfo, 'Old version of getIdOfSelectedProduct found item');
                     return this.productIds[0];
                 } else {
                     return null;
