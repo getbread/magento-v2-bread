@@ -84,13 +84,20 @@ class GenerateCart extends \Magento\Backend\App\Action
             $arr['options']['shippingContact'] = $this->helper->getShippingAddressData();
             $arr['options']['billingContact'] = $this->helper->getBillingAddressData();
 
-            if (!$this->helper->isHealthcare()) {
+            if (!$this->helper->isHealthcare() && !$quote->getUseRewardPoints()) {
                 $arr['options']['items'] = $this->helper->getQuoteItemsData();
             } else {
                 $arr['options']['customTotal'] = round($quote->getGrandTotal() * 100);
             }
 
             $arr['options']['discounts'] = $this->helper->getDiscountData() ? $this->helper->getDiscountData() : [];
+            if($quote->getUseRewardPoints()){
+                array_push($arr['options']['discounts'],
+                    array(
+                        'amount' => round($quote->getRewardCurrencyAmount() * 100),
+                        'description' => __('Reward Points')
+                    ));
+            }
 
             $arr['options']['tax'] = $this->helper->getTaxValue();
 
