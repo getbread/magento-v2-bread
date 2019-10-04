@@ -11,7 +11,7 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 {
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service
      */
     public $paymentApiClient;
 
@@ -32,13 +32,13 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient,
         \Magento\Catalog\Model\ResourceModel\ProductFactory $catalogResourceModelProductFactory,
         \Magento\Framework\DataObjectFactory $dataObjectFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
-        \Bread\BreadCheckout\Helper\Log $logger,
+        \Bread\BreadCheckout\Log\Logger $logger,
         \Bread\BreadCheckout\Helper\Checkout $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
@@ -92,7 +92,7 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 
             $result = $newData;
         } catch (\Throwable $e) {
-            $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
+            $this->logger->write(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $result = ['error' => (string) __('Error: Unable to process transaction.')];
         }
 

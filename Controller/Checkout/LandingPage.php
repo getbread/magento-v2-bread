@@ -10,7 +10,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
     public $request;
 
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service
      */
     public $paymentApiClient;
 
@@ -45,7 +45,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
     public $helper;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Log
+     * @var \Bread\BreadCheckout\Log\Logger
      */
     public $logger;
 
@@ -86,14 +86,14 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient,
         \Magento\Customer\Model\Customer $customer,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Bread\BreadCheckout\Helper\Checkout $helper,
-        \Bread\BreadCheckout\Helper\Log $logger,
+        \Bread\BreadCheckout\Log\Logger $logger,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
@@ -164,7 +164,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
                 $this->_redirect('checkout/onepage/success');
             }
         } catch (\Throwable $e) {
-            $this->logger->log(['ERROR' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
+            $this->logger->write(['ERROR' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $this->customerHelper->sendCustomerErrorReportToMerchant($e, "", $orderRef, $transactionId);
             $this->messageManager->addErrorMessage(
                 __('There was an error with your financing program. Notification was sent to merchant.')
@@ -213,7 +213,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         try {
             $order = $this->quoteManagement->submit($quote);
         } catch (\Throwable $e) {
-            $this->logger->log(
+            $this->logger->write(
                 [
                 'ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage(),
                 'TRACE' => $e->getTraceAsString()

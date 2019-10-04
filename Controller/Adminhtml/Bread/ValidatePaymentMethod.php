@@ -11,7 +11,7 @@ namespace Bread\BreadCheckout\Controller\Adminhtml\Bread;
 class ValidatePaymentMethod extends \Magento\Backend\App\Action
 {
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service
      */
     public $paymentApiClient;
 
@@ -21,7 +21,7 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
     public $resultJsonFactory;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Log
+     * @var \Bread\BreadCheckout\Log\Logger
      */
     public $logger;
 
@@ -37,9 +37,9 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Bread\BreadCheckout\Helper\Log $log,
+        \Bread\BreadCheckout\Log\Logger $log,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
     ) {
@@ -74,7 +74,7 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
             }
             $response = ['result' => $result];
         } catch (\Throwable $e) {
-            $this->logger->log(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
+            $this->logger->write(['EXCEPTION IN VALIDATE PAYMENT IN ADMIN CONTROLLER'=>$e->getMessage()]);
 
             $response = ['error' => 'Something went wrong processing the Bread payment. '
                 . 'Please select a different payment method to complete checkout.'];

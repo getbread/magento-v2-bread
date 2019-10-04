@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Helper;
 
+use Bread\BreadCheckout\Log\Logger;
+
 class Customer extends Data
 {
     /**
@@ -66,7 +68,7 @@ class Customer extends Data
     public $addressRepository;
 
     /**
-     * @var Log
+     * @var Logger
      */
     public $logger;
 
@@ -87,7 +89,7 @@ class Customer extends Data
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
-        \Bread\BreadCheckout\Helper\Log $logger
+        \Bread\BreadCheckout\Log\Logger $logger
     ) {
         $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
@@ -257,7 +259,7 @@ class Customer extends Data
             }
 
         } catch (\Throwable $e) {
-            $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
+            $this->logger->write(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
         }
 
         return $customer;

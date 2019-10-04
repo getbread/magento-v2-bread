@@ -22,7 +22,7 @@ class Checkout extends Quote
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
     ) {
         parent::__construct(

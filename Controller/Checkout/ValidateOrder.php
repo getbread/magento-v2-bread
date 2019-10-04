@@ -11,7 +11,7 @@ namespace Bread\BreadCheckout\Controller\Checkout;
 class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 {
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service
      */
     public $paymentApiClient;
 
@@ -26,7 +26,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     public $cartHelper;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Log
+     * @var \Bread\BreadCheckout\Log\Logger
      */
     public $logger;
 
@@ -77,10 +77,10 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Checkout\Helper\Cart $cartHelper,
-        \Bread\BreadCheckout\Helper\Log $logger,
+        \Bread\BreadCheckout\Log\Logger $logger,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
@@ -134,7 +134,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $token = $this->getRequest()->getParam('token');
             if ($token) {
-                $this->logger->log(
+                $this->logger->write(
                     [
                     'VALIDATE ORDER TOKEN' => $token,
                     ]
@@ -145,7 +145,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         } catch (\Throwable $e) {
             $errorMessage = $e->getMessage();
 
-            $this->logger->log(['MESSAGE' => $errorMessage]);
+            $this->logger->write(['MESSAGE' => $errorMessage]);
 
             //TODO: rewrite this when API is updated to better handle errors, instead of searching
             //TODO: through error message string
@@ -179,7 +179,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
     protected function processOrder($data)
     {
         // @codingStandardsIgnoreStart
-        $this->logger->log(['PROCESS ORDER DATA' => $data]);
+        $this->logger->write(['PROCESS ORDER DATA' => $data]);
 
         /** @var $quote \Magento\Quote\Model\Quote */
         $quote = $this->checkoutSession->getQuote();
@@ -218,13 +218,13 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
             $billingContact['region_id'] = $shippingContact['region_id'];
         }
 
-        $this->logger->log(['SHIPPING CONTACT' => $shippingContact, 'BILLING CONTACT' => $billingContact]);
+        $this->logger->write(['SHIPPING CONTACT' => $shippingContact, 'BILLING CONTACT' => $billingContact]);
 
         $billingAddress = $quote->getBillingAddress()->addData($billingContact);
         $shippingAddress = $quote->getShippingAddress()->addData($shippingContact)->setCollectShippingRates(true);
 
         if (!isset($data['shippingMethodCode'])) {
-            $this->logger->log('Shipping Method Code Is Not Set On The Response');
+            $this->logger->write('Shipping Method Code Is Not Set On The Response');
         }
 
         $shippingAddress->setShippingMethod($data['shippingMethodCode']);
@@ -255,7 +255,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         try {
             $order = $this->quoteManagement->submit($quote);
         } catch (\Throwable $e) {
-            $this->logger->log(['ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage()]);
+            $this->logger->write(['ERROR SUBMITTING QUOTE IN PROCESS ORDER' => $e->getMessage()]);
             throw $e;
         }
 

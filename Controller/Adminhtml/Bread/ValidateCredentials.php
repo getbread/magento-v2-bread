@@ -14,13 +14,13 @@ class ValidateCredentials extends \Magento\Backend\App\Action
     const API_LIVE_URI    = 'https://api.getbread.com/carts/';
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Log
+     * @var \Bread\BreadCheckout\Log\Logger
      */
     public $logger;
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Bread\BreadCheckout\Helper\Log $log
+        \Bread\BreadCheckout\Log\Logger $log
     ) {
         $this->logger = $log;
         parent::__construct($context);
@@ -68,13 +68,13 @@ class ValidateCredentials extends \Magento\Backend\App\Action
             curl_close($curl);
 
             if ($status != 200) {
-                $this->logger->log('Failed keys validation');
+                $this->logger->write('Failed keys validation');
                     return false;
             } else {
                 return true;
             }
         } catch (\Exception $e) {
-            $this->logger->log(
+            $this->logger->write(
                 [
                 'STATUS'    => 'BACKEND API KEYS TEST',
                 'RESULT'    => $result

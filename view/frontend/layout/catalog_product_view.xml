@@ -5,7 +5,6 @@
     </head>
     <body>
         <referenceContainer name="product.info.extrahint">
-            <!--<block template="Bread_BreadCheckout::breadcheckout/view.phtml" class="Bread\BreadCheckout\Block\Product\View" as="breadcheckout.prod.view" name="breadcheckout.prod.view"/>-->
             <block class="Magento\Catalog\Block\Product\View" name="breadcheckout.product.view" template="Bread_BreadCheckout::breadcheckout/view.phtml">
                 <arguments>
                     <argument name="view_model" xsi:type="object">Bread\BreadCheckout\ViewModel\Product\View</argument>

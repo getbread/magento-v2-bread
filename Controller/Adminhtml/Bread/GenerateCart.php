@@ -19,7 +19,7 @@ class GenerateCart extends \Magento\Backend\App\Action
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $helper,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
         \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
         \Bread\BreadCheckout\Helper\Url $urlHelper

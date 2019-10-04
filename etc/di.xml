@@ -7,7 +7,7 @@
         </arguments>
     </type>
 
-    <type name="Bread\BreadCheckout\Log\BreadLogger">
+    <type name="Bread\BreadCheckout\Log\Logger">
         <arguments>
             <argument name="name" xsi:type="string">Bread</argument>
             <argument name="handlers"  xsi:type="array">

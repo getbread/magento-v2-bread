@@ -3,7 +3,11 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
-            <block class="Bread\BreadCheckout\Block\Js" as="breadcheckout.prod.js" name="breadcheckout.prod.js"/>
+            <block class="Magento\Framework\View\Element\Template" name="breadcheckout.js" template="Bread_BreadCheckout::js.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Bread\BreadCheckout\ViewModel\Js</argument>
+                </arguments>
+            </block>
         </referenceContainer>
         <referenceContainer name="after.body.start">
             <block class="Bread\BreadCheckout\Block\Checkout\Minicart" name="bread.minicart.component" />

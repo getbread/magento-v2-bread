@@ -36,7 +36,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
     public $catalogProductFactory;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Log
+     * @var \Bread\BreadCheckout\Log\Logger
      */
     public $logger;
 
@@ -77,7 +77,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Catalog\Model\ProductFactory $catalogProductFactory,
-        \Bread\BreadCheckout\Helper\Log $logger,
+        \Bread\BreadCheckout\Log\Logger $logger,
         \Bread\BreadCheckout\Helper\Checkout $helper,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
@@ -271,7 +271,7 @@ abstract class Checkout extends \Magento\Framework\App\Action\Action
 
             return $address;
         } catch (\Throwable $e) {
-            $this->logger->log(['MESSAGE' => $e->getMessage(),'TRACE' => $e->getTraceAsString()]);
+            $this->logger->write(['MESSAGE' => $e->getMessage(),'TRACE' => $e->getTraceAsString()]);
             return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(
                 [
                 'result' => ['error' => 1, 'text'  => 'Internal error']

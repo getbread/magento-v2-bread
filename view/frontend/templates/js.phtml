@@ -1,0 +1,14 @@
+<?php
+/**
+ * @var $this Magento\Framework\View\Element\Template
+ * @var $viewModel Bread\BreadCheckout\ViewModel\Js
+ */
+$viewModel = $this->getData('view_model');
+?>
+<?php if($viewModel->helper->isActive()): ?>
+    <!--  BreadCheckout Module Version: <?= $viewModel->getModuleVersion() ?>-->
+    <script type="text/x-magento-init">
+    <?= $viewModel->getSentryJsonConfiguration()?>
+    </script>
+    <?= $viewModel->getJsScriptString()?>
+<?php endif; ?>

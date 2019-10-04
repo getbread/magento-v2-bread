@@ -37,12 +37,12 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     public $_allowCurrencyCode       = ['USD'];
 
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service
      */
     public $apiClient;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Log
+     * @var \Bread\BreadCheckout\Log\Logger
      */
     public $breadLogger;
 
@@ -95,7 +95,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Construct Sets API Client And Sets Available For Checkout Flag
      *
      * @param \Magento\Framework\Model\Context                                $context
-     * @param \Bread\BreadCheckout\Model\Payment\Api\Client                   $apiClient
+     * @param \Bread\BreadCheckout\Model\Payment\Api\Service                   $apiClient
      * @param \Bread\BreadCheckout\Helper\Data                                $helper
      * @param \Bread\BreadCheckout\Helper\Quote                               $quoteHelper
      * @param \Magento\Framework\Json\Helper\Data                             $jsonHelper
@@ -114,7 +114,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $apiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $apiClient,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
@@ -123,7 +123,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Bread\BreadCheckout\Helper\Log $breadLogger,
+        \Bread\BreadCheckout\Log\Logger $breadLogger,
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,

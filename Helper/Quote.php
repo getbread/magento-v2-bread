@@ -38,7 +38,7 @@ class Quote extends Data
      */
     public $priceCurrency;
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service
      */
     public $paymentApiClient;
 
@@ -59,7 +59,7 @@ class Quote extends Data
      * @param Catalog                                           $helperCatalog
      * @param \Magento\Sales\Model\AdminOrder\Create            $orderCreateModel
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     * @param \Bread\BreadCheckout\Model\Payment\Api\Client     $paymentApiClient
+     * @param \Bread\BreadCheckout\Model\Payment\Api\Service     $paymentApiClient
      * @param \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository
      */
     public function __construct(
@@ -72,7 +72,7 @@ class Quote extends Data
         \Bread\BreadCheckout\Helper\Catalog $helperCatalog,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
     ) {
         $this->checkoutSession = $checkoutSession;

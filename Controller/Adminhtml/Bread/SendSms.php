@@ -20,7 +20,7 @@ class SendSms extends \Magento\Backend\App\Action
     public $helper;
 
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service
      */
     public $paymentApiClient;
 
@@ -30,13 +30,13 @@ class SendSms extends \Magento\Backend\App\Action
      * @param \Magento\Framework\App\Request\Http           $request
      * @param \Magento\Backend\App\Action\Context           $context
      * @param \Bread\BreadCheckout\Helper\Quote             $helper
-     * @param \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
+     * @param \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $helper,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
+        \Bread\BreadCheckout\Model\Payment\Api\Service $paymentApiClient
     ) {
 
         $this->request = $request;

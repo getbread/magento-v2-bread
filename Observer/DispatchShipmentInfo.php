@@ -23,12 +23,12 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
     private $helper;
 
     /**
-     * @var \Bread\BreadCheckout\Helper\Log $logger
+     * @var \Bread\BreadCheckout\Log\Logger $logger
      */
     private $logger;
 
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Api\Client $client
+     * @var \Bread\BreadCheckout\Model\Payment\Api\Service $client
      */
     private $client;
 
@@ -44,9 +44,9 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
      */
     public function __construct(
         \Bread\BreadCheckout\Model\Payment\Method\Bread $breadPayment,
-        \Bread\BreadCheckout\Model\Payment\Api\Client $client,
+        \Bread\BreadCheckout\Model\Payment\Api\Service $client,
         \Bread\BreadCheckout\Helper\Data $helper,
-        \Bread\BreadCheckout\Helper\Log $logger,
+        \Bread\BreadCheckout\Log\Logger $logger,
         \Magento\Sales\Model\Order\Payment\TransactionFactory $transactionFactory
     ) {
         $this->breadPayment = $breadPayment;
@@ -99,14 +99,14 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
                     $trackingNumber,
                     $carrierCode
                 );
-                $this->logger->log(
+                $this->logger->write(
                     [
                         'DISPATCH SHIPPING DETAILS'      => $data,
                     ]
                 );
 
             } catch (\Throwable $e) {
-                $this->logger->log($e->getMessage());
+                $this->logger->write($e->getMessage());
             }
         }
     }
