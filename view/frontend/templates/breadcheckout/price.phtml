@@ -4,9 +4,9 @@
 <div class="splitpay-clickable-price" style="padding-bottom: 5px"></div>
 
 <script type="text/javascript">
-    require(['jquery', 'splitpay'], function($, splitpay) {
+    require(['jquery', 'splitPay'], function($, splitPay) {
 
-        document.splitpayconfigureButton = function (items) {
+        document.splitPayConfigureButton = function (items) {
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
             var financingInfo   = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var breadConfig = {
@@ -45,7 +45,7 @@
                 }
             }
 
-            if (!document.splitpayhasCheckedConfigData) {
+            if (!document.splitPayHasCheckedConfigData) {
 
                 var configDataUrl = '<?= /* @noEscape */ $block->getConfigDataUrl(); ?>';
                 $.ajax({
@@ -53,7 +53,7 @@
                     type: 'post',
                     context: this
                 }).done(function(data) {
-                    document.splitpayhasCheckedConfigData = true;
+                    document.splitPayHasCheckedConfigData = true;
 
                     if (data.shippingContact !== false) {
                         breadConfig.shippingContact = data.shippingContact;
@@ -64,7 +64,7 @@
                     }
 
                     if (typeof bread !== 'undefined') {
-                        splitpay.setupSplitpay(breadConfig, '.splitpay-clickable-price', true);
+                        splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-price', true);
                     }
                 }).fail(function(error) {
                     document.logBreadIssue('error', {},
@@ -73,7 +73,7 @@
 
             } else {
                 if (typeof bread !== 'undefined') {
-                    splitpay.setupSplitpay(breadConfig, '.splitpay-clickable-price', true);
+                    splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-price', true);
                 }
             }
 
@@ -85,25 +85,25 @@
          * Reconfigure Bread checkout button with updated
          * price and sku values
          */
-        document.splitpayresetPriceAndSku = function(configurable) {
+        document.splitPayResetPriceAndSku = function(configurable) {
             if (!configurable) {
-                document.splitpayconfigureButton(document.splitpaydefaultItems);
+                document.splitPayConfigureButton(document.splitPayDefaultItems);
             }
             else {
-                var price = document.splitpaycalculatePrice();
+                var price = document.splitPayCalculatePrice();
 
                 if(typeof document.customOptions !== "undefined"){
-                    sku = document.splitpayselectedSku + document.customOptions;
+                    sku = document.splitPaySelectedSku + document.customOptions;
                 } else {
-                    sku = document.splitpayselectedSku;
+                    sku = document.splitPaySelectedSku;
                 }
 
-                if (sku != document.splitpaypreviousSku || price != document.splitpaypreviousPrice) {
-                    document.splitpaypreviousSku                    = sku;
-                    document.splitpaypreviousPrice                  = price;
-                    document.splitpaydefaultItems[0]["sku"]         = document.splitpaypreviousSku;
-                    document.splitpaydefaultItems[0]["price"]       = document.splitpaypreviousPrice;
-                    document.splitpayconfigureButton(document.splitpaydefaultItems);
+                if (sku != document.splitPayPreviousSku || price != document.splitPayPreviousPrice) {
+                    document.splitPayPreviousSku                    = sku;
+                    document.splitPayPreviousPrice                  = price;
+                    document.splitPayDefaultItems[0]["sku"]         = document.splitPayPreviousSku;
+                    document.splitPayDefaultItems[0]["price"]       = document.splitPayPreviousPrice;
+                    document.splitPayConfigureButton(document.splitPayDefaultItems);
                 }
             }
         };
@@ -114,7 +114,7 @@
          *
          * @returns int
          */
-        document.splitpaycalculatePrice = function() {
+        document.splitPayCalculatePrice = function() {
             var price = 0;
             var customPrice = 0;
 
@@ -122,7 +122,7 @@
                 customPrice = document.priceWithOptions;
             }
 
-            var selectedProductPrices = spConfig && spConfig.optionPrices[document.splitpayselectedSimpleProductId];
+            var selectedProductPrices = spConfig && spConfig.optionPrices[document.splitPaySelectedSimpleProductId];
 
             if (selectedProductPrices) {
                 price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
@@ -131,19 +131,19 @@
             return Math.max(price, customPrice);
         };
         <?php endif; ?>
-        document.splitpaydefaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-        document.splitpaypreviousPrice      = document.splitpaydefaultItems[0]["price"];
-        document.splitpaypreviousSku        = document.splitpaydefaultItems[0]["sku"];
+        document.splitPayDefaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+        document.splitPayPreviousPrice      = document.splitPayDefaultItems[0]["price"];
+        document.splitPayPreviousSku        = document.splitPayDefaultItems[0]["sku"];
 
         $(document).ready(function () {
             <?php if ($block->getProduct() != null) : ?>
-            document.splitpayproductId                      = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
-            document.splitpaybaseProductSku                 = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-            document.splitpayselectedSku                    = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-            document.splitpayselectedSimpleProductId        = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
-            document.splitpayresetPriceAndSku(false);
+            document.splitPayProductId                      = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+            document.splitPayBaseProductSku                 = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+            document.splitPaySelectedSku                    = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+            document.splitPaySelectedSimpleProductId        = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+            document.splitPayResetPriceAndSku(false);
             <?php else : ?>
-            document.splitpayconfigureButton(document.splitpaydefaultItems);
+            document.splitPayConfigureButton(document.splitPayDefaultItems);
             <?php endif; ?>
         });
     });

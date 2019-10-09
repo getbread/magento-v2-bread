@@ -23,12 +23,19 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public $helperData;
 
+    /**
+     * @var \Bread\BreadCheckout\Model\Payment\Method\Bread
+     */
+    public $breadMethod;
+
     public function __construct(
         \Bread\BreadCheckout\Helper\Quote $helper,
-        \Bread\BreadCheckout\Helper\Data $helperData
+        \Bread\BreadCheckout\Helper\Data $helperData,
+        \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
     ) {
         $this->helper = $helper;
         $this->helperData = $helperData;
+        $this->breadMethod = $breadMethod;
     }
 
     /**
@@ -68,7 +75,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'buttonLocation' => $this->helperData->getCheckoutLocation(),
                         'methodTooltip' => $this->helper->getMethodTooltip(),
                         'productTypeMessage' => $this->helperData->getProductTypeMessage(),
-                        'cartValidation' => $this->helper->validateAllowedProductTypes()
+                        'cartValidation' => $this->helper->validateAllowedProductTypes(),
+                        'methodTitle' => $this->breadMethod->getTitle()
                     ]
                 ]
             ]
