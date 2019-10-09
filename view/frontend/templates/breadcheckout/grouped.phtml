@@ -10,6 +10,9 @@
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
     </div>
+    <div class="button-prevent" id="button-prevent-updating">
+        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please wait') ?>">&nbsp;</span>
+    </div>
     <div class="splitpay-clickable-button"></div>
 </div>
 
@@ -217,6 +220,7 @@
                 }
 
                 if (typeof bread !== 'undefined') {
+                    $('#button-prevent-updating').hide();
                     bread.checkout(breadConfig);
                     splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
                 }
@@ -233,7 +237,8 @@
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
              */
-            $('.button-prevent').show();
+            $('#button-prevent').show();
+            $('#button-prevent-updating').hide();
 
             $('#product_addtocart_form').on('change', function() {
                 document.updateButton(this);
@@ -246,7 +251,8 @@
 
         document.updateButton = function(form) {
             if ($(form).valid()) {
-                $('.button-prevent').hide();
+                $('#button-prevent').hide();
+                $('#button-prevent-updating').show();
 
                 var groupedButtonUpdateUrl = '<?= /* @noEscape */ $block->getGroupedButtonUpdate()?>';
                 var serializedForm = $(form).serialize();
@@ -260,7 +266,7 @@
                     if (response.items) {
                         document.configureButton(response.items);
                     } else {
-                        $('.button-prevent').show();
+                        $('#button-prevent').show();
                     }
                 }).fail(function(error) {
                     var errorInfo = {
