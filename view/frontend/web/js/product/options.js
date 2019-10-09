@@ -139,6 +139,7 @@ define(
 
                     document.customOptions = document.getSkuForOptions(selectedOptions);
                     document.resetPriceAndSku(true);
+                    document.splitPayResetPriceAndSku(true);
                 }
             );
         };
