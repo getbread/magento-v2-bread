@@ -220,9 +220,9 @@
                 }
 
                 if (typeof bread !== 'undefined') {
-                    $('#button-prevent-updating').hide();
                     bread.checkout(breadConfig);
                     splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
+                    $('#button-prevent-updating').hide();
                 }
             }).fail(function(error) {
                 document.logBreadIssue('error', {},
