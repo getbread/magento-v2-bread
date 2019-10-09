@@ -16,10 +16,10 @@
 <script>
     require([
         'jquery',
-        'splitpay',
+        'splitPay',
         'jquery/validate',
         'mage/validation'
-    ], function($, splitpay) {
+    ], function($, splitPay) {
         document.configureButton = function (items) {
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
@@ -218,7 +218,7 @@
 
                 if (typeof bread !== 'undefined') {
                     bread.checkout(breadConfig);
-                    splitpay.setupSplitpay(breadConfig, '.splitpay-clickable-button', false);
+                    splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
                 }
             }).fail(function(error) {
                 document.logBreadIssue('error', {},

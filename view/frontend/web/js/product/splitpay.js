@@ -1,12 +1,6 @@
 define([], function () {
 
-    var MAX_SECS_BEFORE_ABORT = 10;
-    var TIMEOUT_INTERVAL = 100;
-    var RETRIES = MAX_SECS_BEFORE_ABORT * 1000 / TIMEOUT_INTERVAL;
-    var ERROR_PREFIX = 'Bread Integration Error: Could not setup promotional label for SplitPay. Reason: ';
-    var INTEGRATION_ERROR = 'Could not create Bread SplitPay Promotional Label within 5 seconds. Please verify that the provided selector is valid';
-
-    var splitpayPromo = function (opts, selector, includeInstallments) {
+    var splitPayPromo = function (opts, selector, includeInstallments) {
         if (window.bread === undefined || window.bread.ldflags['multipay-enable'] === false) {
             return;
         }
@@ -38,14 +32,24 @@ define([], function () {
     };
 
     return {
-        setupSplitpay: function (breadConfig, selector, includeInstallments) {
+        setupSplitPay: function (breadConfig, selector, includeInstallments) {
+            var boundSplitPayPromo = splitPayPromo.bind(null, breadConfig, selector, includeInstallments);
+            this.waitForFlagsToLoad(boundSplitPayPromo);
+        },
+        waitForFlagsToLoad: function (cb) {
+            var MAX_SECS_BEFORE_ABORT = 10;
+            var TIMEOUT_INTERVAL = 100;
+            var RETRIES = MAX_SECS_BEFORE_ABORT * 1000 / TIMEOUT_INTERVAL;
+            var ERROR_PREFIX = 'Bread Integration Error: Could not setup promotional label for SplitPay. Reason: ';
+            var INTEGRATION_ERROR = 'Could not create Bread SplitPay Promotional Label within 5 seconds. Please verify that the provided selector is valid';
+
             var retryCount = 0;
 
-            var retry = window.setInterval(() => {
+            var retry = window.setInterval(function() {
                 try {
                     if (window.bread && window.bread.ldflags && window.bread.ldflags._isReady) {
                         window.clearInterval(retry);
-                        splitpayPromo(breadConfig, selector, includeInstallments); // Pass in opts. Probably need to rename this variable depending on the environment (Shopify vs M1 vs M2 vs WC).
+                        cb();
                     }
                     if (retryCount < RETRIES) {
                         retryCount += 1;
@@ -53,11 +57,11 @@ define([], function () {
                         throw new Error(INTEGRATION_ERROR);
                     }
                 } catch (err) {
-                    console.error(`${ERROR_PREFIX}${err}`);
+                    console.error(ERROR_PREFIX + err);
                     window.clearInterval(retry);
                     // May also want to do something in this error case so its never "broken"
                 }
             }, TIMEOUT_INTERVAL);
-        },
+        }
     }
 });

@@ -4,6 +4,7 @@ define(
         'ko',
         'jquery',
         'buttonConfig',
+        'splitPay',
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/action/create-billing-address',
         'Magento_Checkout/js/action/select-billing-address',
@@ -21,6 +22,7 @@ define(
         ko,
         $,
         button,
+        splitPay,
         customer,
         createBillingAddress,
         selectBillingAddress,
@@ -78,6 +80,23 @@ define(
                  */
                 getMethodTooltip: function () {
                     return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTooltip;
+                },
+
+                getTitle: function () {
+                    splitPay.waitForFlagsToLoad(function() {
+                        var INSTALLMENTS_BLUE = '#5156ea';
+                        var SPLITPAY_GREEN = '#57c594';
+
+                        if (window.bread.ldflags['multipay-enable'] === true) {
+                            var label = jQuery('#breadcheckout').next('label').attr("for", "breadcheckout");
+                            label.text('');
+                            label.append('Pay Over Time with ' +
+                                '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span> or ' +
+                                '<span style="color: ' + SPLITPAY_GREEN + '; font-weight: 600;">SplitPay</span>');
+                        }
+                    });
+
+                    return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
                 },
 
                 /**

@@ -9,7 +9,7 @@ var config = {
         '*': {
             buttonConfig: 'Bread_BreadCheckout/js/button-config',
             bundleHelper: 'Bread_BreadCheckout/js/bundle-helper',
-            splitpay: 'Bread_BreadCheckout/js/product/splitpay'
+            splitPay: 'Bread_BreadCheckout/js/product/splitpay'
         }
     }
 };
