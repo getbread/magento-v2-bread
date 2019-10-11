@@ -12,7 +12,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($, quote) {
+    require(['jquery', 'jquery/validate', 'mage/validation', '!domReady'], function($) {
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
         if (validateProductTypes === false) {
@@ -27,7 +27,6 @@
             var billingAddress      = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo       = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var total = 0;
             for (var i = 0; i < items.length; i++) {
                 total += items[i]['price'] * items[i]['quantity'];
@@ -195,18 +194,35 @@
                 breadConfig.financingProgramId = targetedFinancingStatus.id;
             }
 
-            var discountAmount =- document.round(window.checkoutConfig.totalsData.discount_amount);
-            if (discountAmount > 0) {
-                breadConfig.discounts = [{
-                    amount: discountAmount,
-                    description: (window.checkoutConfig.totalsData.coupon_code !== null) ?
-                        window.checkoutConfig.totalsData.coupon_code :
-                        "Discount"
-                }];
-            }
-
             if (typeof bread !== 'undefined') {
-                bread.checkout(breadConfig);
+
+                var discount = -document.round(window.checkoutConfig.totalsData.discount_amount);
+                var rewardPoints = false;
+                var result;
+
+                $.ajax({
+                    url: "<?= $this->getUrl('bread/checkout/rewardsDiscount') ?>",
+                    type: 'post'
+                }).success(function (data){
+                    if(data.discount !== 0){
+                        discount += document.round(data.discount);
+                        rewardPoints = true;
+                    }
+
+                    result = [{
+                        amount: discount,
+                        description: (window.checkoutConfig.totalsData.coupon_code !== null && rewardPoints === false) ?
+                            window.checkoutConfig.totalsData.coupon_code :
+                            "Discount"
+                    }];
+
+                }).always(function () {
+                    if(discount>0){
+                        breadConfig.discounts = result;
+                    }
+                    bread.checkout(breadConfig);
+                });
+
             }
         };
 
@@ -214,11 +230,8 @@
             return parseInt(Math.round(value * 100));
         };
 
-        $(document).ready(function() {
-            document.defaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-            document.previousPrice      = document.defaultItems[0]["price"];
-            document.previousSku        = document.defaultItems[0]["sku"];
-            document.configureButton(document.defaultItems);
-        });
+        document.defaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+        document.configureButton(document.defaultItems);
+
     });
 </script>
