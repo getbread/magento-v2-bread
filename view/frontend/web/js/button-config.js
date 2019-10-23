@@ -91,55 +91,55 @@ define(
              * @private
              */
             _init: function () {
+                var self = this;
+                if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
+                    this.checkShippingOptions(function () {
+                        if (typeof bread !== 'undefined') {
+                            bread.showCheckout(self.breadConfig);
+                            fullScreenLoader.stopLoader();
+                        }
+                    });
+                }
+            },
 
+            /**
+             * Makes sure shipping options are up to date
+             */
+            checkShippingOptions: function (cb) {
                 var self = this;
 
-                if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-
-                    if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false) {
-
-                        if (typeof bread !== 'undefined') {
-                            bread.showCheckout(this.breadConfig);
+                if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false) {
+                    cb();
+                } else if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
+                    this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+                    cb();
+                } else {
+                    /* ocs save selected shipping method */
+                    var shippingOptionUrl = window.checkoutConfig.payment.breadcheckout.shippingOptionUrl;
+                    $.ajax(
+                        {
+                            url: shippingOptionUrl,
+                            type: 'post',
+                            context: this
                         }
-
-                    } else if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
-
-                        this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
-                        if (typeof bread !== 'undefined') {
-                            bread.showCheckout(this.breadConfig);
+                    ).done(
+                        function (data) {
+                            self.breadConfig.shippingOptions = [data];
+                            self.breadConfig.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
+                            cb();
                         }
-                    } else {
-                        /* ocs save selected shipping method */
-                        var shippingOptionUrl = window.checkoutConfig.payment.breadcheckout.shippingOptionUrl;
-                        $.ajax(
-                            {
-                                url: shippingOptionUrl,
-                                type: 'post',
-                                context: this
-                            }
-                        ).done(
-                            function (data) {
-                                self.breadConfig.shippingOptions = [data];
-                                self.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
-                                if (typeof bread !== 'undefined') {
-                                    bread.showCheckout(self.breadConfig);
-                                }
-                            }
-                        ).fail(
-                            function (error) {
-                                var errorInfo = {
-                                    bread_config: self.breadConfig
-                                };
-                                document.logBreadIssue(
-                                    'error', errorInfo,
-                                    'Error code returned when calling ' + shippingOptionUrl + ', with status: ' + error.statusText
-                                );
-                            }
-                        );
-                    }
-
+                    ).fail(
+                        function (error) {
+                            var errorInfo = {
+                                bread_config: self.breadConfig
+                            };
+                            document.logBreadIssue(
+                                'error', errorInfo,
+                                'Error code returned when calling ' + shippingOptionUrl + ', with status: ' + error.statusText
+                            );
+                        }
+                    );
                 }
-
             },
 
             /**
@@ -156,10 +156,14 @@ define(
              * @private
              */
             _initEmbedded: function () {
+                var self = this;
                 if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                    if (typeof bread !== 'undefined') {
-                        bread.checkout(this.breadConfig);
-                    }
+                    this.checkShippingOptions(function () {
+                        if (typeof bread !== 'undefined') {
+                            bread.checkout(self.breadConfig);
+                            fullScreenLoader.stopLoader();
+                        }
+                    });
                 }
             },
 
@@ -193,8 +197,6 @@ define(
                         if(quote.isVirtual()) {
                             this.breadConfig.shippingContact = data.billingContact;
                         }
-
-                        fullScreenLoader.stopLoader();
 
                         if(isEmbedded === false) {
                             this._init();
