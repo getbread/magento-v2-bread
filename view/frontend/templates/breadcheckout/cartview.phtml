@@ -22,7 +22,7 @@
             buttonPrevent.show();
         }
 
-        document.configureButton = function(items) {
+        function configureButton(items) {
             var address             = <?= /* @noEscape */ $block->getShippingAddressData(); ?>;
             var billingAddress      = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
@@ -231,7 +231,13 @@
         };
 
         document.defaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-        document.configureButton(document.defaultItems);
+        configureButton(document.defaultItems);
+
+        $(document).on('ajaxComplete', function (event, xhr, settings) {
+            if(settings.url.search('rewards/checkout/applyPointsPost') !== -1){
+                configureButton(this.defaultItems);
+            }
+        });
 
     });
 </script>
