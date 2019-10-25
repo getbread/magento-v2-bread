@@ -524,10 +524,10 @@ class Quote extends Data
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function isFinancingBySku()
+    public function isFinancingBySku($storeCode = null)
     {
         $quote = $this->getSessionQuote();
-        $financingAllowedSkus = $this->getTargetedFinancingSkus();
+        $financingAllowedSkus = $this->getTargetedFinancingSkus($storeCode);
 
         $parentItems = $this->getParentSkus();
         $allowed = [];
