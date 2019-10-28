@@ -34,6 +34,7 @@
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
+                allowSplitPayCheckout: false,
                 <?php if (!$block->isHealthcare()) : ?>
                 items: items,
                 <?php else : ?>
