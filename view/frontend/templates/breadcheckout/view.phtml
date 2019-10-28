@@ -33,6 +33,7 @@
             var financingInfo   = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
+                allowSplitPayCheckout: false,
                 asLowAs: <?= /* @noEscape */ $block->getAsLowAs(); ?>,
                 <?php if (!$block->isHealthcare()) : ?>
                 items: items,
