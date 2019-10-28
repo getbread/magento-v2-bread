@@ -146,9 +146,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Is module active?
      *
      * @param  null $store
+     * @param  null $storeCode
      * @return bool
      */
-    public function isActive($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode = null)
     {
         return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_MODULE_ACTIVE, $store, $storeCode);
     }
@@ -536,7 +537,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function isHealthcare($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool) (
-            $this->isActive($storeCode, $store) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store, $storeCode)
+            $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store, $storeCode)
         );
     }
 
@@ -548,7 +549,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isAsLowAs($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool) ($this->isActive($storeCode, $store) && $this->scopeConfig->getValue(self::XML_CONFIG_AS_LOW_AS, $store, $storeCode));
+        return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_AS_LOW_AS, $store, $storeCode));
     }
 
     /**
@@ -582,7 +583,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isTargetedFinancing($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool) ($this->isActive($storeCode, $store)
+        return (bool) ($this->isActive($store, $storeCode)
             && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode));
     }
 
