@@ -12,7 +12,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($, quote) {
+    require(['jquery', 'jquery/validate', 'mage/validation', '!domReady'], function($) {
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
         if (validateProductTypes === false) {
@@ -214,11 +214,8 @@
             return parseInt(Math.round(value * 100));
         };
 
-        $(document).ready(function() {
-            document.defaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-            document.previousPrice      = document.defaultItems[0]["price"];
-            document.previousSku        = document.defaultItems[0]["sku"];
-            document.configureButton(document.defaultItems);
-        });
+        document.defaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+        document.configureButton(document.defaultItems);
+
     });
 </script>
