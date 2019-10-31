@@ -102,10 +102,7 @@ class Category extends Data
      */
     public function isEnabledForCategory($category)
     {
-        if (!$this->isActive()) {
-            return false;
-        }
-        if (!$this->isEnabledOnCAT()) {
+        if (!$this->isActive() || !$this->isEnabledOnCAT() || empty($category)) {
             return false;
         }
         return in_array($category->getId(), $this->getBreadCategories());
