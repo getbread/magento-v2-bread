@@ -297,7 +297,7 @@
                 customPrice = document.priceWithOptions;
             }
 
-            var selectedProductPrices = spConfig && spConfig.optionPrices[document.selectedSimpleProductId];
+            var selectedProductPrices = (typeof spConfig !== "undefined") && spConfig.optionPrices[document.selectedSimpleProductId];
 
             if (selectedProductPrices) {
                 price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
