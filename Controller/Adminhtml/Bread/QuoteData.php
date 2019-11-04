@@ -39,6 +39,8 @@ class QuoteData extends \Magento\Backend\App\Action
      */
     public function execute()
     {
+        $storeId = $this->getRequest()->getParam('store_id');
+
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(
             [
             'quoteItems' => $this->helper->getQuoteItemsData(),
@@ -47,13 +49,13 @@ class QuoteData extends \Magento\Backend\App\Action
             'shippingOptions' => $this->helper->getShippingOptions(),
             'tax' => $this->helper->getTaxValue(),
             'discounts' => $this->helper->getDiscountData(),
-            'cartSizeFinancing' => $this->helper->getFinancingData(),
+            'cartSizeFinancing' => $this->helper->getFinancingData($storeId),
             'grandTotal' => $this->helper->getGrandTotal(),
-            'asLowAs' => $this->helper->isAsLowAs(),
+            'asLowAs' => $this->helper->isAsLowAs($storeId),
             'paymentUrl' => $this->helper->getAdminPaymentUrl(),
-            'buttonCss' => $this->helper->getButtonDesign(),
+            'buttonCss' => $this->helper->getButtonDesign($storeId),
             'buttonLocation' => $this->helperData->getOtherLocation(),
-            'isHealthcare' => $this->helper->isHealthcare()
+            'isHealthcare' => $this->helper->isHealthcare($storeId)
             ]
         );
     }
