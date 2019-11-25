@@ -121,7 +121,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
     {
-
         $validateAmount = $this->getInfo($breadTransactionId);
 
         // set transaction id so it can be fetched for split payment cancel
@@ -335,8 +334,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
 
                 if ($isSplitPayDecline) {
-
-                    if($this->helper->isSplitPayAutoDecline()){
+                    if ($this->helper->isSplitPayAutoDecline()) {
                         $this->cancel($this->getBreadTransactionId());
                     }
 
@@ -509,7 +507,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
         }
 
         if ($isInAdmin) {
-            return $this->cache->load('admin_store_id');
+            $adminStoreId = $this->cache->load('admin_store_id');
+            return $adminStoreId ? $adminStoreId : $this->storeResolver->getCurrentStoreId();
         }
 
         if (!isset($this->order)) {
