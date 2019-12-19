@@ -4,22 +4,24 @@ define(
         return function (config) {
 
             var TRACKED_TAG_KEYS = [
-            'plugin_version',
-            'merchant_api_key',
+                'plugin_version',
+                'merchant_api_key',
+                'tx_id',
             ];
 
             var getConsoleFunc = function (level) {
+                //don't print to console for info and debug level
                 switch (level) {
-                case 'fatal':
-                    return console.error;
-                case 'error':
-                    return console.error;
-                case 'warning':
-                    return console.warn;
-                case 'info':
-                    return console.info;
-                case 'debug':
-                    return console.log;
+                    case 'fatal':
+                        return console.error;
+                    case 'error':
+                        return console.error;
+                    case 'warning':
+                        return console.warn;
+                    case 'info':
+                        return function (issue) {};
+                    case 'debug':
+                        return function (issue) {};
                 }
             };
 

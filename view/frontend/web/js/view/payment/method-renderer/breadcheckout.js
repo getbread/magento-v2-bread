@@ -33,7 +33,7 @@ define(
         additionalValidators,
         quote
     ) {
-        'use strict';
+        'use strict'; //todo fix all the breadConfigs here to be config provider one as well as button one
         return Component.extend(
             {
                 defaults: {
@@ -145,7 +145,8 @@ define(
                 buttonCallback: function (token) {
                     this.setBreadTransactionId(token);
                     var paymentUrl = window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl;
-                    var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                    var configProviderOpts = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                    var actualButtonOpts = button.breadConfig;
 
                     $.ajax(
                         {
@@ -162,7 +163,8 @@ define(
                             var errorInfo;
                             try {
                                 errorInfo = {
-                                    bread_config: breadConfig,
+                                    config_provider_opts: configProviderOpts,
+                                    button_opts: actualButtonOpts,
                                     response: response,
                                     tx_id: token,
                                 };
@@ -191,7 +193,8 @@ define(
                                                     errorProcessor.process(error, this.messageContainer);
 
                                                     errorInfo = {
-                                                        bread_config: breadConfig,
+                                                        config_provider_opts: configProviderOpts,
+                                                        button_opts: actualButtonOpts,
                                                         error: error,
                                                         tx_id: token,
                                                     };
@@ -210,7 +213,8 @@ define(
                                 errorInfo = {
                                     response: response,
                                     tx_id: token,
-                                    bread_config: breadConfig,
+                                    config_provider_opts: configProviderOpts,
+                                    button_opts: actualButtonOpts,
                                 };
                                 document.logBreadIssue('error', errorInfo, e);
                             }
@@ -218,7 +222,8 @@ define(
                     ).fail(
                         function (error) {
                             var errorInfo = {
-                                bread_config: breadConfig,
+                                config_provider_opts: configProviderOpts,
+                                button_opts: actualButtonOpts,
                                 tx_id: token,
                             };
                             document.logBreadIssue(

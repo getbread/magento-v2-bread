@@ -10,6 +10,12 @@ namespace Bread\BreadCheckout\Helper;
 
 class Checkout extends Quote
 {
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    public $logger;
+
     const BREAD_AMOUNT = "bread_transaction_amount";
 
     public function __construct(
@@ -23,8 +29,10 @@ class Checkout extends Quote
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Bread\BreadCheckout\Helper\Log $logger
     ) {
+        $this->logger = $logger;
         parent::__construct(
             $helperContext,
             $context,
@@ -79,7 +87,23 @@ class Checkout extends Quote
             $info = $this->paymentApiClient->getInfo($transactionId);
             $this->setBreadTransactionAmount($info['adjustedTotal']);
         }
+        
+        $areAmountsEqual = (bool) ($breadAmount == $quoteTotal);
 
-        return (bool) ($breadAmount == $quoteTotal);
+        if (!$areAmountsEqual) {
+            $itemPrices = array_map(function($item) {
+                return $item->getPrice() * 100;
+            }, $this->getSessionQuote()->getItems());
+
+            $this->logger->log([
+                'SESSION QUOTE GRAND TOTAL' => ($this->getSessionQuote()->getGrandTotal() * 100),
+                'SESSION QUOTE SUB TOTAL' => ($this->getSessionQuote()->getSubtotal() * 100),
+                'SESSION QUOTE SUB TOTAL W/ DISCOUNT' => ($this->getSessionQuote()->getSubtotalWithDiscount() * 100),
+                'SESSION QUOTE ITEM PRICES' => $itemPrices
+            ]);
+
+        }
+
+        return $areAmountsEqual;
     }
 }
