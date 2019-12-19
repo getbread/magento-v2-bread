@@ -34,19 +34,25 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
     public $logger;
 
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutSession;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Store\Model\StoreResolver $storeResolver,
-        \Bread\BreadCheckout\Helper\Log $log
+        \Bread\BreadCheckout\Helper\Log $log,
+        \Magento\Checkout\Model\Session $checkoutSession
     ) {
-    
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->storeResolver = $storeResolver;
         $this->logger = $log;
+        $this->checkoutSession = $checkoutSession;
         parent::__construct($context, $registry);
     }
 
@@ -109,7 +115,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
     {
-
         $validateAmount = $this->getInfo($breadTransactionId);
 
         // set transaction id so it can be fetched for split payment cancel
@@ -118,7 +123,28 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $breadAmount = trim($validateAmount['total']);
         $amount = trim($amount);
 
+        $quote = $this->checkoutSession->getQuote();
+        $itemPrices = array_map(function ($item) {
+            return $item->getPrice() * 100;
+        }, $quote->getItems());
+
         if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
+            $quote = $this->checkoutSession->getQuote();
+
+            $itemPrices = array_map(function ($item) {
+                return $item->getPrice() * 100;
+            }, $quote->getItems());
+
+            $this->logger->log([
+                'LOCATION' => __CLASS__,
+                'SESSION QUOTE GRAND TOTAL' => ($quote->getGrandTotal() * 100),
+                'SESSION QUOTE SUB TOTAL' => ($quote->getSubtotal() * 100),
+                'SESSION QUOTE SUB TOTAL W/ DISCOUNT' => ($quote->getSubtotalWithDiscount() * 100),
+                'SESSION QUOTE SHIPPING ADDRESS TAX AMOUNT' => ($quote->getShippingAddress()->getBaseTaxAmount() * 100),
+                'SESSION QUOTE SHIPPING COST' => ($quote->getShippingAddress()->getShippingAmount() * 100),
+                'SESSION QUOTE ITEM PRICES' => $itemPrices
+            ]);
+
             $this->logger->log(
                 [
                     'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
@@ -323,8 +349,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
 
                 if ($isSplitPayDecline) {
-
-                    if($this->helper->isSplitPayAutoDecline()){
+                    if ($this->helper->isSplitPayAutoDecline()) {
                         $this->cancel($this->getBreadTransactionId());
                     }
 

@@ -89,16 +89,21 @@ class Checkout extends Quote
         }
         
         $areAmountsEqual = (bool) ($breadAmount == $quoteTotal);
-
         if (!$areAmountsEqual) {
+            $quote = $this->getSessionQuote();
+
             $itemPrices = array_map(function($item) {
                 return $item->getPrice() * 100;
-            }, $this->getSessionQuote()->getItems());
+            }, $quote->getItems());
 
             $this->logger->log([
-                'SESSION QUOTE GRAND TOTAL' => ($this->getSessionQuote()->getGrandTotal() * 100),
-                'SESSION QUOTE SUB TOTAL' => ($this->getSessionQuote()->getSubtotal() * 100),
-                'SESSION QUOTE SUB TOTAL W/ DISCOUNT' => ($this->getSessionQuote()->getSubtotalWithDiscount() * 100),
+                'LOCATION' => __CLASS__,
+                'SESSION QUOTE GRAND TOTAL' => ($quote->getGrandTotal() * 100),
+                'SESSION QUOTE AFTER ROUND METHOD' => ($quoteTotal * 100),
+                'SESSION QUOTE SUB TOTAL' => ($quote->getSubtotal() * 100),
+                'SESSION QUOTE SUB TOTAL W/ DISCOUNT' => ($quote->getSubtotalWithDiscount() * 100),
+                'SESSION QUOTE SHIPPING ADDRESS TAX AMOUNT' => ($quote->getShippingAddress()->getBaseTaxAmount() * 100),
+                'SESSION QUOTE SHIPPING COST' => ($quote->getShippingAddress()->getShippingAmount() * 100),
                 'SESSION QUOTE ITEM PRICES' => $itemPrices
             ]);
 
