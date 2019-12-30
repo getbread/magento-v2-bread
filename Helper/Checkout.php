@@ -87,8 +87,9 @@ class Checkout extends Quote
             $info = $this->paymentApiClient->getInfo($transactionId);
             $this->setBreadTransactionAmount($info['adjustedTotal']);
         }
-        
-        $areAmountsEqual = (bool) ($breadAmount == $quoteTotal);
+
+        $areAmountsEqual = (bool) (abs((int)$breadAmount - $quoteTotal) <= 2);
+
         if (!$areAmountsEqual) {
             $quote = $this->getSessionQuote();
 
@@ -99,7 +100,7 @@ class Checkout extends Quote
             $this->logger->log([
                 'LOCATION' => __CLASS__,
                 'SESSION QUOTE GRAND TOTAL' => ($quote->getGrandTotal() * 100),
-                'SESSION QUOTE AFTER ROUND METHOD' => ($quoteTotal * 100),
+                'SESSION QUOTE AFTER ROUND METHOD' => ($quoteTotal),
                 'SESSION QUOTE SUB TOTAL' => ($quote->getSubtotal() * 100),
                 'SESSION QUOTE SUB TOTAL W/ DISCOUNT' => ($quote->getSubtotalWithDiscount() * 100),
                 'SESSION QUOTE SHIPPING ADDRESS TAX AMOUNT' => ($quote->getShippingAddress()->getBaseTaxAmount() * 100),
