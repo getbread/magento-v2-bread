@@ -67,7 +67,7 @@ define(
                                     var role = $(this).data('calendar-role');
                                     skuSuffix += '***' + identifier + '===' + role + '===' + val;
 
-                                    if(!skipIds.includes(optionId)) {
+                                    if(skipIds.indexOf(optionId) === -1) {
 
                                         var dateSelected = true;
                                         $('[id^=options_' + optionId + '_]').each(
