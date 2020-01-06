@@ -78,7 +78,7 @@ define(
                             function (key) {
                                 var value = JSON.stringify(issueInfo[key]);
 
-                                if (TRACKED_TAG_KEYS.includes(key)) {
+                                if (TRACKED_TAG_KEYS.indexOf(key) !== -1) {
                                     scope.setTag(key, value);
                                 } else {
                                     scope.setExtra(key, value);

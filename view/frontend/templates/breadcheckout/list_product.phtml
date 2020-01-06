@@ -84,7 +84,7 @@ $productId = $product->getId();
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
             } else if (financingInfo.enabled && financingInfo.mode.sku){
                 var productSku = "<?= /* @noEscape */ $block->getProduct()->getSku(); ?>";
-                if(financingInfo.sku_limit.includes(productSku) === true){
+                if(financingInfo.sku_limit.indexOf(productSku) !== -1){
                     breadConfig.financingProgramId = financingInfo.id;
                 }
             }
