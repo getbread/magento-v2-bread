@@ -3,6 +3,7 @@
  * @var \Bread\BreadCheckout\Block\Payment\Form $block
  */
 $code = $block->escapeHtml($block->getMethodCode());
+$storeId = $block->saveAdminStoreId();
 ?>
 <fieldset class="admin__fieldset payment-method" id="payment_form_<?= /* @noEscape */ $code; ?>" style="display:none;">
     <div id="bread-btn-cntnr">
@@ -53,6 +54,9 @@ $code = $block->escapeHtml($block->getMethodCode());
             $.ajax({
                 url: quoteDataUrl,
                 type: 'get',
+                data: {
+                    store_id: <?= /* @noEscape */ $storeId; ?>
+                },
                 context: bread
             }).done(function(response) {
                 if (response !== null && typeof response === 'object') {
@@ -98,7 +102,8 @@ $code = $block->escapeHtml($block->getMethodCode());
                 url: generateCartUrl,
                 type: 'post',
                 data: {
-                    form_key: window.FORM_KEY
+                    form_key: window.FORM_KEY,
+                    store_id: <?= /* @noEscape */ $storeId; ?>
                 },
                 context: bread
             }).success(function(response) {

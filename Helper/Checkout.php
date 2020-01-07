@@ -80,6 +80,6 @@ class Checkout extends Quote
             $this->setBreadTransactionAmount($info['adjustedTotal']);
         }
 
-        return (bool) ($breadAmount == $quoteTotal);
+        return (bool) ($breadAmount == $quoteTotal || (abs((int)$breadAmount - (int)$quoteTotal) <= 2));
     }
 }
