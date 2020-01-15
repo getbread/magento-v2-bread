@@ -12,7 +12,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'jquery/validate', 'mage/validation', '!domReady'], function($) {
+    require(['jquery', 'jquery/validate', 'mage/validation', 'domReady!'], function($) {
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
         if (validateProductTypes === false) {
