@@ -165,6 +165,7 @@ define(
                                 errorInfo = {
                                     config_provider_opts: configProviderOpts,
                                     button_opts: actualButtonOpts,
+                                    totals: quote.getTotals()._latestValue,
                                     response: response,
                                     tx_id: token,
                                 };
@@ -195,6 +196,7 @@ define(
                                                     errorInfo = {
                                                         config_provider_opts: configProviderOpts,
                                                         button_opts: actualButtonOpts,
+                                                        totals: quote.getTotals()._latestValue,
                                                         error: error,
                                                         tx_id: token,
                                                     };
@@ -215,6 +217,7 @@ define(
                                     tx_id: token,
                                     config_provider_opts: configProviderOpts,
                                     button_opts: actualButtonOpts,
+                                    totals: quote.getTotals()._latestValue,
                                 };
                                 document.logBreadIssue('error', errorInfo, e);
                             }
@@ -224,6 +227,7 @@ define(
                             var errorInfo = {
                                 config_provider_opts: configProviderOpts,
                                 button_opts: actualButtonOpts,
+                                totals: quote.getTotals()._latestValue,
                                 tx_id: token,
                             };
                             document.logBreadIssue(
