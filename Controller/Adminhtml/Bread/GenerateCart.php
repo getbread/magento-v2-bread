@@ -75,6 +75,9 @@ class GenerateCart extends \Magento\Backend\App\Action
                     ) . 'days'
                 )
             );
+
+            $arr['cartOrigin'] = 'magento_carts';
+
             $arr['options'] = [];
             $arr['options']['orderRef'] = $quote->getId();
 
