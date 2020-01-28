@@ -64,7 +64,6 @@ $productId = $product->getId();
             if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
                 breadConfig.customCSS = buttonCss;
             }
-            <?php if (!$block->isHealthcare()) : ?>
             if (address !== false) {
                 breadConfig.shippingContact = address;
             }
@@ -72,7 +71,6 @@ $productId = $product->getId();
             if (billingAddress !== false) {
                 breadConfig.billingContact = billingAddress;
             }
-            <?php endif; ?>
             if (!labelOnly) {
                 breadConfig.actAsLabel = false;
             }
