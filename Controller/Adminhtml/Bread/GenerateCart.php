@@ -41,6 +41,8 @@ class GenerateCart extends \Magento\Backend\App\Action
      */
     public function execute()
     {
+        $storeId = $this->getRequest()->getParam('store_id');
+
         try {
             $quote = $this->helper->getSessionQuote();
 
@@ -84,7 +86,7 @@ class GenerateCart extends \Magento\Backend\App\Action
             $arr['options']['shippingContact'] = $this->helper->getShippingAddressData();
             $arr['options']['billingContact'] = $this->helper->getBillingAddressData();
 
-            if (!$this->helper->isHealthcare() && !$quote->getUseRewardPoints()) {
+            if (!$this->helper->isHealthcare($storeId) && !$quote->getUseRewardPoints()) {
                 $arr['options']['items'] = $this->helper->getQuoteItemsData();
             } else {
                 $arr['options']['customTotal'] = round($quote->getGrandTotal() * 100);
@@ -101,16 +103,16 @@ class GenerateCart extends \Magento\Backend\App\Action
 
             $arr['options']['tax'] = $this->helper->getTaxValue();
 
-            if ($this->helper->isTargetedFinancing() && $this->helper->checkFinancingMode('cart')) {
-                $financingId = $this->helper->getFinancingId();
-                $threshold = $this->helper->getTargetedFinancingThreshold();
+            if ($this->helper->isTargetedFinancing($storeId) && $this->helper->checkFinancingMode('cart', $storeId)) {
+                $financingId = $this->helper->getFinancingId($storeId);
+                $threshold = $this->helper->getTargetedFinancingThreshold($storeId);
 
                 $arr['options']['financingProgramId'] = $quote->getGrandTotal() >= $threshold ? $financingId : null;
-            } elseif ($this->helper->isTargetedFinancing()
-                && $this->helper->checkFinancingMode('sku')
-                && $this->helper->isFinancingBySku()
+            } elseif ($this->helper->isTargetedFinancing($storeId)
+                && $this->helper->checkFinancingMode('sku', $storeId)
+                && $this->helper->isFinancingBySku($storeId)
             ) {
-                $arr['options']['financingProgramId'] = $this->helper->getFinancingId();
+                $arr['options']['financingProgramId'] = $this->helper->getFinancingId($storeId);
             }
 
             $result = $this->paymentApiClient->submitCartData($arr);

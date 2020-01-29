@@ -15,7 +15,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
     const STATUS_PENDING        = 'PENDING';
     const STATUS_CANCELED       = 'CANCELED';
 
-    public $order            = null;
+    public $order               = null;
+
+    /**
+     * @var \Magento\Framework\Model\Context
+     */
+    public $context;
 
     /**
      * @var \Bread\BreadCheckout\Helper\Data
@@ -32,6 +37,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public $storeResolver;
 
+    /**
+     * @var \Magento\Framework\App\CacheInterface
+     */
+    public $cache;
+
     public $logger;
 
     /**
@@ -46,13 +56,16 @@ class Client extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Store\Model\StoreResolver $storeResolver,
         \Bread\BreadCheckout\Helper\Log $log,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Framework\App\CacheInterface $cache
     ) {
+        $this->context = $context;
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->storeResolver = $storeResolver;
         $this->logger = $log;
         $this->checkoutSession = $checkoutSession;
+        $this->cache = $cache;
         parent::__construct($context, $registry);
     }
 
@@ -274,7 +287,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function submitCartData($data)
     {
         return $this->call(
-            $this->helper->getCartCreateApiUrl(),
+            $this->helper->getCartCreateApiUrl($this->getStoreId()),
             $data,
             \Zend_Http_Client::POST
         );
@@ -515,6 +528,17 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getStoreId()
     {
+        try {
+            $isInAdmin = ($this->context->getAppState()->getAreaCode() == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
+        } catch (\Throwable $e) {
+            $isInAdmin = false;
+        }
+
+        if ($isInAdmin) {
+            $adminStoreId = $this->cache->load('admin_store_id');
+            return $adminStoreId ? $adminStoreId : $this->storeResolver->getCurrentStoreId();
+        }
+
         if (!isset($this->order)) {
             return $this->storeResolver->getCurrentStoreId();
         }
