@@ -183,11 +183,11 @@ define(
                     }
                 ).done(
                     function (data) {
-                        if (data.shippingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                        if (data.shippingContact != false) {
                             this.breadConfig.shippingContact = data.shippingContact;
                         }
 
-                        if (data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                        if (data.billingContact != false) {
                             this.breadConfig.billingContact = data.billingContact;
                             this.breadConfig.billingContact.email = (data.billingContact.email) ?
                             data.billingContact.email :
