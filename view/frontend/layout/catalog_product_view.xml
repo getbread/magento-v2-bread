@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <head>
-        <css src="Bread_BreadCheckout::bread/css/bread.css" />
-    </head>
     <body>
         <referenceContainer name="product.info.extrahint">
             <block template="Bread_BreadCheckout::breadcheckout/view.phtml" class="Bread\BreadCheckout\Block\Product\View" as="breadcheckout.prod.view" name="breadcheckout.prod.view"/>
