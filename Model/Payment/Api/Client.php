@@ -136,17 +136,16 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $breadAmount = trim($validateAmount['total']);
         $amount = trim($amount);
 
-        $quote = $this->checkoutSession->getQuote();
-        $itemPrices = array_map(function ($item) {
-            return $item->getPrice() * 100;
-        }, $quote->getItems());
-
         if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
             $quote = $this->checkoutSession->getQuote();
 
-            $itemPrices = array_map(function ($item) {
-                return $item->getPrice() * 100;
-            }, $quote->getItems());
+            $items = $quote->getItems();
+            $itemPrices = "No Item Prices";
+            if (is_array($items)) {
+                $itemPrices = array_map(function ($item) {
+                    return $item->getPrice() * 100;
+                }, $items);
+            }
 
             $this->logger->log([
                 'LOCATION' => __CLASS__,
