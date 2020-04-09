@@ -79,11 +79,30 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
             $token = $this->getRequest()->getParam('token');
             $newData = [];
 
+            $this->logger->info([
+                'MSG'    => 'TOKEN VALUE IN VALIDATE PAYMENT METHOD',
+                'TOKEN'    => $token
+            ]);
+
             if ($token) {
                 $data = $this->paymentApiClient->getInfo($token);
+                $this->logger->info([
+                    'MSG'   => 'DATA VALUE IN VALIDATE PAYMENT METHOD',
+                    'TOKEN' => $token,
+                    'DATA'  => $data
+                ]);
                 if ($data['breadTransactionId']) {
+                    $this->logger->info([
+                        'MSG'   => 'SETTING TX ID IN VALIDATE PAYMENT METHOD',
+                        'TOKEN' => $token
+                    ]);
                     $this->checkoutSession->setBreadTransactionId($token);
                     $newData = $this->updateQuote($token);
+                } else {
+                    $this->logger->info([
+                        'MSG'   => 'DID NOT SET TX ID IN VALIDATE PAYMENT METHOD',
+                        'TOKEN' => $token
+                    ]);
                 }
                 if ($data['adjustedTotal']) {
                     $this->helper->setBreadTransactionAmount($data['adjustedTotal']);

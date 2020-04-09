@@ -200,6 +200,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $this->breadLogger->info('can use billing country');
 
         $token = $this->getToken();
+        $this->breadLogger->info(['MSG' => 'IS TOKEN EMPTY', 'ISEMPTY' => var_export(empty($token), true)]);
+
         if (empty($token)) {
             $this->breadLogger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -556,10 +558,26 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected function getToken()
     {
+        $this->breadLogger->info('GETTING TOKEN IN BREAD PHP');
+
         if ($this->helper->isInAdmin()) {
+            $this->breadLogger->info([
+                'MSG'   => 'GETTING TOKEN IN ADMIN',
+            ]);
             $token = $this->orderCreateModel->getSession()->getBreadTransactionId();
+            $this->breadLogger->info([
+                'MSG'   => 'TOKEN VALUE IN ADMIN',
+                'TOKEN' => $token
+            ]);
         } else {
+            $this->breadLogger->info([
+                'MSG'   => 'GETTING TOKEN IN STOREFRONT',
+            ]);
             $token = $this->checkoutSession->getBreadTransactionId();
+            $this->breadLogger->info([
+                'MSG'   => 'TOKEN VALUE IN STOREFRONT',
+                'TOKEN' => $token
+            ]);
         }
 
         return $token;
