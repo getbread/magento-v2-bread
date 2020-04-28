@@ -33,7 +33,7 @@ define(
         additionalValidators,
         quote
     ) {
-        'use strict';
+        'use strict'; //todo fix all the breadConfigs here to be config provider one as well as button one
         return Component.extend(
             {
                 defaults: {
@@ -145,7 +145,8 @@ define(
                 buttonCallback: function (token) {
                     this.setBreadTransactionId(token);
                     var paymentUrl = window.checkoutConfig.payment[this.getCode()].breadConfig.paymentUrl;
-                    var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                    var configProviderOpts = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                    var actualButtonOpts = button.breadConfig;
 
                     $.ajax(
                         {
@@ -162,7 +163,9 @@ define(
                             var errorInfo;
                             try {
                                 errorInfo = {
-                                    bread_config: breadConfig,
+                                    config_provider_opts: configProviderOpts,
+                                    button_opts: actualButtonOpts,
+                                    totals: quote.getTotals()._latestValue,
                                     response: response,
                                     tx_id: token,
                                 };
@@ -172,7 +175,7 @@ define(
                                         alert(response.error);
                                     } else {
                                         $.when(
-                                            this.updateAddress(response),
+                                            this.updateAddress(response, errorInfo),
                                             this.validateTotals()
                                         ).done(
                                             $.proxy(
@@ -181,7 +184,7 @@ define(
                                                     // If it succeeds we redirect so setting to null doesn't matter.
                                                     // No better way to track errors coming from placeOrder unfortunately, so just have to do this
                                                     this.setBreadTransactionId(null);
-
+                                                    document.logBreadIssue('info', errorInfo, 'Finished with Bread actions, calling placeOrder now');
                                                     return Component.prototype.placeOrder.call(this, this.data, this.event);
                                                 }, this
                                             )
@@ -191,7 +194,9 @@ define(
                                                     errorProcessor.process(error, this.messageContainer);
 
                                                     errorInfo = {
-                                                        bread_config: breadConfig,
+                                                        config_provider_opts: configProviderOpts,
+                                                        button_opts: actualButtonOpts,
+                                                        totals: quote.getTotals()._latestValue,
                                                         error: error,
                                                         tx_id: token,
                                                     };
@@ -210,7 +215,9 @@ define(
                                 errorInfo = {
                                     response: response,
                                     tx_id: token,
-                                    bread_config: breadConfig,
+                                    config_provider_opts: configProviderOpts,
+                                    button_opts: actualButtonOpts,
+                                    totals: quote.getTotals()._latestValue,
                                 };
                                 document.logBreadIssue('error', errorInfo, e);
                             }
@@ -218,7 +225,9 @@ define(
                     ).fail(
                         function (error) {
                             var errorInfo = {
-                                bread_config: breadConfig,
+                                config_provider_opts: configProviderOpts,
+                                button_opts: actualButtonOpts,
+                                totals: quote.getTotals()._latestValue,
                                 tx_id: token,
                             };
                             document.logBreadIssue(
@@ -237,7 +246,7 @@ define(
                  *
                  * @return {jQuery.Deferred}
                  */
-                updateAddress: function (data) {
+                updateAddress: function (data, errorInfo) {
                     var self = this;
                     /**
                      * Billing address

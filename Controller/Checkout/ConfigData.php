@@ -24,17 +24,23 @@ class ConfigData extends \Magento\Framework\App\Action\Action
      */
     public $dataHelper;
 
+    /**
+     * @var \Bread\BreadCheckout\Helper\Log
+     */
+    public $logger;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper,
+        \Bread\BreadCheckout\Helper\Log $logger,
         \Bread\BreadCheckout\Helper\Data $dataHelper
     ) {
-    
         $this->resultFactory = $context->getResultFactory();
         $this->quoteHelper = $quoteHelper;
         $this->customerHelper = $customerHelper;
         $this->dataHelper = $dataHelper;
+        $this->logger = $logger;
         parent::__construct($context);
     }
 
@@ -63,19 +69,25 @@ class ConfigData extends \Magento\Framework\App\Action\Action
      */
     protected function getBillingAddressData()
     {
+        $this->logger->log('CONFIG DATA - GET BILLING ADDRESS DATA');
+
         if ($data = $this->quoteHelper->getBillingAddressData()) {
+            $this->logger->log('RETURNING QUOTE HELPER BILLING ADDRESS DATA');
             return $data;
         }
 
         if (!$this->customerHelper->isUserLoggedIn()) {
+            $this->logger->log('USER IS NOT LOGGED IN RETURNING FALSE');
             return false;
         }
 
         $data = $this->customerHelper->getFormattedDefaultBillingAddress();
         if (empty($data)) {
+            $this->logger->log('FORMATTED DEFAULT BILLING DATA EMPTY RETURNING FALSE');
             return false;
         }
 
+        $this->logger->log('RETURNING FORMATTED BILLING DATA');
         return $data;
     }
 }

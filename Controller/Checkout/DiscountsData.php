@@ -77,9 +77,7 @@ class DiscountsData extends \Bread\BreadCheckout\Controller\Checkout
         $discounts = $this->quoteHelper->getDiscountData();
         
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData(
-            [
-            'discounts' =>  ($discounts)? $discounts : []
-            ]
+            [ 'discounts' =>  ($discounts) ? $discounts : [] ]
         );
     }
 }

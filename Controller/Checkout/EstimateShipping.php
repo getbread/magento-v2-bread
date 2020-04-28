@@ -97,8 +97,18 @@ class EstimateShipping extends \Bread\BreadCheckout\Controller\Checkout
                         'typeId' => $rate->getCode(),
                         'cost'   => round($rate->getPrice() * 100),
                     ];
+
+                    $this->logger->log([
+                        'SHIPPING METHOD' => $rate->getCode(),
+                        'SHIPPING AMOUNT' => $rate->getPrice()
+                    ]);
                 }
             }
+
+            $this->logger->log([
+                'ESTIMATE SHIPPING METHODS' => $methods
+            ]);
+
             $response = ['result' => $methods];
         } catch (\Throwable $e) {
             $this->logger->log(['ERROR' => $e->getMessage(),'PARAMS'=> $this->getRequest()->getParams()]);

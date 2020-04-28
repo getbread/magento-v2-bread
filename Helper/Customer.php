@@ -147,15 +147,18 @@ class Customer extends Data
      */
     public function getFormattedDefaultBillingAddress()
     {
+        $this->logger->log('STARTING GET FORMATTED DEFAULT BILLING');
         $session                    = $this->customerSession;
         $customer                   = $session->getCustomer();
 
         if (empty($customer)) {
+            $this->logger->log('CUSTOMER EMPTY RETURNING []');
             return [];
         }
 
         $defaultBillingAddress     = $customer->getPrimaryBillingAddress();
         if (!$defaultBillingAddress) {
+            $this->logger->log('NO DEFAULT BILLING ADDRESS RETURNING []');
             return [];
         }
 
@@ -174,6 +177,7 @@ class Customer extends Data
             'phone'         => substr(preg_replace('/[^0-9]+/', '', $defaultBillingAddress->getTelephone()), -10)
         ];
 
+        $this->logger->log('RETURNING PRIMARY DATA');
         return $primaryData;
     }
 
