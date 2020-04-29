@@ -48,6 +48,11 @@ class Quote extends Data
     public $productRepository;
 
     /**
+     * @var Log
+     */
+    public $logger;
+
+    /**
      * Quote constructor.
      *
      * @param \Magento\Framework\App\Helper\Context             $helperContext
@@ -73,7 +78,8 @@ class Quote extends Data
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Bread\BreadCheckout\Helper\Log $logger
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->helperCatalog = $helperCatalog;
@@ -81,6 +87,7 @@ class Quote extends Data
         $this->priceCurrency = $priceCurrency;
         $this->paymentApiClient = $paymentApiClient;
         $this->productRepository = $productRepository;
+        $this->logger = $logger;
 
         parent::__construct(
             $helperContext,
@@ -142,7 +149,9 @@ class Quote extends Data
      */
     public function getDiscountData()
     {
+        $this->logger->log('STARTING GET DISCOUNT DATA');
         if ($this->isInAdmin()) {
+            $this->logger->log('GETTING DISCOUNT IN ADMIN');
             $discount = $this->orderCreateModel->getQuote()->getSubtotal() -
                         $this->orderCreateModel->getQuote()->getSubtotalWithDiscount();
             $couponTitle = $this->orderCreateModel->getQuote()->getCouponCode();
@@ -156,14 +165,17 @@ class Quote extends Data
         $discount = round($discount * 100);
 
         if ($discount > 0) {
+            $this->logger->log('DISCOUNT VALUE PRESENT');
             $discount = [
                 'amount'      => $discount,
                 'description' => ($couponTitle) ? $couponTitle : __('Discount')
             ];
         } else {
+            $this->logger->log('NO DISCOUNT PRESENT RETURNING []');
             return [];
         }
 
+        $this->logger->log(['RETURNING  DISCOUNT' => $discount]);
         return [$discount];
     }
 
@@ -212,16 +224,20 @@ class Quote extends Data
      */
     public function getBillingAddressData()
     {
+        $this->logger->log('GET BILLING ADDRESS DATA STARTING');
         if ($this->isInAdmin()) {
+            $this->logger->log('GETTING BILLING ADDRESS IN ADMIN');
             $billingAddress = $this->orderCreateModel->getBillingAddress();
         } else {
             $billingAddress     = $this->getSessionQuote()->getBillingAddress();
         }
 
         if (!$billingAddress->getStreetLine(1)) {
+            $this->logger->log('BILLING ADDRESS MISSING RETURN FALSE');
             return false;
         }
 
+        $this->logger->log('RETURNING BILLING ADDRESS DATA');
         return [
             'address'       => $billingAddress->getStreetLine(1) .
                 ($billingAddress->getStreetLine(2) == '' ? '' : (' ' . $billingAddress->getStreetLine(2))),
@@ -244,17 +260,20 @@ class Quote extends Data
      */
     public function getShippingAddressData()
     {
-
+        $this->logger->log('GETTING SHIPPING ADDRESS DATA STARTING');
         if ($this->isInAdmin()) {
+            $this->logger->log('GETTING SHIPPING ADDRESS IN ADMIN');
             $shippingAddress = $this->orderCreateModel->getShippingAddress();
         } else {
             $shippingAddress = $this->getSessionQuote()->getShippingAddress();
         }
 
         if (!$shippingAddress->getStreetLine(1)) {
+            $this->logger->log('SHIPPING ADDRESS MISSING RETURN FALSE');
             return false;
         }
 
+        $this->logger->log('RETURNING SHIPPING ADDRESS DATA');
         return [
             'fullName'      => trim($shippingAddress->getName()),
             'address'       => $shippingAddress->getStreetLine(1) .

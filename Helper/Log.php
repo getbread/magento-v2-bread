@@ -52,4 +52,17 @@ class Log extends \Magento\Framework\App\Helper\AbstractHelper
             $this->breadLogger->debug($data);
         }
     }
+
+    /**
+     * @param $data
+     */
+    public function info($data)
+    {
+        if ($this->logEnabled()) {
+            if (!is_string($data)) {
+                $data = print_r($data, true);
+            }
+            $this->breadLogger->info($data);
+        }
+    }
 }

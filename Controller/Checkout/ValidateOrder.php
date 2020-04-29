@@ -145,7 +145,7 @@ class ValidateOrder extends \Bread\BreadCheckout\Controller\Checkout
         } catch (\Throwable $e) {
             $errorMessage = $e->getMessage();
 
-            $this->logger->log(['MESSAGE' => $errorMessage]);
+            $this->logger->log(['ERROR' => $errorMessage]);
 
             //TODO: rewrite this when API is updated to better handle errors, instead of searching
             //TODO: through error message string

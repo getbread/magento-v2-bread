@@ -44,6 +44,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
     public $logger;
 
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutSession;
+
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -51,6 +56,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Store\Model\StoreResolver $storeResolver,
         \Bread\BreadCheckout\Helper\Log $log,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\App\CacheInterface $cache
     ) {
         $this->context = $context;
@@ -58,6 +64,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $this->jsonHelper = $jsonHelper;
         $this->storeResolver = $storeResolver;
         $this->logger = $log;
+        $this->checkoutSession = $checkoutSession;
         $this->cache = $cache;
         parent::__construct($context, $registry);
     }
@@ -87,7 +94,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             return $transaction;
         }
 
-        $data = ['type'   => 'cancel'];
+        $data = ['type' => 'cancel'];
 
         if (!$amount == 0) {
             $data['amount'] = $amount;
@@ -130,6 +137,24 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $amount = trim($amount);
 
         if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
+            $quote = $this->checkoutSession->getQuote();
+            $items = $quote->getItems();
+            $itemPrices = "No Item Prices";
+            if (is_array($items)) {
+                $itemPrices = array_map(function ($item) {
+                    return $item->getPrice() * 100;
+                }, $items);
+            }
+            $this->logger->log([
+                'LOCATION' => __CLASS__,
+                'SESSION QUOTE GRAND TOTAL' => ($quote->getGrandTotal() * 100),
+                'SESSION QUOTE SUB TOTAL' => ($quote->getSubtotal() * 100),
+                'SESSION QUOTE SUB TOTAL W/ DISCOUNT' => ($quote->getSubtotalWithDiscount() * 100),
+                'SESSION QUOTE SHIPPING ADDRESS TAX AMOUNT' => ($quote->getShippingAddress()->getBaseTaxAmount() * 100),
+                'SESSION QUOTE SHIPPING COST' => ($quote->getShippingAddress()->getShippingAmount() * 100),
+                'SESSION QUOTE ITEM PRICES' => $itemPrices
+            ]);
+
             $this->logger->log(
                 [
                     'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',

@@ -12,6 +12,11 @@ class Checkout extends Quote
 {
     const BREAD_AMOUNT = "bread_transaction_amount";
 
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    public $logger;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
@@ -23,7 +28,8 @@ class Checkout extends Quote
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Bread\BreadCheckout\Helper\Log $logger
     ) {
         parent::__construct(
             $helperContext,
@@ -36,7 +42,8 @@ class Checkout extends Quote
             $orderCreateModel,
             $priceCurrency,
             $paymentApiClient,
-            $productRepository
+            $productRepository,
+            $logger
         );
     }
 
@@ -76,10 +83,28 @@ class Checkout extends Quote
         $quoteTotal = (int)($this->priceCurrency->round($this->getSessionQuote()->getGrandTotal() * 100));
 
         if ($breadAmount === 0) {
+            $this->logger->info('Bread amount is 0');
             $info = $this->paymentApiClient->getInfo($transactionId);
             $this->setBreadTransactionAmount($info['adjustedTotal']);
         }
 
-        return (bool) ($breadAmount == $quoteTotal || (abs((int)$breadAmount - (int)$quoteTotal) <= 2));
+        $areAmountsEqual = (bool) (abs((int)$breadAmount - $quoteTotal) <= 2);
+        if (!$areAmountsEqual) {
+            $quote = $this->getSessionQuote();
+            $itemPrices = array_map(function($item) {
+                return $item->getPrice() * 100;
+            }, $quote->getItems());
+            $this->logger->log([
+                'LOCATION' => __CLASS__,
+                'SESSION QUOTE GRAND TOTAL' => ($quote->getGrandTotal() * 100),
+                'SESSION QUOTE AFTER ROUND METHOD' => ($quoteTotal),
+                'SESSION QUOTE SUB TOTAL' => ($quote->getSubtotal() * 100),
+                'SESSION QUOTE SUB TOTAL W/ DISCOUNT' => ($quote->getSubtotalWithDiscount() * 100),
+                'SESSION QUOTE SHIPPING ADDRESS TAX AMOUNT' => ($quote->getShippingAddress()->getBaseTaxAmount() * 100),
+                'SESSION QUOTE SHIPPING COST' => ($quote->getShippingAddress()->getShippingAmount() * 100),
+                'SESSION QUOTE ITEM PRICES' => $itemPrices
+            ]);
+        }
+        return $areAmountsEqual;
     }
 }
