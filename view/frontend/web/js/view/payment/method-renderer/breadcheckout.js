@@ -33,7 +33,7 @@ define(
         additionalValidators,
         quote
     ) {
-        'use strict'; //todo fix all the breadConfigs here to be config provider one as well as button one
+        'use strict';
         return Component.extend(
             {
                 defaults: {
@@ -126,6 +126,8 @@ define(
                 placeOrder: function (data, event) {
                     this.data = data;
                     this.event = event;
+                    var configProviderOpts = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                    var actualButtonOpts = button.breadConfig;
 
                     if(additionalValidators.validate()) {
 
@@ -136,7 +138,8 @@ define(
                         }
                     } else {
                         var errorInfo = {
-                            bread_config: window.checkoutConfig.payment[this.getCode()].breadConfig,
+                            config_provider_opts: configProviderOpts,
+                            button_opts: actualButtonOpts,
                         };
                         document.logBreadIssue('error', errorInfo, 'Unable to properly validate order');
                     }
@@ -276,7 +279,8 @@ define(
                 validateTotals: function () {
                     var deferred = $.Deferred();
                     var validateTotalsUrl = window.checkoutConfig.payment[this.getCode()].validateTotalsUrl;
-                    var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                    var configProviderOpts = window.checkoutConfig.payment[this.getCode()].breadConfig;
+                    var actualButtonOpts = button.breadConfig;
                     var tx_id = this.breadTransactionId();
 
                     $.ajax(
@@ -297,7 +301,8 @@ define(
                     ).fail(
                         function (error) {
                             var errorInfo = {
-                                bread_config: breadConfig,
+                                config_provider_opts: configProviderOpts,
+                                button_opts: actualButtonOpts,
                                 tx_id: tx_id,
                             };
                             document.logBreadIssue(

@@ -175,7 +175,6 @@ class Quote extends Data
             return [];
         }
 
-        // todo make sure this works and prints well w/ discount being an arr
         $this->logger->log(['RETURNING  DISCOUNT' => $discount]);
         return [$discount];
     }
