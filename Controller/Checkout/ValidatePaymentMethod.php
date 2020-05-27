@@ -84,18 +84,22 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
                 if ($data['breadTransactionId']) {
                     $this->checkoutSession->setBreadTransactionId($token);
                     $newData = $this->updateQuote($token);
+                    $this->logger->log('UPDATE QUOTE FINISHED IN VALIDATE PAYMENT METHOD');
                 }
                 if ($data['adjustedTotal']) {
+                    $this->logger->log('UPDATING ADJUSTED TOTAL IN VALIDATE PAYMENT METHOD');
                     $this->helper->setBreadTransactionAmount($data['adjustedTotal']);
                 }
             }
 
+            $this->logger->log('SETTING RESULT IN VALIDATE PAYMENT METHOD');
             $result = $newData;
         } catch (\Throwable $e) {
             $this->logger->log(['MESSAGE' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
             $result = ['error' => (string) __('Error: Unable to process transaction.')];
         }
 
+        $this->logger->log('RETURNING RESULT IN VALIDATE PAYMENT METHOD');
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($result);
     }
 
@@ -107,12 +111,15 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
      */
     protected function updateQuote($token)
     {
+        $this->logger->log('STARTING UPDATE QUOTE IN VALIDATE PAYMENT METHOD');
         $data = $this->paymentApiClient->getInfo($token);
         $billingData = $this->getFormattedAddress($data['billingContact']);
 
+        $this->logger->log(['MESSAGE' => 'ADDING BILLING DATA TO QUOTE', 'DATA' => $billingData]);
         $quote = $this->checkoutSession->getQuote();
         $quote->getBillingAddress()->addData($billingData);
 
+        $this->logger->log('ADDED BILLING DATA TO QUOTE');
         return ['billingAddress' => $quote->getBillingAddress()->getData()];
     }
 
