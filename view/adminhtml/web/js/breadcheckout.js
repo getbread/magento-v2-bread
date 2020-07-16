@@ -13,6 +13,7 @@ define(
 
                 var breadConfig = {
                     buttonId: 'bread-checkout-btn',
+                    allowSplitPayCheckout: false,
                     shippingOptions: [data.shippingOptions],
                     tax: data.tax,
                     customTotal: data.grandTotal,

@@ -10,14 +10,19 @@
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
     </div>
+    <div class="button-prevent" id="button-prevent-updating">
+        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please wait') ?>">&nbsp;</span>
+    </div>
+    <div class="splitpay-clickable-button"></div>
 </div>
 
 <script>
     require([
         'jquery',
+        'splitPay',
         'jquery/validate',
         'mage/validation'
-    ], function($) {
+    ], function($, splitPay) {
         document.configureButton = function (items) {
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
@@ -29,6 +34,7 @@
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
+                allowSplitPayCheckout: false,
                 <?php if (!$block->isHealthcare()) : ?>
                 items: items,
                 <?php else : ?>
@@ -216,6 +222,8 @@
 
                 if (typeof bread !== 'undefined') {
                     bread.checkout(breadConfig);
+                    splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
+                    $('#button-prevent-updating').hide();
                 }
             }).fail(function(error) {
                 document.logBreadIssue('error', {},
@@ -230,7 +238,8 @@
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
              */
-            $('.button-prevent').show();
+            $('#button-prevent').show();
+            $('#button-prevent-updating').hide();
 
             $('#product_addtocart_form').on('change', function() {
                 document.updateButton(this);
@@ -243,7 +252,8 @@
 
         document.updateButton = function(form) {
             if ($(form).valid()) {
-                $('.button-prevent').hide();
+                $('#button-prevent').hide();
+                $('#button-prevent-updating').show();
 
                 var groupedButtonUpdateUrl = '<?= /* @noEscape */ $block->getGroupedButtonUpdate()?>';
                 var serializedForm = $(form).serialize();
@@ -257,7 +267,7 @@
                     if (response.items) {
                         document.configureButton(response.items);
                     } else {
-                        $('.button-prevent').show();
+                        $('#button-prevent').show();
                     }
                 }).fail(function(error) {
                     var errorInfo = {

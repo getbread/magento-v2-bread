@@ -10,6 +10,7 @@
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
     </div>
+    <div class="splitpay-clickable-button"></div>
 </div>
 
 <script type="text/x-magento-init">
@@ -24,13 +25,15 @@
 </script>
 
 <script type="text/javascript">
-    require(['jquery'], function($) {
+    require(['jquery', 'splitPay'], function($, splitPay) {
+
         document.configureButton = function (items) {
             var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
             var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
             var financingInfo   = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
+                allowSplitPayCheckout: false,
                 asLowAs: <?= /* @noEscape */ $block->getAsLowAs(); ?>,
                 <?php if (!$block->isHealthcare()) : ?>
                 items: items,
@@ -227,6 +230,7 @@
 
                     if (typeof bread !== 'undefined') {
                         bread.checkout(breadConfig);
+                        splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
                     }
                 }).fail(function(error) {
                     document.logBreadIssue('error', {},
@@ -236,6 +240,7 @@
             } else {
                 if (typeof bread !== 'undefined') {
                     bread.checkout(breadConfig);
+                    splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
                 }
             }
         };

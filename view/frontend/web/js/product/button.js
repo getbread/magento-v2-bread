@@ -50,9 +50,9 @@ define(
                     var isValid = areInputElementsSet && areRadioAndCheckboxElementsSet;
 
                     if(isValid) {
-                        $('.button-prevent').hide();
+                        $('#button-prevent').hide();
                     }else{
-                        $('.button-prevent').show();
+                        $('#button-prevent').show();
                     }
 
                 }

@@ -9,10 +9,11 @@
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ $block->productTypeErrorMessage() ?>">&nbsp;</span>
     </div>
+    <div class="splitpay-clickable-button"></div>
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'jquery/validate', 'mage/validation', '!domReady'], function($) {
+    require(['jquery', 'splitPay', 'jquery/validate', 'mage/validation', '!domReady'], function($, splitPay) {
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
         if (validateProductTypes === false) {
@@ -35,6 +36,7 @@
 
             var breadConfig = {
                 buttonId: "bread-checkout-btn",
+                allowSplitPayCheckout: false,
                 asLowAs: <?= /* @noEscape */ $block->getAsLowAs(); ?>,
                 actAsLabel: false,
                 <?php if (!$block->isHealthcare()) : ?>
@@ -207,6 +209,7 @@
 
             if (typeof bread !== 'undefined') {
                 bread.checkout(breadConfig);
+                splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
             }
         };
 
