@@ -8,7 +8,8 @@ var config = {
     map: {
         '*': {
             buttonConfig: 'Bread_BreadCheckout/js/button-config',
-            bundleHelper: 'Bread_BreadCheckout/js/bundle-helper'
+            bundleHelper: 'Bread_BreadCheckout/js/bundle-helper',
+            'Magento_Checkout/js/action/select-shipping-method': 'Bread_BreadCheckout/web/js/shipping-method'
         }
     }
 };
