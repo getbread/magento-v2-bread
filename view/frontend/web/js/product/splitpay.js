@@ -1,7 +1,7 @@
 define([], function () {
 
     var splitPayPromo = function (opts, selector, includeInstallments) {
-        if (window.bread === undefined || window.bread.ldflags['multipay-enable'] === false) {
+        if (window.bread === undefined) {
             return;
         }
 
@@ -47,7 +47,7 @@ define([], function () {
 
             var retry = window.setInterval(function() {
                 try {
-                    if (window.bread && window.bread.ldflags && window.bread.ldflags._isReady) {
+                    if (window.bread) {
                         window.clearInterval(retry);
                         cb();
                     }
