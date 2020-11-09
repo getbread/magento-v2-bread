@@ -94,6 +94,6 @@ class Checkout extends Quote
             'QUOTE' => $quoteTotal
         ]);
 
-        return (bool) ($breadAmount == $quoteTotal);
+        return (bool) ($breadAmount == $quoteTotal || (abs((int)$breadAmount - (int)$quoteTotal) <= 2));
     }
 }

@@ -9,7 +9,8 @@ var config = {
         '*': {
             buttonConfig: 'Bread_BreadCheckout/js/button-config',
             bundleHelper: 'Bread_BreadCheckout/js/bundle-helper',
-            splitPay: 'Bread_BreadCheckout/js/product/splitpay'
+            splitPay: 'Bread_BreadCheckout/js/product/splitpay',
+            'Magento_Checkout/js/action/select-shipping-method': 'Bread_BreadCheckout/web/js/shipping-method'
         }
     }
 };

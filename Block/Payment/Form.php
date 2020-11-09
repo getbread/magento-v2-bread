@@ -14,15 +14,28 @@ class Form extends \Magento\Payment\Block\Form
     public $helper;
 
     /**
+     * @var \Magento\Backend\Model\Session\Quote
+     */
+    public $sessionQuote;
+
+    /**
+     * @var \Magento\Framework\App\CacheInterface
+     */
+    public $cache;
+
+    /**
      * Constructor
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Bread\BreadCheckout\Helper\Catalog $helper,
+        \Magento\Backend\Model\Session\Quote $sessionQuote,
+        \Magento\Framework\App\CacheInterface $cache,
         array $data = []
     ) {
-
         $this->helper = $helper;
+        $this->sessionQuote = $sessionQuote;
+        $this->cache = $cache;
         parent::__construct($context, $data);
     }
 
@@ -80,5 +93,15 @@ class Form extends \Magento\Payment\Block\Form
     public function getIsDefaultSize()
     {
         return (string) $this->helper->getDefaultButtonSizeHtml();
+    }
+
+    /**
+     * Saves the Store Id in the Magento Cache
+     */
+    public function saveAdminStoreId()
+    {
+        $storeId = $this->sessionQuote->getStoreId();
+        $this->cache->save($storeId, 'admin_store_id');
+        return $storeId;
     }
 }
