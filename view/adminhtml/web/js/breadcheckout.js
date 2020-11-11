@@ -88,9 +88,9 @@ define(
                  * Optional params
                  */
 
+                breadConfig.shippingContact = data.shippingContact;
+                breadConfig.billingContact = data.billingContact;
                 if (!data.isHealthcare) {
-                    breadConfig.shippingContact = data.shippingContact;
-                    breadConfig.billingContact = data.billingContact;
                     breadConfig.items = data.quoteItems;
                 }
 

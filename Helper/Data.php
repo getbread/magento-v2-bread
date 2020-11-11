@@ -146,11 +146,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Is module active?
      *
      * @param  null $store
+     * @param  null $storeCode
      * @return bool
      */
-    public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode = null)
     {
-        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_MODULE_ACTIVE, $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_MODULE_ACTIVE, $store, $storeCode);
     }
 
     /**
@@ -533,10 +534,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isHealthcare($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function isHealthcare($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool) (
-            $this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store)
+            $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store, $storeCode)
         );
     }
 
@@ -546,9 +547,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isAsLowAs($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function isAsLowAs($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_AS_LOW_AS, $store));
+        return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_AS_LOW_AS, $store, $storeCode));
     }
 
     /**
@@ -580,10 +581,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return bool
      */
-    public function isTargetedFinancing($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function isTargetedFinancing($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool) ($this->isActive($store)
-            && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store));
+        return (bool) ($this->isActive($store, $storeCode)
+            && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode));
     }
 
     /**
@@ -591,9 +592,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getFinancingId($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getFinancingId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_TARGETED_FINANCING_ID, $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_TARGETED_FINANCING_ID, $store, $storeCode);
     }
 
     /**
@@ -601,9 +602,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getTargetedFinancingThreshold($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getTargetedFinancingThreshold($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return round($this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store), 2);
+        return round($this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store, $storeCode), 2);
     }
 
     /**
@@ -612,9 +613,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $store
      * @return array
      */
-    public function getTargetedFinancingSkus($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getTargetedFinancingSkus($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store);
+        $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store, $storeCode);
         $list = preg_replace('/\s/', '', $list);
 
         return explode(',', $list);
@@ -627,9 +628,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $store
      * @return int
      */
-    public function checkFinancingMode($mode, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function checkFinancingMode($mode, $storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        $configVal = (int)$this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store);
+        $configVal = (int)$this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode);
         $output = null;
 
         switch ($mode) {
@@ -670,9 +671,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getButtonDesign($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_DESIGN, $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_DESIGN, $store, $storeCode);
     }
 
     /**
@@ -780,14 +781,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getFinancingData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getFinancingData($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return [
-            "enabled" => $this->isTargetedFinancing($store),
-            "mode" => ['cart'=>$this->checkFinancingMode('cart'), 'sku'=>$this->checkFinancingMode('sku')],
-            "id" => $this->getFinancingId($store),
-            "threshold" => $this->getTargetedFinancingThreshold($store),
-            "sku_limit" => $this->getTargetedFinancingSkus($store)
+            "enabled" => $this->isTargetedFinancing($storeCode, $store),
+            "mode" => [
+                'cart'=> $this->checkFinancingMode('cart', $storeCode, $store),
+                'sku'=> $this->checkFinancingMode('sku', $storeCode, $store)
+            ],
+            "id" => $this->getFinancingId($storeCode, $store),
+            "threshold" => $this->getTargetedFinancingThreshold($storeCode, $store),
+            "sku_limit" => $this->getTargetedFinancingSkus($storeCode, $store)
         ];
     }
 

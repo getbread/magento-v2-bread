@@ -87,13 +87,13 @@ class Checkout extends Quote
             $info = $this->paymentApiClient->getInfo($transactionId);
             $this->setBreadTransactionAmount($info['adjustedTotal']);
         }
-
+        
         $this->logger->info([
             'MESSAGE' => 'checking bread and quote tx amounts are same',
             'BREAD' => $breadAmount,
             'QUOTE' => $quoteTotal
         ]);
-
+        
         return (bool) ($breadAmount == $quoteTotal);
     }
 }

@@ -108,9 +108,12 @@ define(
             checkShippingOptions: function (cb) {
                 var self = this;
 
-                if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false) {
+                /**
+                 * This part assumed that the shipping options will never change
+                 * if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false) {
                     cb();
-                } else if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
+                } else */
+                if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
                     this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
                     cb();
                 } else {
@@ -183,11 +186,11 @@ define(
                     }
                 ).done(
                     function (data) {
-                        if (data.shippingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                        if (data.shippingContact != false) {
                             this.breadConfig.shippingContact = data.shippingContact;
                         }
 
-                        if (data.billingContact != false && !window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                        if (data.billingContact != false) {
                             this.breadConfig.billingContact = data.billingContact;
                             this.breadConfig.billingContact.email = (data.billingContact.email) ?
                             data.billingContact.email :

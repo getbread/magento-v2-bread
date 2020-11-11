@@ -194,11 +194,6 @@ class Catalog extends Data
             // For Bundled and Grouped products, final price comes through as 0, so need to use minimum price instead
             if (floatval($price) === 0.0) {
                 $price = $theProduct->getMinimalPrice();
-                //If we can't grab the minimal price here, try to grab minimal price from the price model
-                if (!$price) {
-                    $priceModel = $theProduct->getPriceModel();
-                    $price = $priceModel ? $priceModel->getPrices($theProduct)[0] : null;
-                }
             }
         }
 

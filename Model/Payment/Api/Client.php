@@ -15,7 +15,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
     const STATUS_PENDING        = 'PENDING';
     const STATUS_CANCELED       = 'CANCELED';
 
-    public $order            = null;
+    public $order               = null;
+
+    /**
+     * @var \Magento\Framework\Model\Context
+     */
+    public $context;
 
     /**
      * @var \Bread\BreadCheckout\Helper\Data
@@ -32,6 +37,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public $storeResolver;
 
+    /**
+     * @var \Magento\Framework\App\CacheInterface
+     */
+    public $cache;
+
     public $logger;
 
     public function __construct(
@@ -40,13 +50,15 @@ class Client extends \Magento\Framework\Model\AbstractModel
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Store\Model\StoreResolver $storeResolver,
-        \Bread\BreadCheckout\Helper\Log $log
+        \Bread\BreadCheckout\Helper\Log $log,
+        \Magento\Framework\App\CacheInterface $cache
     ) {
-    
+        $this->context = $context;
         $this->helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->storeResolver = $storeResolver;
         $this->logger = $log;
+        $this->cache = $cache;
         parent::__construct($context, $registry);
     }
 
@@ -109,7 +121,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
     {
-
         $validateAmount = $this->getInfo($breadTransactionId);
 
         // set transaction id so it can be fetched for split payment cancel
@@ -248,7 +259,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function submitCartData($data)
     {
         return $this->call(
-            $this->helper->getCartCreateApiUrl(),
+            $this->helper->getCartCreateApiUrl($this->getStoreId()),
             $data,
             \Zend_Http_Client::POST
         );
@@ -323,8 +334,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
 
                 if ($isSplitPayDecline) {
-
-                    if($this->helper->isSplitPayAutoDecline()){
+                    if ($this->helper->isSplitPayAutoDecline()) {
                         $this->cancel($this->getBreadTransactionId());
                     }
 
@@ -490,6 +500,17 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getStoreId()
     {
+        try {
+            $isInAdmin = ($this->context->getAppState()->getAreaCode() == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
+        } catch (\Throwable $e) {
+            $isInAdmin = false;
+        }
+
+        if ($isInAdmin) {
+            $adminStoreId = $this->cache->load('admin_store_id');
+            return $adminStoreId ? $adminStoreId : $this->storeResolver->getCurrentStoreId();
+        }
+
         if (!isset($this->order)) {
             return $this->storeResolver->getCurrentStoreId();
         }

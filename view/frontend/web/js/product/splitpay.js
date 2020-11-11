@@ -1,7 +1,7 @@
 define([], function () {
 
     var splitPayPromo = function (opts, selector, includeInstallments) {
-        if (window.bread === undefined || window.bread.ldflags['multipay-enable'] === false) {
+        if (window.bread === undefined) {
             return;
         }
 
@@ -33,8 +33,8 @@ define([], function () {
 
     return {
         setupSplitPay: function (breadConfig, selector, includeInstallments) {
-            var boundSplitPayPromo = splitPayPromo.bind(null, breadConfig, selector, includeInstallments);
-            this.waitForFlagsToLoad(boundSplitPayPromo);
+            splitPayPromo.bind(null, breadConfig, selector, includeInstallments);
+            //this.waitForFlagsToLoad(boundSplitPayPromo);
         },
         waitForFlagsToLoad: function (cb) {
             var MAX_SECS_BEFORE_ABORT = 10;
