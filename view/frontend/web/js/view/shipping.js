@@ -10,9 +10,10 @@ define(
     [
         'Magento_Checkout/js/view/shipping',
         'jquery',
-        'Magento_Checkout/js/model/quote'
+        'Magento_Checkout/js/model/quote',
+	'buttonConfig'
     ],
-    function (Shipping, $, quote) {
+    function (Shipping, $, quote, button) {
         'use strict';
         return Shipping.extend(
             {
@@ -24,6 +25,7 @@ define(
 
                     this.updateConfigData();
                     this.invalidateToken();
+		    this.refreshBreadPaymentMethod();
                 },
 
                 /**
@@ -48,6 +50,22 @@ define(
                         window.checkoutConfig.payment.breadcheckout.transactionId = null;
                     }
                 },
+
+
+		/**
+                 * 
+                 * Refresh the payment method section if transactionId is not set
+                 */
+                refreshBreadPaymentMethod: function () {
+                    var paymentMethod = quote.paymentMethod();
+                    if ( paymentMethod !== null && typeof paymentMethod.method !== 'undefined') {
+                        if (quote.paymentMethod().method === 'breadcheckout' 
+                                && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
+                            button.embeddedCheckout();
+                        }
+                    }            
+                },
+
 
                 /**
                  * Round float to 2 decimal plates and convert to integer

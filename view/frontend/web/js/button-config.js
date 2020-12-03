@@ -15,7 +15,6 @@ define(
 
             configure: function (data, context) {
                 this.breadConfig = {
-                    items: data.items,
                     actAsLabel: false,
                     asLowAs: data.asLowAs,
                     customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
