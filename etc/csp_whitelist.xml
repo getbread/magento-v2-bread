@@ -13,5 +13,11 @@
                 <value id="bread-production" type="host">https://checkout.getbread.com</value>
             </values>
         </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="bread-sandbox" type="host">https://checkout-sandbox.getbread.com</value>
+                <value id="bread-production" type="host">https://checkout.getbread.com</value>
+            </values>
+        </policy>
     </policies>
 </csp_whitelist>
