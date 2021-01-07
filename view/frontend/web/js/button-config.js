@@ -107,9 +107,12 @@ define(
             checkShippingOptions: function (cb) {
                 var self = this;
 
-                if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false) {
+                /**
+                 * This part assumed that the shipping options will never change
+                 * if(typeof this.breadConfig.shippingOptions !== "undefined" && this.breadConfig.shippingOptions[0] !== false) {
                     cb();
-                } else if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
+                } else */
+                if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
                     this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
                     cb();
                 } else {

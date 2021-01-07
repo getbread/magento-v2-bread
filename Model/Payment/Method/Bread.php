@@ -179,10 +179,13 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     public function validate()
     {
         $paymentInfo   = $this->getInfoInstance();
+        $this->breadLogger->info('got payment info');
         if ($paymentInfo instanceof \Magento\Sales\Model\Order\Payment) {
-             $billingCountry    = $paymentInfo->getOrder()->getBillingAddress()->getCountryId();
+            $this->breadLogger->info('payment info instance of payment');
+            $billingCountry    = $paymentInfo->getOrder()->getBillingAddress()->getCountryId();
         } else {
-             $billingCountry    = $paymentInfo->getQuote()->getBillingAddress()->getCountryId();
+            $this->breadLogger->info('payment info NOT instance of payment');
+            $billingCountry    = $paymentInfo->getQuote()->getBillingAddress()->getCountryId();
         }
 
         if (!$this->canUseForCountry($billingCountry)) {
@@ -194,6 +197,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 )
             );
         }
+        $this->breadLogger->info('can use billing country');
 
         $token = $this->getToken();
         if (empty($token)) {
@@ -205,6 +209,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 )
             );
         }
+        $this->breadLogger->info('validate succeeded');
 
         return $this;
     }
@@ -248,12 +253,25 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         if (!$this->canAuthorize()) {
+            $this->breadLogger->info('authorize action is not available');
             throw new \Magento\Framework\Exception\LocalizedException(__('Authorize action is not available.'));
         }
 
+        $this->breadLogger->info([
+            'MESSAGE' => 'about to set amount in authorize',
+            'amount' => $amount
+        ]);
         $payment->setAmount($amount);
+        $this->breadLogger->info('about to set isTxClosed in authorize');
         $payment->setIsTransactionClosed(false);
-        $payment->setTransactionId($this->getToken());
+        $tx_id = $this->getToken();
+        $this->breadLogger->info([
+            'MESSAGE' => 'about to set tx_id in authorize',
+            'tx_id' => $tx_id
+        ]);
+        $payment->setTransactionId($tx_id);
+
+        $this->breadLogger->info('all payment info set in authorize');
 
         $this->_place($payment, $amount, self::ACTION_AUTHORIZE);
         return $this;
@@ -385,13 +403,31 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType)
     {
         $this->apiClient->setOrder($payment->getOrder());
+        $this->breadLogger->info('api client order was set');
+
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
+                $this->breadLogger->info('about to call api client authorize');
+                $tx_id = $this->getValidatedTxId($payment);
+                $this->breadLogger->info('got tx_id in place authorize');
+                $amount = ($this->priceCurrency->round($amount) * 100);
+                $this->breadLogger->info([
+                    'MESSAGE' => 'got amount in place authorize',
+                    'amount' => $amount
+                ]);
+                $orderId = $payment->getOrder()->getIncrementId();
+                $this->breadLogger->info([
+                    'MESSAGE' => 'got orderId in place authorize',
+                    'orderId' => $orderId
+                ]);
+
                 $result     = $this->apiClient->authorize(
-                    $this->getValidatedTxId($payment),
-                    ($this->priceCurrency->round($amount) * 100),
-                    $payment->getOrder()->getIncrementId()
+                    $tx_id,
+                    $amount,
+                    $orderId
                 );
+                $this->breadLogger->info('called api client authorize');
+
                 $payment->setTransactionId($result['breadTransactionId']);
                 $this->addTransactionInfo(
                     $payment,
@@ -572,7 +608,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $title = parent::getTitle();
         $showPerMonth = $this->helper->showPerMonthCalculation();
 
-        if ($this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST && $showPerMonth) {
+        $areaIsRestOrFrontend = $this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST
+            || $this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND;
+
+        if ($areaIsRestOrFrontend && $showPerMonth) {
             $data = $this->quoteHelper->submitQuote(null);
             if (isset($data['asLowAs']) && isset($data['asLowAs']['amount'])) {
                 $title .= ' ' . sprintf(__('as low as %s/month*'), $data['asLowAs']['amount']);

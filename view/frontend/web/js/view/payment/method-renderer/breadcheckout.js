@@ -4,6 +4,7 @@ define(
         'ko',
         'jquery',
         'buttonConfig',
+        'splitPay',
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/action/create-billing-address',
         'Magento_Checkout/js/action/select-billing-address',
@@ -21,6 +22,7 @@ define(
         ko,
         $,
         button,
+        splitPay,
         customer,
         createBillingAddress,
         selectBillingAddress,
@@ -78,6 +80,17 @@ define(
                  */
                 getMethodTooltip: function () {
                     return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTooltip;
+                },
+
+                getTitle: function () {         
+                    var INSTALLMENTS_BLUE = '#5156ea';
+                    var SPLITPAY_GREEN = '#57c594';
+                    var label = jQuery('#breadcheckout').next('label').attr("for", "breadcheckout");
+                    label.text('');
+                    label.append('Pay Over Time with ' +
+                        '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span> or ' +
+                        '<span style="color: ' + SPLITPAY_GREEN + '; font-weight: 600;">SplitPay</span>');
+                    return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
                 },
 
                 /**
@@ -172,7 +185,7 @@ define(
                                         alert(response.error);
                                     } else {
                                         $.when(
-                                            this.updateAddress(response),
+                                            this.updateAddress(response, errorInfo),
                                             this.validateTotals()
                                         ).done(
                                             $.proxy(
@@ -237,18 +250,25 @@ define(
                  *
                  * @return {jQuery.Deferred}
                  */
-                updateAddress: function (data) {
+                updateAddress: function (data, errorInfo) {
                     var self = this;
                     /**
                      * Billing address
                      */
+                    document.logBreadIssue('info', errorInfo, 'starting update address');
+
                     var billingAddressData = this.getAddressData(data.billingAddress);
+                    document.logBreadIssue('info', $.extend(true, {}, errorInfo, {billingAddressData: billingAddressData}), 'got billing address data');
                     var newBillingAddress = createBillingAddress(billingAddressData);
+                    document.logBreadIssue('info', $.extend(true, {}, errorInfo, {newBillingAddress: newBillingAddress}), 'got new billing address');
 
                     // New address must be selected as a billing address
                     selectBillingAddress(newBillingAddress);
+                    document.logBreadIssue('info', errorInfo, 'selected new billing address');
                     checkoutData.setSelectedBillingAddress(newBillingAddress.getKey());
+                    document.logBreadIssue('info', errorInfo, 'set selected billing address');
                     checkoutData.setNewCustomerBillingAddress(billingAddressData);
+                    document.logBreadIssue('info', errorInfo, 'set new customer billing address');
 
                     /**
                      * Reload checkout section & add bread token
@@ -256,7 +276,9 @@ define(
                     if(quote.isVirtual()) {
                         return defaultProcessor;
                     }
-                    return defaultProcessor.saveShippingInformation();
+                    var defaultProcessorSavedShipping = defaultProcessor.saveShippingInformation();
+                    document.logBreadIssue('info', $.extend(true, {}, errorInfo, {defaultProcessorSavedShipping: defaultProcessorSavedShipping}), 'default processor saved shipping info');
+                    return defaultProcessorSavedShipping;
                 },
 
                 /**

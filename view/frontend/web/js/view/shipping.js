@@ -11,9 +11,10 @@ define(
         'Magento_Checkout/js/view/shipping',
         'jquery',
         'Magento_Checkout/js/model/quote',
-	'buttonConfig'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'buttonConfig',
     ],
-    function (Shipping, $, quote, button) {
+    function (Shipping, $, quote, fullScreenLoader, button) {
         'use strict';
         return Shipping.extend(
             {
@@ -25,7 +26,7 @@ define(
 
                     this.updateConfigData();
                     this.invalidateToken();
-		    this.refreshBreadPaymentMethod();
+                    this.refreshBreadPaymentMethod();
                 },
 
                 /**
@@ -49,6 +50,21 @@ define(
                     if (window.checkoutConfig.payment.breadcheckout.transactionId !== null) {
                         window.checkoutConfig.payment.breadcheckout.transactionId = null;
                     }
+                },
+                
+                /**
+                 * 
+                 * Refresh the payment method section if transactionId is not set
+                 */
+                refreshBreadPaymentMethod: function () {
+                            var paymentMethod = quote.paymentMethod();
+                            if (typeof paymentMethod.method !== 'undefined' && paymentMethod !== null) {
+                                if (quote.paymentMethod().method === 'breadcheckout' 
+                                        && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
+                                    button.embeddedCheckout();
+                                }
+                            }
+                    
                 },
 
 
