@@ -199,16 +199,6 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
         $this->breadLogger->info('can use billing country');
 
-        $token = $this->getToken();
-        if (empty($token)) {
-            $this->breadLogger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __(
-                    'This financing program is unavailable, please complete the application. 
-                If the problem persists, please contact us.'
-                )
-            );
-        }
         $this->breadLogger->info('validate succeeded');
 
         return $this;
