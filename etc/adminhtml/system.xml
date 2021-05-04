@@ -19,18 +19,22 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="api_mode" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_version" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Bread API version</label>
+                    <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiVersion</source_model>
+                </field>
+                <field id="api_mode" type="select" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API MODE</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiMode</source_model>
                 </field>
-                <field id="api_public_key" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_public_key" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-36 validate-length minimum-length-36</validate>
 		            <label>Live API Public Key</label>
                     <depends>
                         <field id="api_mode">1</field>
                     </depends>
                 </field>
-                <field id="api_secret_key" type="obscure" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_secret_key" type="obscure" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
 		            <validate>validate-length maximum-length-36</validate>
                     <label>Live API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
@@ -38,14 +42,14 @@
                         <field id="api_mode">1</field>
                     </depends>
                 </field>
-                <field id="api_sandbox_public_key" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_sandbox_public_key" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-36 validate-length minimum-length-36</validate>
                     <label>Sandbox API Public Key</label>
                     <depends>
                         <field id="api_mode">0</field>
                     </depends>
                 </field>
-                <field id="api_sandbox_secret_key" type="obscure" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_sandbox_secret_key" type="obscure" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-36</validate>
                     <label>Sandbox API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
@@ -53,44 +57,44 @@
                         <field id="api_mode">0</field>
                     </depends>
                 </field>
-                <field id="payment_action" type="select" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="payment_action" type="select" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
                 </field>
-                <field id="sort_order" type="text" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="sort_order" type="text" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <comment>The Position In the Payment Method List In Checkout</comment>
                     <validate>validate-number</validate>
                 </field>
-                <field id="enabled_on_product_page" type="select" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_product_page" type="select" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Product Details Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="enabled_on_cart_page" type="select" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_cart_page" type="select" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Cart Overview Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="as_low_as" type="select" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="as_low_as" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Show "as low as" pricing to not-logged-in users</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="display_as_payment_method" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="display_as_payment_method" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Display as Payment Method on Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="healthcare_mode" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="healthcare_mode" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Healthcare mode</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
@@ -104,18 +108,18 @@
                                 ]]>
                     </comment>
                 </field>
-                <field id="use_default_button_size" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="use_default_button_size" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use default button size</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="button_on_products" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="button_on_products" type="select" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Display as Button on Product Detail Pages When Logged In</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="button_design" type="textarea" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="button_design" type="textarea" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Bread Button Design</label>
                     <comment>
                         <![CDATA[
@@ -125,7 +129,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="title" type="text" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="title" type="text" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Method Title</label>
                     <comment>
                         <![CDATA[
@@ -135,7 +139,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="incomplete_checkout_message" type="textarea" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="incomplete_checkout_message" type="textarea" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Incomplete Bread Checkout error</label>
                     <comment>
                         <![CDATA[
@@ -145,7 +149,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="allowcheckoutpdp" type="select" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowcheckoutpdp" type="select" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow Checkout From Bread Pop Up On Product Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -161,7 +165,7 @@
                          ]]>
                     </comment>
                 </field>
-                <field id="allowcheckoutcart" type="select" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowcheckoutcart" type="select" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow Checkout From Bread Pop Up On Cart Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -177,15 +181,15 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="allowminicartcheckout" type="select" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowminicartcheckout" type="select" sortOrder="21" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow checkout from mini cart</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="embedded" type="select" sortOrder="21" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="embedded" type="select" sortOrder="22" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="split_auto_cancel" type="select" sortOrder="22" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="split_auto_cancel" type="select" sortOrder="23" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Auto-cancel Failed Split-Pay Orders</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -196,7 +200,7 @@
 				            ]]>
                     </comment>
                 </field>
-                <field id="per_month" type="select" sortOrder="23" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="per_month" type="select" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label><![CDATA[Show "As Low As" price]]></label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -207,7 +211,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="product_type_msg" type="textarea" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="product_type_msg" type="textarea" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Invalid product type message</label>
                     <comment>
                         <![CDATA[
