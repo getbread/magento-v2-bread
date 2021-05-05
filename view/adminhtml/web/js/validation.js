@@ -6,6 +6,8 @@ require(
     ],
     function ($, alert) {
         var apiMode = $("#payment_us_breadcheckout_api_mode").val(),
+            apiVersion = $("payment_us_breadcheckout_api_version").val(),  
+            apiUrl = "#payment_us_breadcheckout_api_url",
             prodKey = "#payment_us_breadcheckout_api_public_key",
             prodSecret = "#payment_us_breadcheckout_api_secret_key",
             sandKey = "#payment_us_breadcheckout_api_sandbox_public_key",
@@ -27,6 +29,8 @@ require(
                             type: "post",
                             data: {
                                 form_key: window.FORM_KEY,
+                                apiVersion: apiVersion,
+                                apiUrl: apiUrl, 
                                 apiMode: apiMode,
                                 pubKey: key,
                                 secKey: secret
@@ -38,7 +42,7 @@ require(
                                 alert(
                                     {
                                         title: 'Error with api credentials validation',
-                                        content: 'Please confirm that you are using correct key values',
+                                        content: 'Please confirm that you are using correct key values' . apiVersion === 'bread_2' ? ' or the bread API endpoint is correct' : '',
                                         actions: {
                                             always: function (){}
                                         }
