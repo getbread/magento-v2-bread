@@ -17,11 +17,19 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
      */
     public $logger;
 
+    /**
+     *
+     * @var type \Magento\Framework\App\Config\Storage\WriterInterface
+     */
+    public $configWriter;
+
     public function __construct(
             \Magento\Backend\App\Action\Context $context,
+            \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
             \Bread\BreadCheckout\Helper\Log $log
     ) {
         $this->logger = $log;
+        $this->configWriter = $configWriter;
         parent::__construct($context);
     }
 
@@ -46,12 +54,12 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
 
                 curl_setopt($curl, CURLOPT_POST, 1);
                 curl_setopt(
-                        $curl,
-                        CURLOPT_HTTPHEADER,
-                        [
-                            'Content-Type: application/json',
-                            'Content-Length: ' . strlen(json_encode($data))
-                        ]
+                    $curl,
+                    CURLOPT_HTTPHEADER,
+                    [
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen(json_encode($data))
+                    ]
                 );
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -64,17 +72,20 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     $this->logger->log('Failed keys validation');
                     return false;
                 } else {
-                    //@todo save the token to DB
+                    $response = json_decode($result);
+                    if(isset($response['token'])) {
+                        $this->configWriter->save('bread_auth_token', $response['token'],'store');
+                    }
                     return true;
                 }
-                
-                
+
+
             } catch (Exception $ex) {
                 $this->logger->log(
-                        [
-                            'STATUS' => 'BACKEND API KEYS TEST',
-                            'RESULT' => $ex->getMessage()
-                        ]
+                    [
+                        'STATUS' => 'BACKEND API KEYS TEST',
+                        'RESULT' => $ex->getMessage()
+                    ]
                 );
 
                 curl_close($curl);
