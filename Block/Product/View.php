@@ -8,6 +8,8 @@
  */
 namespace Bread\BreadCheckout\Block\Product;
 
+use Magento\Store\Model\StoreManagerInterface;
+
 class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable
 {
     public $_product;
@@ -70,6 +72,7 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface                        $priceCurrency
      * @param \Magento\ConfigurableProduct\Model\ConfigurableAttributeData             $configurableAttributeData
      * @param \Bread\BreadCheckout\Helper\Quote                                        $quoteHelper
+     * @param \Magento\Store\Model\StoreManagerInterface                               $storeManager
      * @param array                                                                    $data
      */
     public function __construct(
@@ -547,4 +550,20 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     {
         return $this->getProduct()->getTypeId() === \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE;
     }
+
+    /**
+     * @return string
+     */
+    public function getBreadVersion() {
+        return (string) $this->dataHelper->getApiVersion();
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegrationKey() {
+        return $this->dataHelper->getIntegrationKey();
+    }
+
+
 }

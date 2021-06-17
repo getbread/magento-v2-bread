@@ -1,15 +1,17 @@
 <?php /** @var $block Bread\BreadCheckout\Block\Product\View */ ?>
-<?= /* @noEscape */ $block->getBeforeHtml(); ?>
+<?= /* @noEscape */
+$block->getBeforeHtml(); ?>
 
 <div class="splitpay-clickable-price" style="padding-bottom: 5px"></div>
 
 <?php /** TODO: rename these javascript functions when doing refactor of template files */ ?>
 <script type="text/javascript">
-    require(['jquery', 'splitPay'], function($, splitPay) {
+    <?php if($block->getBreadVersion() !== 'bread_2') : ?>
 
+    require(['jquery', 'splitPay'], function ($, splitPay) {
         document.splitPayConfigureButton = function (items) {
-            var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo   = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
+            var buttonCss = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
+            var financingInfo = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var breadConfig = {
                 <?php if (!$block->isHealthcare()) : ?>
                 items: items,
@@ -18,14 +20,15 @@
                 <?php endif; ?>
                 discounts: <?= /* @noEscape */ $block->getDiscountDataJson(); ?>,
                 allowCheckout: false,
-                done: function() {},
+                done: function () {
+                },
 
                 /**
                  * Add to cart call back used when allow checkout from product page = false
                  *
                  * @param callback
                  */
-                addToCart:  function(callback) {
+                addToCart: function (callback) {
                     document.getElementById('product_addtocart_form').submit();
                 }
             };
@@ -34,14 +37,16 @@
                 breadConfig.customCSS = buttonCss;
             }
 
-            if(financingInfo.enabled && financingInfo.mode.cart){
+            if (financingInfo.enabled && financingInfo.mode.cart) {
                 var cartSizeFinancingId = financingInfo.id;
                 var cartSizeThreshold = financingInfo.threshold;
-                var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity; }, 0) / 100;
+                var itemsPriceSum = items.reduce(function (sum, item) {
+                    return sum + item.price * item.quantity;
+                }, 0) / 100;
                 breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            } else if (financingInfo.enabled && financingInfo.mode.sku){
+            } else if (financingInfo.enabled && financingInfo.mode.sku) {
                 var productSku = "<?= /* @noEscape */ $block->getProduct()->getSku(); ?>";
-                if(financingInfo.sku_limit.includes(productSku) === true){
+                if (financingInfo.sku_limit.includes(productSku) === true) {
                     breadConfig.financingProgramId = financingInfo.id;
                 }
             }
@@ -53,7 +58,7 @@
                     url: configDataUrl,
                     type: 'post',
                     context: this
-                }).done(function(data) {
+                }).done(function (data) {
                     document.splitPayHasCheckedConfigData = true;
 
                     if (data.shippingContact !== false) {
@@ -67,7 +72,7 @@
                     if (typeof bread !== 'undefined') {
                         splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-price', true);
                     }
-                }).fail(function(error) {
+                }).fail(function (error) {
                     document.logBreadIssue('error', {},
                         'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
                 });
@@ -86,24 +91,23 @@
          * Reconfigure Bread checkout button with updated
          * price and sku values
          */
-        document.splitPayResetPriceAndSku = function(configurable) {
+        document.splitPayResetPriceAndSku = function (configurable) {
             if (!configurable) {
                 document.splitPayConfigureButton(document.splitPayDefaultItems);
-            }
-            else {
+            } else {
                 var price = document.splitPayCalculatePrice();
 
-                if(typeof document.customOptions !== "undefined"){
+                if (typeof document.customOptions !== "undefined") {
                     sku = document.splitPaySelectedSku + document.customOptions;
                 } else {
                     sku = document.splitPaySelectedSku;
                 }
 
                 if (sku != document.splitPayPreviousSku || price != document.splitPayPreviousPrice) {
-                    document.splitPayPreviousSku                    = sku;
-                    document.splitPayPreviousPrice                  = price;
-                    document.splitPayDefaultItems[0]["sku"]         = document.splitPayPreviousSku;
-                    document.splitPayDefaultItems[0]["price"]       = document.splitPayPreviousPrice;
+                    document.splitPayPreviousSku = sku;
+                    document.splitPayPreviousPrice = price;
+                    document.splitPayDefaultItems[0]["sku"] = document.splitPayPreviousSku;
+                    document.splitPayDefaultItems[0]["price"] = document.splitPayPreviousPrice;
                     document.splitPayConfigureButton(document.splitPayDefaultItems);
                 }
             }
@@ -115,7 +119,7 @@
          *
          * @returns int
          */
-        document.splitPayCalculatePrice = function() {
+        document.splitPayCalculatePrice = function () {
             var price = 0;
             var customPrice = 0;
 
@@ -132,20 +136,21 @@
             return Math.max(price, customPrice);
         };
         <?php endif; ?>
-        document.splitPayDefaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-        document.splitPayPreviousPrice      = document.splitPayDefaultItems[0]["price"];
-        document.splitPayPreviousSku        = document.splitPayDefaultItems[0]["sku"];
+        document.splitPayDefaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+        document.splitPayPreviousPrice = document.splitPayDefaultItems[0]["price"];
+        document.splitPayPreviousSku = document.splitPayDefaultItems[0]["sku"];
 
         $(document).ready(function () {
             <?php if ($block->getProduct() != null) : ?>
-            document.splitPayProductId                      = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
-            document.splitPayBaseProductSku                 = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-            document.splitPaySelectedSku                    = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-            document.splitPaySelectedSimpleProductId        = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+            document.splitPayProductId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+            document.splitPayBaseProductSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+            document.splitPaySelectedSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+            document.splitPaySelectedSimpleProductId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
             document.splitPayResetPriceAndSku(false);
             <?php else : ?>
             document.splitPayConfigureButton(document.splitPayDefaultItems);
             <?php endif; ?>
         });
     });
+    <?php endif; ?>
 </script>

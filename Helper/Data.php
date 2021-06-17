@@ -16,6 +16,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const JS_SANDBOX_URI                            = 'https://checkout-sandbox.getbread.com/bread.js';
     const JS_LIVE_URI                               = 'https://checkout.getbread.com/bread.js';
 
+    const JS_SANDBOX_SDK                            = 'http://localhost:15000/wordpress/5.6.beta-1/wp-content/plugins/bread-finance/assets/js/v2/sdk-2.js';
+    const JS_LIVE_SDK                               = '';
+
     const URL_LAMBDA_SENTRY_DSN                     = 'https://oapavh9uvh.execute-api.us-east-1.amazonaws.com/prod/sentrydsn?platform=magento2';
 
     const URL_VALIDATE_PAYMENT                      = 'bread/checkout/validatepaymentmethod';
@@ -57,6 +60,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_BUTTON_ON_PRODUCTS             = 'payment/breadcheckout/button_on_products';
     const XML_CONFIG_BUTTON_DESIGN                  = 'payment/breadcheckout/button_design';
     const XML_CONFIG_API_MODE                       = 'payment/breadcheckout/api_mode';
+    const XML_CONFIG_API_VERSION                    = 'payment/breadcheckout/api_version';
+    const XML_CONFIG_API_URL                        = 'payment/breadcheckout/api_url';
+    const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
+    const XML_CONFIG_INTEGRATION_KEY                = 'payment/breadcheckout/integration_key';
     const XML_CONFIG_DEFAULT_BUTTON_SIZE            = 'payment/breadcheckout/use_default_button_size';
     const XML_CONFIG_CREATE_CUSTOMER                = 'payment/breadcheckout/bread_advanced/create_customer_account';
     const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
@@ -141,7 +148,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $helperContext
         );
     }
-    
+
     /**
      * Is module active?
      *
@@ -237,11 +244,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
-            return self::JS_LIVE_URI;
+        $breadVersion = $this->getApiVersion();
+        if($breadVersion === 'bread_2') {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return self::JS_LIVE_SDK;
+            } else {
+                return self::JS_SANDBOX_SDK;
+            }
         } else {
-            return self::JS_SANDBOX_URI;
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return self::JS_LIVE_URI;
+            } else {
+                return self::JS_SANDBOX_URI;
+            }
         }
+
     }
 
     /**
@@ -938,4 +955,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
     }
+
+    /**
+     * @param null $storeCode
+     * @param $store
+     * @return string
+     */
+    public function getApiVersion($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if($this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode);
+        } else {
+            return 'bread_2';
+        }
+    }
+
+    /**
+     * @param null $storeCode
+     * @param string $store
+     * @return string
+     */
+    public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INTEGRATION_KEY, $store, $storeCode);
+    }
+
+
 }

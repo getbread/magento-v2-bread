@@ -1,34 +1,133 @@
 <?php /** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
-<?= /* @noEscape */ $block->getBeforeHtml(); ?>
+<?= /* @noEscape */
+$block->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr">
-    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
+    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */
+    $block->getIsDefaultSize(); ?>>
         <span>
-            <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
+            <span><?= /* @noEscape */
+                __('Bread Checkout'); ?></span>
         </span>
     </div>
     <div class="button-prevent" id="button-prevent">
-        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ $block->productTypeErrorMessage() ?>">&nbsp;</span>
+        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */
+        $block->productTypeErrorMessage() ?>">&nbsp;</span>
     </div>
     <div class="splitpay-clickable-button" style="text-align: center;"></div>
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'splitPay', 'jquery/validate', 'mage/validation', '!domReady'], function($, splitPay) {
+    <?php if($block->getBreadVersion() === 'bread_2') : ?>
+    require(['jquery'], function($) {
+        var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
+        if (validateProductTypes === false) {
+            var buttonPrevent = $('#button-prevent');
+            buttonPrevent.css('width', '100%');
+            buttonPrevent.css('height', '100%');
+            buttonPrevent.show();
+        }
+
+        document.configureButton = function (items) {
+            if (window.BreadPayments !== undefined) {
+
+                var total = 0;
+
+                let itemsObject = [];
+                for (var i = 0; i < items.length; i++) {
+                    total += items[i]['price'] * items[i]['quantity'];
+
+                    let item = {
+                        name: items[i]['name'],
+                        quantity: items[i]['quantity'],
+                        shippingCost: { value: 0, currency: 'USD' },
+                        shippingDescription: '',
+                        unitTax: { value: 0, currency: 'USD' },
+                        unitPrice: {
+                            currency: 'USD',
+                            value: items[i]['price'],
+                        }
+                    };
+
+                    itemsObject.push(item);
+                }
+                //Calculate discounts
+                let discountAmount = -document.round(window.checkoutConfig.totalsData.discount_amount);
+                let discountData = {
+                    value: 0,
+                    currency: 'USD'
+                };
+                if (discountAmount > 0) {
+                    discountData.value = discountAmount
+                }
+
+                let bread_sdk = window.BreadPayments;
+                let onApproved = function onApproved(application) {
+                    // eslint-disable-next-line no-console
+                    console.log({ application });
+                    alert('Got approval in host: ', application.id);
+                };
+                let onCheckout = function onCheckout(application) {
+                    // eslint-disable-next-line no-console
+                    console.log({ application });
+                    alert('Got checkout in host: ', application.id);
+                };
+                bread_sdk.setup({
+                    integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                });
+                bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+
+
+                let placementObject = {
+                    allowCheckout: false,
+                    domID: 'bread-checkout-btn',
+                    order: {
+                        currency: 'USD',
+                        items: itemsObject,
+                        subTotal: { value: total, currency: 'USD' },
+                        totalPrice: { value: (total - discountData.value), currency: 'USD' },
+                        totalDiscounts: discountData,
+                        totalShipping: { value: 0, currency: 'USD' },
+                        totalTax: { value: 0, currency: 'USD' },
+                    },
+                };
+
+                bread_sdk.registerPlacements([placementObject]);
+                window.BreadPayments.renderPlacements(true);
+                window.BreadPayments.init();
+
+            } else {
+                let errorInfo = {
+                    err: 'err'
+                };
+                document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not ');
+            }
+        }
+
+        document.round = function (value) {
+            return parseInt(Math.round(value * 100));
+        };
+
+        document.defaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+        document.configureButton(document.defaultItems);
+    })
+    <?php else : ?>
+    require(['jquery', 'splitPay', 'jquery/validate', 'mage/validation', '!domReady'], function ($, splitPay) {
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
         if (validateProductTypes === false) {
             var buttonPrevent = $('#button-prevent');
-            buttonPrevent.css('width','100%');
-            buttonPrevent.css('height','100%');
+            buttonPrevent.css('width', '100%');
+            buttonPrevent.css('height', '100%');
             buttonPrevent.show();
         }
 
-        document.configureButton = function(items) {
-            var address             = <?= /* @noEscape */ $block->getShippingAddressData(); ?>;
-            var billingAddress      = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
-            var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
-            var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo       = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
+        document.configureButton = function (items) {
+            var address = <?= /* @noEscape */ $block->getShippingAddressData(); ?>;
+            var billingAddress = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
+            var buttonOnProduct = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
+            var buttonCss = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
+            var financingInfo = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
             var total = 0;
             for (var i = 0; i < items.length; i++) {
                 total += items[i]['price'] * items[i]['quantity'];
@@ -80,8 +179,8 @@
                  * @param callback
                  */
                 calculateTax: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?= /* @noEscape */  $block->jsonEncode($block->setAdditionalData()); ?>;
+                    shippingAddress.block_key = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data = <?= /* @noEscape */  $block->jsonEncode($block->setAdditionalData()); ?>;
 
                     var taxEstimationUrl = '<?= /* @noEscape */ $block->getTaxEstimationUrl(); ?>';
                     var shippingString = JSON.stringify(shippingAddress);
@@ -89,7 +188,7 @@
 
                     $.ajax({
                         url: taxEstimationUrl,
-                        data: { shippingInfo: shippingString },
+                        data: {shippingInfo: shippingString},
                         type: 'post'
                     }).done(function (response) {
                         try {
@@ -107,15 +206,14 @@
                             } else {
                                 document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
                             }
-                        }
-                        catch (e) {
+                        } catch (e) {
                             errorInfo = {
                                 response: response,
                                 shipping_info: shippingString,
                             };
                             document.logBreadIssue('error', errorInfo, e);
                         }
-                    }).fail(function(error) {
+                    }).fail(function (error) {
                         errorInfo = {
                             shipping_info: shippingString,
                         };
@@ -131,8 +229,8 @@
                  * @param callback
                  */
                 calculateShipping: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+                    shippingAddress.block_key = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
+                    shippingAddress.additional_data = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
 
                     var shippingAddressEstimationUrl = '<?= /* @noEscape */ $block->getShippingAddressEstimationUrl(); ?>';
                     var errorInfo;
@@ -157,15 +255,14 @@
                             } else {
                                 document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
                             }
-                        }
-                        catch (e) {
+                        } catch (e) {
                             errorInfo = {
                                 response: response,
                                 shipping_info: shippingAddress,
                             };
                             document.logBreadIssue('error', errorInfo, e);
                         }
-                    }).fail(function(error) {
+                    }).fail(function (error) {
                         errorInfo = {
                             shipping_info: shippingAddress,
                         };
@@ -197,7 +294,7 @@
                 breadConfig.financingProgramId = targetedFinancingStatus.id;
             }
 
-            var discountAmount =- document.round(window.checkoutConfig.totalsData.discount_amount);
+            var discountAmount = -document.round(window.checkoutConfig.totalsData.discount_amount);
             if (discountAmount > 0) {
                 breadConfig.discounts = [{
                     amount: discountAmount,
@@ -213,12 +310,13 @@
             }
         };
 
-        document.round = function(value) {
+        document.round = function (value) {
             return parseInt(Math.round(value * 100));
         };
 
-        document.defaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+        document.defaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
         document.configureButton(document.defaultItems);
 
     });
+    <?php endif; ?>
 </script>

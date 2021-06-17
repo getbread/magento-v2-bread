@@ -20,7 +20,7 @@ define(
             {
                 setShippingInformation: function () {
                     /**
-                     * Call parent method 
+                     * Call parent method
                      */
                     Shipping.prototype.setShippingInformation.call(this);
 
@@ -51,37 +51,21 @@ define(
                         window.checkoutConfig.payment.breadcheckout.transactionId = null;
                     }
                 },
-                
+
                 /**
-                 * 
-                 * Refresh the payment method section if transactionId is not set
-                 */
-                refreshBreadPaymentMethod: function () {
-                            var paymentMethod = quote.paymentMethod();
-                            if (typeof paymentMethod.method !== 'undefined' && paymentMethod !== null) {
-                                if (quote.paymentMethod().method === 'breadcheckout' 
-                                        && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
-                                    button.embeddedCheckout();
-                                }
-                            }
-                    
-                },
-
-
-		/**
-                 * 
+                 *
                  * Refresh the payment method section if transactionId is not set
                  */
                 refreshBreadPaymentMethod: function () {
                     var paymentMethod = quote.paymentMethod();
-                    if ( paymentMethod !== null && typeof paymentMethod.method !== 'undefined') {
-                        if (quote.paymentMethod().method === 'breadcheckout' 
-                                && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
+                    if (typeof paymentMethod.method !== 'undefined' && paymentMethod !== null) {
+                        if (quote.paymentMethod().method === 'breadcheckout'
+                            && window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                             button.embeddedCheckout();
                         }
-                    }            
-                },
+                    }
 
+                },
 
                 /**
                  * Round float to 2 decimal plates and convert to integer

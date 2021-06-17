@@ -36,7 +36,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="base_url" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="integration_key" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Integration Key</label>
                     <depends>
                         <field id="api_version">bread_2</field>
