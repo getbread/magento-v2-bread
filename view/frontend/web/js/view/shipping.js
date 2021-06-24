@@ -57,11 +57,14 @@ define(
                  * Refresh the payment method section if transactionId is not set
                  */
                 refreshBreadPaymentMethod: function () {
-                    var paymentMethod = quote.paymentMethod();
-                    if (typeof paymentMethod.method !== 'undefined' && paymentMethod !== null) {
-                        if (quote.paymentMethod().method === 'breadcheckout'
-                            && window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                            button.embeddedCheckout();
+                    let paymentMethod = quote.paymentMethod();
+
+                    if (typeof paymentMethod !== undefined ) {
+                        if (typeof paymentMethod.method !== undefined) {
+                            if (quote.paymentMethod().method === 'breadcheckout'
+                                && window.checkoutConfig.payment.breadcheckout.transactionId === null) {
+                                button.embeddedCheckout();
+                            }
                         }
                     }
 

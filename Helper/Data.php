@@ -16,8 +16,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const JS_SANDBOX_URI                            = 'https://checkout-sandbox.getbread.com/bread.js';
     const JS_LIVE_URI                               = 'https://checkout.getbread.com/bread.js';
 
-    const JS_SANDBOX_SDK                            = 'http://localhost:15000/wordpress/5.6.beta-1/wp-content/plugins/bread-finance/assets/js/v2/sdk-2.js';
+    const JS_SANDBOX_SDK                            = 'https://connect-preview.breadpayments.com/sdk.js';
     const JS_LIVE_SDK                               = '';
+    
+    const AUTH_TOKEN_URL_BREAD                      = 'https://api.bread-ng.getbread.com/api/auth/sa/authenticate';
 
     const URL_LAMBDA_SENTRY_DSN                     = 'https://oapavh9uvh.execute-api.us-east-1.amazonaws.com/prod/sentrydsn?platform=magento2';
 
@@ -269,10 +271,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
-            return self::API_LIVE_URI;
+        $version = $this->getApiVersion($storeCode, $store);
+        if ($version === 'bread_2') {
+            return self::XML_CONFIG_API_URL;
         } else {
-            return self::API_SANDBOX_URI;
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
+                return self::API_LIVE_URI;
+            } else {
+                return self::API_SANDBOX_URI;
+            }
         }
     }
 
@@ -976,6 +983,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INTEGRATION_KEY, $store, $storeCode);
+    }
+    
+    /**
+     * 
+     * @param type $storeCode
+     * @param type $store
+     * @return type
+     */
+    public function getAuthToken($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getBreadAuthTokenUrl() {
+        return (string) self::AUTH_TOKEN_URL_BREAD;
     }
 
 

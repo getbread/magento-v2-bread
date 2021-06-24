@@ -298,21 +298,161 @@ class Client extends \Magento\Framework\Model\AbstractModel
     protected function call($url, array $data, $method = \Zend_Http_Client::POST)
     {
         $storeId = $this->getStoreId();
-        $username   = $this->helper->getApiPublicKey($storeId);
-        $password   = $this->helper->getApiSecretKey($storeId);
+        $username = $this->helper->getApiPublicKey($storeId);
+        $password = $this->helper->getApiSecretKey($storeId);
+        $breadVersion = $this->helper->getApiVersion($storeId);
+        
+        if($breadVersion === 'bread_2') {
+            try {
+                $authToken = $this->helper->getAuthToken($storeId);
+                $response = $this->jsonHelper->jsonDecode($this->callBread($url, $authToken, $data, $method));
+                if (isset($response['error']) && $response['error'] === 'jwt_auth_error') {
+                    //Get a new token and retry (once)
+                    $authTokenUrl = $this->helper->getBreadAuthTokenUrl();
+                    $getToken = $this->generateAuthToken($authTokenUrl, $username, $password);
+                    if(isset($getToken['token'])) {
+                        $authToken = $getToken['token'];
+                        $response = $this->jsonHelper->jsonDecode($this->callBread($url, $authToken, $data, $method));
+                        if ((isset($response['error']) && $response['error'] === 'jwt_auth_error') || $response['error'] !== null) {
+                            $errorMessage = 'Call to Bread APIs failed.';
+                            throw new \Magento\Framework\Exception\LocalizedException(
+                                    __($errorMessage)
+                            );
+                        } else {
+                            return $this->jsonHelper->jsonDecode($response['data']);
+                        }
+                    } else {
+                        $errorMessage = 'Call to Bread API failed.';
+                        throw new \Magento\Framework\Exception\LocalizedException(
+                                __($errorMessage)
+                        );
+                    }
+                } elseif (isset($response['error']) && $response['error'] === null && isset($response['data'])) {
+                    return $this->jsonHelper->jsonDecode($response['data']);
+                } else {
+                    $errorMessage = 'Call to Bread API failed.';
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                            __($errorMessage)
+                    );
+                }
+            } catch (\Throwable $e) {
+                $this->logger->log([
+                    'USER' => $username,
+                    'PASSWORD' => $password,
+                    'URL' => $url,
+                    'DATA' => $data,
+                ]);
+                throw $e;
+            }
+            
+        } else {
+            // @codingStandardsIgnoreStart
+            try {
+                $curl = curl_init($url);
+                curl_setopt($curl, CURLOPT_HEADER, 0);
+                curl_setopt($curl, CURLOPT_USERPWD, $username . ':' . $password);
+                curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
-        // @codingStandardsIgnoreStart
+                if ($method == \Zend_Http_Client::POST) {
+                    curl_setopt($curl, CURLOPT_POST, 1);
+                    curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
+                }
+
+                if ($method == \Zend_Http_Client::PUT) {
+                    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
+                }
+
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                $result = curl_exec($curl);
+                $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+                if ($status != 200) {
+                    $this->logger->log(curl_error($curl));
+
+                    //TODO: rewrite this when API is updated to better handle errors, instead of searching through the description string
+                    // Need to explicitly say !== false instead of === true or something similar because of what strpos returns
+                    $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
+
+                    if ($isSplitPayDecline) {
+                        if ($this->helper->isSplitPayAutoDecline()) {
+                            $this->cancel($this->getBreadTransactionId());
+                        }
+
+                        $errorMessage = 'The credit/debit card portion of your transaction was declined. '
+                                . 'Please use a different card or contact your bank. Otherwise, you can still check out with '
+                                . 'an amount covered by your Bread loan capacity.';
+                    } else {
+                        $errorMessage = 'Call to Bread API failed.';
+                    }
+
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                            __($errorMessage)
+                    );
+                }
+            } catch (\Throwable $e) {
+                $this->logger->log([
+                    'USER' => $username,
+                    'PASSWORD' => $password,
+                    'URL' => $url,
+                    'STATUS' => $status,
+                    'DATA' => $data,
+                    'RESULT' => $result
+                ]);
+
+                curl_close($curl);
+                throw $e;
+            }
+
+            curl_close($curl);
+            // @codingStandardsIgnoreEnd
+
+            $this->logger->log(
+                    [
+                        'USER' => $username,
+                        'PASSWORD' => $password,
+                        'URL' => $url,
+                        'DATA' => $data,
+                        'RESULT' => $result
+                    ]
+            );
+
+            if (!$this->isJson($result)) {
+                throw new \Magento\Framework\Exception\LocalizedException(
+                        __('API Response Is Not Valid JSON.  Result: ' . $result)
+                );
+            }
+
+            return $this->jsonHelper->jsonDecode($result);
+        }
+       
+    }
+    
+    /**
+     * 
+     * @param type $url
+     * @param type $authToken
+     * @param array $data
+     * @param type $method
+     * @return type
+     * @throws \Throwable
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function callBread($url, $authToken, array $data, $method = \Zend_Http_Client::POST) {
         try {
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_HEADER, 0);
-            curl_setopt($curl, CURLOPT_USERPWD, $username . ':' . $password);
+            curl_setopt($curl, CURLOPT_USERPWD, $authToken);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
             if ($method == \Zend_Http_Client::POST) {
                 curl_setopt($curl, CURLOPT_POST, 1);
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [
-                        'Content-Type: application/json',
-                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
 
@@ -324,65 +464,101 @@ class Client extends \Magento\Framework\Model\AbstractModel
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($curl);
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
+            
+            if($status == '401') {
+                return [
+                    'error' => 'jwt_auth_error',
+                    'description' => 'Invalid credentials or expired'
+                ];
+            }
+            
             if ($status != 200) {
                 $this->logger->log(curl_error($curl));
-
-                //TODO: rewrite this when API is updated to better handle errors, instead of searching through the description string
-
-                // Need to explicitly say !== false instead of === true or something similar because of what strpos returns
-                $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
-
-                if ($isSplitPayDecline) {
-                    if ($this->helper->isSplitPayAutoDecline()) {
-                        $this->cancel($this->getBreadTransactionId());
-                    }
-
-                    $errorMessage = 'The credit/debit card portion of your transaction was declined. '
-                        . 'Please use a different card or contact your bank. Otherwise, you can still check out with '
-                        . 'an amount covered by your Bread loan capacity.';
-                } else {
-                    $errorMessage = 'Call to Bread API failed.';
-                }
+                $errorMessage = 'Call to Bread API failed.';
 
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __($errorMessage)
+                        __($errorMessage)
                 );
             }
+            
+            return [
+                'error' => null,
+                'description' => 'Valid Response',
+                'data' => $result
+            ];
         } catch (\Throwable $e) {
             $this->logger->log([
-                'USER'      => $username,
-                'PASSWORD'  => $password,
-                'URL'       => $url,
-                'STATUS'    => $status,
-                'DATA'      => $data,
-                'RESULT'    => $result
+                'AUTH_TOKEN' => $authToken,
+                'URL' => $url,
+                'STATUS' => $status,
+                'DATA' => $data,
+                'RESULT' => $result
             ]);
 
             curl_close($curl);
             throw $e;
         }
+    }
+    
+    /**
+     * 
+     * @param type $url
+     * @param type $apiKey
+     * @param type $apiSecret
+     * @return type
+     * @throws \Throwable
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function generateAuthToken($url, $apiKey, $apiSecret) {
+        $data = [
+            'apiKey' => $apiKey,
+            'apiSecret' => $apiSecret
+        ];
+        try {
+            $curl = curl_init($url);
+            curl_setopt($curl, CURLOPT_HEADER, 0);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
+            
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($curl);
+            $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            
+            if ($status != 200) {
+                $this->logger->log(curl_error($curl));
+                $errorMessage = 'Call to Bread Auth API failed.';
 
-        curl_close($curl);
-        // @codingStandardsIgnoreEnd
+                throw new \Magento\Framework\Exception\LocalizedException(
+                        __($errorMessage)
+                );
+            }
+            
+            $response = $this->jsonHelper->jsonDecode($result);
+            
+            if(isset($response['token'])) {
+                return $response;
+            } else {
+                $errorMessage = 'Call to Bread Auth API failed.';
 
-        $this->logger->log(
-            [
-                'USER'      => $username,
-                'PASSWORD'  => $password,
-                'URL'       => $url,
-                'DATA'      => $data,
-                'RESULT'    => $result
-            ]
-        );
+                throw new \Magento\Framework\Exception\LocalizedException(
+                        __($errorMessage)
+                );
+            }
+            
+        } catch (\Throwable $e) {
+            $this->logger->log([
+                'STATUS' => $status,
+                'DATA' => $data,
+                'RESULT' => $response
+            ]);
 
-        if (!$this->isJson($result)) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('API Response Is Not Valid JSON.  Result: ' . $result)
-            );
+            curl_close($curl);
+            throw $e;
         }
-
-        return $this->jsonHelper->jsonDecode($result);
     }
 
     /**
@@ -457,8 +633,16 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getTransactionInfoUrl($transactionId)
     {
+        $breadVersion = $this->helper->getApiVersion($this->getStoreId());
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        return join('/', [ trim($baseUrl, '/'), 'transactions', trim($transactionId, '/') ]);
+        
+        if($breadVersion === 'bread_2') {
+            return join('/', [ trim($baseUrl, '/'), 'transaction', trim($transactionId,'/') ]);
+        } else {
+            
+            return join('/', [ trim($baseUrl, '/'), 'transactions', trim($transactionId, '/') ]);
+        }
+        
     }
 
     /**

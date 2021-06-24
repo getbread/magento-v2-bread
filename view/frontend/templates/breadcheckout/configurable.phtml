@@ -40,7 +40,9 @@
                         document.selectedSku = document.baseProductSku + "///" +
                             document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
+                        <?php if($block->getBreadVersion() !== 'bread_2'):?>
                         document.splitPayResetPriceAndSku(true);
+                        <?php endif; ?>
                     }
                 }
             };

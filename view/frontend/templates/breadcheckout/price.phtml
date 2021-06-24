@@ -7,6 +7,8 @@ $block->getBeforeHtml(); ?>
 <?php /** TODO: rename these javascript functions when doing refactor of template files */ ?>
 <script type="text/javascript">
     <?php if($block->getBreadVersion() !== 'bread_2') : ?>
+        
+    <?php else : ?>    
 
     require(['jquery', 'splitPay'], function ($, splitPay) {
         document.splitPayConfigureButton = function (items) {

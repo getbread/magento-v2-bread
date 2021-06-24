@@ -50,6 +50,7 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'active' => $this->helper->isPaymentMethodAtCheckout(),
+                    'breadVersion' => $this->helper->getApiVersion(),
                     'defaultSize' => $this->helper->useDefaultButtonSize(),
                     'buttonCss' => $this->helper->getButtonDesign(),
                     'configDataUrl' => $this->helper->getConfigDataUrl(),
@@ -77,6 +78,9 @@ class ConfigProvider implements ConfigProviderInterface
                         'productTypeMessage' => $this->helperData->getProductTypeMessage(),
                         'cartValidation' => $this->helper->validateAllowedProductTypes(),
                         'methodTitle' => $this->breadMethod->getTitle()
+                    ],
+                    'breadConfigV2' => [
+                        'integrationKey' => $this->helper->getIntegrationKey()
                     ]
                 ]
             ]

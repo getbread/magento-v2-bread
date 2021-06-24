@@ -34,17 +34,17 @@ $block->getBeforeHtml(); ?>
 
                 let itemsObject = [];
                 for (var i = 0; i < items.length; i++) {
-                    total += items[i]['price'] * items[i]['quantity'];
+                    total += items[i].unitPrice.value * items[i].quantity;
 
                     let item = {
-                        name: items[i]['name'],
-                        quantity: items[i]['quantity'],
+                        name: items[i].name,
+                        quantity: items[i].quantity,
                         shippingCost: { value: 0, currency: 'USD' },
                         shippingDescription: '',
                         unitTax: { value: 0, currency: 'USD' },
                         unitPrice: {
                             currency: 'USD',
-                            value: items[i]['price'],
+                            value: items[i].unitPrice.value,
                         }
                     };
 
@@ -319,4 +319,4 @@ $block->getBeforeHtml(); ?>
 
     });
     <?php endif; ?>
-</script>
+</script>       ]

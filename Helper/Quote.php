@@ -154,14 +154,29 @@ class Quote extends Data
         }
 
         $discount = round($discount * 100);
-
-        if ($discount > 0) {
-            $discount = [
-                'amount'      => $discount,
-                'description' => ($couponTitle) ? $couponTitle : __('Discount')
-            ];
+        
+        $breadVersion = $this->getApiVersion();
+        if($breadVersion === 'bread_2') {
+            if($discount > 0) {
+                return [
+                  'currency' => 'USD',
+                  'value' => $discount  
+                ];
+            } else {
+                return [
+                    'currency' => 'USD',
+                    'value' => 0
+                ];
+            }
         } else {
-            return [];
+            if ($discount > 0) {
+                $discount = [
+                    'amount' => $discount,
+                    'description' => ($couponTitle) ? $couponTitle : __('Discount')
+                ];
+            } else {
+                return [];
+            }
         }
 
         return [$discount];

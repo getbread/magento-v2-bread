@@ -65,12 +65,25 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
             $token = $this->getRequest()->getParam('token');
             if ($token) {
                 $data   = $this->paymentApiClient->getInfo($token);
-                if (isset($data['breadTransactionId'])) {
+                $breadVersion = $this->helper->getApiVersion();
+                $trxId = null;
+                
+                if($breadVersion === 'bread_2') {
+                    if(isset($data['id'])) {
+                        $trxId = $data['id'];
+                    }
+                } else {
+                    if (isset($data['breadTransactionId'])) {
+                        $trxId = $data['breadTransactionId'];
+                    }
+                }     
+                
+                if(!is_null($trxId)) {
                     $this->orderCreateModel
-                        ->getSession()
-                        ->setBreadTransactionId($data['breadTransactionId']);
-                    $result     = true;
-                }
+                            ->getSession()
+                            ->setBreadTransactionId($trxId);
+                    $result = true;
+                }                                                      
             }
             $response = ['result' => $result];
         } catch (\Throwable $e) {
