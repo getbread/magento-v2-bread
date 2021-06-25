@@ -83,14 +83,18 @@ define(
                         },
 
                         getTitle: function () {
-                            var INSTALLMENTS_BLUE = '#5156ea';
-                            var SPLITPAY_GREEN = '#57c594';
-                            var label = jQuery('#breadcheckout').next('label').attr("for", "breadcheckout");
-                            label.text('');
-                            label.append('Pay Over Time with ' +
-                                    '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span> or ' +
-                                    '<span style="color: ' + SPLITPAY_GREEN + '; font-weight: 600;">SplitPay</span>');
-                            return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
+                            if(window.checkoutConfig.payment[this.getCode()].breadVersion === 'bread_2') {
+                                return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
+                            } else {
+                                var INSTALLMENTS_BLUE = '#5156ea';
+                                var SPLITPAY_GREEN = '#57c594';
+                                var label = jQuery('#breadcheckout').next('label').attr("for", "breadcheckout");
+                                label.text('');
+                                label.append('Pay Over Time with ' +
+                                        '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span> or ' +
+                                        '<span style="color: ' + SPLITPAY_GREEN + '; font-weight: 600;">SplitPay</span>');
+                                return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
+                            }
                         },
 
                         /**
@@ -197,8 +201,8 @@ define(
                                                     alert(response.error);
                                                 } else {
                                                     $.when(
-                                                            this.updateAddress(response, errorInfo),
-                                                            this.validateTotals()
+                                                            //this.updateAddress(response, errorInfo),
+                                                            //this.validateTotals()
                                                             ).done(
                                                             $.proxy(
                                                                     function () {

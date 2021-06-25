@@ -17,12 +17,17 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
      */
     public $logger;
 
-
     /**
      *
-     * @var type \Magento\Framework\App\Config\Storage\WriterInterface
+     * @var \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
      */
     public $configWriter;
+    
+    /**
+     *
+     * @var \Magento\Framework\Json\Helper\Data $jsonHelper
+     */
+    public $jsonHelper;
 
     /**
      * ValidateCredentials constructor.
@@ -33,10 +38,12 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Log $log,
-        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
+        \Magento\Framework\Json\Helper\Data $jsonHelper    
     ) {
         $this->logger = $log;
         $this->configWriter = $configWriter;
+        $this->jsonHelper = $jsonHelper;
         parent::__construct($context);
     }
 
@@ -58,7 +65,7 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     'secret' => "$password"
                 );
 
-                $url = $apiUrl . '/api/auth/sa/authenticate';
+                $url = join('/', [ trim($apiUrl, '/'), 'auth/sa/authenticate' ]);
                 $curl = curl_init($url);
                 curl_setopt($curl, CURLOPT_HEADER, 0);
                 curl_setopt($curl, CURLOPT_TIMEOUT, 30);
@@ -69,7 +76,7 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     CURLOPT_HTTPHEADER,
                     [
                         'Content-Type: application/json',
-                        'Content-Length: ' . strlen(json_encode($data))
+                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))
                     ]
                 );
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
@@ -83,9 +90,9 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     $this->logger->log('Failed keys validation');
                     return false;
                 } else {
-                    $response = (array) json_decode($result);
+                    $response = (array) $this->jsonHelper->jsonDecode($result);
                     if(isset($response['token'])) {
-                        $this->configWriter->save('bread_auth_token', $response['token'],'store');
+                        $this->configWriter->save('payment/breadcheckout/bread_auth_token', $response['token'],'default');
                         return true;
                     }
                     return false;

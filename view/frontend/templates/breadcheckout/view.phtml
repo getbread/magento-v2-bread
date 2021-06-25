@@ -34,16 +34,8 @@
 
             if (window.BreadPayments !== undefined) {
                 let bread_sdk = window.BreadPayments;
-                let onApproved = function onApproved(application) {
-                    // eslint-disable-next-line no-console
-                    console.log({ application });
-                    alert('Got approval in host: ', application.id);
-                };
-                let onCheckout = function onCheckout(application) {
-                    // eslint-disable-next-line no-console
-                    console.log({ application });
-                    alert('Got checkout in host: ', application.id);
-                };
+                let onApproved = function onApproved(application) {};
+                let onCheckout = function onCheckout(application) {};
                 bread_sdk.setup({
                     integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
                 });
@@ -65,8 +57,8 @@
                         },
                     }]
                 );
-                bread_sdk.renderPlacements(true);
-                bread_sdk.init();
+                bread_sdk.__internal__.setInitMode('manual');
+                bread_sdk.__internal__.init();
 
             } else {
                 let errorInfo = {

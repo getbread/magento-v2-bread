@@ -35,7 +35,7 @@ define(
 
                 done: function (err, tx_token) {
                     if (tx_token !== undefined) {
-                        context.buttonCallback(tx_token);
+                        
                     } else {
                         var errorInfo = {
                             err: err,
@@ -43,6 +43,14 @@ define(
                         };
                         document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
                     }
+                },
+                
+                onCheckout: function(application) {
+                    context.buttonCallback(application.transactionID);
+                },
+                
+                onApproval: function(application) {
+                    console.log('Approved');
                 }
             };
 
@@ -101,12 +109,13 @@ define(
                             let onApproved = function onApproved(application) {
                                 // eslint-disable-next-line no-console
                                 console.log({application});
-                                alert('Got approval in host: ', application.id);
+                                //alert('Got approval in host: ', application.id);
                             };
                             let onCheckout = function onCheckout(application) {
                                 // eslint-disable-next-line no-console
+                                console.log('Checkout has been completed');
                                 console.log({application});
-                                context.buttonCallback(application.transactionID);
+                                self.breadButtonCallback(application.transactionID);
                             };
                             bread_sdk.setup({
                                 integrationKey: window.checkoutConfig.payment.breadcheckout.breadConfigV2.integrationKey,
@@ -121,8 +130,8 @@ define(
                                     }
                                 }
                             });
-                            bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
-                            bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                            bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', self.breadConfig.onApproval);
+                            bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', self.breadConfig.onCheckout);
 
                             let totalPrice = (self.breadConfig.customTotal + self.breadConfig.tax) - window.checkoutConfig.payment.breadcheckout.breadConfig.discounts.value;
                             bread_sdk.registerPlacements([{
@@ -143,6 +152,7 @@ define(
                                 }]);
 
                             bread_sdk.__internal__.setInitMode('manual');
+                            //bread_sdk.__internal__.setRenderMode('modal');
                             bread_sdk.__internal__.init();
                             fullScreenLoader.stopLoader();
                         }
@@ -156,6 +166,64 @@ define(
 
                 });
             }
+        },
+        
+        setBreadTransactionId: function(transactionId) {
+            window.checkoutConfig.payment.breadcheckout.transactionId = transactionId;
+        },
+        
+        breadButtonCallback: function (token) {
+            console.log('Bread button callback');
+            this.setBreadTransactionId(token);
+            var paymentUrl = window.checkoutConfig.payment.breadcheckout.breadConfig.paymentUrl;
+            var breadConfig = window.checkoutConfig.payment.breadcheckout.breadConfig;
+            $.ajax(
+                    {
+                        url: paymentUrl,
+                        data: {token: token},
+                        type: 'post',
+                        context: this,
+                        beforeSend: function () {
+                            fullScreenLoader.startLoader();
+                        }
+                    }
+            ).done(function (response) {
+                console.log('We are done pushing the token for Bread API validation');
+                console.log(response);
+                var errorInfo;
+                try {
+                    errorInfo = {
+                        bread_config: breadConfig,
+                        response: response,
+                        tx_id: token,
+                    };
+                    if (response !== null && typeof response === 'object') {
+                        if (response.error) {
+                            document.logBreadIssue('error', errorInfo, 'Error validating payment method');
+                            alert(response.error);
+                        } else {
+                            $.when(
+                                    this.updateAddress(response, errorInfo),
+                                    this.validateTotals()
+                                    ).done(
+                                    
+                                    ).fail(
+                                    
+                                    );
+                        }
+                    } else {
+                        document.logBreadIssue('error', errorInfo, 'Response from ' + paymentUrl + ' was not of type Object');
+                    }
+                } catch (e) {
+                    errorInfo = {
+                        response: response,
+                        tx_id: token,
+                        bread_config: breadConfig,
+                    };
+                    document.logBreadIssue('error', errorInfo, e);
+                }
+            });
+
         },
 
         /**
@@ -230,7 +298,7 @@ define(
          * Get updated quote data and initialize
          */
         setShippingInformation: function (isEmbedded) {
-            
+            console.log('Set shipping information');
             var configDataUrl = window.checkoutConfig.payment.breadcheckout.configDataUrl;
             $.ajax(
                     {

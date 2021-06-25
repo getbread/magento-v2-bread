@@ -59,7 +59,8 @@ define(
                 refreshBreadPaymentMethod: function () {
                     let paymentMethod = quote.paymentMethod();
 
-                    if (typeof paymentMethod !== undefined ) {
+                    if (typeof paymentMethod !== undefined || typeof paymentMethod !== null ) {
+                        console.log('Here I am at the shipping step');
                         if (typeof paymentMethod.method !== undefined) {
                             if (quote.paymentMethod().method === 'breadcheckout'
                                 && window.checkoutConfig.payment.breadcheckout.transactionId === null) {

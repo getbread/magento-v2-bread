@@ -31,10 +31,12 @@ require(
                                 apiMode: apiMode,
                                 pubKey: key,
                                 secKey: secret
-                            },
+                            }
                         }
                     ).done(
                         function (response) {
+                            console.log('validation response');
+                            console.log(response);
                             if(response === false) {
                                 alert(
                                     {

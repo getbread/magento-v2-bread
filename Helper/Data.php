@@ -16,7 +16,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const JS_SANDBOX_URI                            = 'https://checkout-sandbox.getbread.com/bread.js';
     const JS_LIVE_URI                               = 'https://checkout.getbread.com/bread.js';
 
-    const JS_SANDBOX_SDK                            = 'https://connect-preview.breadpayments.com/sdk.js';
+    const JS_SANDBOX_SDK                            = 'http://localhost:15100/sdk.js';//'https://connect-preview.breadpayments.com/sdk.js';
     const JS_LIVE_SDK                               = '';
     
     const AUTH_TOKEN_URL_BREAD                      = 'https://api.bread-ng.getbread.com/api/auth/sa/authenticate';
@@ -273,7 +273,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $version = $this->getApiVersion($storeCode, $store);
         if ($version === 'bread_2') {
-            return self::XML_CONFIG_API_URL;
+            return $this->scopeConfig->getValue(self::XML_CONFIG_API_URL, $store, $storeCode);
         } else {
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
                 return self::API_LIVE_URI;
@@ -992,16 +992,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @return type
      */
     public function getAuthToken($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
     }
     
-    /**
-     * 
-     * @return type
-     */
-    public function getBreadAuthTokenUrl() {
-        return (string) self::AUTH_TOKEN_URL_BREAD;
-    }
 
 
 }

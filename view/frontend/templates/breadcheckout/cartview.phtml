@@ -4,10 +4,12 @@ $block->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr">
     <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */
     $block->getIsDefaultSize(); ?>>
+        <?php if($block->getBreadVersion() !== 'bread_2'):?>
         <span>
             <span><?= /* @noEscape */
                 __('Bread Checkout'); ?></span>
         </span>
+        <?php endif; ?>
     </div>
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */
@@ -57,20 +59,12 @@ $block->getBeforeHtml(); ?>
                     currency: 'USD'
                 };
                 if (discountAmount > 0) {
-                    discountData.value = discountAmount
+                    discountData.value = discountAmount;
                 }
 
                 let bread_sdk = window.BreadPayments;
-                let onApproved = function onApproved(application) {
-                    // eslint-disable-next-line no-console
-                    console.log({ application });
-                    alert('Got approval in host: ', application.id);
-                };
-                let onCheckout = function onCheckout(application) {
-                    // eslint-disable-next-line no-console
-                    console.log({ application });
-                    alert('Got checkout in host: ', application.id);
-                };
+                let onApproved = function onApproved(application) {};
+                let onCheckout = function onCheckout(application) {};
                 bread_sdk.setup({
                     integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
                 });
@@ -93,14 +87,14 @@ $block->getBeforeHtml(); ?>
                 };
 
                 bread_sdk.registerPlacements([placementObject]);
-                window.BreadPayments.renderPlacements(true);
-                window.BreadPayments.init();
+                bread_sdk.__internal__.setInitMode('manual');
+                bread_sdk.__internal__.init();
 
             } else {
                 let errorInfo = {
                     err: 'err'
                 };
-                document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not ');
+                document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not exist');
             }
         }
 
@@ -319,4 +313,4 @@ $block->getBeforeHtml(); ?>
 
     });
     <?php endif; ?>
-</script>       ]
+</script>

@@ -69,8 +69,8 @@ class ValidatePaymentMethod extends \Magento\Backend\App\Action
                 $trxId = null;
                 
                 if($breadVersion === 'bread_2') {
-                    if(isset($data['id'])) {
-                        $trxId = $data['id'];
+                    if(isset($data['transactionID'])) {
+                        $trxId = $data['transactionID'];
                     }
                 } else {
                     if (isset($data['breadTransactionId'])) {
