@@ -1,16 +1,18 @@
 <?php
+
 /**
  * Config provider for the payment method
  *
  * @author Bread   copyright   2016
  * @author Miranda @Mediotype
  */
+
 namespace Bread\BreadCheckout\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 
-class ConfigProvider implements ConfigProviderInterface
-{
+class ConfigProvider implements ConfigProviderInterface {
+
     const CODE = 'breadcheckout';
 
     /**
@@ -29,9 +31,9 @@ class ConfigProvider implements ConfigProviderInterface
     public $breadMethod;
 
     public function __construct(
-        \Bread\BreadCheckout\Helper\Quote $helper,
-        \Bread\BreadCheckout\Helper\Data $helperData,
-        \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
+            \Bread\BreadCheckout\Helper\Quote $helper,
+            \Bread\BreadCheckout\Helper\Data $helperData,
+            \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
     ) {
         $this->helper = $helper;
         $this->helperData = $helperData;
@@ -44,42 +46,82 @@ class ConfigProvider implements ConfigProviderInterface
      *
      * @return array
      */
-    public function getConfig()
-    {
-        return [
-            'payment' => [
-                self::CODE => [
-                    'active' => $this->helper->isPaymentMethodAtCheckout(),
-                    'defaultSize' => $this->helper->useDefaultButtonSize(),
-                    'buttonCss' => $this->helper->getButtonDesign(),
-                    'configDataUrl' => $this->helper->getConfigDataUrl(),
-                    'shippingOptionUrl' => $this->helper->getShippingOptionUrl(),
-                    'transactionId' => $this->helper->getBreadTransactionId(),
-                    'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
-                    'isHealthcare' => $this->helper->isHealthcare(),
-                    'breadConfig' => [
-                        'buttonId' => 'bread-checkout-btn',
-                        'formId' => 'bread-checkout-embedded',
-                        'embeddedCheckout' => $this->helperData->embeddedCheckoutEnabled(),
-                        'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,
-                        'items' => $this->helper->getQuoteItemsData(),
-                        'discounts' => $this->helper->getDiscountData(),
-                        'targetedFinancingStatus' => $this->helper->getTargetedFinancingStatus(),
-                        'asLowAs' => $this->helper->isAsLowAs(),
-                        'paymentUrl' => $this->helper->getPaymentUrl(),
-                        'validateOrderUrl' => $this->helper->getValidateOrderURL(),
-                        'additionalData' => '',
-                        'taxEstimationUrl' => $this->helper->getTaxEstimateUrl(),
-                        'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl(),
-                        'shippingOptions' => $this->helper->getShippingOptions(),
-                        'buttonLocation' => $this->helperData->getCheckoutLocation(),
-                        'methodTooltip' => $this->helper->getMethodTooltip(),
-                        'productTypeMessage' => $this->helperData->getProductTypeMessage(),
-                        'cartValidation' => $this->helper->validateAllowedProductTypes(),
-                        'methodTitle' => $this->breadMethod->getTitle()
+    public function getConfig() {
+        $apiVersion = $this->helper->getApiVersion();
+
+        if ($apiVersion === 'bread_2') {
+            
+            return [
+                'payment' => [
+                    self::CODE => [
+                        'active' => $this->helper->isPaymentMethodAtCheckout(),
+                        'apiVersion' => $apiVersion,
+                        'integrationKey' => $this->helper->getIntegrationKey(),
+                        'configDataUrl' => $this->helper->getConfigDataUrl(),
+                        'shippingOptionUrl' => $this->helper->getShippingOptionUrl(),
+                        'transactionId' => $this->helper->getBreadTransactionId(),
+                        'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
+                        'breadConfig' => [
+                            'buttonId' => 'bread-checkout-btn',
+                            'formId' => 'bread-checkout-embedded',
+                            'embeddedCheckout' => $this->helperData->embeddedCheckoutEnabled(),
+                            'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,
+                            'items' => $this->helper->getQuoteItemsData(),
+                            'discounts' => $this->helper->getDiscountData(),
+                            'paymentUrl' => $this->helper->getPaymentUrl(),
+                            'validateOrderUrl' => $this->helper->getValidateOrderURL(),
+                            'additionalData' => '',
+                            'taxEstimationUrl' => $this->helper->getTaxEstimateUrl(),
+                            'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl(),
+                            'shippingOptions' => $this->helper->getShippingOptions(),
+                            'buttonLocation' => $this->helperData->getCheckoutLocation(),
+                            'methodTooltip' => $this->helper->getMethodTooltip(),
+                            'productTypeMessage' => $this->helperData->getProductTypeMessage(),
+                            'cartValidation' => $this->helper->validateAllowedProductTypes(),
+                            'methodTitle' => $this->breadMethod->getTitle()
+                        ]
                     ]
                 ]
-            ]
-        ];
+            ];
+            
+        } else {
+
+            return [
+                'payment' => [
+                    self::CODE => [
+                        'active' => $this->helper->isPaymentMethodAtCheckout(),
+                        'defaultSize' => $this->helper->useDefaultButtonSize(),
+                        'buttonCss' => $this->helper->getButtonDesign(),
+                        'configDataUrl' => $this->helper->getConfigDataUrl(),
+                        'shippingOptionUrl' => $this->helper->getShippingOptionUrl(),
+                        'transactionId' => $this->helper->getBreadTransactionId(),
+                        'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
+                        'isHealthcare' => $this->helper->isHealthcare(),
+                        'breadConfig' => [
+                            'buttonId' => 'bread-checkout-btn',
+                            'formId' => 'bread-checkout-embedded',
+                            'embeddedCheckout' => $this->helperData->embeddedCheckoutEnabled(),
+                            'blockCode' => \Bread\BreadCheckout\Helper\Data::BLOCK_CODE_CHECKOUT_OVERVIEW,
+                            'items' => $this->helper->getQuoteItemsData(),
+                            'discounts' => $this->helper->getDiscountData(),
+                            'targetedFinancingStatus' => $this->helper->getTargetedFinancingStatus(),
+                            'asLowAs' => $this->helper->isAsLowAs(),
+                            'paymentUrl' => $this->helper->getPaymentUrl(),
+                            'validateOrderUrl' => $this->helper->getValidateOrderURL(),
+                            'additionalData' => '',
+                            'taxEstimationUrl' => $this->helper->getTaxEstimateUrl(),
+                            'shippingEstimationUrl' => $this->helper->getShippingEstimateUrl(),
+                            'shippingOptions' => $this->helper->getShippingOptions(),
+                            'buttonLocation' => $this->helperData->getCheckoutLocation(),
+                            'methodTooltip' => $this->helper->getMethodTooltip(),
+                            'productTypeMessage' => $this->helperData->getProductTypeMessage(),
+                            'cartValidation' => $this->helper->validateAllowedProductTypes(),
+                            'methodTitle' => $this->breadMethod->getTitle()
+                        ]
+                    ]
+                ]
+            ];
+        }
     }
+
 }

@@ -99,6 +99,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const BUTTON_LOCATION_CATEGORY                  = 'category';
     const BUTTON_LOCATION_OTHER                     = 'other';
     const API_CART_EXTENSION                        = 'carts/';
+    
+    //Bread 2.0 configurations
+    const XML_CONFIG_API_VERSION                    = 'payment/breadcheckout/api_version';
+    const XML_CONFIG_API_URL                        = 'payment/breadcheckout/api_url';
+    const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
+    const XML_CONFIG_INTEGRATION_KEY                = 'payment/breadcheckout/integration_key';
+    
+    const JS_SANDBOX_SDK                            = 'https://connect-preview.breadpayments.com/sdk.js';
+    const JS_LIVE_SDK                               = '';
 
     /**
      * @var \Magento\Framework\Model\Context
@@ -235,12 +244,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
-            return self::JS_LIVE_URI;
+    public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $apiVersion = $this->getApiVersion();
+
+        if ($apiVersion === 'bread_2') {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return self::JS_LIVE_SDK;
+            } else {
+                return self::JS_SANDBOX_SDK;
+            }
         } else {
-            return self::JS_SANDBOX_URI;
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return self::JS_LIVE_URI;
+            } else {
+                return self::JS_SANDBOX_URI;
+            }
         }
     }
 
@@ -937,5 +955,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
         return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
+    }
+    
+    /**
+     * @param null $storeCode
+     * @param $store
+     * @return string
+     */
+    public function getApiVersion($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if($this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode);
+        } else {
+            return 'bread_2';
+        }
+    }
+    
+    /**
+     * @param null $storeCode
+     * @param string $store
+     * @return string
+     */
+    public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INTEGRATION_KEY, $store, $storeCode);
     }
 }

@@ -5,6 +5,7 @@
 
 <?php /** TODO: rename these javascript functions when doing refactor of template files */ ?>
 <script type="text/javascript">
+    <?php if($block->getApiVersion() !== 'bread_2') : ?>
     require(['jquery', 'splitPay'], function($, splitPay) {
 
         document.splitPayConfigureButton = function (items) {
@@ -148,4 +149,5 @@
             <?php endif; ?>
         });
     });
+    <?php endif;?>
 </script>

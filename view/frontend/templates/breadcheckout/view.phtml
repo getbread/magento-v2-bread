@@ -3,9 +3,11 @@
 
 <div id="bread-btn-cntnr">
     <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
+        <?php if($block->getApiVersion() !== 'bread_2' ) :?>
         <span>
             <span><img src="<?= /* @noEscape */ $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?= /* @noEscape */ __('Bread Checkout'); ?>" /></span>
         </span>
+        <?php endif; ?>
     </div>
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
@@ -25,6 +27,128 @@
 </script>
 
 <script type="text/javascript">
+    <?php if($block->getApiVersion() === 'bread_2') :?>
+        
+        require(['jquery'], function($) {
+            
+            document.configureButton = function (items, subTotal, totalPrice) {
+
+            if (window.BreadPayments !== undefined) {
+                let bread_sdk = window.BreadPayments;
+                let onApproved = function onApproved(application) {};
+                let onCheckout = function onCheckout(application) {};
+                bread_sdk.setup({
+                    integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                });
+                bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                bread_sdk.registerPlacements([
+                    {
+                        allowCheckout: false,
+                        domID: 'bread-checkout-btn',
+                        order: {
+                            currency: 'USD',
+                            items: [items[0]],
+                            subTotal: { value: items[0].unitPrice.value, currency: 'USD' },
+                            totalPrice: { value: items[0].unitPrice.value, currency: 'USD' },
+                            totalDiscounts: { value: 0, currency: 'USD' },
+                            totalShipping: { value: 0, currency: 'USD' },
+                            totalTax: { value: 0, currency: 'USD' }
+                        },
+                    }]
+                );
+                bread_sdk.__internal__.setInitMode('manual');
+                bread_sdk.__internal__.init();
+
+            } else {
+                let errorInfo = {
+                    err: 'err'
+                };
+                document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not ');
+            }
+        };
+
+        document.clearQuote = function () {
+            var clearQuoteUrl = '<?= /* @noEscape */ $block->getClearQuoteUrl(); ?>';
+            $.ajax({
+                url: clearQuoteUrl
+            }).fail(function (error) {
+                document.logBreadIssue('error', {},
+                    'Error code returned when calling ' + clearQuoteUrl + ', with status: ' + error.statusText);
+            });
+        };
+
+        <?php if ($block->getProduct() != null) : ?>
+
+                /**
+                 * Reconfigure Bread checkout button with updated
+                 * price and sku values
+                 */
+                document.resetPriceAndSku = function (configurable) {
+                    if (!configurable) {
+                        document.configureButton(document.defaultItems);
+                    } else {
+                        var price = document.calculatePrice();
+
+                        if (typeof document.customOptions !== "undefined") {
+                            sku = document.selectedSku + document.customOptions;
+                        } else {
+                            sku = document.selectedSku;
+                        }
+
+                        if (sku != document.previousSku || price != document.previousPrice) {
+                            document.previousSku = sku;
+                            document.previousPrice = price;
+                            document.defaultItems[0]["sku"] = document.previousSku;
+                                       document.defaultItems[0]["price"] = document.previousPrice;
+                                       document.configureButton(document.defaultItems);
+                                   }
+                               }
+                           };
+
+                           /**
+                            * Calculate updated price based on attribute selections
+                            * and/or custom options
+                            *
+                            * @returns int
+                            */
+                           document.calculatePrice = function () {
+                               var price = 0;
+                               var customPrice = 0;
+
+                               if (document.priceWithOptions) {
+                                   customPrice = document.priceWithOptions;
+                               }
+
+                               var selectedProductPrices = (typeof spConfig !== "undefined") && spConfig.optionPrices[document.selectedSimpleProductId];
+
+                               if (selectedProductPrices) {
+                                   price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
+                               }
+
+                               return Math.max(price, customPrice);
+                           };
+        <?php endif; ?>
+
+                       document.defaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+                       document.previousPrice = document.defaultItems[0]["price"];
+                       document.previousSku = document.defaultItems[0]["sku"];
+
+                       $(document).ready(function () {
+        <?php if ($block->getProduct() != null) : ?>
+                               document.productId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+                               document.baseProductSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+                               document.selectedSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+                               document.selectedSimpleProductId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+                               document.resetPriceAndSku(false);
+        <?php else : ?>
+                               document.configureButton(document.defaultItems);
+        <?php endif; ?>
+                       });
+                   });
+        
+    <?php else:?>    
+        
     require(['jquery', 'splitPay'], function($, splitPay) {
 
         document.configureButton = function (items) {
@@ -327,4 +451,5 @@
             <?php endif; ?>
         });
     });
+    <?php endif;?>
 </script>

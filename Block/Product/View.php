@@ -547,4 +547,19 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     {
         return $this->getProduct()->getTypeId() === \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE;
     }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getApiVersion() {
+        return (string) $this->dataHelper->getApiVersion();
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegrationKey() {
+        return $this->dataHelper->getIntegrationKey();
+    }
 }
