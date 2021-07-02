@@ -306,10 +306,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Capture action is not available.'));
         }
-        $this->breadLogger->info('Processing capture action');
         
         $apiVersion = $this->helper->getApiVersion();
-        $this->breadLogger->info('Bread Action => ' . $this->helper->getPaymentAction());
 
         if ($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE) {
             $this->apiClient->setOrder($payment->getOrder());
@@ -319,16 +317,13 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             } else {
                 $token  = $this->checkoutSession->getBreadTransactionId();
             }
-            $this->breadLogger->info('TOKEN => ' . $token );
+
             $result = $this->apiClient->authorize(
                 $token,
                 ($this->priceCurrency->round($amount) * 100),
                 $payment->getOrder()->getIncrementId()
             );
-            $this->breadLogger->log([
-                'Action :: ' => 'Authorize Capture',
-                'result' => $result
-            ]);
+
             
             if($apiVersion === 'bread_2') {
                 $payment->setTransactionId($result['id']);               
@@ -421,7 +416,6 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType)
     {
         $this->apiClient->setOrder($payment->getOrder());
-        $this->breadLogger->info('api client order was set');
         $apiVersion = $this->helper->getApiVersion();
 
         switch ($requestType) {

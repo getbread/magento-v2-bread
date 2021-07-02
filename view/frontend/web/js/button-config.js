@@ -15,8 +15,7 @@ define(
             
             breadConfigV2: undefined,
 
-            configure: function (data, context) {
-                console.log('init 223');
+            configure: function (data, context) {               
                 this.breadConfig = {
                     actAsLabel: false,
                     asLowAs: data.asLowAs,
@@ -37,7 +36,6 @@ define(
                     },
 
                     done: function (err, tx_token) {
-                        console.log('Done processing');
                         if (tx_token !== undefined) {
                             context.buttonCallback(tx_token);
                         } else {
@@ -54,14 +52,10 @@ define(
                     customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
                     
                     onCheckout: function(application) {
-                        console.log('Checkout');
-                        console.log(application.transactionID);
                         context.buttonCallback(application.transactionID);
                     },
 
-                    onApproval: function(application) {
-                        console.log('Approved');
-                    }
+                    onApproval: function(application) {}
                 };
 
                 /**
@@ -122,9 +116,6 @@ define(
                     itemsObject.push(item);
                 }
                 this.breadConfigV2.items = itemsObject;
-                
-                console.log('Configure done');
-                console.log(this.breadConfigV2);
 
             },
 
@@ -145,9 +136,7 @@ define(
                 if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                     this.checkShippingOptions(function () {
                         if(window.checkoutConfig.payment.breadcheckout.apiVersion === 'bread_2') {
-                            console.log('Initialize Bread SDk');
                             if (typeof window.BreadPayments !== 'undefined') {
-                                console.log('Show checkout on Bread 2');
                                 let bread_sdk = window.BreadPayments;
                                 bread_sdk.setup({
                                     integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
@@ -216,7 +205,6 @@ define(
              * Makes sure shipping options are up to date
              */
             checkShippingOptions: function (cb) {
-                console.log('Check shipping options');
                 var self = this;
 
                 /**
@@ -246,8 +234,7 @@ define(
                             self.breadConfig.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
                             //
                             self.breadConfigV2.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
-                            
-                            console.log(self.breadConfigV2);
+
                             cb();
                         }
                     ).fail(
@@ -329,7 +316,6 @@ define(
                             //
                             this.breadConfigV2.shippingContact = data.billingContact;
                         }
-                        console.log(this.breadConfigV2);
                         if(isEmbedded === false) {
                             this._init();
                         } else {
@@ -355,7 +341,6 @@ define(
              */
             setCouponDiscounts: function () {
                 var discountAmount =- this.round(quote.getTotals()._latestValue.discount_amount);
-                console.log(this.breadConfigV2);
                 this.breadConfigV2.discounts = {
                     currency: 'USD',
                     value: 0
@@ -381,8 +366,6 @@ define(
                         }];
                     }
                 }
-                
-                console.log(this.breadConfigV2);
                 /* this is needed if coupon is removed to update total price */
                 this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
             },

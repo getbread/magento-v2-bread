@@ -190,22 +190,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
             
             $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
 
-            $this->logger->log([
-                'Authorize request',
-                'payload' => $data
-            ]);
-            
             $result = $this->call(
                     $this->getUpdateTransactionUrlV2($breadTransactionId, 'authorize'),
                     $data,
                     \Zend_Http_Client::POST,
                     false
                     );
-            $this->logger->log([
-                'Authorize request',
-                'response' => $result,
-                'payload' => $data
-            ]);
+
             if ($result['status'] != self::STATUS_AUTHORIZED) {
                 $this->logger->log(['ERROR'=>'AUTHORIZATION FAILED', 'RESULT'=>$result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
@@ -298,12 +289,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     false
             );
             
-            $this->logger->log([
-                'Settle request',
-                'response' => $result,
-                'payload' => $data
-            ]);
-            
             if ($result['status'] != self::STATUS_SETTLED) {
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('Transaction settle failed (current transaction status :' . $result['status'] . ')')
@@ -351,12 +336,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     \Zend_Http_Client::POST,
                     false
                     );
-            
-            $this->logger->log([
-                'Refund request',
-                'response' => $result,
-                'payload' => $data
-            ]);
             
             return $result;
             
@@ -446,70 +425,42 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $apiVersion = $this->helper->getApiVersion();
         
         if($apiVersion === 'bread_2') {
-            $this->logger->info('Running call to Bread');
             try {
-                $this->logger->info('Inside Try');
                 $authToken = $this->helper->getAuthToken();
                 
                 $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);  
 
                 if (isset($response['error']) && $response['error'] === 'jwt_auth_error') {
-                    $this->logger->info('Invalid JWT 1');
                     $authTokenUrl = $this->getAuthTokenUrl();
                     
                     $getToken = $this->generateAuthToken($authTokenUrl, $username, $password);
-                    $this->logger->info('NEW TOKEN');
                     if(isset($getToken['token'])) {
-                        $this->logger->info('VALID NEW TOKEN');
+
                         $authToken = $getToken['token'];
                         //Save this token to DB here
                         $this->configWriter->save('payment/breadcheckout/bread_auth_token', $authToken, 'default');
-                        $this->logger->info('Call Bread 2');
+
                         $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);
                         
-                        $this->logger->log([
-                            'REQUEST' => $url,
-                            'RESPONSE' => $response
-                        ]);
                         if ((isset($response['error']) && $response['error'] === 'jwt_auth_error')) {
-                            $this->logger->info('TOEKN AUTH FAILED');
+
                             $errorMessage = 'Call to Bread APIs failed. Token Auth';
                             throw new \Magento\Framework\Exception\LocalizedException(
                                     __($errorMessage)
                             );
                         } else {
-                            $this->logger->info('SUCCESSSS');
-                            $this->logger->log([
-                                'STATUS' => 'SUCCESS',
-                                'RESPONSE' => $response
-                            ]);
                             return $this->jsonHelper->jsonDecode($response['data']);
                         }
                     } else {
-                        $this->logger->info('FAILEDD');
-                        $this->logger->log([
-                            'ERROR' => 'Could not fetch Auth token'
-                        ]);
-                        
                         $errorMessage = 'Call to Bread API failed. Auth token generate';
                         throw new \Magento\Framework\Exception\LocalizedException(
                                 __($errorMessage)
                         );
                     }
                 } elseif (isset($response['data'])) {
-                    $this->logger->info('SUCCESS 11');
-                    $this->logger->log([
-                            'RESPONSE VALID' => $url,
-                            'RESPONSE' => $response
-                        ]);
                     return $this->jsonHelper->jsonDecode($response['data']);
                     
                 } else {
-                    $this->logger->info('FAILED 11');
-                    $this->logger->log([
-                        'ERROR' => 'FAILED',
-                        'RESPONSE' => $response
-                    ]);
                     $errorMessage = 'Call to Bread API failed.';
                     throw new \Magento\Framework\Exception\LocalizedException(
                             __($errorMessage)
@@ -623,7 +574,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
     protected function callBread($url, $authToken, $data, $method = \Zend_Http_Client::POST, $jsonEncode = true) {
         $curl = curl_init($url);
         try {
-            $this->logger->info('Try call Bread');
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
@@ -679,7 +629,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     'TOKEN' => $authToken,
                     'URL' => $url
                 ]);
-                $errorMessage = 'Call to Bread API failed ... 200';
+                $errorMessage = 'Call to Bread API failed';
 
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __($errorMessage)
@@ -741,7 +691,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     'RESULT' => $result,
                     'CODE' => '200'
                 ]);
-                $errorMessage = 'Call to Bread Auth API failed. 003';
+                $errorMessage = 'Call to Bread Auth API failed';
 
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __($errorMessage)
@@ -757,7 +707,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 ]);
                 return $response;
             } else {
-                $errorMessage = 'Call to Bread Auth API failed. 004';
+                $errorMessage = 'Call to Bread Auth API failed';
 
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __($errorMessage)
@@ -933,9 +883,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
     protected function getUpdateTransactionUrlV2($transactionId, $action) {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
         $url = join('/', [trim($baseUrl, '/'), 'transaction',$transactionId,$action]);
-        $this->logger->log([
-            'Trx URL' => $url
-        ]);
         return $url;
     }
 }

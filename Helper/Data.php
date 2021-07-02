@@ -106,7 +106,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
     const XML_CONFIG_INTEGRATION_KEY                = 'payment/breadcheckout/integration_key';
     
-    const JS_SANDBOX_SDK                            =  'http://localhost:15100/sdk.js';//'https://connect-preview.breadpayments.com/sdk.js';
+    const JS_SANDBOX_SDK                            =  'https://connect-preview.breadpayments.com/sdk.js';
     const JS_LIVE_SDK                               = '';
 
     /**
