@@ -374,26 +374,30 @@ class Quote extends Data
         }
 
         $session = $this->getSession();
-        if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
+        $apiVersion = $this->getApiVersion();
+        if($apiVersion !== 'bread_2') {
+            if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
 
-            $arr = [];
-            $arr['customTotal'] = (int)(floatval($quote->getGrandTotal()) * 100);
+                $arr = [];
+                $arr['customTotal'] = (int)(floatval($quote->getGrandTotal()) * 100);
 
-            $targetedFinancingStatus = $this->getTargetedFinancingStatus();
+                $targetedFinancingStatus = $this->getTargetedFinancingStatus();
 
-            if ($targetedFinancingStatus['shouldUseFinancingId']) {
-                $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+                if ($targetedFinancingStatus['shouldUseFinancingId']) {
+                    $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+                }
+
+                try {
+                    $result = $this->paymentApiClient->getAsLowAs($arr);
+                } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                    $result = [];
+                }
+
+                $session->setData(self::BREAD_SESSION_QUOTE_RESULT_KEY, $result);
+                $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
             }
-
-            try {
-                $result = $this->paymentApiClient->getAsLowAs($arr);
-            } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                $result = [];
-            }
-
-            $session->setData(self::BREAD_SESSION_QUOTE_RESULT_KEY, $result);
-            $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
         }
+        
         return $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
     }
 

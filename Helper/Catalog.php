@@ -76,7 +76,7 @@ class Catalog extends Data
         $price          = $this->getPrice($lineItemPrice, $theProduct);
 
         $breadVersion = $this->getApiVersion();
-        if($breadVersion === 'bread_2') {
+        if($breadVersion === 'bread_22') {
             
             $productData = [
                 'name' => $theProduct->getName(),

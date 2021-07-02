@@ -306,6 +306,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Capture action is not available.'));
         }
+        $this->breadLogger->info('Processing capture action');
+        
+        $apiVersion = $this->helper->getApiVersion();
+        $this->breadLogger->info('Bread Action => ' . $this->helper->getPaymentAction());
 
         if ($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE) {
             $this->apiClient->setOrder($payment->getOrder());
@@ -315,21 +319,35 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             } else {
                 $token  = $this->checkoutSession->getBreadTransactionId();
             }
-
+            $this->breadLogger->info('TOKEN => ' . $token );
             $result = $this->apiClient->authorize(
                 $token,
                 ($this->priceCurrency->round($amount) * 100),
                 $payment->getOrder()->getIncrementId()
             );
-            $payment->setTransactionId($result['breadTransactionId']);
+            $this->breadLogger->log([
+                'Action :: ' => 'Authorize Capture',
+                'result' => $result
+            ]);
+            
+            if($apiVersion === 'bread_2') {
+                $payment->setTransactionId($result['id']);               
+            } else {
+                $payment->setTransactionId($result['breadTransactionId']);
+            }
+            
         } else {
             $token  = $payment->getAuthorizationTransaction()->getTxnId();
         }
-
+        
         $payment->setTransactionId($token);
         $payment->setAmount($amount);
-        $this->_place($payment, $amount, self::ACTION_CAPTURE);
-
+        if($apiVersion === 'bread_2') {           
+            $settledAmount = ($this->priceCurrency->round($amount) * 100);
+            $this->_place($payment, $settledAmount, self::ACTION_CAPTURE);
+        } else {                      
+            $this->_place($payment, $amount, self::ACTION_CAPTURE);
+        }
         return $this;
     }
 
@@ -404,6 +422,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $this->apiClient->setOrder($payment->getOrder());
         $this->breadLogger->info('api client order was set');
+        $apiVersion = $this->helper->getApiVersion();
 
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
@@ -428,7 +447,12 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 );
                 $this->breadLogger->info('called api client authorize');
 
-                $payment->setTransactionId($result['breadTransactionId']);
+                if($apiVersion === 'bread_2') {
+                    $payment->setTransactionId($result['id']);
+                } else {
+                    $payment->setTransactionId($result['breadTransactionId']);
+                }
+                
                 $this->addTransactionInfo(
                     $payment,
                     ['is_closed' => false, 'authorize_result' => $this->jsonHelper->jsonEncode($result)],
@@ -437,9 +461,13 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 );
                 break;
             case self::ACTION_CAPTURE:
-                $result     = $this->apiClient->settle($this->getValidatedTxId($payment));
-                $payment->setTransactionId($result['breadTransactionId'])
-                    ->setAmount($amount);
+                $result     = $this->apiClient->settle($this->getValidatedTxId($payment), $amount);               
+                if($apiVersion === 'bread_2') {
+                    $payment->setTransactionId($result['id']);
+                } else {
+                    $payment->setTransactionId($result['breadTransactionId']);
+                }
+                $payment->setAmount($amount);
                 $this->addTransactionInfo(
                     $payment,
                     ['is_closed' => false, 'settle_result' => $this->jsonHelper->jsonEncode($result)],
@@ -605,19 +633,25 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function getTitle()
     {
-        $title = parent::getTitle();
-        $showPerMonth = $this->helper->showPerMonthCalculation();
+        $apiVersion = $this->helper->getApiVersion();
+        if($apiVersion === 'bread_2') {
+            return parent::getTitle();
+        } else {
+            $title = parent::getTitle();
+            $showPerMonth = $this->helper->showPerMonthCalculation();
 
-        $areaIsRestOrFrontend = $this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST
-            || $this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND;
+            $areaIsRestOrFrontend = $this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_WEBAPI_REST
+                || $this->_appState->getAreaCode() == \Magento\Framework\App\Area::AREA_FRONTEND;
 
-        if ($areaIsRestOrFrontend && $showPerMonth) {
-            $data = $this->quoteHelper->submitQuote(null);
-            if (isset($data['asLowAs']) && isset($data['asLowAs']['amount'])) {
-                $title .= ' ' . sprintf(__('as low as %s/month*'), $data['asLowAs']['amount']);
+            if ($areaIsRestOrFrontend && $showPerMonth) {
+                $data = $this->quoteHelper->submitQuote(null);
+                if (isset($data['asLowAs']) && isset($data['asLowAs']['amount'])) {
+                    $title .= ' ' . sprintf(__('as low as %s/month*'), $data['asLowAs']['amount']);
+                }
             }
+            return $title;
         }
-        return $title;
+        
     }
 
     /**

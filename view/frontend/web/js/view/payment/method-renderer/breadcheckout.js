@@ -82,15 +82,19 @@ define(
                     return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTooltip;
                 },
 
-                getTitle: function () {         
-                    var INSTALLMENTS_BLUE = '#5156ea';
-                    var SPLITPAY_GREEN = '#57c594';
-                    var label = jQuery('#breadcheckout').next('label').attr("for", "breadcheckout");
-                    label.text('');
-                    label.append('Pay Over Time with ' +
-                        '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span> or ' +
-                        '<span style="color: ' + SPLITPAY_GREEN + '; font-weight: 600;">SplitPay</span>');
-                    return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
+                getTitle: function () {
+                    if(window.checkoutConfig.payment[this.getCode()].apiVersion === 'bread_2') {
+                        return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
+                    } else {
+                        var INSTALLMENTS_BLUE = '#5156ea';
+                        var SPLITPAY_GREEN = '#57c594';
+                        var label = jQuery('#breadcheckout').next('label').attr("for", "breadcheckout");
+                        label.text('');
+                        label.append('Pay Over Time with ' +
+                            '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span> or ' +
+                            '<span style="color: ' + SPLITPAY_GREEN + '; font-weight: 600;">SplitPay</span>');
+                        return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
+                    }           
                 },
 
                 /**
@@ -118,16 +122,22 @@ define(
                  * Initialize the bread checkout button
                  */
                 initComplete: function () {
-                    var data = window.checkoutConfig.payment[this.getCode()].breadConfig;
-
-                    if (typeof bread !== 'undefined') {
-                        button.configure(data, this);
-
-                        if(data.embeddedCheckout) {
-                            button.embeddedCheckout();
+                    var data = window.checkoutConfig.payment[this.getCode()].breadConfig; 
+                    if(window.checkoutConfig.payment[this.getCode()].apiVersion === 'bread_2') {
+                        if (typeof window.BreadPayments !== 'undefined') {
+                            button.configure(data, this);                            
                         }
-                    }
-                    return true;
+                        return true;
+                    } else {
+                        if (typeof bread !== 'undefined') {
+                            button.configure(data, this);
+
+                            if(data.embeddedCheckout) {
+                                button.embeddedCheckout();
+                            }
+                        }
+                        return true;
+                    }                   
                 },
 
                 /**
@@ -143,9 +153,16 @@ define(
                     if(additionalValidators.validate()) {
 
                         if (!this.breadTransactionId()) {
-                            button.setCouponDiscounts();
-                            button.init();
-                            return false;
+                            if(window.checkoutConfig.payment[this.getCode()].apiVersion === 'bread_2') {
+                                button.setCouponDiscounts();
+                                button.init();
+                                return false;
+                            } else {
+                                button.setCouponDiscounts();
+                                button.init();
+                                return false;
+                            }
+                            
                         }
                     } else {
                         var errorInfo = {
@@ -256,7 +273,6 @@ define(
                      * Billing address
                      */
                     document.logBreadIssue('info', errorInfo, 'starting update address');
-
                     var billingAddressData = this.getAddressData(data.billingAddress);
                     document.logBreadIssue('info', $.extend(true, {}, errorInfo, {billingAddressData: billingAddressData}), 'got billing address data');
                     var newBillingAddress = createBillingAddress(billingAddressData);
@@ -291,7 +307,6 @@ define(
                     var validateTotalsUrl = window.checkoutConfig.payment[this.getCode()].validateTotalsUrl;
                     var breadConfig = window.checkoutConfig.payment[this.getCode()].breadConfig;
                     var tx_id = this.breadTransactionId();
-
                     $.ajax(
                         {
                             url: validateTotalsUrl,

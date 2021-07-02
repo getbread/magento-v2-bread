@@ -2,9 +2,11 @@
 <?= /* @noEscape */ $block->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr-minicart">
     <div id="bread-checkout-btn-minicart" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
+        <?php if($block->getApiVersion() !== 'bread_2'):?>
         <span>
             <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
         </span>
+        <?php endif; ?>
     </div>
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ $block->productTypeErrorMessage() ?>">&nbsp;</span>
@@ -12,6 +14,87 @@
 </div>
 
 <script type="text/javascript">
+    <?php if($block->getApiVersion() === 'bread_2'):?>
+        
+    require(['jquery', 'jquery/validate'], function($){
+        var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
+        if(validateProductTypes === false){
+            var buttonPrevent = $('#button-prevent');
+            buttonPrevent.css('width','100%');
+            buttonPrevent.css('height','100%');
+            buttonPrevent.show();
+        }
+        
+        document.configureButton = function (items) {
+                if (window.BreadPayments !== undefined) {
+                        let bread_sdk = window.BreadPayments;
+
+                        var total = 0;
+                        let itemsObject = [];
+                        for (var i = 0; i < items.length; i++) {
+                            total += items[i].price * items[i].quantity;
+                            let item = {
+                                name: items[i].name,
+                                quantity: items[i].quantity,
+                                shippingCost: {value: 0, currency: 'USD'},
+                                shippingDescription: '',
+                                unitTax: {value: 0, currency: 'USD'},
+                                unitPrice: {
+                                    currency: 'USD',
+                                        value: items[i].price
+                                    }
+                                };
+
+                                itemsObject.push(item);
+                            }
+
+                            let discountData = {
+                                value: 0,
+                                currency: 'USD'
+                            };
+
+                            let onApproved = function onApproved(application) {};
+                            let onCheckout = function onCheckout(application) {};
+                            bread_sdk.setup({
+                                integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                            });
+                            bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                            bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+
+
+                            let placementObject = {
+                                allowCheckout: false,
+                                domID: 'bread-checkout-btn-minicart',
+                                order: {
+                                    currency: 'USD',
+                                    items: itemsObject,
+                                    subTotal: {value: total, currency: 'USD'},
+                                    totalPrice: {value: (total - discountData.value), currency: 'USD'},
+                                    totalDiscounts: discountData,
+                                    totalShipping: {value: 0, currency: 'USD'},
+                                    totalTax: {value: 0, currency: 'USD'},
+                                }
+                            };
+
+                            bread_sdk.registerPlacements([placementObject]);
+                            bread_sdk.__internal__.setInitMode('manual');
+                            bread_sdk.__internal__.init();
+
+                        }
+                    }   
+        
+        document.round = function(value) {
+            return parseInt(Math.round(value * 100));
+        };
+
+        $(document).ready(function() {
+            var minicartItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+            document.configureButton(minicartItems);
+        });
+        
+    });     
+      
+    <?php else : ?>  
     require(['jquery', 'jquery/validate', 'mage/validation'], function($){
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
@@ -219,5 +302,6 @@
             document.configureButton(minicartItems);
         });
     });
+    <?php endif; ?>
     //# sourceURL=bread-minicart.js
 </script>

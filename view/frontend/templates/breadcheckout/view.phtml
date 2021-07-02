@@ -42,15 +42,31 @@
                 });
                 bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
                 bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                let itemsObject = [];
+                for (var i = 0; i < items.length; i++) {
+                    let item = {
+                        name: items[i].name,
+                        quantity: items[i].quantity,
+                        shippingCost: { value: 0, currency: 'USD' },
+                        shippingDescription: '',
+                        unitTax: { value: 0, currency: 'USD' },
+                        unitPrice: {
+                            currency: 'USD',
+                            value: items[i].price,
+                        }
+                    };
+
+                    itemsObject.push(item);
+                }
                 bread_sdk.registerPlacements([
                     {
                         allowCheckout: false,
                         domID: 'bread-checkout-btn',
                         order: {
                             currency: 'USD',
-                            items: [items[0]],
-                            subTotal: { value: items[0].unitPrice.value, currency: 'USD' },
-                            totalPrice: { value: items[0].unitPrice.value, currency: 'USD' },
+                            items: itemsObject,
+                            subTotal: { value: items[0]["price"], currency: 'USD' },
+                            totalPrice: { value: items[0]["price"], currency: 'USD' },
                             totalDiscounts: { value: 0, currency: 'USD' },
                             totalShipping: { value: 0, currency: 'USD' },
                             totalTax: { value: 0, currency: 'USD' }

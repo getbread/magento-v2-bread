@@ -12,8 +12,11 @@ define(
 
         return {
             breadConfig: undefined,
+            
+            breadConfigV2: undefined,
 
             configure: function (data, context) {
+                console.log('init 223');
                 this.breadConfig = {
                     actAsLabel: false,
                     asLowAs: data.asLowAs,
@@ -34,6 +37,7 @@ define(
                     },
 
                     done: function (err, tx_token) {
+                        console.log('Done processing');
                         if (tx_token !== undefined) {
                             context.buttonCallback(tx_token);
                         } else {
@@ -45,6 +49,20 @@ define(
                         }
                     }
                 };
+                
+                this.breadConfigV2 = {
+                    customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
+                    
+                    onCheckout: function(application) {
+                        console.log('Checkout');
+                        console.log(application.transactionID);
+                        context.buttonCallback(application.transactionID);
+                    },
+
+                    onApproval: function(application) {
+                        console.log('Approved');
+                    }
+                };
 
                 /**
                  * Optional params
@@ -53,14 +71,21 @@ define(
                 if(!quote.isVirtual()) {
                     this.breadConfig.shippingOptions =  [data.shippingOptions];
                     this.breadConfig.tax = this.round(quote.getTotals()._latestValue.base_tax_amount);
+                    //
+                    this.breadConfigV2.shippingOptions =  [data.shippingOptions];
+                    this.breadConfigV2.tax = this.round(quote.getTotals()._latestValue.base_tax_amount);
                 } else {
                     this.breadConfig.requireShippingContact = false;
                 }
 
                 if(data.embeddedCheckout) {
                     this.breadConfig.formId = data.formId;
+                    //
+                    this.breadConfigV2.formId = data.formId;
                 } else {
                     this.breadConfig.buttonId = data.buttonId;
+                    //
+                    this.breadConfigV2.buttonId = data.buttonId;
                 }
 
                 if (!window.checkoutConfig.payment.breadcheckout.isHealthcare) {
@@ -73,7 +98,33 @@ define(
 
                 if (typeof data.billingContact !== 'undefined' && data.billingContact != false) {
                     this.breadConfig.billingContact = data.billingContact;
+                    //
+                    this.breadConfigV2.billingContact = data.billingContact;
                 }
+                
+                //Configure items for Bread V2
+                let items = window.checkoutConfig.payment.breadcheckout.breadConfig.items;
+
+                let itemsObject = [];
+                for (var i = 0; i < items.length; i++) {
+                    let item = {
+                        name: items[i].name,
+                        quantity: items[i].quantity,
+                        shippingCost: { value: 0, currency: 'USD' },
+                        shippingDescription: '',
+                        unitTax: { value: 0, currency: 'USD' },
+                        unitPrice: {
+                            currency: 'USD',
+                            value: items[i].price,
+                        }
+                    };
+
+                    itemsObject.push(item);
+                }
+                this.breadConfigV2.items = itemsObject;
+                
+                console.log('Configure done');
+                console.log(this.breadConfigV2);
 
             },
 
@@ -93,10 +144,70 @@ define(
                 var self = this;
                 if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                     this.checkShippingOptions(function () {
-                        if (typeof bread !== 'undefined') {
-                            bread.showCheckout(self.breadConfig);
-                            fullScreenLoader.stopLoader();
+                        if(window.checkoutConfig.payment.breadcheckout.apiVersion === 'bread_2') {
+                            console.log('Initialize Bread SDk');
+                            if (typeof window.BreadPayments !== 'undefined') {
+                                console.log('Show checkout on Bread 2');
+                                let bread_sdk = window.BreadPayments;
+                                bread_sdk.setup({
+                                    integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
+                                    buyer: {
+                                        shippingAddress: {
+                                            address1: self.breadConfigV2.billingContact.address,
+                                            address2: self.breadConfigV2.billingContact.address2,
+                                            country: 'US',
+                                            locality: self.breadConfigV2.billingContact.city,
+                                            region: self.breadConfigV2.billingContact.state,
+                                            postalCode: self.breadConfigV2.billingContact.zip
+                                        }
+                                    }
+                                });
+
+                                bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', self.breadConfigV2.onApproval);
+                                bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', self.breadConfigV2.onCheckout);
+                                
+                                let shippingOptions = {
+                                    value: 0,
+                                    currency: 'USD'
+                                };
+                                if(self.breadConfigV2.shippingOptions.length > 0) {
+                                    shippingOptions.value = self.breadConfig.shippingOptions[0].cost;
+                                }
+                                
+                                let subTotalPrice = (self.breadConfigV2.customTotal + self.breadConfigV2.discounts.value) - ( shippingOptions.value + self.breadConfigV2.tax);
+                                
+                                let placementObject = {
+                                    allowCheckout: true,
+                                    domID: 'bread-checkout-btn-2',//window.checkoutConfig.payment.breadcheckout.breadConfig.buttonId,
+                                    order: {
+                                        currency: 'USD',
+                                        items: self.breadConfigV2.items,
+                                        subTotal: {
+                                            currency: 'USD',
+                                            value: subTotalPrice
+                                        },
+                                        totalPrice: {value: self.breadConfigV2.customTotal, currency: 'USD'},
+                                        totalDiscounts: self.breadConfigV2.discounts,
+                                        totalShipping: shippingOptions,
+                                        totalTax: {currency: 'USD', value: self.breadConfig.tax}
+                                    }
+                                };
+
+                                bread_sdk.registerPlacements([placementObject]);
+
+                                bread_sdk.__internal__.setInitMode('manual');
+                                //bread_sdk.__internal__.setRenderMode('modal');
+                                bread_sdk.__internal__.init();
+                            
+                                fullScreenLoader.stopLoader();
+                            }
+                        } else {
+                            if (typeof bread !== 'undefined') {
+                                bread.showCheckout(self.breadConfig);
+                                fullScreenLoader.stopLoader();
+                            }
                         }
+                        
                     });
                 }
             },
@@ -105,6 +216,7 @@ define(
              * Makes sure shipping options are up to date
              */
             checkShippingOptions: function (cb) {
+                console.log('Check shipping options');
                 var self = this;
 
                 /**
@@ -114,6 +226,8 @@ define(
                 } else */
                 if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
                     this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+                    //
+                    this.breadConfigV2.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
                     cb();
                 } else {
                     /* ocs save selected shipping method */
@@ -127,7 +241,13 @@ define(
                     ).done(
                         function (data) {
                             self.breadConfig.shippingOptions = [data];
+                            //
+                            self.breadConfigV2.shippingOptions = [data];
                             self.breadConfig.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
+                            //
+                            self.breadConfigV2.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
+                            
+                            console.log(self.breadConfigV2);
                             cb();
                         }
                     ).fail(
@@ -187,19 +307,29 @@ define(
                     function (data) {
                         if (data.shippingContact != false) {
                             this.breadConfig.shippingContact = data.shippingContact;
+                            this.breadConfigV2.shippingContact = data.shippingContact;
                         }
 
                         if (data.billingContact != false) {
                             this.breadConfig.billingContact = data.billingContact;
+                            //
+                            this.breadConfigV2.billingContact = data.billingContact;
                             this.breadConfig.billingContact.email = (data.billingContact.email) ?
                             data.billingContact.email :
                             checkout.getValidatedEmailValue();
+                            //
+                            this.breadConfigV2.billingContact.email = (data.billingContact.email) ?
+                            data.billingContact.email :
+                            checkout.getValidatedEmailValue();
+                    
                         }
 
                         if(quote.isVirtual()) {
                             this.breadConfig.shippingContact = data.billingContact;
+                            //
+                            this.breadConfigV2.shippingContact = data.billingContact;
                         }
-
+                        console.log(this.breadConfigV2);
                         if(isEmbedded === false) {
                             this._init();
                         } else {
@@ -224,16 +354,35 @@ define(
              * Sets coupon discount
              */
             setCouponDiscounts: function () {
-
                 var discountAmount =- this.round(quote.getTotals()._latestValue.discount_amount);
-                if (discountAmount > 0) {
-                    this.breadConfig.discounts = [{
-                        amount: discountAmount,
-                        description: (quote.getTotals()._latestValue.coupon_code !== null) ?
-                        quote.getTotals()._latestValue.coupon_code :
-                        "Discount"
-                    }];
+                console.log(this.breadConfigV2);
+                this.breadConfigV2.discounts = {
+                    currency: 'USD',
+                    value: 0
+                };
+
+                if(window.checkoutConfig.payment.breadcheckout.apiVersion === 'bread_2') {
+                    if (discountAmount > 0) {
+                        this.breadConfig.discounts = [{                            
+                            amount: discountAmount,
+                            description: (quote.getTotals()._latestValue.coupon_code !== null) ?
+                            quote.getTotals()._latestValue.coupon_code :
+                            "Discount"
+                        }];
+                        this.breadConfigV2.discounts.value = discountAmount;
+                    }
+                } else {
+                    if (discountAmount > 0) {
+                        this.breadConfig.discounts = [{
+                            amount: discountAmount,
+                            description: (quote.getTotals()._latestValue.coupon_code !== null) ?
+                            quote.getTotals()._latestValue.coupon_code :
+                            "Discount"
+                        }];
+                    }
                 }
+                
+                console.log(this.breadConfigV2);
                 /* this is needed if coupon is removed to update total price */
                 this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
             },
@@ -244,6 +393,6 @@ define(
             round: function (value) {
                 return Math.round(value * 100);
             }
-        };
+        };  
     }
 );

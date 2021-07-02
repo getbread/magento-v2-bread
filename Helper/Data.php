@@ -106,7 +106,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
     const XML_CONFIG_INTEGRATION_KEY                = 'payment/breadcheckout/integration_key';
     
-    const JS_SANDBOX_SDK                            = 'https://connect-preview.breadpayments.com/sdk.js';
+    const JS_SANDBOX_SDK                            =  'http://localhost:15100/sdk.js';//'https://connect-preview.breadpayments.com/sdk.js';
     const JS_LIVE_SDK                               = '';
 
     /**
@@ -268,13 +268,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+    public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) 
     {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
-            return self::API_LIVE_URI;
+        $apiVersion = $this->getApiVersion();
+        if($apiVersion === 'bread_2') {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_API_URL, $store, $storeCode);
+            } else {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_API_URL, $store, $storeCode);
+            }
         } else {
-            return self::API_SANDBOX_URI;
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
+                return self::API_LIVE_URI;
+            } else {
+                return self::API_SANDBOX_URI;
+            }
         }
+        
     }
 
     /**
@@ -977,5 +987,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INTEGRATION_KEY, $store, $storeCode);
+    }
+    
+    /**
+     * 
+     * @param type $storeCode
+     * @param type $store
+     * @return type
+     */
+    public function getAuthToken($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
     }
 }
