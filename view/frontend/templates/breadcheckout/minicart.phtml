@@ -1,5 +1,6 @@
 <?php /** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
 <?= /* @noEscape */ $block->getBeforeHtml(); ?>
+<div id="bread-minicart-btn"></div>
 <div id="bread-btn-cntnr-minicart">
     <div id="bread-checkout-btn-minicart" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
         <?php if($block->getApiVersion() !== 'bread_2'):?>
@@ -64,7 +65,7 @@
 
                             let placementObject = {
                                 allowCheckout: false,
-                                domID: 'bread-checkout-btn-minicart',
+                                domID: 'bread-minicart-btn',
                                 order: {
                                     currency: 'USD',
                                     items: itemsObject,
@@ -77,8 +78,6 @@
                             };
 
                             bread_sdk.registerPlacements([placementObject]);
-                            bread_sdk.__internal__.setInitMode('manual');
-                            bread_sdk.__internal__.init();
 
                         }
                     }   

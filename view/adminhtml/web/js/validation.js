@@ -12,14 +12,28 @@ require(
             prodSecret = "#payment_us_breadcheckout_api_secret_key",
             sandKey = "#payment_us_breadcheckout_api_sandbox_public_key",
             sandSecret = "#payment_us_breadcheckout_api_sandbox_secret_key",
-            selector = [prodKey,prodSecret,sandKey,sandSecret].join(", "),
+            //Bread 2.0
+            breadProdKey = "#payment_us_breadcheckout_bread_api_public_key",
+            breadProdSecret = "#payment_us_breadcheckout_bread_api_secret_key",
+            breadSandKey = "#payment_us_breadcheckout_bread_api_sandbox_public_key",
+            breadSandSecret = "#payment_us_breadcheckout_bread_api_sandbox_secret_key",
             validationUrl = window.location.origin + "/admin/breadadmin/bread/validateCredentials";
+    
+        var selector = apiVersion === 'bread_2' ? 
+            [breadProdKey,breadProdSecret,breadSandKey,breadSandSecret].join(", ") : 
+            [prodKey,prodSecret,sandKey,sandSecret].join(", ");
 
         $(selector).on(
             "input",function () {
-
-                var key = apiMode === "1" ? $(prodKey).val() : $(sandKey).val();
-                var secret = apiMode === "1" ? $(prodSecret).val() : $(sandSecret).val();
+                var key = "";
+                var secret = "";
+                if(apiVersion === 'bread_2') {
+                    key = apiMode === "1" ? $(breadProdKey).val() : $(breadSandKey).val();
+                    secret = apiMode === "1" ? $(breadProdSecret).val() : $(breadSandSecret).val();
+                } else {
+                    key = apiMode === "1" ? $(prodKey).val() : $(sandKey).val();
+                    secret = apiMode === "1" ? $(prodSecret).val() : $(sandSecret).val();
+                }
 
                 var secretKeyEntered = secret.indexOf('*') === -1;
 
@@ -34,7 +48,7 @@ require(
                                 apiMode: apiMode,
                                 pubKey: key,
                                 secKey: secret
-                            },
+                            }
                         }
                     ).done(
                         function (response) {

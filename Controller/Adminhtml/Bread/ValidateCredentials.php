@@ -88,12 +88,15 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
 
                 if ($status != 200) {
                     $this->logger->log('Failed keys validation');
+                    $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0",'default');
                     return false;
                 } else {
                     $response = (array) $this->jsonHelper->jsonDecode($result);
                     if(isset($response['token'])) {
                         $this->configWriter->save('payment/breadcheckout/bread_auth_token', $response['token'],'default');
                         return true;
+                    } else {
+                        $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0",'default');
                     }
                     return false;
                 }
