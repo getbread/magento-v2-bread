@@ -169,7 +169,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             
             $breadAmount = trim($validateAmount['totalAmount']['value']);
             $amount = trim($amount);
-            
+            $this->logger->info('Inside process Bread 2.0 request');
             if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
                 $this->logger->log(
                     [
@@ -189,6 +189,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
             
             
             $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
+            $this->logger->log([
+                'Function' => 'Authorize',
+                'DATA' => $data
+            ]);
 
             $result = $this->call(
                     $this->getUpdateTransactionUrlV2($breadTransactionId, 'authorize'),
@@ -197,6 +201,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     false
                     );
 
+            $this->logger->log([
+               'AUTH RESPONSE',
+                "RESPONSE"=> $result
+            ]);
+            
             if ($result['status'] != self::STATUS_AUTHORIZED) {
                 $this->logger->log(['ERROR'=>'AUTHORIZATION FAILED', 'RESULT'=>$result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
@@ -417,7 +426,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    protected function call($url, array $data, $method = \Zend_Http_Client::POST, $jsonEncode = true)
+    protected function call($url, $data, $method = \Zend_Http_Client::POST, $jsonEncode = true)
     {
         $storeId = $this->getStoreId();
         $username   = $this->helper->getApiPublicKey($storeId);
@@ -426,25 +435,44 @@ class Client extends \Magento\Framework\Model\AbstractModel
         
         if($apiVersion === 'bread_2') {
             try {
+                $this->logger->info('Inside function call');
                 $authToken = $this->helper->getAuthToken();
+
+                $authTokenUrl = $this->getAuthTokenUrl();
+                
+                $this->logger->log([
+                    'RESPONSE' => 'CALL',
+                    'TOKEN' => $authToken
+                ]);
+
+                if(is_null($authToken) || $authToken === '') {
+                    $getToken = $this->generateAuthToken($authTokenUrl, $username, $password);
+                    if(isset($getToken['token'])) {
+                        $authToken = $getToken['token'];
+                        $this->configWriter->save('payment/breadcheckout/bread_auth_token', $authToken, 'default');
+                    } else {
+                        $errorMessage = 'Call to Bread APIs failed.';
+                        throw new \Magento\Framework\Exception\LocalizedException(
+                                __($errorMessage)
+                        );
+                    }
+                }
                 
                 $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);  
 
                 if (isset($response['error']) && $response['error'] === 'jwt_auth_error') {
-                    $authTokenUrl = $this->getAuthTokenUrl();
-                    
+                                       
                     $getToken = $this->generateAuthToken($authTokenUrl, $username, $password);
                     if(isset($getToken['token'])) {
 
                         $authToken = $getToken['token'];
-                        //Save this token to DB here
                         $this->configWriter->save('payment/breadcheckout/bread_auth_token', $authToken, 'default');
 
                         $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);
                         
                         if ((isset($response['error']) && $response['error'] === 'jwt_auth_error')) {
 
-                            $errorMessage = 'Call to Bread APIs failed. Token Auth';
+                            $errorMessage = 'Call to Bread APIs failed.';
                             throw new \Magento\Framework\Exception\LocalizedException(
                                     __($errorMessage)
                             );

@@ -78,6 +78,8 @@
                             };
 
                             bread_sdk.registerPlacements([placementObject]);
+                            bread_sdk.__internal__.setInitMode('manual');    
+                            bread_sdk.__internal__.init();
 
                         }
                     }   

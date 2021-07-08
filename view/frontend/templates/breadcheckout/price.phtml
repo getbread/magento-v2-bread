@@ -8,7 +8,6 @@
     <?php if($block->getApiVersion() === 'bread_2') : ?>
         
         require(['jquery'], function($) {
-            
             document.configureButton = function (items, subTotal, totalPrice) {
 
             if (window.BreadPayments !== undefined) {
@@ -51,6 +50,9 @@
                         },
                     }]
                 );
+
+                bread_sdk.__internal__.setInitMode('manual');    
+                bread_sdk.__internal__.init();
 
 
             } else {
