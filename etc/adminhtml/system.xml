@@ -259,9 +259,6 @@
                 <field id="allowminicartcheckout" type="select" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow checkout from mini cart</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="api_version">classic</field>
-                    </depends>
                 </field>
                 <field id="embedded" type="select" sortOrder="21" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
