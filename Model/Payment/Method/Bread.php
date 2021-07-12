@@ -439,10 +439,15 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                     $amount,
                     $orderId
                 );
-                $this->breadLogger->info('called api client authorize');
 
                 if($apiVersion === 'bread_2') {
                     $payment->setTransactionId($result['id']);
+                    $this->addTransactionInfo(
+                            $payment,
+                            ['bread_version' => 'bread_2'],
+                            [],
+                            'Bread 2.0 transaction'
+                    );
                 } else {
                     $payment->setTransactionId($result['breadTransactionId']);
                 }
