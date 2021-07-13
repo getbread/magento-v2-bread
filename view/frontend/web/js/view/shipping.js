@@ -51,34 +51,20 @@ define(
                         window.checkoutConfig.payment.breadcheckout.transactionId = null;
                     }
                 },
-                
-                /**
-                 * 
-                 * Refresh the payment method section if transactionId is not set
-                 */
-                refreshBreadPaymentMethod: function () {
-                            var paymentMethod = quote.paymentMethod();
-                            if (typeof paymentMethod.method !== 'undefined' && paymentMethod !== null) {
-                                if (quote.paymentMethod().method === 'breadcheckout' 
-                                        && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
-                                    button.embeddedCheckout();
-                                }
-                            }
-                    
-                },
-
-
 		/**
                  * 
                  * Refresh the payment method section if transactionId is not set
                  */
                 refreshBreadPaymentMethod: function () {
                     var paymentMethod = quote.paymentMethod();
-                    if ( paymentMethod !== null && typeof paymentMethod.method !== 'undefined') {
-                        if (quote.paymentMethod().method === 'breadcheckout' 
+                    if ( typeof paymentMethod !== 'undefined') {
+                        if(typeof paymentMethod.method !== 'undefined') {
+                            if (quote.paymentMethod().method === 'breadcheckout' 
                                 && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
                             button.embeddedCheckout();
                         }
+                        }
+                        
                     }            
                 },
 
