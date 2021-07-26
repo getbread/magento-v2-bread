@@ -56,18 +56,14 @@ define(
                  * Refresh the payment method section if transactionId is not set
                  */
                 refreshBreadPaymentMethod: function () {
-                    var paymentMethod = quote.paymentMethod();
-                    if ( typeof paymentMethod !== 'undefined') {
-                        if(typeof paymentMethod.method !== 'undefined') {
-                            if (quote.paymentMethod().method === 'breadcheckout' 
-                                && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
-                            button.embeddedCheckout();
-                        }
-                        }
-                        
-                    }            
+                            var paymentMethod = quote.paymentMethod();
+                            if(paymentMethod) {
+                                if (quote.paymentMethod().method === 'breadcheckout'
+                                        && window.checkoutConfig.payment.breadcheckout.transactionId === null) {
+                                    button.embeddedCheckout();
+                                }
+                            }          
                 },
-
 
                 /**
                  * Round float to 2 decimal plates and convert to integer

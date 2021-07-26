@@ -181,13 +181,10 @@ define(
                                         totalTax: {currency: 'USD', value: self.breadConfig.tax}
                                     }
                                 };
-
+                                bread_sdk.__internal__.setAutoRender(false);
                                 bread_sdk.registerPlacements([placementObject]);
-
                                 bread_sdk.__internal__.setInitMode('manual');
-                                //bread_sdk.__internal__.setRenderMode('modal');
-                                bread_sdk.__internal__.init();
-                            
+                                bread_sdk.__internal__.init();                          
                                 fullScreenLoader.stopLoader();
                             }
                         } else {
@@ -214,7 +211,6 @@ define(
                 } else */
                 if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
                     this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
-                    //
                     this.breadConfigV2.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
                     cb();
                 } else {
@@ -229,10 +225,8 @@ define(
                     ).done(
                         function (data) {
                             self.breadConfig.shippingOptions = [data];
-                            //
                             self.breadConfigV2.shippingOptions = [data];
                             self.breadConfig.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
-                            //
                             self.breadConfigV2.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
 
                             cb();

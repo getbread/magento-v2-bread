@@ -74,46 +74,21 @@ class Catalog extends Data
         $theProduct     = ($baseProduct == null) ? $product : $baseProduct;
         $skuString      = $this->getSkuString($product, $theProduct);
         $price          = $this->getPrice($lineItemPrice, $theProduct);
+     
+        $productData = [
+            'name' => $theProduct->getName(),
+            'price' => $price,
+            'sku' => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'] . '///' . $skuString),
+            'detailUrl' => $theProduct->getProductUrl(),
+            'quantity' => $qty,
+        ];
 
-        $breadVersion = $this->getApiVersion();
-        if($breadVersion === 'bread_22') {
-            
-            $productData = [
-                'name' => $theProduct->getName(),
-                'quantity' => $qty,
-                'unitPrice' => [
-                    'currency' => 'USD',
-                    'value' => $price,
-                ],
-                'unitTax' => [
-                    'currency' => 'USD',
-                    'value' => 0
-                ],
-                'shippingCost'=>  [
-                    'currency' => 'USD',
-                    'value' => 0
-                ],
-                'shippingDescription' => '',
-            ];
-            
-            return $productData;
-            
-        } else {
-            $productData = [
-                'name' => $theProduct->getName(),
-                'price' => $price,
-                'sku' => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'] . '///' . $skuString),
-                'detailUrl' => $theProduct->getProductUrl(),
-                'quantity' => $qty,
-            ];
-
-            $imgSrc = $this->getImgSrc($product);
-            if ($imgSrc != null) {
-                $productData['imageUrl'] = $imgSrc;
-            }
-
-            return $productData;
+        $imgSrc = $this->getImgSrc($product);
+        if ($imgSrc != null) {
+            $productData['imageUrl'] = $imgSrc;
         }
+
+        return $productData;
     }
 
     /**
