@@ -29,15 +29,23 @@ class ConfigProvider implements ConfigProviderInterface {
      * @var \Bread\BreadCheckout\Model\Payment\Method\Bread
      */
     public $breadMethod;
+    
+    /**
+     *
+     * @var \Rbc\PayplanCheckout\Helper\Catalog
+     */
+    public $catalog;
 
     public function __construct(
             \Bread\BreadCheckout\Helper\Quote $helper,
             \Bread\BreadCheckout\Helper\Data $helperData,
-            \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
+            \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
+            \Rbc\PayplanCheckout\Helper\Catalog $catalog
     ) {
         $this->helper = $helper;
         $this->helperData = $helperData;
         $this->breadMethod = $breadMethod;
+        $this->catalog = $catalog;
     }
 
     /**
@@ -79,7 +87,8 @@ class ConfigProvider implements ConfigProviderInterface {
                         'methodTooltip' => $this->helper->getMethodTooltip(),
                         'productTypeMessage' => $this->helperData->getProductTypeMessage(),
                         'cartValidation' => $this->helper->validateAllowedProductTypes(),
-                        'methodTitle' => $this->breadMethod->getTitle()
+                        'methodTitle' => $this->breadMethod->getTitle(),
+                        'currencyCode' => $this->catalog->getCurrentCurrencyCode()
                     ]
                 ]
             ]

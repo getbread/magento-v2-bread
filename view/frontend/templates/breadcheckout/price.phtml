@@ -10,7 +10,7 @@
         require(['jquery'], function($) {
             document.configureButton = function (items, subTotal, totalPrice) {
 
-            if (window.BreadPayments !== undefined) {
+            if (typeof window.BreadPayments !== 'undefined') {
                 let bread_sdk = window.BreadPayments;
                 let onApproved = function onApproved(application) {};
                 let onCheckout = function onCheckout(application) {};

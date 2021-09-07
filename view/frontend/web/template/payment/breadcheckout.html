@@ -10,17 +10,16 @@
     </div>
 
     <div class="payment-method-content" data-bind="css: getCode()">
-        <div id="bread-checkout-btn-2"></div>
+
         <!-- ko if: isEmbeddedCheckout() -->
         <div id="bread-checkout-embedded"></div>
         <!-- /ko -->
-
-        <!-- ko ifnot: isEmbeddedCheckout() -->
 
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!-- /ko -->
         <div class="actions-toolbar">
+            <div id="bread-checkout-btn"></div>
             <input id="bread_transaction_id"
                    name="bread_transaction_id"
                    type="hidden"
@@ -48,8 +47,6 @@
             </div>
             <!-- /ko -->
         </div>
-
-        <!-- /ko -->
 
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->

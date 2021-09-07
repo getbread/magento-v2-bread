@@ -1,21 +1,24 @@
 <?php
+
 /**
  * Class Bread_BreadCheckout_Model_Payment_Api_Client
  *
  * @author Bread   copyright   2016
  * @author Joel    @Mediotype
  * @author Miranda @Mediotype
+ * @author Kip     @Bread
  */
+
 namespace Bread\BreadCheckout\Model\Payment\Api;
 
-class Client extends \Magento\Framework\Model\AbstractModel
-{
-    const STATUS_AUTHORIZED     = 'AUTHORIZED';
-    const STATUS_SETTLED        = 'SETTLED';
-    const STATUS_PENDING        = 'PENDING';
-    const STATUS_CANCELED       = 'CANCELED';
+class Client extends \Magento\Framework\Model\AbstractModel {
 
-    public $order               = null;
+    const STATUS_AUTHORIZED = 'AUTHORIZED';
+    const STATUS_SETTLED = 'SETTLED';
+    const STATUS_PENDING = 'PENDING';
+    const STATUS_CANCELED = 'CANCELED';
+
+    public $order = null;
 
     /**
      * @var \Magento\Framework\Model\Context
@@ -41,20 +44,18 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @var \Magento\Framework\App\CacheInterface
      */
     public $cache;
-
     public $logger;
-    
     public $configWriter;
 
     public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Bread\BreadCheckout\Helper\Data $helper,
-        \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Magento\Store\Model\StoreResolver $storeResolver,
-        \Bread\BreadCheckout\Helper\Log $log,
-        \Magento\Framework\App\CacheInterface $cache,
-        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter    
+            \Magento\Framework\Model\Context $context,
+            \Magento\Framework\Registry $registry,
+            \Bread\BreadCheckout\Helper\Data $helper,
+            \Magento\Framework\Json\Helper\Data $jsonHelper,
+            \Magento\Store\Model\StoreResolver $storeResolver,
+            \Bread\BreadCheckout\Helper\Log $log,
+            \Magento\Framework\App\CacheInterface $cache,
+            \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
     ) {
         $this->context = $context;
         $this->helper = $helper;
@@ -69,8 +70,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     /**
      * @param \Magento\Sales\Model\Order $order
      */
-    public function setOrder(\Magento\Sales\Model\Order $order)
-    {
+    public function setOrder(\Magento\Sales\Model\Order $order) {
         $this->order = $order;
     }
 
@@ -83,45 +83,38 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function cancel($breadTransactionId, $amount = 0, $lineItems = [])
-    {
+    public function cancel($breadTransactionId, $amount = 0, $lineItems = []) {
         /* Check if already canceled in bread */
         $transaction = $this->getInfo($breadTransactionId);
-        if ($transaction['status'] === self::STATUS_CANCELED) {
+        if (strtoupper($transaction['status']) === self::STATUS_CANCELED || strtoupper($transaction['status']) === 'CANCELLED') {
             return $transaction;
         }
-        
+
         $apiVersion = $this->helper->getApiVersion();
-        
-        if($apiVersion === 'bread_2') {
-            
-            $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
-            
+
+        if ($apiVersion === 'bread_2') {
+
+            $data = '{"amount": {"currency":"USD","value":' . $transaction['totalAmount']['value'] . '}}';
+
             $result = $this->call(
-                    $this->getUpdateTransactionUrlV2($breadTransactionId, 'cancel'), 
+                    $this->getUpdateTransactionUrlV2($breadTransactionId, 'cancel'),
                     $data,
                     \Zend_Http_Client::POST,
                     false
-                    );
-            
-            $this->logger->log([
-                'Cancel request',
-                'response' => $result,
-                'payload' => $data
-            ]);
-            
-            if ($result['status'] != self::STATUS_CANCELED) {
-                $this->logger->log(['ERROR'=>'Transaction cancel failed', 'RESULT'=>$result]);
+            );
+
+
+            if ($result['status'] !== 'CANCELLED') {
+                $this->logger->log(['ERROR' => 'Transaction cancel failed', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Transaction cancel failed (current transaction status :' . $result->status . ')')
+                        __('Transaction cancel failed (current transaction status :' . $result['status'] . ')')
                 );
             }
-            
+
             return $result;
-            
         } else {
-            
-            $data = ['type'   => 'cancel'];
+
+            $data = ['type' => 'cancel'];
 
             if (!$amount == 0) {
                 $data['amount'] = $amount;
@@ -134,9 +127,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
 
             if ($result['status'] != self::STATUS_CANCELED) {
-                $this->logger->log(['ERROR'=>'Transaction cancel failed', 'RESULT'=>$result]);
+                $this->logger->log(['ERROR' => 'Transaction cancel failed', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Transaction cancel failed (current transaction status :' . $result->status . ')')
+                        __('Transaction cancel failed (current transaction status :' . $result->status . ')')
                 );
             }
 
@@ -154,86 +147,73 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
-    {
-        $this->logger->info('Authorizing transaction');
-        
+    public function authorize($breadTransactionId, $amount, $merchantOrderId = null) {
+
         $apiVersion = $this->helper->getApiVersion();
         $validateAmount = $this->getInfo($breadTransactionId);
-                
+
 
         // set transaction id so it can be fetched for split payment cancel
         $this->setBreadTransactionId($breadTransactionId);
-        
-        if($apiVersion === 'bread_2') {
-            
+
+        if ($apiVersion === 'bread_2') {
+
             $breadAmount = trim($validateAmount['totalAmount']['value']);
             $amount = trim($amount);
-            $this->logger->info('Inside process Bread 2.0 request');
-            if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
+            if (((int) $breadAmount != (int) $amount) && (abs((int) $breadAmount - (int) $amount) >= 2)) {
                 $this->logger->log(
-                    [
-                        'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
-                        'BREAD AMOUNT'  =>(int)$breadAmount,
-                        'QUOTE AMOUNT'  =>(int)$amount,
-                        'RESULT'        =>$validateAmount
-                    ]
+                        [
+                            'ERROR' => 'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
+                            'BREAD AMOUNT' => (int) $breadAmount,
+                            'QUOTE AMOUNT' => (int) $amount,
+                            'RESULT' => $validateAmount
+                        ]
                 );
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __(
-                        'There was a mismatch between the Bread amount and the transaction amount, Please contact '
-                        . 'the store owner.'
-                    )
+                        __(
+                                'There was a mismatch between the Bread amount and the transaction amount, Please contact '
+                                . 'the store owner.'
+                        )
                 );
             }
-            
-            
+
+
             $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
-            $this->logger->log([
-                'Function' => 'Authorize',
-                'DATA' => $data
-            ]);
 
             $result = $this->call(
                     $this->getUpdateTransactionUrlV2($breadTransactionId, 'authorize'),
                     $data,
                     \Zend_Http_Client::POST,
                     false
-                    );
+            );
 
-            $this->logger->log([
-               'AUTH RESPONSE',
-                "RESPONSE"=> $result
-            ]);
-            
             if ($result['status'] != self::STATUS_AUTHORIZED) {
-                $this->logger->log(['ERROR'=>'AUTHORIZATION FAILED', 'RESULT'=>$result]);
+                $this->logger->log(['ERROR' => 'AUTHORIZATION FAILED', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Transaction authorize failed (current transaction status : ' . $result['status'] . ').')
+                        __('Transaction authorize failed (current transaction status : ' . $result['status'] . ').')
                 );
             }
 
             return $result;
-            
         } else {
-            
+
             $breadAmount = trim($validateAmount['total']);
             $amount = trim($amount);
 
-            if (((int) $breadAmount != (int) $amount) && (abs((int)$breadAmount - (int)$amount) >= 2)) {
+            if (((int) $breadAmount != (int) $amount) && (abs((int) $breadAmount - (int) $amount) >= 2)) {
                 $this->logger->log(
-                    [
-                        'ERROR'         =>'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
-                        'BREAD AMOUNT'  =>(int)$breadAmount,
-                        'QUOTE AMOUNT'  =>(int)$amount,
-                        'RESULT'        =>$validateAmount
-                    ]
+                        [
+                            'ERROR' => 'BREAD AMOUNT AND QUOTE AMOUNT MIS-MATCH',
+                            'BREAD AMOUNT' => (int) $breadAmount,
+                            'QUOTE AMOUNT' => (int) $amount,
+                            'RESULT' => $validateAmount
+                        ]
                 );
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __(
-                        'There was a mismatch between the Bread amount and the transaction amount, Please contact '
-                        . 'the store owner.'
-                    )
+                        __(
+                                'There was a mismatch between the Bread amount and the transaction amount, Please contact '
+                                . 'the store owner.'
+                        )
                 );
             }
 
@@ -243,20 +223,21 @@ class Client extends \Magento\Framework\Model\AbstractModel
             }
 
             $result = $this->call(
-                $this->getUpdateTransactionUrl($breadTransactionId),
-                $data_array
+                    $this->getUpdateTransactionUrl($breadTransactionId),
+                    $data_array
             );
 
             if ($result['status'] != self::STATUS_AUTHORIZED) {
-                $this->logger->log(['ERROR'=>'AUTHORIZATION FAILED', 'RESULT'=>$result]);
+                $this->logger->log(['ERROR' => 'AUTHORIZATION FAILED', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Transaction authorize failed (current transaction status : ' . $result['status'] . ').')
+                        __('Transaction authorize failed (current transaction status : ' . $result['status'] . ').')
                 );
             }
 
             return $result;
-        } 
+        }
     }
+
     /**
      * Call API Update Order Id
      *
@@ -265,12 +246,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function updateOrderId($breadTransactionId, $merchantOrderId)
-    {
+    public function updateOrderId($breadTransactionId, $merchantOrderId) {
         $result = $this->call(
-            $this->getTransactionInfoUrl($breadTransactionId),
-            ['merchantOrderId' => $merchantOrderId],
-            \Zend_Http_Client::PUT
+                $this->getTransactionInfoUrl($breadTransactionId),
+                ['merchantOrderId' => $merchantOrderId],
+                \Zend_Http_Client::PUT
         );
 
         return $result;
@@ -284,10 +264,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function settle($breadTransactionId, $amount = null)
-    {
+    public function settle($breadTransactionId, $amount = null) {
         $apiVersion = $this->helper->getApiVersion();
-        if($apiVersion === 'bread_2') {
+        if ($apiVersion === 'bread_2') {
 
             $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
 
@@ -297,30 +276,28 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     \Zend_Http_Client::POST,
                     false
             );
-            
+
             if ($result['status'] != self::STATUS_SETTLED) {
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Transaction settle failed (current transaction status :' . $result['status'] . ')')
+                        __('Transaction settle failed (current transaction status :' . $result['status'] . ')')
                 );
             }
 
             return $result;
-            
         } else {
             $result = $this->call(
-                $this->getUpdateTransactionUrl($breadTransactionId),
-                ['type' => 'settle']
+                    $this->getUpdateTransactionUrl($breadTransactionId),
+                    ['type' => 'settle']
             );
 
             if ($result['status'] != self::STATUS_SETTLED) {
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Transaction settle failed (current transaction status :' . $result['status'] . ')')
+                        __('Transaction settle failed (current transaction status :' . $result['status'] . ')')
                 );
             }
 
             return $result;
         }
-        
     }
 
     /**
@@ -332,22 +309,20 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function refund($breadTransactionId, $amount = 0, $lineItems = [])
-    {
+    public function refund($breadTransactionId, $amount = 0, $lineItems = []) {
         $apiVersion = $this->helper->getApiVersion();
-        if($apiVersion === 'bread_2') {
-            
+        if ($apiVersion === 'bread_2') {
+
             $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
-            
+
             $result = $this->call(
-                    $this->getUpdateTransactionUrlV2($breadTransactionId, 'refund'), 
+                    $this->getUpdateTransactionUrlV2($breadTransactionId, 'refund'),
                     $data,
                     \Zend_Http_Client::POST,
                     false
-                    );
-            
+            );
+
             return $result;
-            
         } else {
             $data = ['type' => 'refund'];
 
@@ -361,7 +336,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
             return $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
         }
-        
     }
 
     /**
@@ -371,12 +345,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function getInfo($breadTransactionId)
-    {
+    public function getInfo($breadTransactionId) {
         return $this->call(
-            $this->getTransactionInfoUrl($breadTransactionId),
-            [],
-            \Zend_Http_Client::GET
+                        $this->getTransactionInfoUrl($breadTransactionId),
+                        [],
+                        \Zend_Http_Client::GET
         );
     }
 
@@ -387,12 +360,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function submitCartData($data)
-    {
+    public function submitCartData($data) {
         return $this->call(
-            $this->helper->getCartCreateApiUrl($this->getStoreId()),
-            $data,
-            \Zend_Http_Client::POST
+                        $this->helper->getCartCreateApiUrl($this->getStoreId()),
+                        $data,
+                        \Zend_Http_Client::POST
         );
     }
 
@@ -404,14 +376,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws Exception
      */
-    public function getAsLowAs($data)
-    {
+    public function getAsLowAs($data) {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $asLowAsUrl = join('/', [ trim($baseUrl, '/'), 'aslowas' ]);
+        $asLowAsUrl = join('/', [trim($baseUrl, '/'), 'aslowas']);
         return $this->call(
-            $asLowAsUrl,
-            $data,
-            \Zend_Http_Client::POST
+                        $asLowAsUrl,
+                        $data,
+                        \Zend_Http_Client::POST
         );
     }
 
@@ -426,28 +397,22 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    protected function call($url, $data, $method = \Zend_Http_Client::POST, $jsonEncode = true)
-    {
+    protected function call($url, $data, $method = \Zend_Http_Client::POST, $jsonEncode = true) {
         $storeId = $this->getStoreId();
-        $username   = $this->helper->getApiPublicKey($storeId);
-        $password   = $this->helper->getApiSecretKey($storeId);
+        $username = $this->helper->getApiPublicKey($storeId);
+        $password = $this->helper->getApiSecretKey($storeId);
         $apiVersion = $this->helper->getApiVersion();
-        
-        if($apiVersion === 'bread_2') {
+
+        if ($apiVersion === 'bread_2') {
             try {
                 $this->logger->info('Inside function call');
                 $authToken = $this->helper->getAuthToken();
 
                 $authTokenUrl = $this->getAuthTokenUrl();
-                
-                $this->logger->log([
-                    'RESPONSE' => 'CALL',
-                    'TOKEN' => $authToken
-                ]);
 
-                if(is_null($authToken) || $authToken === '') {
+                if (is_null($authToken) || $authToken === '') {
                     $getToken = $this->generateAuthToken($authTokenUrl, $username, $password);
-                    if(isset($getToken['token'])) {
+                    if (isset($getToken['token'])) {
                         $authToken = $getToken['token'];
                         $this->configWriter->save('payment/breadcheckout/bread_auth_token', $authToken, 'default');
                     } else {
@@ -457,19 +422,19 @@ class Client extends \Magento\Framework\Model\AbstractModel
                         );
                     }
                 }
-                
-                $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);  
+
+                $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);
 
                 if (isset($response['error']) && $response['error'] === 'jwt_auth_error') {
-                                       
+
                     $getToken = $this->generateAuthToken($authTokenUrl, $username, $password);
-                    if(isset($getToken['token'])) {
+                    if (isset($getToken['token'])) {
 
                         $authToken = $getToken['token'];
                         $this->configWriter->save('payment/breadcheckout/bread_auth_token', $authToken, 'default');
 
                         $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);
-                        
+
                         if ((isset($response['error']) && $response['error'] === 'jwt_auth_error')) {
 
                             $errorMessage = 'Call to Bread APIs failed.';
@@ -487,14 +452,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     }
                 } elseif (isset($response['data'])) {
                     return $this->jsonHelper->jsonDecode($response['data']);
-                    
                 } else {
                     $errorMessage = 'Call to Bread API failed.';
                     throw new \Magento\Framework\Exception\LocalizedException(
                             __($errorMessage)
                     );
                 }
-                
             } catch (\Throwable $e) {
                 $this->logger->log([
                     'URL' => $url,
@@ -502,7 +465,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 ]);
                 throw $e;
             }
-
         } else {
             // @codingStandardsIgnoreStart
             try {
@@ -514,8 +476,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 if ($method == \Zend_Http_Client::POST) {
                     curl_setopt($curl, CURLOPT_POST, 1);
                     curl_setopt($curl, CURLOPT_HTTPHEADER, [
-                            'Content-Type: application/json',
-                            'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
                 }
 
@@ -532,7 +494,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     $this->logger->log(curl_error($curl));
 
                     //TODO: rewrite this when API is updated to better handle errors, instead of searching through the description string
-
                     // Need to explicitly say !== false instead of === true or something similar because of what strpos returns
                     $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
 
@@ -542,24 +503,24 @@ class Client extends \Magento\Framework\Model\AbstractModel
                         }
 
                         $errorMessage = 'The credit/debit card portion of your transaction was declined. '
-                            . 'Please use a different card or contact your bank. Otherwise, you can still check out with '
-                            . 'an amount covered by your Bread loan capacity.';
+                                . 'Please use a different card or contact your bank. Otherwise, you can still check out with '
+                                . 'an amount covered by your Bread loan capacity.';
                     } else {
                         $errorMessage = 'Call to Bread API failed.';
                     }
 
                     throw new \Magento\Framework\Exception\LocalizedException(
-                        __($errorMessage)
+                            __($errorMessage)
                     );
                 }
             } catch (\Throwable $e) {
                 $this->logger->log([
-                    'USER'      => $username,
-                    'PASSWORD'  => $password,
-                    'URL'       => $url,
-                    'STATUS'    => $status,
-                    'DATA'      => $data,
-                    'RESULT'    => $result
+                    'USER' => $username,
+                    'PASSWORD' => $password,
+                    'URL' => $url,
+                    'STATUS' => $status,
+                    'DATA' => $data,
+                    'RESULT' => $result
                 ]);
 
                 curl_close($curl);
@@ -570,25 +531,25 @@ class Client extends \Magento\Framework\Model\AbstractModel
             // @codingStandardsIgnoreEnd
 
             $this->logger->log(
-                [
-                    'USER'      => $username,
-                    'PASSWORD'  => $password,
-                    'URL'       => $url,
-                    'DATA'      => $data,
-                    'RESULT'    => $result
-                ]
+                    [
+                        'USER' => $username,
+                        'PASSWORD' => $password,
+                        'URL' => $url,
+                        'DATA' => $data,
+                        'RESULT' => $result
+                    ]
             );
 
             if (!$this->isJson($result)) {
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('API Response Is Not Valid JSON.  Result: ' . $result)
+                        __('API Response Is Not Valid JSON.  Result: ' . $result)
                 );
             }
 
             return $this->jsonHelper->jsonDecode($result);
         }
     }
-    
+
     /**
      * 
      * @param type $url
@@ -606,9 +567,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
             if ($method == \Zend_Http_Client::POST) {
-                
+
                 curl_setopt($curl, CURLOPT_POST, 1);
-                $authorization = "Authorization: Bearer ".$authToken;
+                $authorization = "Authorization: Bearer " . $authToken;
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [
                     'Content-Type: application/json',
                     'Content-Length: ' . strlen($data),
@@ -620,24 +581,24 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
-            
-            if($method == \Zend_Http_Client::GET) {
-                $authorization = "Authorization: Bearer ".$authToken;
+
+            if ($method == \Zend_Http_Client::GET) {
+                $authorization = "Authorization: Bearer " . $authToken;
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [$authorization]);
             }
 
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($curl);
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            
+
             $this->logger->log([
                 'Process Request',
                 'URL' => $url,
                 'data' => $data,
                 'Encode' => $jsonEncode
             ]);
-            
-            if($status == 401) {
+
+            if ($status == 401) {
                 $this->logger->log([
                     'MESSAGE' => 'JWT ERROR',
                     'URL' => $url,
@@ -648,7 +609,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     'description' => 'JWT Auth error'
                 ];
             }
-            
+
             if ($status != 200) {
                 $this->logger->log([
                     'ERROR' => 'Code is not equal to 200',
@@ -663,11 +624,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
                         __($errorMessage)
                 );
             }
-            
+
             $this->logger->log([
                 'RESPONSE' => $result
             ]);
-            
+
             return [
                 'error' => null,
                 'data' => $result
@@ -684,7 +645,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             throw $e;
         }
     }
-    
+
     /**
      * 
      * @param type $url
@@ -700,7 +661,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             'secret' => $apiSecret
         ];
         $curl = curl_init($url);
-        try {      
+        try {
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
             curl_setopt($curl, CURLOPT_POST, 1);
@@ -708,11 +669,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))]);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
-            
+
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($curl);
             $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            
+
             if ($status != 200) {
                 $this->logger->log([
                     'URL' => $url,
@@ -725,10 +686,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
                         __($errorMessage)
                 );
             }
-            
+
             $response = $this->jsonHelper->jsonDecode($result);
-            
-            if(isset($response['token'])) {
+
+            if (isset($response['token'])) {
                 $this->logger->log([
                     'MESSAGE' => 'SUCCESS',
                     'RESPONSE' => $response
@@ -741,7 +702,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
                         __($errorMessage)
                 );
             }
-            
         } catch (\Throwable $e) {
             $this->logger->log([
                 'MESSAGE' => $e->getMessage(),
@@ -761,15 +721,14 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function sendSms($cartId, $phone)
-    {
+    public function sendSms($cartId, $phone) {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $sendSmsUrl = join('/', [ trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'text' ]);
-        $data = [ 'phone' => $phone ];
+        $sendSmsUrl = join('/', [trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'text']);
+        $data = ['phone' => $phone];
         return $this->call(
-            $sendSmsUrl,
-            $data,
-            \Zend_Http_Client::POST
+                        $sendSmsUrl,
+                        $data,
+                        \Zend_Http_Client::POST
         );
     }
 
@@ -782,15 +741,14 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function sendEmail($cartId, $email, $name)
-    {
+    public function sendEmail($cartId, $email, $name) {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $sendEmailUrl = join('/', [ trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'email' ]);
-        $data = [ 'email' => $email, 'name' => $name ];
+        $sendEmailUrl = join('/', [trim($baseUrl, '/'), 'carts', trim($cartId, '/'), 'email']);
+        $data = ['email' => $email, 'name' => $name];
         return $this->call(
-            $sendEmailUrl,
-            $data,
-            \Zend_Http_Client::POST
+                        $sendEmailUrl,
+                        $data,
+                        \Zend_Http_Client::POST
         );
     }
 
@@ -802,18 +760,17 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function setShippingDetails($transactionId, $trackingNumber, $carrierName)
-    {
+    public function setShippingDetails($transactionId, $trackingNumber, $carrierName) {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
         $setShippingDetailsUrl = join(
-            '/',
-            [ trim($baseUrl, '/'), 'transactions', trim($transactionId), 'shipment' ]
+                '/',
+                [trim($baseUrl, '/'), 'transactions', trim($transactionId), 'shipment']
         );
-        $data = [ 'trackingNumber' => $trackingNumber, 'carrierName' => $carrierName ];
+        $data = ['trackingNumber' => $trackingNumber, 'carrierName' => $carrierName];
         return $this->call(
-            $setShippingDetailsUrl,
-            $data,
-            \Zend_Http_Client::POST
+                        $setShippingDetailsUrl,
+                        $data,
+                        \Zend_Http_Client::POST
         );
     }
 
@@ -823,16 +780,14 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param  $transactionId
      * @return string
      */
-    protected function getTransactionInfoUrl($transactionId)
-    {
+    protected function getTransactionInfoUrl($transactionId) {
         $apiVersion = $this->helper->getApiVersion();
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        if($apiVersion === 'bread_2') {
-            return join('/', [ trim($baseUrl, '/'), 'transaction', trim($transactionId,'/') ]);
+        if ($apiVersion === 'bread_2') {
+            return join('/', [trim($baseUrl, '/'), 'transaction', trim($transactionId, '/')]);
         } else {
-            return join('/', [ trim($baseUrl, '/'), 'transactions', trim($transactionId, '/') ]);
+            return join('/', [trim($baseUrl, '/'), 'transactions', trim($transactionId, '/')]);
         }
-        
     }
 
     /**
@@ -841,25 +796,23 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param  $transactionId
      * @return string
      */
-    protected function getUpdateTransactionUrl($transactionId)
-    {
+    protected function getUpdateTransactionUrl($transactionId) {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
         return join(
-            '/',
-            [ trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/') ]
+                '/',
+                [trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/')]
         );
     }
-    
+
     /**
      * Form transaction info URI string
      *
      * @param  $transactionId
      * @return string
      */
-    protected function getAuthTokenUrl()
-    {
+    protected function getAuthTokenUrl() {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        return join('/', [ trim($baseUrl, '/'), 'auth/sa/authenticate' ]);
+        return join('/', [trim($baseUrl, '/'), 'auth/sa/authenticate']);
     }
 
     /**
@@ -868,8 +821,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param  $string
      * @return bool
      */
-    protected function isJson($string)
-    {
+    protected function isJson($string) {
         try {
             $this->jsonHelper->jsonDecode($string);
         } catch (\Throwable $e) {
@@ -884,8 +836,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      *
      * @return int
      */
-    protected function getStoreId()
-    {
+    protected function getStoreId() {
         try {
             $isInAdmin = ($this->context->getAppState()->getAreaCode() == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
         } catch (\Throwable $e) {
@@ -902,7 +853,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         }
         return $this->order->getData('store_id');
     }
-    
+
     /**
      * 
      * @param type $transactionId
@@ -910,7 +861,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getUpdateTransactionUrlV2($transactionId, $action) {
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $url = join('/', [trim($baseUrl, '/'), 'transaction',$transactionId,$action]);
+        $url = join('/', [trim($baseUrl, '/'), 'transaction', $transactionId, $action]);
         return $url;
     }
+
 }

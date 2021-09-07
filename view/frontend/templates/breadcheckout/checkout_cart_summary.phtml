@@ -1,12 +1,8 @@
 <?php /** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
-<div id="bread-btn-cntnr">
-    <div id="bread-checkout-btn-2"></div>
-</div>
-
+<div id="bread-checkout-btn-2"></div>
 <script type="text/javascript">
     <?php if($block->getApiVersion() === 'bread_2') :?>
     require(['jquery'], function($) {
-        console.log('Template LOADED');
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
         if (validateProductTypes === false) {
             var buttonPrevent = $('#button-prevent');
@@ -16,7 +12,7 @@
         }
         
         document.configureButton = function (items) {
-            if (window.BreadPayments !== undefined) {
+            if (typeof window.BreadPayments !== 'undefined') {
 
                 var total = 0;
                 let itemsObject = [];
@@ -67,8 +63,8 @@
                         totalPrice: { value: (total - discountData.value), currency: 'USD' },
                         totalDiscounts: discountData,
                         totalShipping: { value: 0, currency: 'USD' },
-                        totalTax: { value: 0, currency: 'USD' },
-                    },
+                        totalTax: { value: 0, currency: 'USD' }
+                    }
                 };
 
                 bread_sdk.registerPlacements([placementObject]);

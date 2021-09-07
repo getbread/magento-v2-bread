@@ -81,6 +81,7 @@ class Catalog extends Data
             'sku' => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'] . '///' . $skuString),
             'detailUrl' => $theProduct->getProductUrl(),
             'quantity' => $qty,
+            'currency'  => $this->getCurrentCurrencyCode()
         ];
 
         $imgSrc = $this->getImgSrc($product);
@@ -113,6 +114,7 @@ class Catalog extends Data
             'sku'       => $item->getSku(),
             'detailUrl' => $item->getProductUrl(),
             'quantity'  => 1,
+            'currency'  => $this->getCurrentCurrencyCode()
         ];
 
         $imgSrc = $this->getImgSrc($item);
@@ -221,5 +223,13 @@ class Catalog extends Data
         } catch (\Throwable $e) {
             return null;
         }
+    }
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getCurrentCurrencyCode() {
+        return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 }

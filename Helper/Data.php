@@ -102,16 +102,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     
     //Bread 2.0 configurations
     const XML_CONFIG_API_VERSION                    = 'payment/breadcheckout/api_version';
-    const XML_CONFIG_API_URL                        = 'payment/breadcheckout/api_url';
     const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
-    const XML_CONFIG_INTEGRATION_KEY                = 'payment/breadcheckout/integration_key';
     const XML_CONFIG_BREAD_API_PUB_KEY              = 'payment/breadcheckout/bread_api_public_key';
     const XML_CONFIG_BREAD_API_SECRET_KEY           = 'payment/breadcheckout/bread_api_secret_key';
+    const XML_CONFIG_BREAD_API_URL                  = 'payment/breadcheckout/bread_api_url';
+    const XML_CONFIG_BREAD_INTEGRATION_KEY          = 'payment/breadcheckout/bread_api_integration_key';
     const XML_CONFIG_BREAD_API_SANDBOX_PUB_KEY      = 'payment/breadcheckout/bread_api_sandbox_public_key';
     const XML_CONFIG_BREAD_API_SANDBOX_SECRET_KEY   = 'payment/breadcheckout/bread_api_sandbox_secret_key';
+    const XML_CONFIG_BREAD_API_SANDBOX_URL          = 'payment/breadcheckout/bread_api_sandbox_url';
+    const XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY    = 'payment/breadcheckout/bread_api_sandbox_integration_key';
     
     const JS_SANDBOX_SDK                            =  'https://connect-preview.breadpayments.com/sdk.js';
-    const JS_LIVE_SDK                               = '';
+    const JS_LIVE_SDK                               = 'https://connect.breadpayments.com/sdk.js';
 
     /**
      * @var \Magento\Framework\Model\Context
@@ -300,9 +302,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $apiVersion = $this->getApiVersion();
         if($apiVersion === 'bread_2') {
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
-                return $this->scopeConfig->getValue(self::XML_CONFIG_API_URL, $store, $storeCode);
+                return $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_URL, $store, $storeCode);
             } else {
-                return $this->scopeConfig->getValue(self::XML_CONFIG_API_URL, $store, $storeCode);
+                return $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_SANDBOX_URL, $store, $storeCode);
             }
         } else {
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
@@ -1013,7 +1015,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @return string
      */
     public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INTEGRATION_KEY, $store, $storeCode);
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_INTEGRATION_KEY, $store, $storeCode);
+        } else {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY, $store, $storeCode);
+        }
     }
     
     /**
