@@ -32,7 +32,7 @@ class ConfigProvider implements ConfigProviderInterface {
     
     /**
      *
-     * @var \Rbc\PayplanCheckout\Helper\Catalog
+     * @var \Bread\BreadCheckout\Helper\Catalog
      */
     public $catalog;
 
@@ -40,7 +40,7 @@ class ConfigProvider implements ConfigProviderInterface {
             \Bread\BreadCheckout\Helper\Quote $helper,
             \Bread\BreadCheckout\Helper\Data $helperData,
             \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
-            \Rbc\PayplanCheckout\Helper\Catalog $catalog
+            \Bread\BreadCheckout\Helper\Catalog $catalog
     ) {
         $this->helper = $helper;
         $this->helperData = $helperData;
