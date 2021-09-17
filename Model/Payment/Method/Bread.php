@@ -191,7 +191,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if (!$this->canUseForCountry($billingCountry)) {
             $this->breadLogger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY'. $billingCountry);
             throw new \Magento\Framework\Exception\LocalizedException(
-                __(
+                $this->helper->getConfigClient() === 'RBC' ? __(
+                    'This financing program is available to CA residents, please click the finance button 
+                and complete the application in order to complete your purchase with the financing payment method.'
+                ) : __(
                     'This financing program is available to US residents, please click the finance button 
                 and complete the application in order to complete your purchase with the financing payment method.'
                 )
@@ -417,7 +420,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $this->apiClient->setOrder($payment->getOrder());
         $apiVersion = $this->helper->getApiVersion();
-
+        $client = $this->helper->getConfigClient() !== 'CORE' ? $this->helper->getConfigClient() : 'Bread Finance';
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
                 $this->breadLogger->info('about to call api client authorize');
@@ -446,7 +449,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                             $payment,
                             ['bread_version' => 'bread_2'],
                             [],
-                            'Bread 2.0 transaction'
+                            $client . ' platform transaction'
                     );
                 } else {
                     $payment->setTransactionId($result['breadTransactionId']);
@@ -456,7 +459,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                     $payment,
                     ['is_closed' => false, 'authorize_result' => $this->jsonHelper->jsonEncode($result)],
                     [],
-                    'Bread Finance Payment Authorized'
+                    $client . ' Payment Authorized'
                 );
                 break;
             case self::ACTION_CAPTURE:
@@ -471,7 +474,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                     $payment,
                     ['is_closed' => false, 'settle_result' => $this->jsonHelper->jsonEncode($result)],
                     [],
-                    'Bread Finance Payment Captured'
+                    $client . ' Payment Captured'
                 );
                 break;
             case self::ACTION_REFUND:
@@ -487,7 +490,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                     $payment,
                     ['is_closed' => false, 'refund_result' => $this->jsonHelper->jsonEncode($result)],
                     [],
-                    'Bread Finance Payment Refunded'
+                    $client . ' Payment Refunded'
                 );
                 break;
             case self::ACTION_VOID:
@@ -499,7 +502,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                     $payment,
                     ['is_closed' => true, 'cancel_result' => $this->jsonHelper->jsonEncode($result)],
                     [],
-                    'Bread Finance Payment Canceled'
+                    $client . ' Payment Canceled'
                 );
                 break;
             default:

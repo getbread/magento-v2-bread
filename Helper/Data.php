@@ -101,6 +101,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const API_CART_EXTENSION                        = 'carts/';
     
     //Bread 2.0 configurations
+    const XML_CONFIG_CLIENT                         = 'CORE'; //ADS+Bread = CORE, RBC = RBC
     const XML_CONFIG_API_VERSION                    = 'payment/breadcheckout/api_version';
     const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
     const XML_CONFIG_BREAD_API_PUB_KEY              = 'payment/breadcheckout/bread_api_public_key';
@@ -112,8 +113,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_BREAD_API_SANDBOX_URL          = 'payment/breadcheckout/bread_api_sandbox_url';
     const XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY    = 'payment/breadcheckout/bread_api_sandbox_integration_key';
     
-    const JS_SANDBOX_SDK                            =  'https://connect-preview.breadpayments.com/sdk.js';
-    const JS_LIVE_SDK                               = 'https://connect.breadpayments.com/sdk.js';
+    const JS_SANDBOX_SDK_CORE                           =  'https://connect-preview.breadpayments.com/sdk.js';
+    const JS_LIVE_SDK_CORE                               = 'https://connect.breadpayments.com/sdk.js';
+
+    const JS_SANDBOX_SDK_RBC                        = 'https://connect-preview.rbc.breadpayments.com/sdk.js';
+    const JS_LIVE_SDK_RBC                           = 'https://connect.rbcpayplan.com/sdk.js';
 
     /**
      * @var \Magento\Framework\Model\Context
@@ -277,10 +281,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $apiVersion = $this->getApiVersion();
 
         if ($apiVersion === 'bread_2') {
-            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
-                return self::JS_LIVE_SDK;
+            $client = $this->getConfigClient();
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {               
+                switch($client) {
+                    case 'RBC':
+                        return self::JS_LIVE_SDK_RBC;
+                        break;
+                    default:
+                        return self::JS_LIVE_SDK_CORE;    
+                }                
             } else {
-                return self::JS_SANDBOX_SDK;
+                switch ($client) {
+                    case 'RBC':
+                        return self::JS_SANDBOX_SDK_RBC;
+                        break;
+                    default:
+                        return self::JS_SANDBOX_SDK_CORE;
+                }        
             }
         } else {
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
@@ -1030,5 +1047,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAuthToken($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
+    }
+
+    public function getConfigClient() {
+        return self::XML_CONFIG_CLIENT;
     }
 }
