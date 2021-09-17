@@ -1049,7 +1049,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
     }
 
+    /**
+     * Returns the configured app
+     * 
+     * @return string
+     */
     public function getConfigClient() {
         return self::XML_CONFIG_CLIENT;
+    }
+
+    /**
+     * Get the merchant country code
+     * 
+     * @return string
+     */
+    public function getMerchantCountry($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return $this->_scopeConfig->getValue('general/country/default', $store, $storeCode);
     }
 }

@@ -68,6 +68,8 @@ class ConfigProvider implements ConfigProviderInterface {
                     'transactionId' => $this->helper->getBreadTransactionId(),
                     'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
                     'isHealthcare' => $this->helper->isHealthcare(),
+                    'country' => $this->helper->getMerchantCountry(),
+                    'client' => 'CORE', //CORE|RBC
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'formId' => 'bread-checkout-embedded',

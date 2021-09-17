@@ -1,90 +1,117 @@
-<?php /** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
+<?php
+
+/** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
 <div id="bread-checkout-btn-2"></div>
 <script type="text/javascript">
-    <?php if($block->getApiVersion() === 'bread_2') :?>
-    require(['jquery'], function($) {
-        var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
-        if (validateProductTypes === false) {
-            var buttonPrevent = $('#button-prevent');
-            buttonPrevent.css('width', '100%');
-            buttonPrevent.css('height', '100%');
-            buttonPrevent.show();
-        }
-        
-        document.configureButton = function (items) {
-            if (typeof window.BreadPayments !== 'undefined') {
+    <?php if ($block->getApiVersion() === 'bread_2') : ?>
+        require(['jquery'], function($) {
+            var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
+            if (validateProductTypes === false) {
+                var buttonPrevent = $('#button-prevent');
+                buttonPrevent.css('width', '100%');
+                buttonPrevent.css('height', '100%');
+                buttonPrevent.show();
+            }
 
-                var total = 0;
-                let itemsObject = [];
-                for (var i = 0; i < items.length; i++) {
-                    total += items[i].price * items[i].quantity;
+            document.configureButton = function(items) {
+                if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                    let bread_sdk = null;
+                    let config_client = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                    if (config_client === 'RBC') {
+                        bread_sdk = window.RBCPayPlan;
+                    } else {
+                        bread_sdk = window.BreadPayments;
+                    }
 
-                    let item = {
-                        name: items[i].name,
-                        quantity: items[i].quantity,
-                        shippingCost: { value: 0, currency: 'USD' },
-                        shippingDescription: '',
-                        unitTax: { value: 0, currency: 'USD' },
-                        unitPrice: {
-                            currency: 'USD',
-                            value: items[i].price
+                    var total = 0;
+                    let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
+                    let itemsObject = [];
+                    for (var i = 0; i < items.length; i++) {
+                        total += items[i].price * items[i].quantity;
+
+                        let item = {
+                            name: items[i].name,
+                            quantity: items[i].quantity,
+                            shippingCost: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            shippingDescription: '',
+                            unitTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            unitPrice: {
+                                currency: currentCurrencyCode,
+                                value: items[i].price
+                            }
+                        };
+
+                        itemsObject.push(item);
+                    }
+                    //Calculate discounts
+                    let discountAmount = -document.round(window.checkoutConfig.totalsData.discount_amount);
+                    let discountData = {
+                        value: 0,
+                        currency: currentCurrencyCode
+                    };
+                    if (discountAmount > 0) {
+                        discountData.value = discountAmount;
+                    }
+
+                    let onApproved = function onApproved(application) {};
+                    let onCheckout = function onCheckout(application) {};
+                    bread_sdk.setup({
+                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                    });
+                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+
+
+                    let placementObject = {
+                        allowCheckout: false,
+                        domID: 'bread-checkout-btn-2',
+                        order: {
+                            currency: currentCurrencyCode,
+                            items: itemsObject,
+                            subTotal: {
+                                value: total,
+                                currency: currentCurrencyCode
+                            },
+                            totalPrice: {
+                                value: (total - discountData.value),
+                                currency: currentCurrencyCode
+                            },
+                            totalDiscounts: discountData,
+                            totalShipping: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            }
                         }
                     };
 
-                    itemsObject.push(item);
+                    bread_sdk.registerPlacements([placementObject]);
+                    bread_sdk.__internal__.setInitMode('manual');
+                    bread_sdk.__internal__.init();
+
+                } else {
+                    let errorInfo = {
+                        err: 'err'
+                    };
+                    document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not exist');
                 }
-                //Calculate discounts
-                let discountAmount = -document.round(window.checkoutConfig.totalsData.discount_amount);
-                let discountData = {
-                    value: 0,
-                    currency: 'USD'
-                };
-                if (discountAmount > 0) {
-                    discountData.value = discountAmount;
-                }
+            };
 
-                let bread_sdk = window.BreadPayments;
-                let onApproved = function onApproved(application) {};
-                let onCheckout = function onCheckout(application) {};
-                bread_sdk.setup({
-                    integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
-                });
-                bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
-                bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+            document.round = function(value) {
+                return parseInt(Math.round(value * 100));
+            };
 
-
-                let placementObject = {
-                    allowCheckout: false,
-                    domID: 'bread-checkout-btn-2',
-                    order: {
-                        currency: 'USD',
-                        items: itemsObject,
-                        subTotal: { value: total, currency: 'USD' },
-                        totalPrice: { value: (total - discountData.value), currency: 'USD' },
-                        totalDiscounts: discountData,
-                        totalShipping: { value: 0, currency: 'USD' },
-                        totalTax: { value: 0, currency: 'USD' }
-                    }
-                };
-
-                bread_sdk.registerPlacements([placementObject]);
-                bread_sdk.__internal__.setInitMode('manual');    
-                bread_sdk.__internal__.init();
-
-            } else {
-                let errorInfo = {
-                    err: 'err'
-                };
-                document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not exist');
-            }
-        };
-        
-        document.round = function (value) {
-            return parseInt(Math.round(value * 100));
-        };
-
-        document.defaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-        document.configureButton(document.defaultItems);
-    });
+            document.defaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+            document.configureButton(document.defaultItems);
+        });
     <?php endif; ?>
 </script>

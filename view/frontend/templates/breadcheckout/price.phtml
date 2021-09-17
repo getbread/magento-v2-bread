@@ -1,85 +1,113 @@
-<?php /** @var $block Bread\BreadCheckout\Block\Product\View */ ?>
+<?php
+
+/** @var $block Bread\BreadCheckout\Block\Product\View */ ?>
 <?= /* @noEscape */ $block->getBeforeHtml(); ?>
 
 <div class="splitpay-clickable-price" id="splitpay-clickable-price" style="padding-bottom: 5px"></div>
 
 <?php /** TODO: rename these javascript functions when doing refactor of template files */ ?>
 <script type="text/javascript">
-    <?php if($block->getApiVersion() === 'bread_2') : ?>
-        
+    <?php if ($block->getApiVersion() === 'bread_2') : ?>
+
         require(['jquery'], function($) {
-            document.configureButton = function (items, subTotal, totalPrice) {
+            document.configureButton = function(items, subTotal, totalPrice) {
 
-            if (typeof window.BreadPayments !== 'undefined') {
-                let bread_sdk = window.BreadPayments;
-                let onApproved = function onApproved(application) {};
-                let onCheckout = function onCheckout(application) {};
-                bread_sdk.setup({
-                    integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
-                });
-                bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
-                bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
-                let itemsObject = [];
-                for (var i = 0; i < items.length; i++) {
-                    let item = {
-                        name: items[i].name,
-                        quantity: items[i].quantity,
-                        shippingCost: { value: 0, currency: 'USD' },
-                        shippingDescription: '',
-                        unitTax: { value: 0, currency: 'USD' },
-                        unitPrice: {
-                            currency: 'USD',
-                            value: items[i].price,
-                        }
-                    };
+                if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                    let bread_sdk = null;
+                    let config_client = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                    if (config_client === 'RBC') {
+                        bread_sdk = window.RBCPayPlan;
+                    } else {
+                        bread_sdk = window.BreadPayments;
+                    }
+                    let onApproved = function onApproved(application) {};
+                    let onCheckout = function onCheckout(application) {};
+                    bread_sdk.setup({
+                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                    });
+                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                    let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
+                    let itemsObject = [];
+                    for (var i = 0; i < items.length; i++) {
+                        let item = {
+                            name: items[i].name,
+                            quantity: items[i].quantity,
+                            shippingCost: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            shippingDescription: '',
+                            unitTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            unitPrice: {
+                                currency: currentCurrencyCode,
+                                value: items[i].price,
+                            }
+                        };
 
-                    itemsObject.push(item);
-                }
-                bread_sdk.registerPlacements([
-                    {
+                        itemsObject.push(item);
+                    }
+                    bread_sdk.registerPlacements([{
                         allowCheckout: false,
                         domID: 'splitpay-clickable-price',
                         order: {
-                            currency: 'USD',
+                            currency: currentCurrencyCode,
                             items: itemsObject,
-                            subTotal: { value: items[0]["price"], currency: 'USD' },
-                            totalPrice: { value: items[0]["price"], currency: 'USD' },
-                            totalDiscounts: { value: 0, currency: 'USD' },
-                            totalShipping: { value: 0, currency: 'USD' },
-                            totalTax: { value: 0, currency: 'USD' }
+                            subTotal: {
+                                value: items[0]["price"],
+                                currency: currentCurrencyCode
+                            },
+                            totalPrice: {
+                                value: items[0]["price"],
+                                currency: currentCurrencyCode
+                            },
+                            totalDiscounts: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalShipping: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            }
                         },
-                    }]
-                );
+                    }]);
 
-                bread_sdk.__internal__.setInitMode('manual');    
-                bread_sdk.__internal__.init();
+                    bread_sdk.__internal__.setInitMode('manual');
+                    bread_sdk.__internal__.init();
 
 
-            } else {
-                let errorInfo = {
-                    err: 'err'
-                };
-                document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not ');
-            }
-        };
+                } else {
+                    let errorInfo = {
+                        err: 'err'
+                    };
+                    document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not ');
+                }
+            };
 
-        document.clearQuote = function () {
-            var clearQuoteUrl = '<?= /* @noEscape */ $block->getClearQuoteUrl(); ?>';
-            $.ajax({
-                url: clearQuoteUrl
-            }).fail(function (error) {
-                document.logBreadIssue('error', {},
-                    'Error code returned when calling ' + clearQuoteUrl + ', with status: ' + error.statusText);
-            });
-        };
+            document.clearQuote = function() {
+                var clearQuoteUrl = '<?= /* @noEscape */ $block->getClearQuoteUrl(); ?>';
+                $.ajax({
+                    url: clearQuoteUrl
+                }).fail(function(error) {
+                    document.logBreadIssue('error', {},
+                        'Error code returned when calling ' + clearQuoteUrl + ', with status: ' + error.statusText);
+                });
+            };
 
-        <?php if ($block->getProduct() != null) : ?>
+            <?php if ($block->getProduct() != null) : ?>
 
                 /**
                  * Reconfigure Bread checkout button with updated
                  * price and sku values
                  */
-                document.resetPriceAndSku = function (configurable) {
+                document.resetPriceAndSku = function(configurable) {
                     if (!configurable) {
                         document.configureButton(document.defaultItems);
                     } else {
@@ -95,195 +123,196 @@
                             document.previousSku = sku;
                             document.previousPrice = price;
                             document.defaultItems[0]["sku"] = document.previousSku;
-                                       document.defaultItems[0]["price"] = document.previousPrice;
-                                       document.configureButton(document.defaultItems);
-                                   }
-                               }
-                           };
-
-                           /**
-                            * Calculate updated price based on attribute selections
-                            * and/or custom options
-                            *
-                            * @returns int
-                            */
-                           document.calculatePrice = function () {
-                               var price = 0;
-                               var customPrice = 0;
-
-                               if (document.priceWithOptions) {
-                                   customPrice = document.priceWithOptions;
-                               }
-
-                               var selectedProductPrices = (typeof spConfig !== "undefined") && spConfig.optionPrices[document.selectedSimpleProductId];
-
-                               if (selectedProductPrices) {
-                                   price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
-                               }
-
-                               return Math.max(price, customPrice);
-                           };
-        <?php endif; ?>
-
-                       document.defaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-                       document.previousPrice = document.defaultItems[0]["price"];
-                       document.previousSku = document.defaultItems[0]["sku"];
-
-                       $(document).ready(function () {
-        <?php if ($block->getProduct() != null) : ?>
-                               document.productId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
-                               document.baseProductSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-                               document.selectedSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-                               document.selectedSimpleProductId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
-                               document.resetPriceAndSku(false);
-        <?php else : ?>
-                               document.configureButton(document.defaultItems);
-        <?php endif; ?>
-                       });
-                   });
-    <?php else: ?>    
-    require(['jquery', 'splitPay'], function($, splitPay) {
-
-        document.splitPayConfigureButton = function (items) {
-            var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo   = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
-            var breadConfig = {
-                <?php if (!$block->isHealthcare()) : ?>
-                items: items,
-                <?php else : ?>
-                customTotal: items[0]['price'],
-                <?php endif; ?>
-                discounts: <?= /* @noEscape */ $block->getDiscountDataJson(); ?>,
-                allowCheckout: false,
-                done: function() {},
+                            document.defaultItems[0]["price"] = document.previousPrice;
+                            document.configureButton(document.defaultItems);
+                        }
+                    }
+                };
 
                 /**
-                 * Add to cart call back used when allow checkout from product page = false
+                 * Calculate updated price based on attribute selections
+                 * and/or custom options
                  *
-                 * @param callback
+                 * @returns int
                  */
-                addToCart:  function(callback) {
-                    document.getElementById('product_addtocart_form').submit();
-                }
-            };
+                document.calculatePrice = function() {
+                    var price = 0;
+                    var customPrice = 0;
 
-            if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
-                breadConfig.customCSS = buttonCss;
-            }
-
-            if(financingInfo.enabled && financingInfo.mode.cart){
-                var cartSizeFinancingId = financingInfo.id;
-                var cartSizeThreshold = financingInfo.threshold;
-                var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity; }, 0) / 100;
-                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
-            } else if (financingInfo.enabled && financingInfo.mode.sku){
-                var productSku = "<?= /* @noEscape */ $block->getProduct()->getSku(); ?>";
-                if(financingInfo.sku_limit.includes(productSku) === true){
-                    breadConfig.financingProgramId = financingInfo.id;
-                }
-            }
-
-            if (!document.splitPayHasCheckedConfigData) {
-
-                var configDataUrl = '<?= /* @noEscape */ $block->getConfigDataUrl(); ?>';
-                $.ajax({
-                    url: configDataUrl,
-                    type: 'post',
-                    context: this
-                }).done(function(data) {
-                    document.splitPayHasCheckedConfigData = true;
-
-                    if (data.shippingContact !== false) {
-                        breadConfig.shippingContact = data.shippingContact;
+                    if (document.priceWithOptions) {
+                        customPrice = document.priceWithOptions;
                     }
 
-                    if (data.billingContact !== false) {
-                        breadConfig.billingContact = data.billingContact;
+                    var selectedProductPrices = (typeof spConfig !== "undefined") && spConfig.optionPrices[document.selectedSimpleProductId];
+
+                    if (selectedProductPrices) {
+                        price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
                     }
 
+                    return Math.max(price, customPrice);
+                };
+            <?php endif; ?>
+
+            document.defaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+            document.previousPrice = document.defaultItems[0]["price"];
+            document.previousSku = document.defaultItems[0]["sku"];
+
+            $(document).ready(function() {
+                <?php if ($block->getProduct() != null) : ?>
+                    document.productId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+                    document.baseProductSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+                    document.selectedSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+                    document.selectedSimpleProductId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+                    document.resetPriceAndSku(false);
+                <?php else : ?>
+                    document.configureButton(document.defaultItems);
+                <?php endif; ?>
+            });
+        });
+    <?php else : ?>
+        require(['jquery', 'splitPay'], function($, splitPay) {
+
+            document.splitPayConfigureButton = function(items) {
+                var buttonCss = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
+                var financingInfo = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
+                var breadConfig = {
+                    <?php if (!$block->isHealthcare()) : ?>
+                        items: items,
+                    <?php else : ?>
+                        customTotal: items[0]['price'],
+                    <?php endif; ?>
+                    discounts: <?= /* @noEscape */ $block->getDiscountDataJson(); ?>,
+                    allowCheckout: false,
+                    done: function() {},
+
+                    /**
+                     * Add to cart call back used when allow checkout from product page = false
+                     *
+                     * @param callback
+                     */
+                    addToCart: function(callback) {
+                        document.getElementById('product_addtocart_form').submit();
+                    }
+                };
+
+                if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
+                    breadConfig.customCSS = buttonCss;
+                }
+
+                if (financingInfo.enabled && financingInfo.mode.cart) {
+                    var cartSizeFinancingId = financingInfo.id;
+                    var cartSizeThreshold = financingInfo.threshold;
+                    var itemsPriceSum = items.reduce(function(sum, item) {
+                        return sum + item.price * item.quantity;
+                    }, 0) / 100;
+                    breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : 'null';
+                } else if (financingInfo.enabled && financingInfo.mode.sku) {
+                    var productSku = "<?= /* @noEscape */ $block->getProduct()->getSku(); ?>";
+                    if (financingInfo.sku_limit.includes(productSku) === true) {
+                        breadConfig.financingProgramId = financingInfo.id;
+                    }
+                }
+
+                if (!document.splitPayHasCheckedConfigData) {
+
+                    var configDataUrl = '<?= /* @noEscape */ $block->getConfigDataUrl(); ?>';
+                    $.ajax({
+                        url: configDataUrl,
+                        type: 'post',
+                        context: this
+                    }).done(function(data) {
+                        document.splitPayHasCheckedConfigData = true;
+
+                        if (data.shippingContact !== false) {
+                            breadConfig.shippingContact = data.shippingContact;
+                        }
+
+                        if (data.billingContact !== false) {
+                            breadConfig.billingContact = data.billingContact;
+                        }
+
+                        if (typeof bread !== 'undefined') {
+                            splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-price', true);
+                        }
+                    }).fail(function(error) {
+                        document.logBreadIssue('error', {},
+                            'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
+                    });
+
+                } else {
                     if (typeof bread !== 'undefined') {
                         splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-price', true);
                     }
-                }).fail(function(error) {
-                    document.logBreadIssue('error', {},
-                        'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
-                });
-
-            } else {
-                if (typeof bread !== 'undefined') {
-                    splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-price', true);
-                }
-            }
-
-        };
-
-        <?php if ($block->getProduct() != null) : ?>
-
-        /**
-         * Reconfigure Bread checkout button with updated
-         * price and sku values
-         */
-        document.splitPayResetPriceAndSku = function(configurable) {
-            if (!configurable) {
-                document.splitPayConfigureButton(document.splitPayDefaultItems);
-            }
-            else {
-                var price = document.splitPayCalculatePrice();
-
-                if(typeof document.customOptions !== "undefined"){
-                    sku = document.splitPaySelectedSku + document.customOptions;
-                } else {
-                    sku = document.splitPaySelectedSku;
                 }
 
-                if (sku != document.splitPayPreviousSku || price != document.splitPayPreviousPrice) {
-                    document.splitPayPreviousSku                    = sku;
-                    document.splitPayPreviousPrice                  = price;
-                    document.splitPayDefaultItems[0]["sku"]         = document.splitPayPreviousSku;
-                    document.splitPayDefaultItems[0]["price"]       = document.splitPayPreviousPrice;
-                    document.splitPayConfigureButton(document.splitPayDefaultItems);
-                }
-            }
-        };
+            };
 
-        /**
-         * Calculate updated price based on attribute selections
-         * and/or custom options
-         *
-         * @returns int
-         */
-        document.splitPayCalculatePrice = function() {
-            var price = 0;
-            var customPrice = 0;
-
-            if (document.priceWithOptions) {
-                customPrice = document.priceWithOptions;
-            }
-
-            var selectedProductPrices = spConfig && spConfig.optionPrices[document.splitPaySelectedSimpleProductId];
-
-            if (selectedProductPrices) {
-                price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
-            }
-
-            return Math.max(price, customPrice);
-        };
-        <?php endif; ?>
-        document.splitPayDefaultItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-        document.splitPayPreviousPrice      = document.splitPayDefaultItems[0]["price"];
-        document.splitPayPreviousSku        = document.splitPayDefaultItems[0]["sku"];
-
-        $(document).ready(function () {
             <?php if ($block->getProduct() != null) : ?>
-            document.splitPayProductId                      = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
-            document.splitPayBaseProductSku                 = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-            document.splitPaySelectedSku                    = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
-            document.splitPaySelectedSimpleProductId        = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
-            document.splitPayResetPriceAndSku(false);
-            <?php else : ?>
-            document.splitPayConfigureButton(document.splitPayDefaultItems);
+
+                /**
+                 * Reconfigure Bread checkout button with updated
+                 * price and sku values
+                 */
+                document.splitPayResetPriceAndSku = function(configurable) {
+                    if (!configurable) {
+                        document.splitPayConfigureButton(document.splitPayDefaultItems);
+                    } else {
+                        var price = document.splitPayCalculatePrice();
+
+                        if (typeof document.customOptions !== "undefined") {
+                            sku = document.splitPaySelectedSku + document.customOptions;
+                        } else {
+                            sku = document.splitPaySelectedSku;
+                        }
+
+                        if (sku != document.splitPayPreviousSku || price != document.splitPayPreviousPrice) {
+                            document.splitPayPreviousSku = sku;
+                            document.splitPayPreviousPrice = price;
+                            document.splitPayDefaultItems[0]["sku"] = document.splitPayPreviousSku;
+                            document.splitPayDefaultItems[0]["price"] = document.splitPayPreviousPrice;
+                            document.splitPayConfigureButton(document.splitPayDefaultItems);
+                        }
+                    }
+                };
+
+                /**
+                 * Calculate updated price based on attribute selections
+                 * and/or custom options
+                 *
+                 * @returns int
+                 */
+                document.splitPayCalculatePrice = function() {
+                    var price = 0;
+                    var customPrice = 0;
+
+                    if (document.priceWithOptions) {
+                        customPrice = document.priceWithOptions;
+                    }
+
+                    var selectedProductPrices = spConfig && spConfig.optionPrices[document.splitPaySelectedSimpleProductId];
+
+                    if (selectedProductPrices) {
+                        price = parseInt(Math.round(selectedProductPrices.finalPrice.amount * 100));
+                    }
+
+                    return Math.max(price, customPrice);
+                };
             <?php endif; ?>
+            document.splitPayDefaultItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+            document.splitPayPreviousPrice = document.splitPayDefaultItems[0]["price"];
+            document.splitPayPreviousSku = document.splitPayDefaultItems[0]["sku"];
+
+            $(document).ready(function() {
+                <?php if ($block->getProduct() != null) : ?>
+                    document.splitPayProductId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+                    document.splitPayBaseProductSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+                    document.splitPaySelectedSku = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
+                    document.splitPaySelectedSimpleProductId = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
+                    document.splitPayResetPriceAndSku(false);
+                <?php else : ?>
+                    document.splitPayConfigureButton(document.splitPayDefaultItems);
+                <?php endif; ?>
+            });
         });
-    });
-    <?php endif;?>
+    <?php endif; ?>
 </script>

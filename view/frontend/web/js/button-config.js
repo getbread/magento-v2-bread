@@ -137,15 +137,20 @@ define(
             if (window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                 this.checkShippingOptions(function () {
                     if (window.checkoutConfig.payment.breadcheckout.apiVersion === 'bread_2') {
-                        if (typeof window.BreadPayments !== 'undefined') {
-                            let bread_sdk = window.BreadPayments;
+                        if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                            let bread_sdk = null;
+                            if(window.checkoutConfig.payment.breadcheckout.client === 'RBC') {
+                                bread_sdk = window.RBCPayPlan;
+                            } else {
+                                bread_sdk = window.BreadPayments;
+                            }                         
                             bread_sdk.setup({
                                 integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
                                 buyer: {
                                     shippingAddress: {
                                         address1: self.breadConfigV2.billingContact.address,
                                         address2: self.breadConfigV2.billingContact.address2,
-                                        country: 'US',
+                                        country: window.checkoutConfig.payment.breadcheckout.country,
                                         locality: self.breadConfigV2.billingContact.city,
                                         region: self.breadConfigV2.billingContact.state,
                                         postalCode: self.breadConfigV2.billingContact.zip

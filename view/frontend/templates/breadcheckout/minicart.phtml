@@ -1,12 +1,14 @@
-<?php /** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
+<?php
+
+/** @var Bread\BreadCheckout\Block\Checkout\Overview $block */ ?>
 <?= /* @noEscape */ $block->getBeforeHtml(); ?>
 <div id="bread-minicart-btn"></div>
 <div id="bread-btn-cntnr-minicart">
     <div id="bread-checkout-btn-minicart" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
-        <?php if($block->getApiVersion() !== 'bread_2'):?>
-        <span>
-            <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
-        </span>
+        <?php if ($block->getApiVersion() !== 'bread_2') : ?>
+            <span>
+                <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
+            </span>
         <?php endif; ?>
     </div>
     <div class="button-prevent" id="button-prevent">
@@ -15,294 +17,318 @@
 </div>
 
 <script type="text/javascript">
-    <?php if($block->getApiVersion() === 'bread_2'):?>
-        
-    require(['jquery', 'jquery/validate'], function($){
-        var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
-        if(validateProductTypes === false){
-            var buttonPrevent = $('#button-prevent');
-            buttonPrevent.css('width','100%');
-            buttonPrevent.css('height','100%');
-            buttonPrevent.show();
-        }
-        
-        document.configureButton = function (items) {
-                if (window.BreadPayments !== undefined) {
-                        let bread_sdk = window.BreadPayments;
+    <?php if ($block->getApiVersion() === 'bread_2') : ?>
 
-                        var total = 0;
-                        let itemsObject = [];
-                        for (var i = 0; i < items.length; i++) {
-                            total += items[i].price * items[i].quantity;
-                            let item = {
-                                name: items[i].name,
-                                quantity: items[i].quantity,
-                                shippingCost: {value: 0, currency: 'USD'},
-                                shippingDescription: '',
-                                unitTax: {value: 0, currency: 'USD'},
-                                unitPrice: {
-                                    currency: 'USD',
-                                        value: items[i].price
-                                    }
-                                };
-
-                                itemsObject.push(item);
-                            }
-
-                            let discountData = {
-                                value: 0,
-                                currency: 'USD'
-                            };
-
-                            let onApproved = function onApproved(application) {};
-                            let onCheckout = function onCheckout(application) {};
-                            bread_sdk.setup({
-                                integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
-                            });
-                            bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
-                            bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
-
-
-                            let placementObject = {
-                                allowCheckout: false,
-                                domID: 'bread-minicart-btn',
-                                order: {
-                                    currency: 'USD',
-                                    items: itemsObject,
-                                    subTotal: {value: total, currency: 'USD'},
-                                    totalPrice: {value: (total - discountData.value), currency: 'USD'},
-                                    totalDiscounts: discountData,
-                                    totalShipping: {value: 0, currency: 'USD'},
-                                    totalTax: {value: 0, currency: 'USD'},
-                                }
-                            };
-
-                            bread_sdk.registerPlacements([placementObject]);
-                            bread_sdk.__internal__.setInitMode('manual');    
-                            bread_sdk.__internal__.init();
-
-                        }
-                    }   
-        
-        document.round = function(value) {
-            return parseInt(Math.round(value * 100));
-        };
-
-        $(document).ready(function() {
-            var minicartItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-            document.configureButton(minicartItems);
-        });
-        
-    });     
-      
-    <?php else : ?>  
-    require(['jquery', 'jquery/validate', 'mage/validation'], function($){
-
-        var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
-        if(validateProductTypes === false){
-            var buttonPrevent = $('#button-prevent');
-            buttonPrevent.css('width','100%');
-            buttonPrevent.css('height','100%');
-            buttonPrevent.show();
-        }
-
-        document.configureButton = function (items) {
-            var address             = <?= /* @noEscape */ $block->getShippingAddressData(); ?>;
-            var billingAddress      = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
-            var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
-            var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo         = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
-            var total = 0;
-            for(var i = 0; i < items.length; i++){
-                total += items[i]['price'] * items[i]['quantity'];
+        require(['jquery', 'jquery/validate'], function($) {
+            var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
+            if (validateProductTypes === false) {
+                var buttonPrevent = $('#button-prevent');
+                buttonPrevent.css('width', '100%');
+                buttonPrevent.css('height', '100%');
+                buttonPrevent.show();
             }
 
-            var breadConfig = {
-                buttonId: "bread-checkout-btn-minicart",
-                allowSplitPayCheckout: false,
-                asLowAs: <?= /* @noEscape */ $block->getAsLowAs(); ?>,
-                actAsLabel: false,
-                <?php if (!$block->isHealthcare()) : ?>
-                items: items,
-                <?php else : ?>
-                customTotal: total,
-                <?php endif; ?>
-                allowCheckout: <?= /* @noEscape */ $block->getAllowCheckout(); ?>,
-                buttonLocation: '<?= /* @noEscape */ $block->getCartSummaryLocation(); ?>',
-
-                done: function (err, tx_token) {
-                    if (tx_token !== undefined) {
-                        var i = document.createElement('input');
-                        var k = document.createElement('input');
-                        i.type = 'hidden';
-                        i.name = 'token';
-                        i.value = tx_token;
-                        k.type = 'hidden';
-                        k.name = 'form_key';
-                        k.value = $.cookie('form_key');
-                        var f = document.createElement('form');
-                        f.action = '<?= /* @noEscape */ $block->getValidateOrderUrl(); ?>';
-                        f.method = 'POST';
-                        f.appendChild(i);
-                        f.appendChild(k);
-                        document.body.appendChild(f);
-                        f.submit();
+            document.configureButton = function(items) {
+                if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                    let bread_sdk = null;
+                    let config_client = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                    if (config_client === 'RBC') {
+                        bread_sdk = window.RBCPayPlan;
                     } else {
-                        var errorInfo = {
-                            bread_config: breadConfig,
-                            err: err
-                        };
-                        document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
+                        bread_sdk = window.BreadPayments;
                     }
-                },
 
-                /**
-                 * Calculate tax value callback
-                 *
-                 * @param shippingAddress
-                 * @param callback
-                 */
-                calculateTax: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+                    var total = 0;
+                    let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
+                    let itemsObject = [];
+                    for (var i = 0; i < items.length; i++) {
+                        total += items[i].price * items[i].quantity;
+                        let item = {
+                            name: items[i].name,
+                            quantity: items[i].quantity,
+                            shippingCost: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            shippingDescription: '',
+                            unitTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            unitPrice: {
+                                currency: currentCurrencyCode,
+                                value: items[i].price
+                            }
+                        };
 
-                    var taxEstimationUrl = '<?= /* @noEscape */ $block->getTaxEstimationUrl(); ?>';
-                    var shippingString = JSON.stringify(shippingAddress);
-                    var errorInfo;
+                        itemsObject.push(item);
+                    }
 
-                    $.ajax({
-                        url: taxEstimationUrl,
-                        data: { shippingInfo: shippingString },
-                        type: 'post'
-                    }).done(function (response) {
-                        try {
+                    let discountData = {
+                        value: 0,
+                        currency: currentCurrencyCode
+                    };
+
+                    let onApproved = function onApproved(application) {};
+                    let onCheckout = function onCheckout(application) {};
+                    bread_sdk.setup({
+                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                    });
+                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+
+
+                    let placementObject = {
+                        allowCheckout: false,
+                        domID: 'bread-minicart-btn',
+                        order: {
+                            currency: currentCurrencyCode,
+                            items: itemsObject,
+                            subTotal: {
+                                value: total,
+                                currency: currentCurrencyCode
+                            },
+                            totalPrice: {
+                                value: (total - discountData.value),
+                                currency: currentCurrencyCode
+                            },
+                            totalDiscounts: discountData,
+                            totalShipping: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                        }
+                    };
+
+                    bread_sdk.registerPlacements([placementObject]);
+                    bread_sdk.__internal__.setInitMode('manual');
+                    bread_sdk.__internal__.init();
+
+                }
+            }
+
+            document.round = function(value) {
+                return parseInt(Math.round(value * 100));
+            };
+
+            $(document).ready(function() {
+                var minicartItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+                document.configureButton(minicartItems);
+            });
+
+        });
+
+    <?php else : ?>
+        require(['jquery', 'jquery/validate', 'mage/validation'], function($) {
+
+            var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
+            if (validateProductTypes === false) {
+                var buttonPrevent = $('#button-prevent');
+                buttonPrevent.css('width', '100%');
+                buttonPrevent.css('height', '100%');
+                buttonPrevent.show();
+            }
+
+            document.configureButton = function(items) {
+                var address = <?= /* @noEscape */ $block->getShippingAddressData(); ?>;
+                var billingAddress = <?= /* @noEscape */ $block->getBillingAddressData(); ?>;
+                var buttonOnProduct = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
+                var buttonCss = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
+                var financingInfo = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
+                var total = 0;
+                for (var i = 0; i < items.length; i++) {
+                    total += items[i]['price'] * items[i]['quantity'];
+                }
+
+                var breadConfig = {
+                    buttonId: "bread-checkout-btn-minicart",
+                    allowSplitPayCheckout: false,
+                    asLowAs: <?= /* @noEscape */ $block->getAsLowAs(); ?>,
+                    actAsLabel: false,
+                    <?php if (!$block->isHealthcare()) : ?>
+                        items: items,
+                    <?php else : ?>
+                        customTotal: total,
+                    <?php endif; ?>
+                    allowCheckout: <?= /* @noEscape */ $block->getAllowCheckout(); ?>,
+                    buttonLocation: '<?= /* @noEscape */ $block->getCartSummaryLocation(); ?>',
+
+                    done: function(err, tx_token) {
+                        if (tx_token !== undefined) {
+                            var i = document.createElement('input');
+                            var k = document.createElement('input');
+                            i.type = 'hidden';
+                            i.name = 'token';
+                            i.value = tx_token;
+                            k.type = 'hidden';
+                            k.name = 'form_key';
+                            k.value = $.cookie('form_key');
+                            var f = document.createElement('form');
+                            f.action = '<?= /* @noEscape */ $block->getValidateOrderUrl(); ?>';
+                            f.method = 'POST';
+                            f.appendChild(i);
+                            f.appendChild(k);
+                            document.body.appendChild(f);
+                            f.submit();
+                        } else {
+                            var errorInfo = {
+                                bread_config: breadConfig,
+                                err: err
+                            };
+                            document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
+                        }
+                    },
+
+                    /**
+                     * Calculate tax value callback
+                     *
+                     * @param shippingAddress
+                     * @param callback
+                     */
+                    calculateTax: function(shippingAddress, callback) {
+                        shippingAddress.block_key = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
+                        shippingAddress.additional_data = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+
+                        var taxEstimationUrl = '<?= /* @noEscape */ $block->getTaxEstimationUrl(); ?>';
+                        var shippingString = JSON.stringify(shippingAddress);
+                        var errorInfo;
+
+                        $.ajax({
+                            url: taxEstimationUrl,
+                            data: {
+                                shippingInfo: shippingString
+                            },
+                            type: 'post'
+                        }).done(function(response) {
+                            try {
+                                errorInfo = {
+                                    response: response,
+                                    shipping_info: shippingString,
+                                };
+                                if (response !== null && typeof response === 'object') {
+                                    if (response.error) {
+                                        document.logBreadIssue('error', errorInfo, 'Error estimating tax');
+                                        alert(response.message);
+                                    } else {
+                                        callback(null, response.result);
+                                    }
+                                } else {
+                                    document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
+                                }
+                            } catch (e) {
+                                errorInfo = {
+                                    response: response,
+                                    shipping_info: shippingString,
+                                };
+                                document.logBreadIssue('error', errorInfo, e);
+                            }
+                        }).fail(function(error) {
                             errorInfo = {
-                                response: response,
                                 shipping_info: shippingString,
                             };
-                            if (response !== null && typeof response === 'object') {
-                                if (response.error) {
-                                    document.logBreadIssue('error', errorInfo, 'Error estimating tax');
-                                    alert(response.message);
+                            document.logBreadIssue('error', errorInfo,
+                                'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
+                        });
+                    },
+
+                    /**
+                     * Calculate shipping cost callback
+                     *
+                     * @param shippingAddress
+                     * @param callback
+                     */
+                    calculateShipping: function(shippingAddress, callback) {
+                        shippingAddress.block_key = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
+                        shippingAddress.additional_data = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+
+                        var shippingAddressEstimationUrl = '<?= /* @noEscape */ $block->getShippingAddressEstimationUrl(); ?>';
+                        var errorInfo;
+
+                        $.ajax({
+                            url: shippingAddressEstimationUrl,
+                            data: shippingAddress,
+                            type: 'post'
+                        }).done(function(response) {
+                            try {
+                                errorInfo = {
+                                    response: response,
+                                    shipping_info: shippingAddress,
+                                };
+                                if (response !== null && typeof response === 'object') {
+                                    if (response.error) {
+                                        document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
+                                        alert(response.message);
+                                    } else {
+                                        callback(null, response.result);
+                                    }
                                 } else {
-                                    callback(null, response.result);
+                                    document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
                                 }
-                            } else {
-                                document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
+                            } catch (e) {
+                                errorInfo = {
+                                    response: response,
+                                    shipping_info: shippingAddress,
+                                };
+                                document.logBreadIssue('error', errorInfo, e);
                             }
-                        }
-                        catch (e) {
+                        }).fail(function(error) {
                             errorInfo = {
-                                response: response,
-                                shipping_info: shippingString,
-                            };
-                            document.logBreadIssue('error', errorInfo, e);
-                        }
-                    }).fail(function(error) {
-                        errorInfo = {
-                            shipping_info: shippingString,
-                        };
-                        document.logBreadIssue('error', errorInfo,
-                            'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
-                    });
-                },
-
-                /**
-                 * Calculate shipping cost callback
-                 *
-                 * @param shippingAddress
-                 * @param callback
-                 */
-                calculateShipping: function (shippingAddress, callback) {
-                    shippingAddress.block_key        = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.additional_data  = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
-
-                    var shippingAddressEstimationUrl = '<?= /* @noEscape */ $block->getShippingAddressEstimationUrl(); ?>';
-                    var errorInfo;
-
-                    $.ajax({
-                        url: shippingAddressEstimationUrl,
-                        data: shippingAddress,
-                        type: 'post'
-                    }).done(function (response) {
-                        try {
-                            errorInfo = {
-                                response: response,
                                 shipping_info: shippingAddress,
                             };
-                            if (response !== null && typeof response === 'object') {
-                                if (response.error) {
-                                    document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
-                                    alert(response.message);
-                                } else {
-                                    callback(null, response.result);
-                                }
-                            } else {
-                                document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
-                            }
-                        }
-                        catch (e) {
-                            errorInfo = {
-                                response: response,
-                                shipping_info: shippingAddress,
-                            };
-                            document.logBreadIssue('error', errorInfo, e);
-                        }
-                    }).fail(function(error) {
-                        errorInfo = {
-                            shipping_info: shippingAddress,
-                        };
-                        document.logBreadIssue('error', errorInfo,
-                            'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
-                    });
+                            document.logBreadIssue('error', errorInfo,
+                                'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
+                        });
+                    }
+                };
+
+                if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
+                    breadConfig.customCSS = buttonCss;
+                }
+
+                if (address !== false) {
+                    breadConfig.shippingContact = address;
+                }
+
+                if (billingAddress !== false) {
+                    breadConfig.billingContact = billingAddress;
+                }
+
+                if (buttonOnProduct === true) {
+                    breadConfig.actAsLabel = false;
+                }
+
+                var targetedFinancingStatus = <?= /* @noEscape */ $block->getTargetedFinancingStatusJson(); ?>;
+
+                if (targetedFinancingStatus.shouldUseFinancingId) {
+                    breadConfig.financingProgramId = targetedFinancingStatus.id;
+                }
+
+                var discountAmount = <?= /* @noEscape */ json_encode($block->quoteHelper->getDiscountData()); ?>;
+                if (discountAmount.length > 0) {
+                    breadConfig.discounts = [{
+                        amount: discountAmount[0].amount,
+                        description: (discountAmount[0].description !== null) ?
+                            discountAmount[0].description : "Discount"
+                    }];
+                }
+                if (typeof bread !== 'undefined') {
+                    bread.checkout(breadConfig);
                 }
             };
 
-            if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
-                breadConfig.customCSS = buttonCss;
-            }
+            document.round = function(value) {
+                return parseInt(Math.round(value * 100));
+            };
 
-            if (address !== false) {
-                breadConfig.shippingContact = address;
-            }
-
-            if (billingAddress !== false) {
-                breadConfig.billingContact = billingAddress;
-            }
-
-            if (buttonOnProduct === true) {
-                breadConfig.actAsLabel = false;
-            }
-
-            var targetedFinancingStatus = <?= /* @noEscape */ $block->getTargetedFinancingStatusJson(); ?>;
-
-            if (targetedFinancingStatus.shouldUseFinancingId) {
-                breadConfig.financingProgramId = targetedFinancingStatus.id;
-            }
-
-            var discountAmount = <?= /* @noEscape */ json_encode($block->quoteHelper->getDiscountData());?>;
-            if (discountAmount.length > 0) {
-                breadConfig.discounts = [{
-                    amount: discountAmount[0].amount,
-                    description: (discountAmount[0].description !== null) ?
-                        discountAmount[0].description :
-                        "Discount"
-                }];
-            }
-            if (typeof bread !== 'undefined') {
-                bread.checkout(breadConfig);
-            }
-        };
-
-        document.round = function(value) {
-            return parseInt(Math.round(value * 100));
-        };
-
-        $(document).ready(function() {
-            var minicartItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
-            document.configureButton(minicartItems);
+            $(document).ready(function() {
+                var minicartItems = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+                document.configureButton(minicartItems);
+            });
         });
-    });
     <?php endif; ?>
     //# sourceURL=bread-minicart.js
 </script>

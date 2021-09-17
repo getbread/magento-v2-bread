@@ -562,4 +562,18 @@ class View extends \Magento\ConfigurableProduct\Block\Product\View\Type\Configur
     public function getIntegrationKey() {
         return $this->dataHelper->getIntegrationKey();
     }
+
+    /**
+     * @return string
+     */
+    public function getConfigClient() {
+        return $this->dataHelper->getConfigClient();
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentCurrencyCode() {
+        return $this->catalogHelper->getCurrentCurrencyCode();
+    }
 }
