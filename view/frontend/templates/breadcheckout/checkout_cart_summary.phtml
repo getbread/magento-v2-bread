@@ -50,7 +50,8 @@
                         itemsObject.push(item);
                     }
                     //Calculate discounts
-                    let discountAmount = -document.round(window.checkoutConfig.totalsData.discount_amount);
+                    let discounts = <?= /* @noEscape */ $block->quoteHelper->getDiscountData(); ?>;
+                    let discountAmount = -document.round(discounts.amount !== undefined ? discounts.amount : 0);
                     let discountData = {
                         value: 0,
                         currency: currentCurrencyCode
