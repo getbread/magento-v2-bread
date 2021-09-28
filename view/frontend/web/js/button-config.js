@@ -319,8 +319,9 @@ define(
                             //
                             this.breadConfigV2.shippingContact = data.billingContact;
                         }
-                        if (isEmbedded === false) {
-                            this._init();
+
+                        if (window.checkoutConfig.payment.breadcheckout.apiVersion === 'bread_2' || !isEmbedded) {
+                            this._init();    
                         } else {
                             this._initEmbedded();
                         }

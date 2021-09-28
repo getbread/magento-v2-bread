@@ -60,7 +60,7 @@ define(
                             if(paymentMethod) {
                                 if (quote.paymentMethod().method === 'breadcheckout'
                                         && window.checkoutConfig.payment.breadcheckout.transactionId === null) {
-                                    button.embeddedCheckout();
+                                    button.init();
                                 }
                             }          
                 },
