@@ -1064,6 +1064,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @return string
      */
     public function getMerchantCountry($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->_scopeConfig->getValue('general/country/default', $store, $storeCode);
+        return $this->scopeConfig->getValue('general/country/default', $store, $storeCode);
     }
 }
