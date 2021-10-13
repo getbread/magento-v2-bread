@@ -11,6 +11,7 @@
                 <payment_action>authorize</payment_action>
                 <api_mode>0</api_mode>
                 <!-- default to sandbox mode -->
+                <api_version>bread_2</api_version>
                 <incomplete_checkout_message>Please click the pay over time button and complete the finance forms or choose another payment method.</incomplete_checkout_message>
                 <allowcheckoutpdp>1</allowcheckoutpdp>
                 <allowcheckoutcart>1</allowcheckoutcart>

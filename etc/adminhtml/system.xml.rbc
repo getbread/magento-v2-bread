@@ -24,69 +24,43 @@
                     <comment>The Position In the Payment Method List In Checkout</comment>
                     <validate>validate-number</validate>
                 </field>
+                <field id="api_version" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>RBC platform version</label>
+                    <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiVersion</source_model>
+                </field>
                 <field id="api_mode" type="select" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Checkout Mode</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiMode</source_model>
                 </field>                
-                <field id="api_public_key" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_public_key" type="text" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-50</validate>
-                    <label>Production Public Key</label>
+		            <label>Production API Public Key</label>
                     <depends>
                         <field id="api_mode">1</field>
+                        <field id="api_version">bread_2</field>
                     </depends>
                 </field>
-                <field id="api_secret_key" type="obscure" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50</validate>
-                    <label>Production Secret Key</label>
+                <field id="bread_api_secret_key" type="obscure" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+		    <validate>validate-length maximum-length-50</validate>
+                    <label>Production API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <depends>
                         <field id="api_mode">1</field>
+                        <field id="api_version">bread_2</field>
                     </depends>
                 </field>
-                <field id="api_integration_key" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_integration_key" type="text" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Production Integration Key</label>
                     <depends>
                         <field id="api_mode">1</field>
+                        <field id="api_version">bread_2</field>
                     </depends>
-                </field>
-                <field id="api_base_url" type="text" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Production Merchant API Url</label>
+                </field>                                   
+                <field id="bread_api_url" type="text" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Production RBC Payplan URL</label>
                     <depends>
                         <field id="api_mode">1</field>
-                    </depends>
-                    <comment>
-                        <![CDATA[
-                                <div>
-                                    <p>You will get this from your RBC Payplan representative</p>
-                                </div>
-                        ]]>
-                    </comment>
-                </field>                
-                <field id="api_sandbox_public_key" type="text" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50</validate>
-                    <label>Sandbox Public Key</label>
-                    <depends>
-                        <field id="api_mode">0</field>
-                    </depends>
-                </field>
-                <field id="api_sandbox_secret_key" type="obscure" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50</validate>
-                    <label>Sandbox Secret Key</label>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    <depends>
-                        <field id="api_mode">0</field>
-                    </depends>
-                </field>
-                <field id="api_sandbox_integration_key" type="text" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Sandbox Integration Key</label>
-                    <depends>
-                        <field id="api_mode">0</field>
-                    </depends>
-                </field>
-                <field id="api_sandbox_base_url" type="text" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Sandbox Merchant API Url</label>
-                    <depends>
-                        <field id="api_mode">0</field>
+                        <field id="api_version">bread_2</field>
                     </depends>
                     <comment>
                         <![CDATA[
@@ -95,7 +69,45 @@
                                 </div>
                         ]]>
                     </comment>
-                </field>         
+                </field>
+                <field id="bread_api_sandbox_public_key" type="text" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-length maximum-length-50</validate>
+                    <label>Sandbox API Public Key</label>
+                    <depends>
+                        <field id="api_mode">0</field>
+                        <field id="api_version">bread_2</field>
+                    </depends>
+                </field>
+                <field id="bread_api_sandbox_secret_key" type="obscure" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-length maximum-length-50</validate>
+                    <label>Sandbox API Secret Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="api_mode">0</field>
+                        <field id="api_version">bread_2</field>
+                    </depends>
+                </field>
+                <field id="bread_api_sandbox_integration_key" type="text" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox Integration Key</label>
+                    <depends>
+                        <field id="api_mode">0</field>
+                        <field id="api_version">bread_2</field>
+                    </depends>
+                </field>                                   
+                <field id="bread_api_sandbox_url" type="text" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox RBC Payplan URL</label>
+                    <depends>
+                        <field id="api_mode">0</field>
+                        <field id="api_version">bread_2</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[
+                                <div>
+                                    <p>You will get this from your RBC representative</p>
+                                </div>
+                        ]]>
+                    </comment>
+                </field>    
                 <field id="payment_action" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
