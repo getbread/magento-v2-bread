@@ -22,7 +22,7 @@ require(
             "input",function () {
                 var key = "";
                 var secret = "";
-                apiUrl = "";
+                var apiUrl = "";
                 key = apiMode === "1" ? $(breadProdKey).val() : $(breadSandKey).val();
                 secret = apiMode === "1" ? $(breadProdSecret).val() : $(breadSandSecret).val();
                 apiUrl = apiMode === "1" ? $(breadApiUrl).val() : $(breadSandApiUrl).val();

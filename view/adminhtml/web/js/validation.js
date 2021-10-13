@@ -29,7 +29,7 @@ require(
             "input",function () {
                 var key = "";
                 var secret = "";
-                apiUrl = "";
+                var apiUrl = "";
                 if(apiVersion === 'bread_2') {
                     key = apiMode === "1" ? $(breadProdKey).val() : $(breadSandKey).val();
                     secret = apiMode === "1" ? $(breadProdSecret).val() : $(breadSandSecret).val();
