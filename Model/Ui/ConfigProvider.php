@@ -69,7 +69,7 @@ class ConfigProvider implements ConfigProviderInterface {
                     'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
                     'isHealthcare' => $this->helper->isHealthcare(),
                     'country' => $this->helper->getMerchantCountry(),
-                    'client' => 'CORE', //CORE|RBC
+                    'client' => $this->helperData->getConfigClient(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'formId' => 'bread-checkout-embedded',
