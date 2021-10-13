@@ -84,7 +84,6 @@
                     <label>Payment Action</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
                 </field>
-                
                 <field id="enabled_on_product_page" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Product Details Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
