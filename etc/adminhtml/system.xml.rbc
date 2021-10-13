@@ -56,20 +56,6 @@
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>                                   
-                <field id="bread_api_url" type="text" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Production RBC Payplan URL</label>
-                    <depends>
-                        <field id="api_mode">1</field>
-                        <field id="api_version">bread_2</field>
-                    </depends>
-                    <comment>
-                        <![CDATA[
-                                <div>
-                                    <p>You will get this from your RBC representative</p>
-                                </div>
-                        ]]>
-                    </comment>
-                </field>
                 <field id="bread_api_sandbox_public_key" type="text" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-50</validate>
                     <label>Sandbox API Public Key</label>
@@ -93,21 +79,7 @@
                         <field id="api_mode">0</field>
                         <field id="api_version">bread_2</field>
                     </depends>
-                </field>                                   
-                <field id="bread_api_sandbox_url" type="text" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Sandbox RBC Payplan URL</label>
-                    <depends>
-                        <field id="api_mode">0</field>
-                        <field id="api_version">bread_2</field>
-                    </depends>
-                    <comment>
-                        <![CDATA[
-                                <div>
-                                    <p>You will get this from your RBC representative</p>
-                                </div>
-                        ]]>
-                    </comment>
-                </field>    
+                </field>                                    
                 <field id="payment_action" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
