@@ -30,30 +30,38 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
     public $jsonHelper;
 
     /**
+     *
+     * @var \Bread\BreadCheckout\Helper\Data $dataHelper
+     */
+    public $dataHelper;
+
+    /**
      * ValidateCredentials constructor.
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Bread\BreadCheckout\Helper\Log $log
      * @param \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+     * @param \Bread\BreadCheckout\Helper\Data $dataHelper
+     * @param \Magento\Framework\Json\Helper\Data $jsonHelper 
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Log $log,
+        \Bread\BreadCheckout\Helper\Data $dataHelper,
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
         \Magento\Framework\Json\Helper\Data $jsonHelper    
     ) {
         $this->logger = $log;
         $this->configWriter = $configWriter;
         $this->jsonHelper = $jsonHelper;
+        $this->dataHelper = $dataHelper;
         parent::__construct($context);
     }
 
     public function execute()
-    {
+    {       
 
         $params = $this->getRequest()->getParams();
-        $this->logger->log($params);
         $result = $this->testCredentials($params['apiMode'], $params['pubKey'], $params['secKey'], $params['apiVersion']);
-
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($result);
     }
 
@@ -65,7 +73,7 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     'apiKey' => "$username",
                     'secret' => "$password"
                 );
-                $apiUrls = $this->jsonHelper->getApiUrls();
+                $apiUrls = $this->dataHelper->getApiUrls();
                 
                 foreach ($apiUrls as $apiUrl => $tenant) {
                     $url = join('/', [ trim($apiUrl, '/'), 'auth/sa/authenticate' ]);
@@ -89,7 +97,12 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
                     curl_close($curl);
                     if ($status != 200) {
-                        $this->logger->log('Failed keys validation for: ', $apiUrl);
+                        $this->logger->log(
+                            [
+                                'STATUS' => 'KEY/SECRET VALIDATION FAIL',
+                                'RESULT' => $apiUrl
+                            ]
+                        );
                         continue;
                     }
                     $this->configWriter->save('payment/breadcheckout/tenant', $tenant, "default");

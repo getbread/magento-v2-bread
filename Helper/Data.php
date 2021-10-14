@@ -12,7 +12,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const API_URL = array(
         "https://api-preview.platform.breadpayments.com/api" => "CORE",
-        "https://api-preview.platform.breadpayments.com/api" => "CORE",
+        "https://api.platform.breadpayments.com/api" => "CORE",
         "https://api-preview.rbc.breadpayments.com/api" => "RBC", 
         "https://api.rbc.breadpayments.com/api" => "RBC",
         
@@ -163,6 +163,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
+        
         parent::__construct(
             $helperContext
         );
@@ -203,11 +204,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Return api url array
      *
      * @param null 
-     * @return array
+     * @return arr 
      */
     public function getApiUrls() {
         return self::API_URL;
-    }
+    }       
 
     /**
      * Return custom message for non supported product type
