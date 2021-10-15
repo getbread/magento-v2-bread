@@ -10,6 +10,13 @@ namespace Bread\BreadCheckout\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    const API_URL = array(
+        "https://api-preview.platform.breadpayments.com/api" => "CORE",
+        "https://api.platform.breadpayments.com/api" => "CORE",
+        "https://api-preview.rbc.breadpayments.com/api" => "RBC", 
+        "https://api.rbc.breadpayments.com/api" => "RBC",
+        
+    );
     const API_SANDBOX_URI                           = 'https://api-sandbox.getbread.com/';
     const API_LIVE_URI                              = 'https://api.getbread.com/';
 
@@ -101,7 +108,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const API_CART_EXTENSION                        = 'carts/';
     
     //Bread 2.0 configurations
-    const XML_CONFIG_CLIENT                         = 'CORE'; //ADS+Bread = CORE, RBC = RBC
+    const XML_CONFIG_CLIENT                         = 'payment/breadcheckout/tenant';
     const XML_CONFIG_API_VERSION                    = 'payment/breadcheckout/api_version';
     const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
     const XML_CONFIG_BREAD_API_PUB_KEY              = 'payment/breadcheckout/bread_api_public_key';
@@ -156,6 +163,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
+        
         parent::__construct(
             $helperContext
         );
@@ -191,6 +199,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         ];
         return in_array($typeId, $allowedProductTypes);
     }
+
+    /**
+     * Return api url array
+     *
+     * @param null 
+     * @return arr 
+     */
+    public function getApiUrls() {
+        return self::API_URL;
+    }       
 
     /**
      * Return custom message for non supported product type
@@ -1050,12 +1068,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Returns the configured app
+     * Returns the tenant name from the database
      * 
      * @return string
      */
-    public function getConfigClient() {
-        return self::XML_CONFIG_CLIENT;
+    public function getConfigClient($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode);
     }
 
     /**

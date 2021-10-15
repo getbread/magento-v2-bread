@@ -30,33 +30,42 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
     public $jsonHelper;
 
     /**
+     *
+     * @var \Bread\BreadCheckout\Helper\Data $dataHelper
+     */
+    public $dataHelper;
+
+    /**
      * ValidateCredentials constructor.
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Bread\BreadCheckout\Helper\Log $log
      * @param \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+     * @param \Bread\BreadCheckout\Helper\Data $dataHelper
+     * @param \Magento\Framework\Json\Helper\Data $jsonHelper 
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Bread\BreadCheckout\Helper\Log $log,
+        \Bread\BreadCheckout\Helper\Data $dataHelper,
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
         \Magento\Framework\Json\Helper\Data $jsonHelper    
     ) {
         $this->logger = $log;
         $this->configWriter = $configWriter;
         $this->jsonHelper = $jsonHelper;
+        $this->dataHelper = $dataHelper;
         parent::__construct($context);
     }
 
     public function execute()
-    {
+    {       
 
         $params = $this->getRequest()->getParams();
-        $result = $this->testCredentials($params['apiMode'], $params['pubKey'], $params['secKey'], $params['apiVersion'], $params['apiUrl']);
-
+        $result = $this->testCredentials($params['apiMode'], $params['pubKey'], $params['secKey'], $params['apiVersion']);
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($result);
     }
 
-    private function testCredentials($apiMode, $username, $password, $apiVersion, $apiUrl)
+    private function testCredentials($apiMode, $username, $password, $apiVersion)
     {
         if($apiVersion === 'bread_2') {
             try {
@@ -64,43 +73,50 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     'apiKey' => "$username",
                     'secret' => "$password"
                 );
-
-                $url = join('/', [ trim($apiUrl, '/'), 'auth/sa/authenticate' ]);
-                $curl = curl_init($url);
-                curl_setopt($curl, CURLOPT_HEADER, 0);
-                curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-
-                curl_setopt($curl, CURLOPT_POST, 1);
-                curl_setopt(
-                    $curl,
-                    CURLOPT_HTTPHEADER,
-                    [
-                        'Content-Type: application/json',
-                        'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))
-                    ]
-                );
-                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-                $result = curl_exec($curl);
-                $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                curl_close($curl);
-
-                if ($status != 200) {
-                    $this->logger->log('Failed keys validation');
-                    $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0",'default');
-                    return false;
-                } else {
+                $apiUrls = $this->dataHelper->getApiUrls();
+                
+                foreach ($apiUrls as $apiUrl => $tenant) {
+                    $url = join('/', [ trim($apiUrl, '/'), 'auth/sa/authenticate' ]);
+                    $curl = curl_init($url);
+                    curl_setopt($curl, CURLOPT_HEADER, 0);
+                    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+    
+                    curl_setopt($curl, CURLOPT_POST, 1);
+                    curl_setopt(
+                        $curl,
+                        CURLOPT_HTTPHEADER,
+                        [
+                            'Content-Type: application/json',
+                            'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))
+                        ]
+                    );
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    
+                    $result = curl_exec($curl);
+                    $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                    curl_close($curl);
+                    if ($status != 200) {
+                        $this->logger->log(
+                            [
+                                'STATUS' => 'KEY/SECRET VALIDATION FAIL',
+                                'RESULT' => $apiUrl
+                            ]
+                        );
+                        continue;
+                    }
+                    $this->configWriter->save('payment/breadcheckout/tenant', $tenant, "default");
                     $response = (array) $this->jsonHelper->jsonDecode($result);
                     if(isset($response['token'])) {
                         $this->configWriter->save('payment/breadcheckout/bread_auth_token', $response['token'],'default');
                         return true;
-                    } else {
-                        $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0",'default');
                     }
-                    return false;
+                    break;  
                 }
-
+                // Case for all api urls calls returning status != 200 or token is not set in response
+                $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0",'default');
+                $this->configWriter->save('payment/breadcheckout/tenant', "CORE", "default");
+                return false;
 
             } catch (Exception $ex) {
                 $this->logger->log(
