@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="rbccheckout" type="text" sortOrder="305" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+            <group id="breadcheckout" type="text" sortOrder="305" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                 <label>Payplan by RBC</label>
                 <fieldset_css>complex</fieldset_css>
                 <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>
@@ -84,32 +84,32 @@
                     <label>Payment Action</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
                 </field>
-                <field id="enabled_on_product_page" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_product_page" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Product Details Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="enabled_on_cart_page" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_cart_page" type="select" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Cart Overview Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="allowminicartcheckout" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowminicartcheckout" type="select" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Mini Cart Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="display_as_payment_method" type="select" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="display_as_payment_method" type="select" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Display as Payment Method on Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="title" type="text" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="title" type="text" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Method Title</label>
                     <comment>
                         <![CDATA[
@@ -119,7 +119,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="embedded" type="select" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="embedded" type="select" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
@@ -134,7 +134,7 @@
                     </comment>
                 </field>
                    
-                <field id="product_type_msg" type="textarea" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="product_type_msg" type="textarea" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Invalid product type message</label>
                     <depends>
                         <field id="api_version">classic</field>
@@ -147,7 +147,7 @@
 				            ]]>
                     </comment>
                 </field>
-                <group id="rbc_advanced" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                <group id="rbc_advanced" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>RBC Payplan Advanced Settings</label>
                     <!-- threshold_amount is a global threshold not to be confused with financing -->
                     <field id="threshold_amount" type="text" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">

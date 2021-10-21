@@ -5,14 +5,12 @@ require(
         'domReady!'
     ],
     function ($, alert) {
-        var apiMode = $("#payment_us_breadcheckout_api_mode").val(),
+        var apiMode = $("#payment_ca_breadcheckout_api_mode").val(),
             apiVersion = 'bread_2',    
-            breadProdKey = "#payment_us_breadcheckout_bread_api_public_key",
-            breadProdSecret = "#payment_us_breadcheckout_bread_api_secret_key",
-            breadApiUrl = "#payment_us_breadcheckout_bread_api_url",
-            breadSandKey = "#payment_us_breadcheckout_bread_api_sandbox_public_key",
-            breadSandSecret = "#payment_us_breadcheckout_bread_api_sandbox_secret_key",
-            breadSandApiUrl = "#payment_us_breadcheckout_bread_api_sandbox_url",
+            breadProdKey = "#payment_ca_breadcheckout_bread_api_public_key",
+            breadProdSecret = "#payment_ca_breadcheckout_bread_api_secret_key",
+            breadSandKey = "#payment_ca_breadcheckout_bread_api_sandbox_public_key",
+            breadSandSecret = "#payment_ca_breadcheckout_bread_api_sandbox_secret_key",
             validationUrl = window.location.origin + "/admin/breadadmin/bread/validateCredentials";
     
             var selector = [breadProdKey,breadProdSecret,breadSandKey,breadSandSecret].join(", ");
@@ -22,10 +20,8 @@ require(
             "input",function () {
                 var key = "";
                 var secret = "";
-                var apiUrl = "";
                 key = apiMode === "1" ? $(breadProdKey).val() : $(breadSandKey).val();
                 secret = apiMode === "1" ? $(breadProdSecret).val() : $(breadSandSecret).val();
-                apiUrl = apiMode === "1" ? $(breadApiUrl).val() : $(breadSandApiUrl).val();
 
                 var secretKeyEntered = secret.indexOf('*') === -1;
 
@@ -36,7 +32,6 @@ require(
                             data: {
                                 form_key: window.FORM_KEY,
                                 apiVersion: apiVersion,
-                                apiUrl: apiUrl,
                                 apiMode: apiMode,
                                 pubKey: key,
                                 secKey: secret

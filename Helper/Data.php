@@ -10,13 +10,18 @@ namespace Bread\BreadCheckout\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const API_URL = array(
-        "https://api-preview.platform.breadpayments.com/api" => "CORE",
-        "https://api.platform.breadpayments.com/api" => "CORE",
-        "https://api-preview.rbc.breadpayments.com/api" => "RBC", 
-        "https://api.rbc.breadpayments.com/api" => "RBC",
-        
+    
+    const API_PLATFORM_URI = array(
+        'SANDBOX' => array(
+            'RBC'  => "https://api.rbc.breadpayments.com/api",
+            'CORE' => "https://api-preview.platform.breadpayments.com/api"
+        ),
+        'LIVE'    => array(
+            'RBC'  => "https://api-preview.rbc.breadpayments.com/api",
+            'CORE' => "https://api.platform.breadpayments.com/api"
+        )
     );
+    
     const API_SANDBOX_URI                           = 'https://api-sandbox.getbread.com/';
     const API_LIVE_URI                              = 'https://api.getbread.com/';
 
@@ -206,8 +211,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null 
      * @return arr 
      */
-    public function getApiUrls() {
-        return self::API_URL;
+    public function getPlatformApiUri() {
+        return self::API_PLATFORM_URI;
     }       
 
     /**
