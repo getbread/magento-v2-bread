@@ -73,10 +73,17 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                     'apiKey' => "$username",
                     'secret' => "$password"
                 );
-                $apiUrls = $this->dataHelper->getApiUrls();
+                $apiUrls = $this->dataHelper->getPlatformApiUri();
+                $apiMode === '1' ? 'LIVE' : 'SANDBOX';
+                $tenantLoaded = false;
+                $response = null;
                 
-                foreach ($apiUrls as $apiUrl => $tenant) {
-                    $url = join('/', [ trim($apiUrl, '/'), 'auth/sa/authenticate' ]);
+                foreach($apiUrls[$apiMode] as $tenantName => $link) {
+                    if($tenantLoaded) {
+                        continue;
+                    }
+                    
+                    $url = join('/', [ trim($link, '/'), 'auth/sa/authenticate' ]);
                     $curl = curl_init($url);
                     curl_setopt($curl, CURLOPT_HEADER, 0);
                     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
@@ -100,24 +107,26 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
                         $this->logger->log(
                             [
                                 'STATUS' => 'KEY/SECRET VALIDATION FAIL',
-                                'RESULT' => $apiUrl
+                                'RESULT' => 'Key validation failed'
                             ]
                         );
                         continue;
-                    }
-                    $this->configWriter->save('payment/breadcheckout/tenant', $tenant, "default");
-                    $response = (array) $this->jsonHelper->jsonDecode($result);
-                    if(isset($response['token'])) {
-                        $this->configWriter->save('payment/breadcheckout/bread_auth_token', $response['token'],'default');
-                        return true;
-                    }
-                    break;  
+                    } else {
+                        $response = (array) $this->jsonHelper->jsonDecode($result);
+                        if(isset($response['token'])) {
+                            $tenantLoaded = true;
+                            $this->configWriter->save('payment/breadcheckout/tenant', $tenantName, "default");
+                            $this->configWriter->save('payment/breadcheckout/bread_auth_token', $response['token'],'default');
+                            return true;
+                        }                        
+                    }            
                 }
+                
                 // Case for all api urls calls returning status != 200 or token is not set in response
-                $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0",'default');
+                $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0", 'default');
                 $this->configWriter->save('payment/breadcheckout/tenant', "CORE", "default");
                 return false;
-
+                
             } catch (Exception $ex) {
                 $this->logger->log(
                     [

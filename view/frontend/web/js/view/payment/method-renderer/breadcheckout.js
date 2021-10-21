@@ -124,7 +124,7 @@ define(
                 initComplete: function () {
                     var data = window.checkoutConfig.payment[this.getCode()].breadConfig; 
                     if(window.checkoutConfig.payment[this.getCode()].apiVersion === 'bread_2') {
-                        if (typeof window.BreadPayments !== 'undefined') {
+                        if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                             button.configure(data, this);                            
                         }
                         return true;
