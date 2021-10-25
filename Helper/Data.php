@@ -13,11 +13,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     
     const API_PLATFORM_URI = array(
         'SANDBOX' => array(
-            'RBC'  => "https://api.rbc.breadpayments.com/api",
+            'RBC'  => "https://api-preview.rbc.breadpayments.com/api",
             'CORE' => "https://api-preview.platform.breadpayments.com/api"
         ),
         'LIVE'    => array(
-            'RBC'  => "https://api-preview.rbc.breadpayments.com/api",
+            'RBC'  => "https://api.rbc.breadpayments.com/api",
             'CORE' => "https://api.platform.breadpayments.com/api"
         )
     );
