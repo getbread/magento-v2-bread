@@ -41,6 +41,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_CONFIG_AS_LOW_AS                      = 'payment/breadcheckout/as_low_as';
     const XML_CONFIG_PAYMENT_ACTION                 = 'payment/breadcheckout/payment_action';
     const XML_CONFIG_HEALTHCARE_MODE                = 'payment/breadcheckout/healthcare_mode';
+    const XML_CONFIG_SHOW_SPLITPAY_LABEL            = 'payment/breadcheckout/show_splitpay_label';
     const XML_CONFIG_ACTIVE_ON_PDP                  = 'payment/breadcheckout/enabled_on_product_page';
     const XML_CONFIG_ACTIVE_ON_CAT                  = 'payment/breadcheckout/bread_category/enabled_on_category_page';
     const XML_CONFIG_ACTIVE_ON_CART_VIEW            = 'payment/breadcheckout/enabled_on_cart_page';
@@ -538,6 +539,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) (
             $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store, $storeCode)
+        );
+    }
+    
+    /**
+     * Are we showing the split pay label
+     * 
+     * @param null $store
+     * @return bool
+     */
+    public function showSplitpayLabelOnCheckout($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) (
+            $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_SHOW_SPLITPAY_LABEL, $store, $storeCode)
         );
     }
 

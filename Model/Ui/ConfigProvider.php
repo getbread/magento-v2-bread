@@ -76,7 +76,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'methodTooltip' => $this->helper->getMethodTooltip(),
                         'productTypeMessage' => $this->helperData->getProductTypeMessage(),
                         'cartValidation' => $this->helper->validateAllowedProductTypes(),
-                        'methodTitle' => $this->breadMethod->getTitle()
+                        'methodTitle' => $this->breadMethod->getTitle(),
+                        'showSplitpayLabel' => $this->helper->showSplitpayLabelOnCheckout()
                     ]
                 ]
             ]
