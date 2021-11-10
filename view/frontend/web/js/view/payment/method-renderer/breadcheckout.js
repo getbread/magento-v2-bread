@@ -87,9 +87,14 @@ define(
                     var SPLITPAY_GREEN = '#57c594';
                     var label = jQuery('#breadcheckout').next('label').attr("for", "breadcheckout");
                     label.text('');
-                    label.append('Pay Over Time with ' +
+                    if(window.checkoutConfig.payment[this.getCode()].breadConfig.showSplitpayLabel) {
+                        label.append('Pay Over Time with ' +
                         '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span> or ' +
                         '<span style="color: ' + SPLITPAY_GREEN + '; font-weight: 600;">SplitPay</span>');
+                    } else {
+                        label.append('Pay Over Time with ' +
+                        '<span style="color: ' + INSTALLMENTS_BLUE + '; font-weight: 600;">Installments</span>');
+                    }
                     return window.checkoutConfig.payment[this.getCode()].breadConfig.methodTitle;
                 },
 

@@ -104,18 +104,25 @@
                                 ]]>
                     </comment>
                 </field>
-                <field id="use_default_button_size" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="show_splitpay_label" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Splipay label on checkout title</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="use_default_button_size" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use default button size</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="button_on_products" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="button_on_products" type="select" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Display as Button on Product Detail Pages When Logged In</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="button_design" type="textarea" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="button_design" type="textarea" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Bread Button Design</label>
                     <comment>
                         <![CDATA[
@@ -125,7 +132,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="title" type="text" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="title" type="text" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Method Title</label>
                     <comment>
                         <![CDATA[
@@ -135,7 +142,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="incomplete_checkout_message" type="textarea" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="incomplete_checkout_message" type="textarea" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Incomplete Bread Checkout error</label>
                     <comment>
                         <![CDATA[
@@ -145,7 +152,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="allowcheckoutpdp" type="select" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowcheckoutpdp" type="select" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow Checkout From Bread Pop Up On Product Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -161,7 +168,7 @@
                          ]]>
                     </comment>
                 </field>
-                <field id="allowcheckoutcart" type="select" sortOrder="19" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowcheckoutcart" type="select" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow Checkout From Bread Pop Up On Cart Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -177,15 +184,15 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="allowminicartcheckout" type="select" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowminicartcheckout" type="select" sortOrder="21" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow checkout from mini cart</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="embedded" type="select" sortOrder="21" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="embedded" type="select" sortOrder="22" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="split_auto_cancel" type="select" sortOrder="22" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="split_auto_cancel" type="select" sortOrder="23" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Auto-cancel Failed Split-Pay Orders</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -196,7 +203,7 @@
 				            ]]>
                     </comment>
                 </field>
-                <field id="per_month" type="select" sortOrder="23" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="per_month" type="select" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label><![CDATA[Show "As Low As" price]]></label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -207,7 +214,7 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="product_type_msg" type="textarea" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="product_type_msg" type="textarea" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Invalid product type message</label>
                     <comment>
                         <![CDATA[
