@@ -29,6 +29,7 @@
                     bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
                     let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
                     let itemsObject = [];
+                    <?php if(!$block->isHealthcare()) : ?>
                     for (var i = 0; i < items.length; i++) {
                         let item = {
                             name: items[i].name,
@@ -44,12 +45,13 @@
                             },
                             unitPrice: {
                                 currency: currentCurrencyCode,
-                                value: items[i].price,
+                                value: items[i].price
                             }
                         };
 
                         itemsObject.push(item);
                     }
+                    <?php endif; ?>
                     bread_sdk.registerPlacements([{
                         allowCheckout: false,
                         domID: 'splitpay-clickable-price',
@@ -76,7 +78,7 @@
                                 value: 0,
                                 currency: currentCurrencyCode
                             }
-                        },
+                        }
                     }]);
 
                     bread_sdk.__internal__.setInitMode('manual');

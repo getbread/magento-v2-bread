@@ -101,20 +101,23 @@ define(
             let items = window.checkoutConfig.payment.breadcheckout.breadConfig.items;
 
             let itemsObject = [];
-            for (var i = 0; i < items.length; i++) {
-                let item = {
-                    name: items[i].name,
-                    quantity: items[i].quantity,
-                    shippingCost: {value: 0, currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode},
-                    shippingDescription: '',
-                    unitTax: {value: 0, currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode},
-                    unitPrice: {
-                        currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
-                        value: items[i].price
-                    }
-                };
+            //For Healthcare mode we are not sending cart items
+            if(!window.checkoutConfig.payment.breadcheckout.isHealthcare) {
+                for (var i = 0; i < items.length; i++) {
+                        let item = {
+                            name: items[i].name,
+                            quantity: items[i].quantity,
+                            shippingCost: {value: 0, currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode},
+                            shippingDescription: '',
+                            unitTax: {value: 0, currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode},
+                            unitPrice: {
+                                currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
+                                value: items[i].price
+                            }
+                        };
 
-                itemsObject.push(item);
+                        itemsObject.push(item);
+                    }
             }
             this.breadConfigV2.items = itemsObject;
 

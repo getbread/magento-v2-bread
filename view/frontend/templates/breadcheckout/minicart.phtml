@@ -41,6 +41,7 @@
                     var total = 0;
                     let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
                     let itemsObject = [];
+                    <?php if(!$block->isHealthcare()) : ?>
                     for (var i = 0; i < items.length; i++) {
                         total += items[i].price * items[i].quantity;
                         let item = {
@@ -63,7 +64,7 @@
 
                         itemsObject.push(item);
                     }
-
+                    <?php endif; ?>
                     let discountData = {
                         value: 0,
                         currency: currentCurrencyCode
