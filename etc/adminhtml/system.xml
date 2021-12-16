@@ -152,7 +152,6 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
-                        <field id="api_version">classic</field>
                     </depends>
                     <comment>
                         <![CDATA[

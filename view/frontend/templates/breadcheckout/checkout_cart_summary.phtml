@@ -26,6 +26,7 @@
                     var total = 0;
                     let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
                     let itemsObject = [];
+                    <?php if (!$block->isHealthcare()) : ?>
                     for (var i = 0; i < items.length; i++) {
                         total += items[i].price * items[i].quantity;
 
@@ -49,8 +50,9 @@
 
                         itemsObject.push(item);
                     }
+                    <?php endif; ?>
                     //Calculate discounts
-                    let discounts = <?= /* @noEscape */ $block->quoteHelper->getDiscountData(); ?>;
+                    let discounts = <?= /* @noEscape */ $block->getDiscountDataJson(); ?>;
                     let discountAmount = -document.round(discounts.amount !== undefined ? discounts.amount : 0);
                     let discountData = {
                         value: 0,

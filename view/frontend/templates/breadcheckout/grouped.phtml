@@ -17,6 +17,133 @@
 </div>
 
 <script>
+    <?php if ($block->getApiVersion() === 'bread_2') : ?>
+        require(['jquery'], function($) {
+            document.configureButton = function (items) {
+                if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                    let bread_sdk = null;
+                    let config_client = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                    if (config_client === 'RBC') {
+                        bread_sdk = window.RBCPayPlan;
+                    } else {
+                        bread_sdk = window.BreadPayments;
+                    }
+                    let onApproved = function onApproved(application) {};
+                    let onCheckout = function onCheckout(application) {};
+                    bread_sdk.setup({
+                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                    });
+                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                    let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
+                    let itemsObject = [];
+                    var total = 0;
+                    for(var i = 0; i < items.length; i++){
+                        total += items[i]['price'] * items[i]['quantity'];
+                    }
+                    <?php if(!$block->isHealthcare()) : ?>
+                    for (var i = 0; i < items.length; i++) {
+                        let item = {
+                            name: items[i].name,
+                            quantity: items[i].quantity,
+                            shippingCost: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            shippingDescription: '',
+                            unitTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            unitPrice: {
+                                currency: currentCurrencyCode,
+                                value: items[i].price
+                            }
+                        };
+
+                        itemsObject.push(item);
+                    }
+                    <?php endif; ?>
+                    bread_sdk.registerPlacements([{
+                        allowCheckout: false,
+                        domID: 'bread-checkout-btn',
+                        order: {
+                            currency: currentCurrencyCode,
+                            items: itemsObject,
+                            subTotal: {
+                                value: total,
+                                currency: currentCurrencyCode
+                            },
+                            totalPrice: {
+                                value: total,
+                                currency: currentCurrencyCode
+                            },
+                            totalDiscounts: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalShipping: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            }
+                        }
+                    }]);
+                    bread_sdk.__internal__.setInitMode('manual');
+                    bread_sdk.__internal__.init();    
+                }
+            };
+            $(document).ready(function() {
+
+               /**
+                * Overlay element onto bread button to prevent
+                * it from being clicked until options are selected
+                */
+                $('#button-prevent').show();
+                $('#button-prevent-updating').hide();
+
+                $('#product_addtocart_form').on('change', function() {
+                    document.updateButton(this);
+                });
+
+                <?php if ($block->getProduct() != null) : ?>
+                    document.configureButton(<?= /* @noEscape */ $block->getGroupedDataJson(); ?>);
+                <?php endif; ?>
+            });
+            
+            document.updateButton = function(form) {
+                if ($(form).valid()) {
+                    $('#button-prevent').hide();
+                    $('#button-prevent-updating').show();
+
+                    var groupedButtonUpdateUrl = '<?= /* @noEscape */ $block->getGroupedButtonUpdate()?>';
+                    var serializedForm = $(form).serialize();
+
+                    $.ajax({
+                        url: groupedButtonUpdateUrl,
+                        data: serializedForm,
+                        type: 'post',
+                        context: this
+                    }).done(function(response) {
+                        if (response.items) {
+                            document.configureButton(response.items);
+                        } else {
+                            $('#button-prevent').show();
+                        }
+                    }).fail(function(error) {
+                        var errorInfo = {
+                            data: serializedForm,
+                        };
+                        document.logBreadIssue('error', errorInfo,
+                            'Error code returned when calling ' + groupedButtonUpdateUrl + ', with status: ' + error.statusText);
+                    });
+                }
+            };
+        });
+    <?php else : ?>    
     require([
         'jquery',
         'splitPay',
@@ -280,4 +407,5 @@
         };
 
     });
+    <?php endif; ?>
 </script>
