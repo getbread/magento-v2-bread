@@ -4,12 +4,12 @@
  * API version options
  *
  * @copyright (c) Bread
- * @author Kiprotich
+ * @author Kip
  */
 
 namespace Bread\BreadCheckout\Model\System\Config\Source;
 
-class ApiVersionRbc implements \Magento\Framework\Option\ArrayInterface {
+class TenantRbc implements \Magento\Framework\Option\ArrayInterface {
 
     /**
      * Options getter
@@ -18,7 +18,7 @@ class ApiVersionRbc implements \Magento\Framework\Option\ArrayInterface {
      */
     public function toOptionArray() {
         return [
-            ['value' => 'bread_2', 'label' => __('RBC platform')],
+            ['value' => 'rbc', 'label' => __('Payplan by RBC')],
         ];
     }
 
@@ -29,7 +29,7 @@ class ApiVersionRbc implements \Magento\Framework\Option\ArrayInterface {
      */
     public function toArray() {
         return [
-            'bread_2' => __('RBC platform'),
+            'rbc' => __('Payplan by RBC'),
         ];
     }
 

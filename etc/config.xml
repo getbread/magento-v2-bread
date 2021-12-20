@@ -16,7 +16,7 @@
                 <allowcheckoutpdp>1</allowcheckoutpdp>
                 <allowcheckoutcart>1</allowcheckoutcart>
                 <allowspecific>1</allowspecific>
-                <specificcountry>US</specificcountry>
+                <specificcountry>US,CA</specificcountry>
                 <create_order_before>1</create_order_before>
                 <product_type_msg>Gift cards cannot be purchased with financing. Please remove any gift cards from your cart and try again.</product_type_msg>
                 <order_shipped>1</order_shipped>

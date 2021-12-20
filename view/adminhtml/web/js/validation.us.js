@@ -16,15 +16,17 @@ require(
             breadProdSecret = "#payment_us_breadcheckout_bread_api_secret_key",
             breadSandKey = "#payment_us_breadcheckout_bread_api_sandbox_public_key",
             breadSandSecret = "#payment_us_breadcheckout_bread_api_sandbox_secret_key",
+            tenant = $("#payment_us_breadcheckout_tenant").val(),
             validationUrl = window.location.origin + "/admin/breadadmin/bread/validateCredentials";
 
         var selector = apiVersion === 'bread_2' ?
-            [breadProdKey, breadProdSecret, breadSandKey, breadSandSecret].join(", ") :
+            [breadProdKey, breadProdSecret, breadSandKey, breadSandSecret, tenant].join(", ") :
             [prodKey, prodSecret, sandKey, sandSecret].join(", ");
 
 
         $(selector).on(
             "input", function () {
+                var tenant = "";
                 var key = "";
                 var secret = "";
                 if (apiVersion === 'bread_2') {
@@ -46,7 +48,8 @@ require(
                             apiVersion: apiVersion,
                             apiMode: apiMode,
                             pubKey: key,
-                            secKey: secret
+                            secKey: secret,
+                            tenant: tenant
                         }
                     }
                     ).done(

@@ -61,70 +61,62 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
     {       
 
         $params = $this->getRequest()->getParams();
-        $result = $this->testCredentials($params['apiMode'], $params['pubKey'], $params['secKey'], $params['apiVersion']);
+        $result = $this->testCredentials($params['apiMode'], $params['pubKey'], $params['secKey'], $params['apiVersion'], $params['tenant']);
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)->setData($result);
     }
 
-    private function testCredentials($apiMode, $username, $password, $apiVersion)
+    private function testCredentials($apiMode, $username, $password, $apiVersion,$tenant)
     {
         if($apiVersion === 'bread_2') {
+            $tenant = strtoupper($tenant);
             try {
                 $data = array(
                     'apiKey' => "$username",
                     'secret' => "$password"
                 );
-                $apiUrls = $this->dataHelper->getPlatformApiUri();
                 $apiMode === '1' ? 'LIVE' : 'SANDBOX';
+                $link = $this->dataHelper->getPlatformApiUri($tenant, $apiMode);                
                 $tenantLoaded = false;
                 $response = null;
                 
-                foreach($apiUrls[$apiMode] as $tenantName => $link) {
-                    if($tenantLoaded) {
-                        continue;
-                    }
-                    
-                    $url = join('/', [ trim($link, '/'), 'auth/sa/authenticate' ]);
-                    $curl = curl_init($url);
-                    curl_setopt($curl, CURLOPT_HEADER, 0);
-                    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-    
-                    curl_setopt($curl, CURLOPT_POST, 1);
-                    curl_setopt(
+                $url = join('/', [trim($link, '/'), 'auth/sa/authenticate']);
+                $curl = curl_init($url);
+                curl_setopt($curl, CURLOPT_HEADER, 0);
+                curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+
+                curl_setopt($curl, CURLOPT_POST, 1);
+                curl_setopt(
                         $curl,
                         CURLOPT_HTTPHEADER,
                         [
                             'Content-Type: application/json',
                             'Content-Length: ' . strlen($this->jsonHelper->jsonEncode($data))
                         ]
-                    );
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    
-                    $result = curl_exec($curl);
-                    $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                    curl_close($curl);
-                    if ($status != 200) {
-                        $this->logger->log(
+                );
+                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+                $result = curl_exec($curl);
+                $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                curl_close($curl);
+                if ($status != 200) {
+                    $this->logger->log(
                             [
                                 'STATUS' => 'KEY/SECRET VALIDATION FAIL',
                                 'RESULT' => 'Key validation failed'
                             ]
-                        );
-                        continue;
-                    } else {
-                        $response = (array) $this->jsonHelper->jsonDecode($result);
-                        if(isset($response['token'])) {
-                            $tenantLoaded = true;
-                            $this->configWriter->save('payment/breadcheckout/tenant', $tenantName, "default");
-                            $this->configWriter->save('payment/breadcheckout/bread_auth_token', $response['token'],'default');
-                            return true;
-                        }                        
-                    }            
+                    );
+                    return false;
+                } else {
+                    $response = (array) $this->jsonHelper->jsonDecode($result);
+                    if (isset($response['token'])) {
+                        $tenantLoaded = true;
+                        $this->configWriter->save('payment/breadcheckout/bread_auth_token', $response['token'], 'default');
+                        return true;
+                    }
                 }
-                
                 // Case for all api urls calls returning status != 200 or token is not set in response
                 $this->configWriter->save('payment/breadcheckout/bread_auth_token', "0", 'default');
-                $this->configWriter->save('payment/breadcheckout/tenant', "CORE", "default");
                 return false;
                 
             } catch (Exception $ex) {
