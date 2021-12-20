@@ -11,16 +11,11 @@ namespace Bread\BreadCheckout\Helper;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     
-    const API_PLATFORM_URI = array(
-        'SANDBOX' => array(
-            'RBC'  => "https://api-preview.rbc.breadpayments.com/api",
-            'CORE' => "https://api-preview.platform.breadpayments.com/api"
-        ),
-        'LIVE'    => array(
-            'RBC'  => "https://api.rbc.breadpayments.com/api",
-            'CORE' => "https://api.platform.breadpayments.com/api"
-        )
-    );
+    const API_PLATFORM_URI_RBC_LIVE = "https://api.rbc.breadpayments.com/api";
+    const API_PLATFORM_URI_RBC_SANDBOX = "https://api.rbcpayplan.com/api";
+    
+    const API_PLATFORM_URI_CORE_LIVE = "https://api.platform.breadpayments.com/api";
+    const API_PLATFORM_URI_CORE_SANDBOX = "https://api-preview.platform.breadpayments.com/api";
     
     const API_SANDBOX_URI                           = 'https://api-sandbox.getbread.com/';
     const API_LIVE_URI                              = 'https://api.getbread.com/';
@@ -211,8 +206,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null 
      * @return arr 
      */
-    public function getPlatformApiUri() {
-        return self::API_PLATFORM_URI;
+    public function getPlatformApiUri($tenant, $env) {
+        switch($tenant) {
+            case 'RBC':
+                if($env === 'LIVE') {
+                    return self::API_PLATFORM_URI_RBC_LIVE;
+                } else {
+                    return self::API_PLATFORM_URI_RBC_SANDBOX;
+                }
+                break;
+            case 'CORE':
+            default:
+                if($env === 'LIVE') {
+                    return self::API_PLATFORM_URI_CORE_LIVE;
+                } else {
+                    return self::API_PLATFORM_URI_CORE_SANDBOX;
+                }
+        }
     }       
 
     /**
@@ -341,10 +351,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $apiVersion = $this->getApiVersion();
         if($apiVersion === 'bread_2') {
+            $tenant = strtoupper($this->getConfigClient());
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
-                return $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_URL, $store, $storeCode);
+                return $this->getPlatformApiUri($tenant, 'LIVE');
             } else {
-                return $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_SANDBOX_URL, $store, $storeCode);
+                return $this->getPlatformApiUri($tenant, 'SANDBOX');
             }
         } else {
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
@@ -1078,7 +1089,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @return string
      */
     public function getConfigClient($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode);
+        return strtoupper($this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode));
     }
 
     /**
