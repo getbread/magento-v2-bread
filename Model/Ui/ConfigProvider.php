@@ -5,6 +5,7 @@
  *
  * @author Bread   copyright   2016
  * @author Miranda @Mediotype
+ * @author Kip     @Bread
  */
 
 namespace Bread\BreadCheckout\Model\Ui;
