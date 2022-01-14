@@ -11,8 +11,8 @@ namespace Bread\BreadCheckout\Helper;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     
-    const API_PLATFORM_URI_RBC_LIVE = "https://api.rbc.breadpayments.com/api";
-    const API_PLATFORM_URI_RBC_SANDBOX = "https://api.rbcpayplan.com/api";
+    const API_PLATFORM_URI_RBC_LIVE = "https://api.rbcpayplan.com/api";
+    const API_PLATFORM_URI_RBC_SANDBOX = "https://api.rbc.breadpayments.com/api";
     
     const API_PLATFORM_URI_CORE_LIVE = "https://api.platform.breadpayments.com/api";
     const API_PLATFORM_URI_CORE_SANDBOX = "https://api-preview.platform.breadpayments.com/api";
