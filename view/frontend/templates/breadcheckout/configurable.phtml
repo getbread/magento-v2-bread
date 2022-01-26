@@ -7,7 +7,7 @@
 
     require(['jquery', 'underscore'], function($, _) {
         $(document).ready(function () {
-
+            var apiVersion = <?= /* @noEscape */ $block->getApiVersion(); ?>; 
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
@@ -38,9 +38,11 @@
                         /** Reconfigure Bread button if we narrowed it down to 1 product */
                         document.selectedSimpleProductId = newProductId;
                         document.selectedSku = document.baseProductSku + "///" +
-                            document.Skus[document.selectedSimpleProductId];
+                        document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
-                        document.splitPayResetPriceAndSku(true);
+                        if(apiVersion !== 'bread_2') {
+                            document.splitPayResetPriceAndSku(true);
+                        }
                     }
                 }
             };

@@ -242,7 +242,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('Void action is not available.'));
         }
 
-        return $this->_place($payment, 0, self::ACTION_VOID);
+        return $this->_place($payment, 0, self::ACTION_VOID, $this->helper->getCurrentCurrencyCode());
     }
 
     /**
@@ -311,7 +311,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
         
         $apiVersion = $this->helper->getApiVersion();
-
+        $result = null;
         if ($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE) {
             $this->apiClient->setOrder($payment->getOrder());
 
@@ -342,7 +342,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $payment->setAmount($amount);
         if($apiVersion === 'bread_2') {           
             $settledAmount = ($this->priceCurrency->round($amount) * 100);
-            $this->_place($payment, $settledAmount, self::ACTION_CAPTURE);
+            $this->_place($payment, $settledAmount, self::ACTION_CAPTURE, $this->helper->getCurrentCurrencyCode());
         } else {                      
             $this->_place($payment, $amount, self::ACTION_CAPTURE);
         }
@@ -380,7 +380,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('Refund action is not available.'));
         }
 
-        return $this->_place($payment, $amount, self::ACTION_REFUND);
+        return $this->_place($payment, $amount, self::ACTION_REFUND, $this->helper->getCurrentCurrencyCode());
     }
 
     /**
@@ -416,7 +416,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * @return mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType)
+    protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType, $currency = null)
     {
         $this->apiClient->setOrder($payment->getOrder());
         $apiVersion = $this->helper->getApiVersion();
@@ -463,7 +463,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 );
                 break;
             case self::ACTION_CAPTURE:
-                $result     = $this->apiClient->settle($this->getValidatedTxId($payment), $amount);               
+                $result     = $this->apiClient->settle($this->getValidatedTxId($payment), $amount, $currency);               
                 if($apiVersion === 'bread_2') {
                     $payment->setTransactionId($result['id']);
                 } else {
@@ -480,7 +480,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             case self::ACTION_REFUND:
                 $result     = $this->apiClient->refund(
                     $this->getValidatedTxId($payment),
-                    ($this->priceCurrency->round($amount) * 100)
+                    ($this->priceCurrency->round($amount) * 100),
+                    [],
+                    $currency
                 );
                 $payment->setTransactionId($payment->getTransactionId())
                     ->setAmount($amount)
