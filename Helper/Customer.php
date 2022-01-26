@@ -76,7 +76,6 @@ class Customer extends Data
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Model\AddressFactory $customerAddressFactory,
@@ -87,9 +86,9 @@ class Customer extends Data
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
-        \Bread\BreadCheckout\Helper\Log $logger
+        \Bread\BreadCheckout\Helper\Log $logger,
+        \Magento\Store\Model\StoreManagerInterface $storeManager    
     ) {
-        $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
         $this->customerFactory = $customerFactory;
         $this->customerAddressFactory = $customerAddressFactory;
@@ -101,7 +100,7 @@ class Customer extends Data
         $this->customerRepository = $customerRepository;
         $this->addressRepository = $addressRepository;
         $this->logger = $logger;
-        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory,$storeManager);
     }
     /**
      * Pass Back Bread Formatted Default Customer Address If It Exists

@@ -19,17 +19,21 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="sort_order" type="text" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="tenant" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tenant</label>
+                    <source_model>Bread\BreadCheckout\Model\System\Config\Source\TenantRbc</source_model>
+                </field>
+                <field id="sort_order" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <comment>The Position In the Payment Method List In Checkout</comment>
                     <validate>validate-number</validate>
                 </field>
                 
-                <field id="api_mode" type="select" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_mode" type="select" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API Mode</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiMode</source_model>
                 </field>                
-                <field id="bread_api_public_key" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_public_key" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-50</validate>
 		            <label>Production API Public Key</label>
                     <depends>
@@ -37,7 +41,7 @@
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>
-                <field id="bread_api_secret_key" type="obscure" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_secret_key" type="obscure" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
 		    <validate>validate-length maximum-length-50</validate>
                     <label>Production API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
@@ -46,14 +50,14 @@
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>
-                <field id="bread_api_integration_key" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_integration_key" type="text" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Production Integration Key</label>
                     <depends>
                         <field id="api_mode">1</field>
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>                                   
-                <field id="bread_api_sandbox_public_key" type="text" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_sandbox_public_key" type="text" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-50</validate>
                     <label>Sandbox API Public Key</label>
                     <depends>
@@ -61,7 +65,7 @@
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>
-                <field id="bread_api_sandbox_secret_key" type="obscure" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_sandbox_secret_key" type="obscure" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>validate-length maximum-length-50</validate>
                     <label>Sandbox API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
@@ -70,43 +74,43 @@
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>
-                <field id="bread_api_sandbox_integration_key" type="text" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bread_api_sandbox_integration_key" type="text" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Sandbox Integration Key</label>
                     <depends>
                         <field id="api_mode">0</field>
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>                                    
-                <field id="payment_action" type="select" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="payment_action" type="select" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
                 </field>
-                <field id="enabled_on_product_page" type="select" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_product_page" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Product Details Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="enabled_on_cart_page" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_cart_page" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Cart Overview Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="allowminicartcheckout" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="allowminicartcheckout" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Mini Cart Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="display_as_payment_method" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="display_as_payment_method" type="select" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Display as Payment Method on Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="title" type="text" sortOrder="14" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="title" type="text" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Method Title</label>
                     <comment>
                         <![CDATA[
@@ -116,11 +120,11 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="embedded" type="select" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="embedded" type="select" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="incomplete_checkout_message" type="textarea" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="incomplete_checkout_message" type="textarea" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Incomplete RBC Payplan Checkout error</label>
                     <comment>
                         <![CDATA[
@@ -131,7 +135,7 @@
                     </comment>
                 </field>
                    
-                <field id="product_type_msg" type="textarea" sortOrder="17" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="product_type_msg" type="textarea" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Invalid product type message</label>
                     <depends>
                         <field id="api_version">classic</field>
@@ -144,7 +148,7 @@
 				            ]]>
                     </comment>
                 </field>
-                <group id="rbc_advanced" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                <group id="rbc_advanced" type="text" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>RBC Payplan Advanced Settings</label>
                     <!-- threshold_amount is a global threshold not to be confused with financing -->
                     <field id="create_customer_account" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -193,15 +197,11 @@
                                         </div>
                                     ]]>
                         </comment>
+                    </field>       
+                    <field id="api_version" type="select" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>RBC platform version</label>
+                        <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiVersionRbc</source_model>
                     </field>
-                    <field id="tenant" type="select" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Tenant</label>
-                    <source_model>Bread\BreadCheckout\Model\System\Config\Source\TenantRbc</source_model>
-                </field>
-                <field id="api_version" type="select" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>RBC platform version</label>
-                    <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiVersionRbc</source_model>
-                </field>
                 </group>
             </group>
         </section>

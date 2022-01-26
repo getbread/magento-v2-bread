@@ -1,20 +1,29 @@
 <?php /** @var $block Bread\BreadCheckout\Block\Product\View */ ?>
 <?= /* @noEscape */ $block->getBeforeHtml(); ?>
 
-<div id="bread-btn-cntnr">
-    <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
-        <span>
+<?php if ($block->getApiVersion() === 'bread_2') : ?>
+    <div id="bread-btn-cntnr">
+        <div id="bread-checkout-btn" title="Bread Checkout"></div>
+        <div id="loading-items">
             <span><img src="<?= /* @noEscape */ $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?= /* @noEscape */ __('Bread Checkout'); ?>" /></span>
-        </span>
+        </div>
     </div>
-    <div class="button-prevent" id="button-prevent">
-        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
+<?php else : ?>
+    <div id="bread-btn-cntnr">
+        <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
+            <span>
+                <span><img src="<?= /* @noEscape */ $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?= /* @noEscape */ __('Bread Checkout'); ?>" /></span>
+            </span>
+        </div>
+        <div class="button-prevent" id="button-prevent">
+            <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
+        </div>
+        <div class="button-prevent" id="button-prevent-updating">
+            <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please wait') ?>">&nbsp;</span>
+        </div>
+        <div class="splitpay-clickable-button" style="text-align: center;"></div>
     </div>
-    <div class="button-prevent" id="button-prevent-updating">
-        <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please wait') ?>">&nbsp;</span>
-    </div>
-    <div class="splitpay-clickable-button" style="text-align: center;"></div>
-</div>
+<?php endif; ?>
 
 <script>
     <?php if ($block->getApiVersion() === 'bread_2') : ?>
@@ -97,14 +106,7 @@
                 }
             };
             $(document).ready(function() {
-
-               /**
-                * Overlay element onto bread button to prevent
-                * it from being clicked until options are selected
-                */
-                $('#button-prevent').show();
-                $('#button-prevent-updating').hide();
-
+                $('#loading-items').hide();
                 $('#product_addtocart_form').on('change', function() {
                     document.updateButton(this);
                 });
@@ -116,9 +118,7 @@
             
             document.updateButton = function(form) {
                 if ($(form).valid()) {
-                    $('#button-prevent').hide();
-                    $('#button-prevent-updating').show();
-
+                    $('#loading-items').show();
                     var groupedButtonUpdateUrl = '<?= /* @noEscape */ $block->getGroupedButtonUpdate()?>';
                     var serializedForm = $(form).serialize();
 
@@ -128,10 +128,9 @@
                         type: 'post',
                         context: this
                     }).done(function(response) {
-                        if (response.items) {
+                        $('#loading-items').hide();
+                        if (response.items) {                            
                             document.configureButton(response.items);
-                        } else {
-                            $('#button-prevent').show();
                         }
                     }).fail(function(error) {
                         var errorInfo = {

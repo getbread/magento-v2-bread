@@ -15,10 +15,6 @@ class Catalog extends Data
      */
     public $productViewBlock;
 
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    public $storeManager;
 
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterfaceFactory
@@ -37,8 +33,7 @@ class Catalog extends Data
     ) {
         $this->productViewBlock = $productViewBlock;
         $this->productRepositoryFactory = $productRepositoryFactory;
-        $this->storeManager = $storeManager;
-        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory);
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
     }
 
     /**

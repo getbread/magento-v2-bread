@@ -11,7 +11,7 @@ require(
             breadProdSecret = "#payment_ca_breadcheckout_bread_api_secret_key",
             breadSandKey = "#payment_ca_breadcheckout_bread_api_sandbox_public_key",
             breadSandSecret = "#payment_ca_breadcheckout_bread_api_sandbox_secret_key",
-            tenant = "#payment_ca_breadcheckout_rbc_advanced_tenant",
+            tenant = "#payment_ca_breadcheckout_tenant",
             validationUrl = window.location.origin + "/admin/breadadmin/bread/validateCredentials";
     
             var selector = [breadProdKey,breadProdSecret,breadSandKey,breadSandSecret,tenant].join(", ");
