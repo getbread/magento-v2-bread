@@ -18,7 +18,7 @@ class Tenant implements \Magento\Framework\Option\ArrayInterface {
      */
     public function toOptionArray() {
         return [
-            ['value' => 'core', 'label' => __('CORE')],
+            ['value' => 'core', 'label' => __('CORE (US)')],
         ];
     }
 
@@ -29,7 +29,7 @@ class Tenant implements \Magento\Framework\Option\ArrayInterface {
      */
     public function toArray() {
         return [
-            'core' => __('CORE'),
+            'core' => __('CORE (US'),
         ];
     }
 
