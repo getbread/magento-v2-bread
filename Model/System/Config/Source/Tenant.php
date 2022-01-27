@@ -19,7 +19,6 @@ class Tenant implements \Magento\Framework\Option\ArrayInterface {
     public function toOptionArray() {
         return [
             ['value' => 'core', 'label' => __('CORE')],
-            ['value' => 'rbc', 'label' => __('Payplan by RBC')],
         ];
     }
 
@@ -31,7 +30,6 @@ class Tenant implements \Magento\Framework\Option\ArrayInterface {
     public function toArray() {
         return [
             'core' => __('CORE'),
-            'rbc' => __('Payplan by RBC'),
         ];
     }
 
