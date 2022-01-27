@@ -73,7 +73,8 @@ class Quote extends Data
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Store\Model\StoreManagerInterface $storeManager    
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->helperCatalog = $helperCatalog;
@@ -87,7 +88,8 @@ class Quote extends Data
             $context,
             $request,
             $encryptor,
-            $urlInterfaceFactory
+            $urlInterfaceFactory,
+            $storeManager    
         );
     }
 

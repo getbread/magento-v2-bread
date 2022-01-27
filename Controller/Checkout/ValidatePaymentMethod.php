@@ -5,6 +5,7 @@
  * @author Bread   copyright 2016
  * @author Joel    @Mediotype
  * @author Miranda @Mediotype
+ * @author Kip     @Bread
  */
 namespace Bread\BreadCheckout\Controller\Checkout;
 
@@ -155,13 +156,14 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
     {
         $breadVersion = $this->helper->getApiVersion();
         if ($breadVersion === 'bread_2') {
-            $regionId = $this->regionFactory->create()->loadByCode($data['address']['region'], 'US')->getId();
+            $merchantCountry = $this->helper->getMerchantCountry();
+            $regionId = $this->regionFactory->create()->loadByCode($data['address']['region'], $merchantCountry)->getId();
             return [
                 'firstname' => $data['name']['givenName'],
                 'lastname' => $data['name']['familyName'],
                 'street' => $data['address']['address1'],
                 'city' => $data['address']['locality'],
-                'country_id' => 'US',
+                'country_id' => $merchantCountry,
                 'region' => $data['address']['region'],
                 'region_id' => $regionId,
                 'postcode' => $data['address']['postalCode'],

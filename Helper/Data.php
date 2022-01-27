@@ -12,7 +12,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     
     const API_PLATFORM_URI_RBC_LIVE = "https://api.rbcpayplan.com/api";
-    const API_PLATFORM_URI_RBC_SANDBOX = "https://api.rbc.breadpayments.com/api";
+    const API_PLATFORM_URI_RBC_SANDBOX = "https://api-preview.rbc.breadpayments.com/api";
     
     const API_PLATFORM_URI_CORE_LIVE = "https://api.platform.breadpayments.com/api";
     const API_PLATFORM_URI_CORE_SANDBOX = "https://api-preview.platform.breadpayments.com/api";
@@ -150,19 +150,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Framework\UrlInterfaceFactory
      */
     public $urlInterfaceFactory;
+    
+    /**
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    public $storeManager;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Encryption\Encryptor $encryptor,
-        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
+        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager    
     ) {
         $this->context = $context;
         $this->request = $request;
         $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
+        $this->storeManager = $storeManager;
         
         parent::__construct(
             $helperContext
@@ -1098,6 +1106,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @return string
      */
     public function getMerchantCountry($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue('general/country/default', $store, $storeCode);
+        $client = $this->getConfigClient();
+        switch($client) {
+            case 'RBC':
+                return 'CA';
+            case 'CORE':
+                return 'US';
+            default:    
+                return $this->scopeConfig->getValue('general/country/default', $store, $storeCode);
+        }
+    }
+    
+    /**
+     * 
+     * Get the current selected currency
+     * 
+     * @return string
+     */
+    public function getCurrentCurrencyCode() {
+        return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 }

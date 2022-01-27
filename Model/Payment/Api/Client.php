@@ -93,8 +93,8 @@ class Client extends \Magento\Framework\Model\AbstractModel {
         $apiVersion = $this->helper->getApiVersion();
 
         if ($apiVersion === 'bread_2') {
-
-            $data = '{"amount": {"currency":"USD","value":' . $transaction['totalAmount']['value'] . '}}';
+            $currency = $transaction['totalAmount']['currency'];
+            $data = '{"amount": {"currency":"'.$currency.'","value":' . $transaction['totalAmount']['value'] . '}}';
 
             $result = $this->call(
                     $this->getUpdateTransactionUrlV2($breadTransactionId, 'cancel'),
@@ -159,6 +159,7 @@ class Client extends \Magento\Framework\Model\AbstractModel {
         if ($apiVersion === 'bread_2') {
 
             $breadAmount = trim($validateAmount['totalAmount']['value']);
+            $currency = trim($validateAmount['totalAmount']['currency']);
             $amount = trim($amount);
             if (((int) $breadAmount != (int) $amount) && (abs((int) $breadAmount - (int) $amount) >= 2)) {
                 $this->logger->log(
@@ -178,7 +179,7 @@ class Client extends \Magento\Framework\Model\AbstractModel {
             }
 
 
-            $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
+            $data = '{"amount": {"currency":"'.$currency.'","value":' . $amount . '}}';
 
             $result = $this->call(
                     $this->getUpdateTransactionUrlV2($breadTransactionId, 'authorize'),
@@ -264,11 +265,11 @@ class Client extends \Magento\Framework\Model\AbstractModel {
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function settle($breadTransactionId, $amount = null) {
+    public function settle($breadTransactionId, $amount = null, $currency = null) {
         $apiVersion = $this->helper->getApiVersion();
         if ($apiVersion === 'bread_2') {
 
-            $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
+            $data = '{"amount": {"currency":"'.$currency.'","value":' . $amount . '}}';
 
             $result = $this->call(
                     $this->getUpdateTransactionUrlV2($breadTransactionId, 'settle'),
@@ -309,11 +310,11 @@ class Client extends \Magento\Framework\Model\AbstractModel {
      * @return mixed
      * @throws \Exception
      */
-    public function refund($breadTransactionId, $amount = 0, $lineItems = []) {
+    public function refund($breadTransactionId, $amount = 0, $lineItems = [], $currency = null) {
         $apiVersion = $this->helper->getApiVersion();
         if ($apiVersion === 'bread_2') {
 
-            $data = '{"amount": {"currency":"USD","value":' . $amount . '}}';
+            $data = '{"amount": {"currency":"'.$currency.'","value":' . $amount . '}}';
 
             $result = $this->call(
                     $this->getUpdateTransactionUrlV2($breadTransactionId, 'refund'),
