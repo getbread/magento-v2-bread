@@ -762,17 +762,32 @@ class Client extends \Magento\Framework\Model\AbstractModel {
      * @throws \Exception
      */
     public function setShippingDetails($transactionId, $trackingNumber, $carrierName) {
+        $apiVersion = $this->helper->getApiVersion();
         $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        $setShippingDetailsUrl = join(
-                '/',
-                [trim($baseUrl, '/'), 'transactions', trim($transactionId), 'shipment']
-        );
-        $data = ['trackingNumber' => $trackingNumber, 'carrierName' => $carrierName];
-        return $this->call(
-                        $setShippingDetailsUrl,
-                        $data,
-                        \Zend_Http_Client::POST
-        );
+
+        if ($apiVersion === 'bread_2') {
+
+            $data = '{"amount": {"tracking_number":"' . $trackingNumber . '","carrier":' . $carrierName . '}}';
+            $result = $this->call(
+                    $this->getUpdateTransactionUrlV2($transactionId, 'fulfillment'),
+                    $data,
+                    \Zend_Http_Client::POST,
+                    false
+            );
+
+            return $result;
+        } else {
+            $setShippingDetailsUrl = join(
+                    '/',
+                    [trim($baseUrl, '/'), 'transactions', trim($transactionId), 'shipment']
+            );
+            $data = ['trackingNumber' => $trackingNumber, 'carrierName' => $carrierName];
+            return $this->call(
+                            $setShippingDetailsUrl,
+                            $data,
+                            \Zend_Http_Client::POST
+            );
+        }
     }
 
     /**
