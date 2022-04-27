@@ -1,9 +1,9 @@
-Bread Checkout for Magento 2
+Bread Pay Checkout for Magento 2
 =============================
 
 Helping retailers acquire and convert more customers.
 
-Bread Finance Features
+Bread Pay Features
 ----------------------
 
 * Full Funnel. Your shoppers can discover, pre-qualify, and check out from anywhere - your homepage, 
@@ -45,7 +45,7 @@ For Canada Merchants
 
 ### Install using composer. 
 
-- This is currently available for Bread Classic merchants only
+- This is currently available for Bread Pay Classic merchants only. Confirm with your Bread Pay representative for your Bread Pay merchant account details
 
 1. Navigate to your Magento 2 root folder
 
@@ -67,8 +67,8 @@ For Canada Merchants
 
 For US Merchants
 -----------------
-See documentation at https://docs.getbread.com
-Contact your Bread representative for login credentials.
+See documentation at https://docs.breadpayments.com/bread-classic/docs/magento-2-integration-steps
+Contact your Bread Pay representative for login credentials.
 
 For Canada Merchants
 --------------------

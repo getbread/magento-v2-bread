@@ -10,8 +10,8 @@
                     <![CDATA[
                             <div>
                                 <span class="bread-logo"></span>
-                            Bread Payments by <a href="https://www.getbread.com/" target="_blank">getbread.com</a> - <b>Onsite Consumer Financing</b>.
-                            <br/> Developers API reference: <a href="https://docs.getbread.com/docs/integration/magento-2/magento-2-overview/" target="_blank">Bread Developer API Reference</a>
+                            Bread Pay by <a href="https://payments.breadfinancial.com/" target="_blank">payments.breadfinancial.com</a> - <b>The only buy now, pay later solution that drives growth</b>.
+                            <br/> Developers API reference: <a href="https://docs.breadpayments.com/bread-classic/docs/magento-2-integration-steps/" target="_blank">Bread Pay Developer API Reference</a>
                             </div>
                     ]]>
                 </comment>
@@ -307,7 +307,7 @@
                     </comment>
                 </field>
                 <group id="bread_advanced" type="text" sortOrder="34" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
-                    <label>Bread Advanced Settings</label>
+                    <label>Bread Pay Advanced Settings</label>
                     <field id="targeted_financing" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Enable Targeted Financing</label>
                         <source_model>Bread\BreadCheckout\Model\System\Config\Source\TargetedFinancing</source_model>
@@ -390,7 +390,7 @@
                         </comment>
                     </field>
                     <field id="sentry_enabled" type="select" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Send Error Information to Bread</label>
+                        <label>Send Error Information to Bread Pay</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>
                             <![CDATA[
@@ -401,7 +401,7 @@
                         </comment>
                     </field>
                     <field id="disabled_skus" type="textarea" sortOrder="10" translate="label" showInStore="1" showInWebsite="1" showInDefault="1">
-                        <label>Disable Bread checkout for skus</label>
+                        <label>Disable Bread Pay checkout for skus</label>
                         <comment><![CDATA[<div><p>Enter sku list separated by comma with skus of products for which Bread checkout should not be used or available (example: <strong>sku1,sku2,sku3</strong>)</p></div>]]></comment>
                         <depends>
                             <field id="api_version">classic</field>
