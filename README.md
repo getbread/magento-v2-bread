@@ -1,9 +1,9 @@
-Bread Checkout for Magento 2
+Bread Pay Checkout for Magento 2
 =============================
 
 Helping retailers acquire and convert more customers.
 
-Bread Finance Features
+Bread Pay Features
 ----------------------
 
 * Full Funnel. Your shoppers can discover, pre-qualify, and check out from anywhere - your homepage, 
@@ -27,12 +27,14 @@ For US Merchants
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.us.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.us.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
+- Copy file `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.us.php` to `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.php`
 
 For Canada Merchants
 --------------------
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.ca.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.ca.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
+- Copy file `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.ca.php` to `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.php`
 
 
 4. Enable module
@@ -44,8 +46,6 @@ For Canada Merchants
     ```
 
 ### Install using composer. 
-
-- This is currently available for Bread Classic merchants only
 
 1. Navigate to your Magento 2 root folder
 
@@ -67,8 +67,8 @@ For Canada Merchants
 
 For US Merchants
 -----------------
-See documentation at https://docs.getbread.com
-Contact your Bread representative for login credentials.
+See documentation at https://docs.breadpayments.com/bread-classic/docs/magento-2-integration-steps
+Contact your Bread Pay representative for login credentials.
 
 For Canada Merchants
 --------------------

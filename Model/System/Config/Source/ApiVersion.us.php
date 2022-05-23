@@ -3,8 +3,8 @@
 /**
  * API version options
  *
- * @copyright (c) Bread
- * @author Kiprotich
+ * @copyright (c) Bread Financial
+ * @author Kiprotich, Maritim <kip.maritim@breadfinancial.com>
  */
 
 namespace Bread\BreadCheckout\Model\System\Config\Source;
@@ -18,8 +18,8 @@ class ApiVersion implements \Magento\Framework\Option\ArrayInterface {
      */
     public function toOptionArray() {
         return [
-            ['value' => 'bread_2', 'label' => __('Bread 2.0')],
             ['value' => 'classic', 'label' => __('Bread Classic')],
+            ['value' => 'bread_2', 'label' => __('Bread 2.0')]
         ];
     }
 
@@ -30,8 +30,8 @@ class ApiVersion implements \Magento\Framework\Option\ArrayInterface {
      */
     public function toArray() {
         return [
-            'bread_2' => __('Bread 2.0'),
             'classic' => __('Bread Classic'),
+            'bread_2' => __('Bread 2.0')
         ];
     }
 

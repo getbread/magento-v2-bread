@@ -3,8 +3,8 @@
 /**
  * API version options
  *
- * @copyright (c) Bread
- * @author Kiprotich
+ * @copyright (c) Bread Financial
+ * @author Kiprotich, Maritim <kip.maritim@breadfinancial.com>
  */
 
 namespace Bread\BreadCheckout\Model\System\Config\Source;
