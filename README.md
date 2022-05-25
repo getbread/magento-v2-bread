@@ -27,14 +27,12 @@ For US Merchants
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.us.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.us.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
-- Copy file `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.us.php` to `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.php`
 
 For Canada Merchants
 --------------------
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.ca.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.ca.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
-- Copy file `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.ca.php` to `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.php`
 
 
 4. Enable module
@@ -58,14 +56,12 @@ For Canada Merchants
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.us.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.us.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
-- Copy file `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.us.php` to `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.php`
 
 For Canada Merchants
 --------------------
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.ca.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.ca.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
-- Copy file `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.ca.php` to `app/code/Bread/BreadCheckout/Model/System/Config/Source/ApiVersion.php
 
 4. Enable module
     ```bash
