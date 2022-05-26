@@ -51,5 +51,5 @@ Installation
 
 ## Usage instructions:
 
-See documentation at https://docs.getbread.com
-Contact your Bread representative for login credentials.
+See documentation at https://docs.breadpayments.com/bread-classic/docs/magento-2
+Contact your Bread representative for your merchant credentials.
