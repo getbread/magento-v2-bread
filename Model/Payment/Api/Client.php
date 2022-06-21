@@ -289,7 +289,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
         $apiVersion = $this->helper->getApiVersion();
         if ($apiVersion === 'bread_2') {
-
+            $validateAmount = $this->getInfo($breadTransactionId);
+            $currency = trim($validateAmount['totalAmount']['currency']);
             $data = '{"amount": {"currency":"'.$currency.'","value":' . $amount . '}}';
 
             $result = $this->call(
@@ -335,7 +336,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
         $apiVersion = $this->helper->getApiVersion();
         if ($apiVersion === 'bread_2') {
-
+            $validateAmount = $this->getInfo($breadTransactionId);
+            $currency = trim($validateAmount['totalAmount']['currency']);
             $data = '{"amount": {"currency":"'.$currency.'","value":' . $amount . '}}';
 
             $result = $this->call(

@@ -307,7 +307,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return mixed
      */
     public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $apiVersion = $this->getApiVersion($store, $store);
+        $apiVersion = $this->getApiVersion($storeCode, $store);
         if($apiVersion === 'bread_2') {
             $tenant = strtoupper($this->getConfigClient($storeCode, $store));
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
@@ -1051,6 +1051,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getCurrentCurrencyCode() {
+        error_log('NIAJEJ NIAHE NIAHE');
+        error_log($this->storeManager->getStore()->getCurrentCurrencyCode());
         return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 
