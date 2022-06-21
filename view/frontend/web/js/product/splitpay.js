@@ -63,5 +63,5 @@ define([], function () {
                 }
             }, TIMEOUT_INTERVAL);
         }
-    }
+    };
 });

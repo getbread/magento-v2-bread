@@ -3,9 +3,11 @@
 
 <div id="bread-btn-cntnr">
     <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
+        <?php if($block->getApiVersion() !== 'bread_2' ) :?>
         <span>
             <span><img src="<?= /* @noEscape */ $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?= /* @noEscape */ __('Bread Checkout'); ?>" /></span>
         </span>
+        <?php endif; ?>
     </div>
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
@@ -24,7 +26,8 @@
     }
 </script>
 
-<script type="text/javascript">
+<?php if($block->getApiVersion() !== 'bread_2') :?> 
+<script type="text/javascript">    
     require(['jquery', 'splitPay'], function($, splitPay) {
 
         document.configureButton = function (items) {
@@ -328,3 +331,4 @@
         });
     });
 </script>
+<?php endif;?>

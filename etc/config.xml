@@ -10,6 +10,7 @@
                 <title>Pay Over Time</title>
                 <payment_action>authorize</payment_action>
                 <api_mode>0</api_mode>
+                <api_version>bread_2</api_version>
                 <show_splitpay_label>1</show_splitpay_label>
                 <!-- default to sandbox mode -->
                 <incomplete_checkout_message>Please click the pay over time button and complete the finance forms or choose another payment method.</incomplete_checkout_message>

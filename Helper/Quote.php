@@ -61,6 +61,7 @@ class Quote extends Data
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param \Bread\BreadCheckout\Model\Payment\Api\Client     $paymentApiClient
      * @param \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager $storeManager
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $helperContext,
@@ -73,7 +74,8 @@ class Quote extends Data
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Store\Model\StoreManagerInterface $storeManager    
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->helperCatalog = $helperCatalog;
@@ -87,7 +89,8 @@ class Quote extends Data
             $context,
             $request,
             $encryptor,
-            $urlInterfaceFactory
+            $urlInterfaceFactory,
+            $storeManager    
         );
     }
 
@@ -374,25 +377,29 @@ class Quote extends Data
         }
 
         $session = $this->getSession();
-        if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
+        $apiVersion = $this->getApiVersion();
+        
+        if ($apiVersion !== 'bread_2') {
+            if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
 
-            $arr = [];
-            $arr['customTotal'] = (int)(floatval($quote->getGrandTotal()) * 100);
+                $arr = [];
+                $arr['customTotal'] = (int) (floatval($quote->getGrandTotal()) * 100);
 
-            $targetedFinancingStatus = $this->getTargetedFinancingStatus();
+                $targetedFinancingStatus = $this->getTargetedFinancingStatus();
 
-            if ($targetedFinancingStatus['shouldUseFinancingId']) {
-                $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+                if ($targetedFinancingStatus['shouldUseFinancingId']) {
+                    $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+                }
+
+                try {
+                    $result = $this->paymentApiClient->getAsLowAs($arr);
+                } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                    $result = [];
+                }
+
+                $session->setData(self::BREAD_SESSION_QUOTE_RESULT_KEY, $result);
+                $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
             }
-
-            try {
-                $result = $this->paymentApiClient->getAsLowAs($arr);
-            } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                $result = [];
-            }
-
-            $session->setData(self::BREAD_SESSION_QUOTE_RESULT_KEY, $result);
-            $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
         }
         return $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
     }

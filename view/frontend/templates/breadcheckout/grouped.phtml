@@ -3,9 +3,11 @@
 
 <div id="bread-btn-cntnr">
     <div id="bread-checkout-btn" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
+        <?php if ($block->getApiVersion() !== 'bread_2') : ?>
         <span>
             <span><img src="<?= /* @noEscape */ $block->getViewFileUrl('Bread_BreadCheckout/bread/images/ajax-loader-small.gif'); ?>" alt="<?= /* @noEscape */ __('Bread Checkout'); ?>" /></span>
         </span>
+        <?php endif; ?>
     </div>
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ __('Please complete product configuration') ?>">&nbsp;</span>
@@ -17,267 +19,369 @@
 </div>
 
 <script>
-    require([
-        'jquery',
-        'splitPay',
-        'jquery/validate',
-        'mage/validation'
-    ], function($, splitPay) {
-        document.configureButton = function (items) {
-            var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
-            var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
-            var financingInfo       = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
-            var total = 0;
-            for(var i = 0; i < items.length; i++){
-                total += items[i]['price'] * items[i]['quantity'];
-            }
-
-            var breadConfig = {
-                buttonId: "bread-checkout-btn",
-                allowSplitPayCheckout: false,
-                <?php if (!$block->isHealthcare()) : ?>
-                items: items,
-                <?php else : ?>
-                customTotal: total,
-                <?php endif; ?>
-                discounts: <?= /* @noEscape */ $block->getDiscountDataJson(); ?>,
-                allowCheckout: <?= /* @noEscape */ $block->getAllowCheckout(); ?>,
-
-                done: function (err, tx_token) {
-                    if (tx_token !== undefined) {
-                        var i = document.createElement('input');
-                        var k = document.createElement('input');
-                        i.type = 'hidden';
-                        i.name = 'token';
-                        i.value = tx_token;
-                        k.type = 'hidden';
-                        k.name = 'form_key';
-                        k.value = $.cookie('form_key');
-                        var f = document.createElement('form');
-                        f.action = '<?= /* @noEscape */ $block->getValidateOrderUrl(); ?>?product_page=1';
-                        f.method = 'POST';
-                        f.appendChild(i);
-                        f.appendChild(k);
-                        document.body.appendChild(f);
-                        f.submit();
+    <?php if ($block->getApiVersion() === 'bread_2') : ?>
+        require(['jquery'], function($) {
+            document.configureButton = function (items) {
+                if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                    let bread_sdk = null;
+                    let config_client = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                    if (config_client === 'RBC') {
+                        bread_sdk = window.RBCPayPlan;
                     } else {
-                        var errorInfo = {
-                            bread_config: breadConfig,
-                            err: err
-                        };
-                        document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
+                        bread_sdk = window.BreadPayments;
                     }
-                },
+                    let onApproved = function onApproved(application) {};
+                    let onCheckout = function onCheckout(application) {};
+                    bread_sdk.setup({
+                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                    });
+                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                    let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
+                    let itemsObject = [];
+                    var total = 0;
+                    for(var i = 0; i < items.length; i++){
+                        total += items[i]['price'] * items[i]['quantity'];
+                    }
+                    <?php if(!$block->isHealthcare()) : ?>
+                    for (var i = 0; i < items.length; i++) {
+                        let item = {
+                            name: items[i].name,
+                            quantity: items[i].quantity,
+                            shippingCost: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            shippingDescription: '',
+                            unitTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            unitPrice: {
+                                currency: currentCurrencyCode,
+                                value: items[i].price
+                            }
+                        };
 
-                /**
-                 * Calculate tax value callback
-                 *
-                 * @param shippingAddress
-                 * @param callback
-                 */
-                calculateTax: function (shippingAddress, callback) {
-
-                    shippingAddress.block_key                       = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.product_type                    = '<?= /* @noEscape */ \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE ?>';
-                    shippingAddress.items                           = breadConfig.items;
-                    shippingAddress.additional_data                 = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
-
-                    var taxEstimationUrl = '<?= /* @noEscape */ $block->getTaxEstimationUrl(); ?>';
-                    var shippingString = JSON.stringify(shippingAddress);
-                    var errorInfo;
-
-                    $.ajax({
-                        url: taxEstimationUrl,
-                        data: { shippingInfo: shippingString },
-                        type: 'post'
-                    }).done(function (response) {
-                        try {
-                            errorInfo = {
-                                response: response,
-                                shipping_info: shippingString,
-                            };
-                            if (response !== null && typeof response === 'object') {
-                                if (response.error) {
-                                    document.logBreadIssue('error', errorInfo, 'Error estimating tax');
-                                    alert(response.message);
-                                } else {
-                                    callback(null, response.result);
-                                }
-                            } else {
-                                document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
+                        itemsObject.push(item);
+                    }
+                    <?php endif; ?>
+                    bread_sdk.registerPlacements([{
+                        allowCheckout: false,
+                        domID: 'bread-checkout-btn',
+                        order: {
+                            currency: currentCurrencyCode,
+                            items: itemsObject,
+                            subTotal: {
+                                value: total,
+                                currency: currentCurrencyCode
+                            },
+                            totalPrice: {
+                                value: total,
+                                currency: currentCurrencyCode
+                            },
+                            totalDiscounts: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalShipping: {
+                                value: 0,
+                                currency: currentCurrencyCode
+                            },
+                            totalTax: {
+                                value: 0,
+                                currency: currentCurrencyCode
                             }
                         }
-                        catch (e) {
-                            errorInfo = {
-                                response: response,
-                                shipping_info: shippingString,
-                            };
-                            document.logBreadIssue('error', errorInfo, e);
-                        }
-                    }).fail(function(error) {
-                        errorInfo = {
-                            shipping_info: shippingString,
-                        };
-                        document.logBreadIssue('error', errorInfo,
-                            'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
-                    });
-                },
-
-                /**
-                 * Calculate shipping cost callback
-                 *
-                 * @param shippingAddress
-                 * @param callback
-                 */
-                calculateShipping: function (shippingAddress, callback) {
-
-                    shippingAddress.block_key                       = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
-                    shippingAddress.product_type                    = '<?= /* @noEscape */ \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE ?>';
-                    shippingAddress.items                           = breadConfig.items;
-                    shippingAddress.additional_data                 = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
-
-                    var shippingAddressEstimationUrl = '<?= /* @noEscape */ $block->getShippingAddressEstimationUrl(); ?>';
-                    var errorInfo;
-
-                    $.ajax({
-                        url: shippingAddressEstimationUrl,
-                        data: shippingAddress,
-                        type: 'post'
-                    }).done(function (response) {
-                        try {
-                            errorInfo = {
-                                response: response,
-                                shipping_info: shippingAddress,
-                            };
-                            if (response !== null && typeof response === 'object') {
-                                if (response.error) {
-                                    document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
-                                    alert(response.message);
-                                } else {
-                                    callback(null, response.result);
-                                }
-                            } else {
-                                document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
-                            }
-                        }
-                        catch (e) {
-                            errorInfo = {
-                                response: response,
-                                shipping_info: shippingAddress,
-                            };
-                            document.logBreadIssue('error', errorInfo, e);
-                        }
-                    }).fail(function(error) {
-                        errorInfo = {
-                            shipping_info: shippingAddress,
-                        };
-                        document.logBreadIssue('error', errorInfo,
-                            'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
-                    });
-                },
-
-                /**
-                 * Add to cart call back used when allow checkout from product page = false
-                 *
-                 * @param callback
-                 */
-                addToCart:  function(callback) {
-                    document.getElementById('product-addtocart-button').click();
+                    }]);
+                    bread_sdk.__internal__.setInitMode('manual');
+                    bread_sdk.__internal__.init();    
                 }
             };
+            $(document).ready(function() {
+                $('#loading-items').hide();
+                $('#product_addtocart_form').on('change', function() {
+                    document.updateButton(this);
+                });
 
-            if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
-                breadConfig.customCSS = buttonCss;
-            }
+                <?php if ($block->getProduct() != null) : ?>
+                    document.configureButton(<?= /* @noEscape */ $block->getGroupedDataJson(); ?>);
+                <?php endif; ?>
+            });
+            
+            document.updateButton = function(form) {
+                if ($(form).valid()) {
+                    $('#loading-items').show();
+                    var groupedButtonUpdateUrl = '<?= /* @noEscape */ $block->getGroupedButtonUpdate()?>';
+                    var serializedForm = $(form).serialize();
 
-            if (buttonOnProduct === true) {
-                breadConfig.actAsLabel = false;
-            }
-
-            if(financingInfo.enabled && financingInfo.mode.cart){
-                var cartSizeFinancingId = financingInfo.id;
-                var cartSizeThreshold = financingInfo.threshold;
-                var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity }, 0) / 100;
-                breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : null;
-            } else if(financingInfo.enabled && financingInfo.mode.sku){
-                var productSku = "<?= /* @noEscape */ $block->getProduct()->getSku(); ?>";
-                if(financingInfo.sku_limit.indexOf(productSku) !== -1){
-                    breadConfig.financingProgramId = financingInfo.id;
+                    $.ajax({
+                        url: groupedButtonUpdateUrl,
+                        data: serializedForm,
+                        type: 'post',
+                        context: this
+                    }).done(function(response) {
+                        $('#loading-items').hide();
+                        if (response.items) {                            
+                            document.configureButton(response.items);
+                        }
+                    }).fail(function(error) {
+                        var errorInfo = {
+                            data: serializedForm,
+                        };
+                        document.logBreadIssue('error', errorInfo,
+                            'Error code returned when calling ' + groupedButtonUpdateUrl + ', with status: ' + error.statusText);
+                    });
                 }
-            }
+            };
+        });
+    <?php else : ?> 
+        require([
+            'jquery',
+            'splitPay',
+            'jquery/validate',
+            'mage/validation'
+        ], function($, splitPay) {
+            document.configureButton = function (items) {
+                var buttonOnProduct     = <?= /* @noEscape */ $block->getIsButtonOnProduct(); ?>;
+                var buttonCss           = '<?= /* @noEscape */ $block->getButtonDesign(); ?>';
+                var financingInfo       = <?= /* @noEscape */ $block->getFinancingJson(); ?>;
+                var total = 0;
+                for(var i = 0; i < items.length; i++){
+                    total += items[i]['price'] * items[i]['quantity'];
+                }
 
-            var configDataUrl = '<?= /* @noEscape */ $block->getConfigDataUrl(); ?>';
-            $.ajax({
-                url: configDataUrl,
-                type: 'post',
-                context: this
-            }).done(function(data) {
+                var breadConfig = {
+                    buttonId: "bread-checkout-btn",
+                    allowSplitPayCheckout: false,
+        <?php if (!$block->isHealthcare()) : ?>
+                        items: items,
+        <?php else : ?>
+                        customTotal: total,
+        <?php endif; ?>
+                    discounts: <?= /* @noEscape */ $block->getDiscountDataJson(); ?>,
+                    allowCheckout: <?= /* @noEscape */ $block->getAllowCheckout(); ?>,
+
+                    done: function (err, tx_token) {
+                        if (tx_token !== undefined) {
+                            var i = document.createElement('input');
+                            var k = document.createElement('input');
+                            i.type = 'hidden';
+                                i.name = 'token';
+                                i.value = tx_token;
+                                k.type = 'hidden';
+                                k.name = 'form_key';
+                                k.value = $.cookie('form_key');
+                                var f = document.createElement('form');
+                                f.action = '<?= /* @noEscape */ $block->getValidateOrderUrl(); ?>?product_page=1';
+                                f.method = 'POST';
+                                f.appendChild(i);
+                                f.appendChild(k);
+                                document.body.appendChild(f);
+                                f.submit();
+                        } else {
+                        var errorInfo = {
+                        bread_config: breadConfig,
+                                err: err
+                        };
+                                document.logBreadIssue('error', errorInfo, 'tx_token undefined in done callback');
+                        }
+                        },
+                        /**
+                         * Calculate tax value callback
+                         *
+                         * @param shippingAddress
+                         * @param callback
+                         */
+                        calculateTax: function (shippingAddress, callback) {
+
+                        shippingAddress.block_key = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
+                                shippingAddress.product_type = '<?= /* @noEscape */ \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE ?>';
+                                shippingAddress.items = breadConfig.items;
+                                shippingAddress.additional_data = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+                                var taxEstimationUrl = '<?= /* @noEscape */ $block->getTaxEstimationUrl(); ?>';
+                                var shippingString = JSON.stringify(shippingAddress);
+                                var errorInfo;
+                                $.ajax({
+                                url: taxEstimationUrl,
+                                        data: { shippingInfo: shippingString },
+                                        type: 'post'
+                                }).done(function (response) {
+                        try {
+                        errorInfo = {
+                        response: response,
+                                shipping_info: shippingString,
+                        };
+                                if (response !== null && typeof response === 'object') {
+                        if (response.error) {
+                        document.logBreadIssue('error', errorInfo, 'Error estimating tax');
+                                alert(response.message);
+                        } else {
+                        callback(null, response.result);
+                        }
+                        } else {
+                        document.logBreadIssue('error', errorInfo, 'Response from ' + taxEstimationUrl + ' was not of type Object');
+                        }
+                        }
+                        catch (e) {
+                        errorInfo = {
+                        response: response,
+                                shipping_info: shippingString,
+                        };
+                                document.logBreadIssue('error', errorInfo, e);
+                        }
+                        }).fail(function(error) {
+                        errorInfo = {
+                        shipping_info: shippingString,
+                        };
+                                document.logBreadIssue('error', errorInfo,
+                                        'Error code returned when calling ' + taxEstimationUrl + ', with status: ' + error.statusText);
+                        });
+                        },
+                        /**
+                         * Calculate shipping cost callback
+                         *
+                         * @param shippingAddress
+                         * @param callback
+                         */
+                        calculateShipping: function (shippingAddress, callback) {
+
+                        shippingAddress.block_key = '<?= /* @noEscape */ $block->getBlockCode(); ?>';
+                                shippingAddress.product_type = '<?= /* @noEscape */ \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE ?>';
+                                shippingAddress.items = breadConfig.items;
+                                shippingAddress.additional_data = <?= /* @noEscape */ $block->jsonEncode($block->setAdditionalData()); ?>;
+                                var shippingAddressEstimationUrl = '<?= /* @noEscape */ $block->getShippingAddressEstimationUrl(); ?>';
+                                var errorInfo;
+                                $.ajax({
+                                url: shippingAddressEstimationUrl,
+                                        data: shippingAddress,
+                                        type: 'post'
+                                }).done(function (response) {
+                        try {
+                        errorInfo = {
+                        response: response,
+                                shipping_info: shippingAddress,
+                        };
+                                if (response !== null && typeof response === 'object') {
+                        if (response.error) {
+                        document.logBreadIssue('error', errorInfo, 'Error calculating shipping');
+                                alert(response.message);
+                        } else {
+                        callback(null, response.result);
+                        }
+                        } else {
+                        document.logBreadIssue('error', errorInfo, 'Response from ' + shippingAddressEstimationUrl + ' was not of type Object');
+                        }
+                        }
+                        catch (e) {
+                        errorInfo = {
+                        response: response,
+                                shipping_info: shippingAddress,
+                        };
+                                document.logBreadIssue('error', errorInfo, e);
+                        }
+                        }).fail(function(error) {
+                        errorInfo = {
+                        shipping_info: shippingAddress,
+                        };
+                                document.logBreadIssue('error', errorInfo,
+                                        'Error code returned when calling ' + shippingAddressEstimationUrl + ', with status: ' + error.statusText);
+                        });
+                        },
+                        /**
+                         * Add to cart call back used when allow checkout from product page = false
+                         *
+                         * @param callback
+                         */
+                        addToCart:  function(callback) {
+                        document.getElementById('product-addtocart-button').click();
+                        }
+                };
+                        if (buttonCss !== null && buttonCss !== '' && buttonCss != false) {
+                breadConfig.customCSS = buttonCss;
+                }
+
+                if (buttonOnProduct === true) {
+                breadConfig.actAsLabel = false;
+                }
+
+                if (financingInfo.enabled && financingInfo.mode.cart){
+                var cartSizeFinancingId = financingInfo.id;
+                        var cartSizeThreshold = financingInfo.threshold;
+                        var itemsPriceSum = items.reduce(function(sum, item) { return sum + item.price * item.quantity }, 0) / 100;
+                        breadConfig.financingProgramId = (itemsPriceSum >= cartSizeThreshold) ? cartSizeFinancingId : null;
+                } else if (financingInfo.enabled && financingInfo.mode.sku){
+                var productSku = "<?= /* @noEscape */ $block->getProduct()->getSku(); ?>";
+                        if (financingInfo.sku_limit.indexOf(productSku) !== - 1){
+                breadConfig.financingProgramId = financingInfo.id;
+                }
+                }
+
+                var configDataUrl = '<?= /* @noEscape */ $block->getConfigDataUrl(); ?>';
+                        $.ajax({
+                        url: configDataUrl,
+                                type: 'post',
+                                context: this
+                        }).done(function(data) {
                 if (data.shippingContact !== false) {
-                    breadConfig.shippingContact = data.shippingContact;
+                breadConfig.shippingContact = data.shippingContact;
                 }
 
                 if (data.billingContact !== false) {
-                    breadConfig.billingContact = data.billingContact;
+                breadConfig.billingContact = data.billingContact;
                 }
 
                 if (typeof bread !== 'undefined') {
-                    bread.checkout(breadConfig);
-                    splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
-                    $('#button-prevent-updating').hide();
+                bread.checkout(breadConfig);
+                        splitPay.setupSplitPay(breadConfig, '.splitpay-clickable-button', false);
+                        $('#button-prevent-updating').hide();
                 }
-            }).fail(function(error) {
-                document.logBreadIssue('error', {},
-                    'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
-            });
-
-        };
-
-        $(document).ready(function() {
-
-            /**
-             * Overlay element onto bread button to prevent
-             * it from being clicked until options are selected
-             */
-            $('#button-prevent').show();
-            $('#button-prevent-updating').hide();
-
-            $('#product_addtocart_form').on('change', function() {
-                document.updateButton(this);
-            });
-
-            <?php if ($block->getProduct() != null) : ?>
-            document.configureButton(<?= /* @noEscape */ $block->getGroupedDataJson(); ?>);
-            <?php endif; ?>
-        });
-
-        document.updateButton = function(form) {
-            if ($(form).valid()) {
-                $('#button-prevent').hide();
-                $('#button-prevent-updating').show();
-
-                var groupedButtonUpdateUrl = '<?= /* @noEscape */ $block->getGroupedButtonUpdate()?>';
-                var serializedForm = $(form).serialize();
-
-                $.ajax({
-                    url: groupedButtonUpdateUrl,
-                    data: serializedForm,
-                    type: 'post',
-                    context: this
-                }).done(function(response) {
-                    if (response.items) {
-                        document.configureButton(response.items);
-                    } else {
-                        $('#button-prevent').show();
-                    }
                 }).fail(function(error) {
-                    var errorInfo = {
-                        data: serializedForm,
-                    };
-                    document.logBreadIssue('error', errorInfo,
-                        'Error code returned when calling ' + groupedButtonUpdateUrl + ', with status: ' + error.statusText);
+                document.logBreadIssue('error', {},
+                        'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
                 });
-            }
-        };
+                };
+                        $(document).ready(function() {
 
-    });
+                /**
+                 * Overlay element onto bread button to prevent
+                 * it from being clicked until options are selected
+                 */
+                $('#button-prevent').show();
+                        $('#button-prevent-updating').hide();
+                        $('#product_addtocart_form').on('change', function() {
+                document.updateButton(this);
+                });
+        <?php if ($block->getProduct() != null) : ?>
+                    document.configureButton(<?= /* @noEscape */ $block->getGroupedDataJson(); ?>);
+        <?php endif; ?>
+                });
+                        document.updateButton = function(form) {
+                        if ($(form).valid()) {
+                        $('#button-prevent').hide();
+                                $('#button-prevent-updating').show();
+                                var groupedButtonUpdateUrl = '<?= /* @noEscape */ $block->getGroupedButtonUpdate() ?>';
+                                var serializedForm = $(form).serialize();
+                                $.ajax({
+                                url: groupedButtonUpdateUrl,
+                                        data: serializedForm,
+                                        type: 'post',
+                                        context: this
+                                }).done(function(response) {
+                        if (response.items) {
+                        document.configureButton(response.items);
+                        } else {
+                        $('#button-prevent').show();
+                        }
+                        }).fail(function(error) {
+                        var errorInfo = {
+                        data: serializedForm,
+                        };
+                                document.logBreadIssue('error', errorInfo,
+                                        'Error code returned when calling ' + groupedButtonUpdateUrl + ', with status: ' + error.statusText);
+                        });
+                        }
+                        };
+                });
+    <?php endif; ?>    
 </script>

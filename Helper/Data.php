@@ -116,11 +116,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     
     const XML_CONFIG_BREAD_API_PUB_KEY              = 'payment/breadcheckout/bread_api_public_key';
     const XML_CONFIG_BREAD_API_SECRET_KEY           = 'payment/breadcheckout/bread_api_secret_key';
-    const XML_CONFIG_BREAD_INTEGRATION_KEY          = 'payment/breadcheckout/bread_api_integration_key';
+    const XML_CONFIG_BREAD_INTEGRATION_KEY          = 'payment/breadcheckout/api_integration_key';
     
-    const XML_CONFIG_BREAD_API_SANDBOX_PUB_KEY      = 'payment/breadcheckout/bread_api_sandbox_public_key';
-    const XML_CONFIG_BREAD_API_SANDBOX_SECRET_KEY   = 'payment/breadcheckout/bread_api_sandbox_secret_key';
-    const XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY    = 'payment/breadcheckout/bread_api_sandbox_integration_key';
+    const XML_CONFIG_BREAD_API_SANDBOX_PUB_KEY      = 'payment/breadcheckout/api_sandbox_public_key';
+    const XML_CONFIG_BREAD_API_SANDBOX_SECRET_KEY   = 'payment/breadcheckout/api_sandbox_secret_key';
+    const XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY    = 'payment/breadcheckout/api_sandbox_integration_key';
 
     /**
      * @var \Magento\Framework\Model\Context
@@ -146,19 +146,36 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @var \Magento\Framework\UrlInterfaceFactory
      */
     public $urlInterfaceFactory;
+    
+    /**
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    public $storeManager;
 
+    /**
+     * 
+     * @param \Magento\Framework\App\Helper\Context $helperContext
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Framework\Encryption\Encryptor $encryptor
+     * @param \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     */
     public function __construct(
             \Magento\Framework\App\Helper\Context $helperContext,
             \Magento\Framework\Model\Context $context,
             \Magento\Framework\App\Request\Http $request,
             \Magento\Framework\Encryption\Encryptor $encryptor,
-            \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
+            \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
+            \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->context = $context;
         $this->request = $request;
         $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
+        $this->storeManager = $storeManager;
         parent::__construct(
                 $helperContext
         );
@@ -253,10 +270,33 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return mixed
      */
     public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
-            return self::JS_LIVE_URI;
+        $apiVersion = $this->getApiVersion();
+        
+        if ($apiVersion === 'bread_2') {
+            $client = $this->getConfigClient();
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {               
+                switch($client) {
+                    case 'RBC':
+                        return self::JS_LIVE_SDK_RBC;
+                        break;
+                    default:
+                        return self::JS_LIVE_SDK_CORE;    
+                }                
+            } else {
+                switch ($client) {
+                    case 'RBC':
+                        return self::JS_SANDBOX_SDK_RBC;
+                        break;
+                    default:
+                        return self::JS_SANDBOX_SDK_CORE;
+                }        
+            }
         } else {
-            return self::JS_SANDBOX_URI;
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return self::JS_LIVE_URI;
+            } else {
+                return self::JS_SANDBOX_URI;
+            }
         }
     }
 
@@ -267,11 +307,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return mixed
      */
     public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
-            return self::API_LIVE_URI;
+        $apiVersion = $this->getApiVersion($store, $store);
+        if($apiVersion === 'bread_2') {
+            $tenant = strtoupper($this->getConfigClient($storeCode, $store));
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
+                return $this->getPlatformApiUri($tenant, 'LIVE');
+            } else {
+                return $this->getPlatformApiUri($tenant, 'SANDBOX');
+            }
         } else {
-            return self::API_SANDBOX_URI;
-        }
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
+                return self::API_LIVE_URI;
+            } else {
+                return self::API_SANDBOX_URI;
+            }
+        }        
     }
 
     /**
@@ -925,6 +975,83 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
                     return self::API_PLATFORM_URI_CORE_SANDBOX;
                 }
         }
+    }
+    
+    /**
+     * @since 2.1.0
+     * @param null $storeCode
+     * @param $store
+     * @return string
+     */
+    public function getApiVersion($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if($this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode);
+        } else {
+            return 'bread_2';
+        }
+    }
+    
+    /**
+     * Returns the tenant name from the database
+     * 
+     * @since 2.1.0
+     * @return string
+     */
+    public function getConfigClient($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return strtoupper($this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode));
+    }
+    
+    /**
+     * @since 2.1.0
+     * @param null $storeCode
+     * @param string $store
+     * @return string
+     */
+    public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_INTEGRATION_KEY, $store, $storeCode);
+        } else {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY, $store, $storeCode);
+        }
+    }
+    
+    /**
+     * @since 2.1.0
+     * @param type $storeCode
+     * @param type $store
+     * @return type
+     */
+    public function getAuthToken($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
+    }
+    
+    /**
+     * Get the merchant country code
+     * 
+     * @since 2.1.0
+     * @return string
+     */
+    public function getMerchantCountry($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $client = $this->getConfigClient();
+        switch($client) {
+            case 'RBC':
+                return 'CA';
+            case 'CORE':
+                return 'US';
+            default:    
+                return $this->scopeConfig->getValue('general/country/default', $store, $storeCode);
+        }
+    }
+    
+    /**
+     * 
+     * Get the current selected currency
+     * 
+     * @since 2.1.0
+     * @return string
+     */
+    public function getCurrentCurrencyCode() {
+        return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 
 }

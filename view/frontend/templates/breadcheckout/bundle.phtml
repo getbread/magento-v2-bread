@@ -9,7 +9,7 @@ require([
         'mage/validation'
    ], function($, bundleHelper) {
         'use strict';
-
+        let apiVersion = <?= /* @noEscape */ $block->getApiVersion(); ?>;
         var globalConfig = {
             optionConfig:               <?= /* @noEscape */ $block->getJsonConfig(); ?>,
             optionConfigBundle:         <?= /* @noEscape */ $block->getBundleProductDataJson(); ?>,
@@ -219,10 +219,12 @@ require([
                         document.defaultItems[0]["price"]   = this.cache.currentElement.selectedPrice * 100;
                         document.selectedSku                = this.cache.currentElement.selectedSku;
                         document.configureButton(document.defaultItems);
-                        document.splitPayConfigureButton(document.defaultItems);
+                        if (apiVersion !== 'bread_2') {
+                            document.splitPayConfigureButton(document.defaultItems);
+                        }
                     }
                 }
-            },
+            }
         });
 
         $(document).ready(function() {
