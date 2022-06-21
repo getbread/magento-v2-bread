@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Handles Config & Basic Shared Helper Functionality
  *
@@ -6,100 +7,120 @@
  * @author Joel    @Mediotype
  * @author Miranda @Mediotype
  */
+
 namespace Bread\BreadCheckout\Helper;
 
-class Data extends \Magento\Framework\App\Helper\AbstractHelper
-{
-    const API_SANDBOX_URI                           = 'https://api-sandbox.getbread.com/';
-    const API_LIVE_URI                              = 'https://api.getbread.com/';
+class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 
-    const JS_SANDBOX_URI                            = 'https://checkout-sandbox.getbread.com/bread.js';
-    const JS_LIVE_URI                               = 'https://checkout.getbread.com/bread.js';
 
-    const URL_LAMBDA_SENTRY_DSN                     = 'https://oapavh9uvh.execute-api.us-east-1.amazonaws.com/prod/sentrydsn?platform=magento2';
-
-    const URL_VALIDATE_PAYMENT                      = 'bread/checkout/validatepaymentmethod';
-    const URL_VALIDATE_ORDER                        = 'bread/checkout/validateorder';
-    const URL_VALIDATE_TOTALS                       = 'bread/checkout/validatetotals';
-    const URL_SHIPPING_ESTIMATE                     = 'bread/checkout/estimateshipping';
-    const URL_TAX_ESTIMATE                          = 'bread/checkout/estimatetax';
-    const URL_CONFIG_DATA                           = 'bread/checkout/configdata';
-    const URL_DISCOUNTS_DATA                        = 'bread/checkout/discountsdata';
-    const URL_CLEAR_QUOTE                           = 'bread/checkout/clearquote';
-    const URL_GROUPED_ITEMS                         = 'bread/checkout/groupeditems';
-    const URL_LANDING_PAGE                          = 'bread/checkout/landingpage';
-    const URL_SHIPPING_OPTION                       = 'bread/checkout/shippingoption';
-    const URL_ADMIN_QUOTE_DATA                      = 'breadadmin/bread/quotedata';
-    const URL_ADMIN_VALIDATE_PAYMENT                = 'breadadmin/bread/validatepaymentmethod';
-    const URL_ADMIN_GENERATE_CART                   = 'breadadmin/bread/generatecart';
-    const URL_ADMIN_SEND_MAIL                       = 'breadadmin/bread/sendmail';
-    const URL_ADMIN_SEND_MAIL_BREAD                 = 'breadadmin/bread/sendbreademail';
-    const URL_ADMIN_SEND_SMS                        = 'breadadmin/bread/sendsms';
-
-    const XML_CONFIG_MODULE_ACTIVE                  = 'payment/breadcheckout/active';
-
-    const XML_CONFIG_AS_LOW_AS                      = 'payment/breadcheckout/as_low_as';
-    const XML_CONFIG_PAYMENT_ACTION                 = 'payment/breadcheckout/payment_action';
-    const XML_CONFIG_HEALTHCARE_MODE                = 'payment/breadcheckout/healthcare_mode';
-    const XML_CONFIG_SHOW_SPLITPAY_LABEL            = 'payment/breadcheckout/show_splitpay_label';
-    const XML_CONFIG_ACTIVE_ON_PDP                  = 'payment/breadcheckout/enabled_on_product_page';
-    const XML_CONFIG_ACTIVE_ON_CAT                  = 'payment/breadcheckout/bread_category/enabled_on_category_page';
-    const XML_CONFIG_ACTIVE_ON_CART_VIEW            = 'payment/breadcheckout/enabled_on_cart_page';
-    const XML_CONGIG_MINICART_CHECKOUT              = 'payment/breadcheckout/allowminicartcheckout';
-    const XML_CONFIG_ENABLE_AS_PAYMENT_METHOD       = 'payment/breadcheckout/display_as_payment_method';
-    const XML_CONFIG_CHECKOUT_TITLE                 = 'payment/breadcheckout/title';
-    const XML_CONFIG_CHECKOUT_PER_MONTH             = 'payment/breadcheckout/per_month';
-    const XML_CONFIG_INCOMPLETE_MSG                 = 'payment/breadcheckout/incomplete_checkout_message';
-    const XML_CONFIG_API_PUB_KEY                    = 'payment/breadcheckout/api_public_key';
-    const XML_CONFIG_API_SECRET_KEY                 = 'payment/breadcheckout/api_secret_key';
-    const XML_CONFIG_API_SANDBOX_PUB_KEY            = 'payment/breadcheckout/api_sandbox_public_key';
-    const XML_CONFIG_API_SANDBOX_SECRET_KEY         = 'payment/breadcheckout/api_sandbox_secret_key';
-    const XML_CONFIG_JS_LIB_LOCATION                = 'payment/breadcheckout/js_location';
-    const XML_CONFIG_BUTTON_ON_PRODUCTS             = 'payment/breadcheckout/button_on_products';
-    const XML_CONFIG_BUTTON_DESIGN                  = 'payment/breadcheckout/button_design';
-    const XML_CONFIG_API_MODE                       = 'payment/breadcheckout/api_mode';
-    const XML_CONFIG_DEFAULT_BUTTON_SIZE            = 'payment/breadcheckout/use_default_button_size';
-    const XML_CONFIG_CREATE_CUSTOMER                = 'payment/breadcheckout/bread_advanced/create_customer_account';
-    const XML_CONFIG_ALLOW_CHECKOUT_PDP             = 'payment/breadcheckout/allowcheckoutpdp';
-    const XML_CONFIG_ALLOW_CHECKOUT_CART            = 'payment/breadcheckout/allowcheckoutcart';
-    const XML_CONFIG_EMBEDDED_CHECKOUT              = 'payment/breadcheckout/embedded';
-    const XML_CONFIG_PRODUCT_TYPE_MSG               = 'payment/breadcheckout/product_type_msg';
-    const XML_CONFIG_ORDER_SHIPPED                  = 'payment/breadcheckout/bread_advanced/order_shipped';
-    const XML_CONFIG_DELETE_QUOTE_AFTER             = "checkout/cart/delete_quote_after";
-    const XML_CONFIG_THRESHOLD_AMOUNT               = 'payment/breadcheckout/bread_advanced/threshold_amount';
-    const XML_CONFIG_AUTO_CANCEL                    = 'payment/breadcheckout/split_auto_cancel';
-
-    const XML_CONFIG_ENABLE_TARGETED_FINANCING      = 'payment/breadcheckout/bread_advanced/targeted_financing';
-    const XML_CONFIG_TARGETED_FINANCING_ID          = 'payment/breadcheckout/bread_advanced/financing_program_id';
-    const XML_CONFIG_FINANCING_THRESHOLD            = 'payment/breadcheckout/bread_advanced/financing_threshold';
-    const XML_CONFIG_FINANCING_SKU                  = 'payment/breadcheckout/bread_advanced/financing_sku';
-    const XML_CONFIG_DISABLED_FOR_SKUS              = 'payment/breadcheckout/bread_advanced/disabled_skus';
-
-    const XML_CONFIG_CATEGORY_GROUP                 = 'payment/breadcheckout/bread_category';
-    const XML_CONFIG_CAT_AS_LOW_AS                  = 'payment/breadcheckout/bread_category/as_low_as';
-    const XML_CONFIG_CAT_LABEL_ONLY                 = 'payment/breadcheckout/bread_category/label_only';
-    const XML_CONFIG_CAT_BUTTON_DESIGN              = 'payment/breadcheckout/bread_category/button_design';
-    const XML_CONFIG_CAT_WINDOW                     = 'payment/breadcheckout/bread_category/display_new_window';
-    const XML_CONFIG_DEFAULT_BS_CAT                 = 'payment/breadcheckout/bread_category/use_default_button_size';
-    const XML_CONFIG_SELECT_CATEGORIES              = 'payment/breadcheckout/bread_category/categories';
-
-    const XML_CONFIG_CP_BUTTON_DESIGN               = 'payment/breadcheckout/bread_cartpage/button_design';
-    const XML_CONFIG_PDP_BUTTON_DESIGN              = 'payment/breadcheckout/bread_productdetail/button_design';
-
-    const XML_SENTRY_LOG_ENABLED                    = 'payment/breadcheckout/bread_advanced/sentry_enabled';
-
-    const BLOCK_CODE_PRODUCT_VIEW                   = 'product_view';
-    const BLOCK_CODE_CHECKOUT_OVERVIEW              = 'checkout_overview';
-
+    const API_SANDBOX_URI = 'https://api-sandbox.getbread.com/';
+    const API_LIVE_URI = 'https://api.getbread.com/';
+    
+    const API_PLATFORM_URI_RBC_LIVE = "https://api.rbcpayplan.com/api";
+    const API_PLATFORM_URI_RBC_SANDBOX = "https://api-preview.rbc.breadpayments.com/api";
+    
+    const API_PLATFORM_URI_CORE_LIVE = "https://api.platform.breadpayments.com/api";
+    const API_PLATFORM_URI_CORE_SANDBOX = "https://api-preview.platform.breadpayments.com/api";
+    
+    
+    const JS_SANDBOX_URI = 'https://checkout-sandbox.getbread.com/bread.js';
+    const JS_LIVE_URI = 'https://checkout.getbread.com/bread.js';
+    
+    
+    const URL_LAMBDA_SENTRY_DSN = 'https://oapavh9uvh.execute-api.us-east-1.amazonaws.com/prod/sentrydsn?platform=magento2';
+    const URL_VALIDATE_PAYMENT = 'bread/checkout/validatepaymentmethod';
+    const URL_VALIDATE_ORDER = 'bread/checkout/validateorder';
+    const URL_VALIDATE_TOTALS = 'bread/checkout/validatetotals';
+    const URL_SHIPPING_ESTIMATE = 'bread/checkout/estimateshipping';
+    const URL_TAX_ESTIMATE = 'bread/checkout/estimatetax';
+    const URL_CONFIG_DATA = 'bread/checkout/configdata';
+    const URL_DISCOUNTS_DATA = 'bread/checkout/discountsdata';
+    const URL_CLEAR_QUOTE = 'bread/checkout/clearquote';
+    const URL_GROUPED_ITEMS = 'bread/checkout/groupeditems';
+    const URL_LANDING_PAGE = 'bread/checkout/landingpage';
+    const URL_SHIPPING_OPTION = 'bread/checkout/shippingoption';
+    const URL_ADMIN_QUOTE_DATA = 'breadadmin/bread/quotedata';
+    const URL_ADMIN_VALIDATE_PAYMENT = 'breadadmin/bread/validatepaymentmethod';
+    const URL_ADMIN_GENERATE_CART = 'breadadmin/bread/generatecart';
+    const URL_ADMIN_SEND_MAIL = 'breadadmin/bread/sendmail';
+    const URL_ADMIN_SEND_MAIL_BREAD = 'breadadmin/bread/sendbreademail';
+    const URL_ADMIN_SEND_SMS = 'breadadmin/bread/sendsms';
+    const XML_CONFIG_MODULE_ACTIVE = 'payment/breadcheckout/active';
+    const XML_CONFIG_AS_LOW_AS = 'payment/breadcheckout/as_low_as';
+    const XML_CONFIG_PAYMENT_ACTION = 'payment/breadcheckout/payment_action';
+    const XML_CONFIG_HEALTHCARE_MODE = 'payment/breadcheckout/healthcare_mode';
+    const XML_CONFIG_SHOW_SPLITPAY_LABEL = 'payment/breadcheckout/show_splitpay_label';
+    const XML_CONFIG_ACTIVE_ON_PDP = 'payment/breadcheckout/enabled_on_product_page';
+    const XML_CONFIG_ACTIVE_ON_CAT = 'payment/breadcheckout/bread_category/enabled_on_category_page';
+    const XML_CONFIG_ACTIVE_ON_CART_VIEW = 'payment/breadcheckout/enabled_on_cart_page';
+    const XML_CONGIG_MINICART_CHECKOUT = 'payment/breadcheckout/allowminicartcheckout';
+    const XML_CONFIG_ENABLE_AS_PAYMENT_METHOD = 'payment/breadcheckout/display_as_payment_method';
+    const XML_CONFIG_CHECKOUT_TITLE = 'payment/breadcheckout/title';
+    const XML_CONFIG_CHECKOUT_PER_MONTH = 'payment/breadcheckout/per_month';
+    const XML_CONFIG_INCOMPLETE_MSG = 'payment/breadcheckout/incomplete_checkout_message';
+    const XML_CONFIG_API_PUB_KEY = 'payment/breadcheckout/api_public_key';
+    const XML_CONFIG_API_SECRET_KEY = 'payment/breadcheckout/api_secret_key';
+    const XML_CONFIG_API_SANDBOX_PUB_KEY = 'payment/breadcheckout/api_sandbox_public_key';
+    const XML_CONFIG_API_SANDBOX_SECRET_KEY = 'payment/breadcheckout/api_sandbox_secret_key';
+    const XML_CONFIG_JS_LIB_LOCATION = 'payment/breadcheckout/js_location';
+    const XML_CONFIG_BUTTON_ON_PRODUCTS = 'payment/breadcheckout/button_on_products';
+    const XML_CONFIG_BUTTON_DESIGN = 'payment/breadcheckout/button_design';
+    const XML_CONFIG_API_MODE = 'payment/breadcheckout/api_mode';
+    const XML_CONFIG_DEFAULT_BUTTON_SIZE = 'payment/breadcheckout/use_default_button_size';
+    const XML_CONFIG_CREATE_CUSTOMER = 'payment/breadcheckout/bread_advanced/create_customer_account';
+    const XML_CONFIG_ALLOW_CHECKOUT_PDP = 'payment/breadcheckout/allowcheckoutpdp';
+    const XML_CONFIG_ALLOW_CHECKOUT_CART = 'payment/breadcheckout/allowcheckoutcart';
+    const XML_CONFIG_EMBEDDED_CHECKOUT = 'payment/breadcheckout/embedded';
+    const XML_CONFIG_PRODUCT_TYPE_MSG = 'payment/breadcheckout/product_type_msg';
+    const XML_CONFIG_ORDER_SHIPPED = 'payment/breadcheckout/bread_advanced/order_shipped';
+    const XML_CONFIG_DELETE_QUOTE_AFTER = "checkout/cart/delete_quote_after";
+    const XML_CONFIG_THRESHOLD_AMOUNT = 'payment/breadcheckout/bread_advanced/threshold_amount';
+    const XML_CONFIG_AUTO_CANCEL = 'payment/breadcheckout/split_auto_cancel';
+    const XML_CONFIG_ENABLE_TARGETED_FINANCING = 'payment/breadcheckout/bread_advanced/targeted_financing';
+    const XML_CONFIG_TARGETED_FINANCING_ID = 'payment/breadcheckout/bread_advanced/financing_program_id';
+    const XML_CONFIG_FINANCING_THRESHOLD = 'payment/breadcheckout/bread_advanced/financing_threshold';
+    const XML_CONFIG_FINANCING_SKU = 'payment/breadcheckout/bread_advanced/financing_sku';
+    const XML_CONFIG_DISABLED_FOR_SKUS = 'payment/breadcheckout/bread_advanced/disabled_skus';
+    const XML_CONFIG_CATEGORY_GROUP = 'payment/breadcheckout/bread_category';
+    const XML_CONFIG_CAT_AS_LOW_AS = 'payment/breadcheckout/bread_category/as_low_as';
+    const XML_CONFIG_CAT_LABEL_ONLY = 'payment/breadcheckout/bread_category/label_only';
+    const XML_CONFIG_CAT_BUTTON_DESIGN = 'payment/breadcheckout/bread_category/button_design';
+    const XML_CONFIG_CAT_WINDOW = 'payment/breadcheckout/bread_category/display_new_window';
+    const XML_CONFIG_DEFAULT_BS_CAT = 'payment/breadcheckout/bread_category/use_default_button_size';
+    const XML_CONFIG_SELECT_CATEGORIES = 'payment/breadcheckout/bread_category/categories';
+    const XML_CONFIG_CP_BUTTON_DESIGN = 'payment/breadcheckout/bread_cartpage/button_design';
+    const XML_CONFIG_PDP_BUTTON_DESIGN = 'payment/breadcheckout/bread_productdetail/button_design';
+    const XML_SENTRY_LOG_ENABLED = 'payment/breadcheckout/bread_advanced/sentry_enabled';
+    const BLOCK_CODE_PRODUCT_VIEW = 'product_view';
+    const BLOCK_CODE_CHECKOUT_OVERVIEW = 'checkout_overview';
     // Bread button locations
-    const BUTTON_LOCATION_PRODUCT_VIEW              = 'product';
-    const BUTTON_LOCATION_CART_SUMMARY              = 'cart_summary';
-    const BUTTON_LOCATION_CHECKOUT                  = 'checkout';
-    const BUTTON_LOCATION_FINANCING                 = 'financing';
-    const BUTTON_LOCATION_MARKETING                 = 'marketing';
-    const BUTTON_LOCATION_CATEGORY                  = 'category';
-    const BUTTON_LOCATION_OTHER                     = 'other';
-    const API_CART_EXTENSION                        = 'carts/';
+    const BUTTON_LOCATION_PRODUCT_VIEW = 'product';
+    const BUTTON_LOCATION_CART_SUMMARY = 'cart_summary';
+    const BUTTON_LOCATION_CHECKOUT = 'checkout';
+    const BUTTON_LOCATION_FINANCING = 'financing';
+    const BUTTON_LOCATION_MARKETING = 'marketing';
+    const BUTTON_LOCATION_CATEGORY = 'category';
+    const BUTTON_LOCATION_OTHER = 'other';
+    const API_CART_EXTENSION = 'carts/';
+    
+    const JS_SANDBOX_SDK_CORE = 'https://connect-preview.breadpayments.com/sdk.js';
+    const JS_LIVE_SDK_CORE = 'https://connect.breadpayments.com/sdk.js';
+    
+    const JS_SANDBOX_SDK_RBC = 'https://connect-preview.rbc.breadpayments.com/sdk.js';
+    const JS_LIVE_SDK_RBC = 'https://connect.rbcpayplan.com/sdk.js';
+    
+    //Bread 2.0 configurations
+    const XML_CONFIG_CLIENT                         = 'payment/breadcheckout/tenant';
+    const XML_CONFIG_API_VERSION                    = 'payment/breadcheckout/api_version';
+    const XML_CONFIG_AUTH_TOKEN                     = 'payment/breadcheckout/bread_auth_token';
+    
+    const XML_CONFIG_BREAD_API_PUB_KEY              = 'payment/breadcheckout/bread_api_public_key';
+    const XML_CONFIG_BREAD_API_SECRET_KEY           = 'payment/breadcheckout/bread_api_secret_key';
+    const XML_CONFIG_BREAD_INTEGRATION_KEY          = 'payment/breadcheckout/api_integration_key';
+    
+    const XML_CONFIG_BREAD_API_SANDBOX_PUB_KEY      = 'payment/breadcheckout/api_sandbox_public_key';
+    const XML_CONFIG_BREAD_API_SANDBOX_SECRET_KEY   = 'payment/breadcheckout/api_sandbox_secret_key';
+    const XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY    = 'payment/breadcheckout/api_sandbox_integration_key';
 
     /**
      * @var \Magento\Framework\Model\Context
@@ -125,24 +146,41 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Framework\UrlInterfaceFactory
      */
     public $urlInterfaceFactory;
+    
+    /**
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    public $storeManager;
 
+    /**
+     * 
+     * @param \Magento\Framework\App\Helper\Context $helperContext
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Framework\Encryption\Encryptor $encryptor
+     * @param \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $helperContext,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\App\Request\Http $request,
-        \Magento\Framework\Encryption\Encryptor $encryptor,
-        \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory
+            \Magento\Framework\App\Helper\Context $helperContext,
+            \Magento\Framework\Model\Context $context,
+            \Magento\Framework\App\Request\Http $request,
+            \Magento\Framework\Encryption\Encryptor $encryptor,
+            \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
+            \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->context = $context;
         $this->request = $request;
         $this->scopeConfig = $helperContext->getScopeConfig();
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
+        $this->storeManager = $storeManager;
         parent::__construct(
-            $helperContext
+                $helperContext
         );
     }
-    
+
     /**
      * Is module active?
      *
@@ -150,8 +188,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $storeCode
      * @return bool
      */
-    public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode = null)
-    {
+    public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode = null) {
         return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_MODULE_ACTIVE, $store, $storeCode);
     }
 
@@ -161,8 +198,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string $typeId
      * @return bool
      */
-    public function allowedProductType($typeId)
-    {
+    public function allowedProductType($typeId) {
         $allowedProductTypes = [
             \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE,
             \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
@@ -180,8 +216,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string $store
      * @return mixed
      */
-    public function getProductTypeMessage($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getProductTypeMessage($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return $this->scopeConfig->getValue(self::XML_CONFIG_PRODUCT_TYPE_MSG, $store);
     }
 
@@ -192,9 +227,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @return bool
      */
     /*    public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_LOG_ENABLED, $store);
-    }*/
+      {
+      return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_LOG_ENABLED, $store);
+      } */
 
     /**
      * Get API Pub Key
@@ -202,8 +237,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getApiPublicKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getApiPublicKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
             return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store, $storeCode);
         } else {
@@ -217,15 +251,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return string
      */
-    public function getApiSecretKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getApiSecretKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
             return (string) $this->encryptor->decrypt(
-                $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
+                            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
             );
         } else {
             return (string) $this->encryptor->decrypt(
-                $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_SECRET_KEY, $store, $storeCode)
+                            $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_SECRET_KEY, $store, $storeCode)
             );
         }
     }
@@ -236,12 +269,34 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
-            return self::JS_LIVE_URI;
+    public function getJsLibLocation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $apiVersion = $this->getApiVersion();
+        
+        if ($apiVersion === 'bread_2') {
+            $client = $this->getConfigClient();
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {               
+                switch($client) {
+                    case 'RBC':
+                        return self::JS_LIVE_SDK_RBC;
+                        break;
+                    default:
+                        return self::JS_LIVE_SDK_CORE;    
+                }                
+            } else {
+                switch ($client) {
+                    case 'RBC':
+                        return self::JS_SANDBOX_SDK_RBC;
+                        break;
+                    default:
+                        return self::JS_SANDBOX_SDK_CORE;
+                }        
+            }
         } else {
-            return self::JS_SANDBOX_URI;
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return self::JS_LIVE_URI;
+            } else {
+                return self::JS_SANDBOX_URI;
+            }
         }
     }
 
@@ -251,13 +306,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
-            return self::API_LIVE_URI;
+    public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $apiVersion = $this->getApiVersion($storeCode, $store);
+        if($apiVersion === 'bread_2') {
+            $tenant = strtoupper($this->getConfigClient($storeCode, $store));
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
+                return $this->getPlatformApiUri($tenant, 'LIVE');
+            } else {
+                return $this->getPlatformApiUri($tenant, 'SANDBOX');
+            }
         } else {
-            return self::API_SANDBOX_URI;
-        }
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
+                return self::API_LIVE_URI;
+            } else {
+                return self::API_SANDBOX_URI;
+            }
+        }        
     }
 
     /**
@@ -265,10 +329,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getPaymentUrl()
-    {
+    public function getPaymentUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_PAYMENT, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_PAYMENT, ['_secure' => $isSecure]);
     }
 
     /**
@@ -276,10 +339,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getValidateOrderURL()
-    {
+    public function getValidateOrderURL() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_ORDER, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_ORDER, ['_secure' => $isSecure]);
     }
 
     /**
@@ -287,19 +349,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getValidateTotalsUrl()
-    {
+    public function getValidateTotalsUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_TOTALS, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_VALIDATE_TOTALS, ['_secure' => $isSecure]);
     }
 
     /**
      * Get Shipping Address Estimate URL
      */
-    public function getShippingEstimateUrl()
-    {
+    public function getShippingEstimateUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_ESTIMATE, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_ESTIMATE, ['_secure' => $isSecure]);
     }
 
     /**
@@ -307,10 +367,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getTaxEstimateUrl()
-    {
+    public function getTaxEstimateUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_TAX_ESTIMATE, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_TAX_ESTIMATE, ['_secure' => $isSecure]);
     }
 
     /**
@@ -319,10 +378,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getConfigDataUrl()
-    {
+    public function getConfigDataUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_CONFIG_DATA, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_CONFIG_DATA, ['_secure' => $isSecure]);
     }
 
     /**
@@ -331,10 +389,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getDiscountsDataUrl()
-    {
+    public function getDiscountsDataUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_DISCOUNTS_DATA, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_DISCOUNTS_DATA, ['_secure' => $isSecure]);
     }
 
     /**
@@ -343,10 +400,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getClearQuoteUrl()
-    {
+    public function getClearQuoteUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_CLEAR_QUOTE, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_CLEAR_QUOTE, ['_secure' => $isSecure]);
     }
 
     /**
@@ -355,20 +411,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getGroupedProductItemsUrl()
-    {
+    public function getGroupedProductItemsUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_GROUPED_ITEMS, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_GROUPED_ITEMS, ['_secure' => $isSecure]);
     }
+
     /**
      * Get URL for quote data retrieval in admin checkout
      *
      * @return string
      */
-    public function getQuoteDataUrl()
-    {
+    public function getQuoteDataUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_QUOTE_DATA, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_QUOTE_DATA, ['_secure' => $isSecure]);
     }
 
     /**
@@ -376,10 +431,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getGenerateCartUrl()
-    {
+    public function getGenerateCartUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_GENERATE_CART, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_GENERATE_CART, ['_secure' => $isSecure]);
     }
 
     /**
@@ -387,10 +441,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getSendMailUrl()
-    {
+    public function getSendMailUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_MAIL, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_MAIL, ['_secure' => $isSecure]);
     }
 
     /**
@@ -398,10 +451,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getSendMailBreadUrl()
-    {
+    public function getSendMailBreadUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_MAIL_BREAD, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_MAIL_BREAD, ['_secure' => $isSecure]);
     }
 
     /**
@@ -409,10 +461,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getSendSmsUrl()
-    {
+    public function getSendSmsUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_SMS, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_SEND_SMS, ['_secure' => $isSecure]);
     }
 
     /**
@@ -420,10 +471,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getAdminPaymentUrl()
-    {
+    public function getAdminPaymentUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_VALIDATE_PAYMENT, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_ADMIN_VALIDATE_PAYMENT, ['_secure' => $isSecure]);
     }
 
     /**
@@ -431,10 +481,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getShippingOptionUrl()
-    {
+    public function getShippingOptionUrl() {
         $isSecure = $this->request->isSecure();
-        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_OPTION, ['_secure'=>$isSecure]);
+        return $this->urlInterfaceFactory->create()->getUrl(self::URL_SHIPPING_OPTION, ['_secure' => $isSecure]);
     }
 
     /**
@@ -443,8 +492,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return string
      */
-    public function getPaymentAction($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getPaymentAction($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (string) $this->scopeConfig->getValue(self::XML_CONFIG_PAYMENT_ACTION, $store);
     }
 
@@ -454,8 +502,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return string
      */
-    public function getPaymentMethodTitle($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getPaymentMethodTitle($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (string) $this->__("" . $this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_TITLE, $store));
     }
 
@@ -465,9 +512,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  $store
      * @return string
      */
-    public function showPerMonthCalculation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_PER_MONTH, $store);
+    public function showPerMonthCalculation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_PER_MONTH, $store);
     }
 
     /**
@@ -476,10 +522,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isAutoCreateCustomerAccountEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store)
-            && $this->scopeConfig->getValue(self::XML_CONFIG_CREATE_CUSTOMER, $store));
+    public function isAutoCreateCustomerAccountEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_CREATE_CUSTOMER, $store));
     }
 
     /**
@@ -488,8 +532,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isButtonOnProducts($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function isButtonOnProducts($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_ON_PRODUCTS, $store);
     }
 
@@ -499,10 +542,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isEnabledOnPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store)
-            && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_PDP, $store));
+    public function isEnabledOnPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_PDP, $store));
     }
 
     /**
@@ -511,10 +552,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isEnabledOnCOP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store)
-            && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_CART_VIEW, $store));
+    public function isEnabledOnCOP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_CART_VIEW, $store));
     }
 
     /**
@@ -523,10 +562,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isPaymentMethodAtCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store)
-            && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_AS_PAYMENT_METHOD, $store));
+    public function isPaymentMethodAtCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_AS_PAYMENT_METHOD, $store));
     }
 
     /**
@@ -535,13 +572,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isHealthcare($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function isHealthcare($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) (
-            $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store, $storeCode)
-        );
+                $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store, $storeCode)
+                );
     }
-    
+
     /**
      * Are we showing the split pay label
      * 
@@ -550,8 +586,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function showSplitpayLabelOnCheckout($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) (
-            $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_SHOW_SPLITPAY_LABEL, $store, $storeCode)
-        );
+                $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_SHOW_SPLITPAY_LABEL, $store, $storeCode)
+                );
     }
 
     /**
@@ -560,8 +596,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isAsLowAs($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function isAsLowAs($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_AS_LOW_AS, $store, $storeCode));
     }
 
@@ -571,10 +606,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function getAllowCheckoutPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store)
-            && !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_PDP, $store));
+    public function getAllowCheckoutPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) ($this->isActive($store) && !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_PDP, $store));
     }
 
     /**
@@ -583,10 +616,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function getAllowCheckoutCP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getAllowCheckoutCP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) ($this->isActive($store) &&
-            !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_CART, $store));
+                !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_CART, $store));
     }
 
     /**
@@ -594,10 +626,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return bool
      */
-    public function isTargetedFinancing($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool) ($this->isActive($store, $storeCode)
-            && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode));
+    public function isTargetedFinancing($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode));
     }
 
     /**
@@ -605,8 +635,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getFinancingId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getFinancingId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return $this->scopeConfig->getValue(self::XML_CONFIG_TARGETED_FINANCING_ID, $store, $storeCode);
     }
 
@@ -615,8 +644,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getTargetedFinancingThreshold($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getTargetedFinancingThreshold($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return round($this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store, $storeCode), 2);
     }
 
@@ -626,8 +654,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $store
      * @return array
      */
-    public function getTargetedFinancingSkus($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getTargetedFinancingSkus($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store, $storeCode);
         $list = preg_replace('/\s/', '', $list);
 
@@ -641,9 +668,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $store
      * @return int
      */
-    public function checkFinancingMode($mode, $storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        $configVal = (int)$this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode);
+    public function checkFinancingMode($mode, $storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $configVal = (int) $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode);
         $output = null;
 
         switch ($mode) {
@@ -663,9 +689,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getBlockCodeProductView()
-    {
-        return  (string) self::BLOCK_CODE_PRODUCT_VIEW;
+    public function getBlockCodeProductView() {
+        return (string) self::BLOCK_CODE_PRODUCT_VIEW;
     }
 
     /**
@@ -673,8 +698,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getBlockCodeCheckoutOverview()
-    {
+    public function getBlockCodeCheckoutOverview() {
         return (string) self::BLOCK_CODE_CHECKOUT_OVERVIEW;
     }
 
@@ -684,8 +708,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getButtonDesign($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getButtonDesign($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_DESIGN, $store, $storeCode);
     }
 
@@ -695,8 +718,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getCartButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getCartButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return $this->scopeConfig->getValue(self::XML_CONFIG_CP_BUTTON_DESIGN, $store);
     }
 
@@ -706,8 +728,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getPDPButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getPDPButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return $this->scopeConfig->getValue(self::XML_CONFIG_PDP_BUTTON_DESIGN, $store);
     }
 
@@ -717,10 +738,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function useDefaultButtonSize($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function useDefaultButtonSize($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) ($this->isActive($store) &&
-                       $this->scopeConfig->getValue(self::XML_CONFIG_DEFAULT_BUTTON_SIZE, $store));
+                $this->scopeConfig->getValue(self::XML_CONFIG_DEFAULT_BUTTON_SIZE, $store));
     }
 
     /**
@@ -729,8 +749,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string $store
      * @return string
      */
-    public function getIncompleteCheckoutMsg($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getIncompleteCheckoutMsg($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INCOMPLETE_MSG, $store);
     }
 
@@ -740,9 +759,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string $store
      * @return int
      */
-    public function embeddedCheckoutEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_EMBEDDED_CHECKOUT, $store);
+    public function embeddedCheckoutEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_EMBEDDED_CHECKOUT, $store);
     }
 
     /**
@@ -751,9 +769,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function dispatchShipmentData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_ORDER_SHIPPED, $store);
+    public function dispatchShipmentData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_ORDER_SHIPPED, $store);
     }
 
     /**
@@ -762,9 +779,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return bool
      */
-    public function isSentryEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool)$this->scopeConfig->getValue(self::XML_SENTRY_LOG_ENABLED, $store);
+    public function isSentryEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) $this->scopeConfig->getValue(self::XML_SENTRY_LOG_ENABLED, $store);
     }
 
     /**
@@ -774,8 +790,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getQuoteExpiration($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getQuoteExpiration($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return $this->scopeConfig->getValue(self::XML_CONFIG_DELETE_QUOTE_AFTER, $store);
     }
 
@@ -784,8 +799,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getDefaultCountry()
-    {
+    public function getDefaultCountry() {
         return 'US';
     }
 
@@ -794,13 +808,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getFinancingData($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
+    public function getFinancingData($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return [
             "enabled" => $this->isTargetedFinancing($storeCode, $store),
             "mode" => [
-                'cart'=> $this->checkFinancingMode('cart', $storeCode, $store),
-                'sku'=> $this->checkFinancingMode('sku', $storeCode, $store)
+                'cart' => $this->checkFinancingMode('cart', $storeCode, $store),
+                'sku' => $this->checkFinancingMode('sku', $storeCode, $store)
             ],
             "id" => $this->getFinancingId($storeCode, $store),
             "threshold" => $this->getTargetedFinancingThreshold($storeCode, $store),
@@ -813,10 +826,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return bool
      */
-    public function isInAdmin()
-    {
-        return (bool) ($this->context->getAppState()->getAreaCode()
-            == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
+    public function isInAdmin() {
+        return (bool) ($this->context->getAppState()->getAreaCode() == \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
     }
 
     /**
@@ -824,8 +835,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getProductViewLocation()
-    {
+    public function getProductViewLocation() {
         return (string) self::BUTTON_LOCATION_PRODUCT_VIEW;
     }
 
@@ -834,8 +844,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getCartSummaryLocation()
-    {
+    public function getCartSummaryLocation() {
         return (string) self::BUTTON_LOCATION_CART_SUMMARY;
     }
 
@@ -844,8 +853,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getCheckoutLocation()
-    {
+    public function getCheckoutLocation() {
         return (string) self::BUTTON_LOCATION_CHECKOUT;
     }
 
@@ -854,8 +862,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getFinancingLocation()
-    {
+    public function getFinancingLocation() {
         return (string) self::BUTTON_LOCATION_FINANCING;
     }
 
@@ -864,8 +871,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getMarketingLocation()
-    {
+    public function getMarketingLocation() {
         return (string) self::BUTTON_LOCATION_MARKETING;
     }
 
@@ -874,8 +880,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getCategoryPageLocation()
-    {
+    public function getCategoryPageLocation() {
         return (string) self::BUTTON_LOCATION_CATEGORY;
     }
 
@@ -884,8 +889,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getOtherLocation()
-    {
+    public function getOtherLocation() {
         return (string) self::BUTTON_LOCATION_OTHER;
     }
 
@@ -896,8 +900,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function escapeCustomCSS($input)
-    {
+    public function escapeCustomCSS($input) {
         return str_replace("'", '"', $input);
     }
 
@@ -907,9 +910,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  null $store
      * @return mixed
      */
-    public function getCartCreateApiUrl($store = null)
-    {
-        return $this->getTransactionApiUrl($store).self::API_CART_EXTENSION;
+    public function getCartCreateApiUrl($store = null) {
+        return $this->getTransactionApiUrl($store) . self::API_CART_EXTENSION;
     }
 
     /**
@@ -918,9 +920,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string $store
      * @return bool
      */
-    public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
+    public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) $this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
     }
 
     /**
@@ -929,13 +930,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  float $cost
      * @return bool
      */
-    public function aboveThreshold($cost)
-    {
+    public function aboveThreshold($cost) {
         $aboveThreshold = true;
-        $thresholdAmount = (int)$this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
+        $thresholdAmount = (int) $this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
 
         if ($thresholdAmount) {
-            $aboveThreshold = (int)$cost >= $thresholdAmount;
+            $aboveThreshold = (int) $cost >= $thresholdAmount;
         }
 
         return $aboveThreshold;
@@ -947,8 +947,113 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string $store
      * @return bool
      */
-    public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-    {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
+    public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
     }
+
+    /**
+     * Return api url array
+     *
+     * @since 2.1.0
+     * @param null 
+     * @return arr 
+     */
+    public function getPlatformApiUri($tenant, $env) {
+        switch ($tenant) {
+            case 'RBC':
+                if ($env === 'LIVE') {
+                    return self::API_PLATFORM_URI_RBC_LIVE;
+                } else {
+                    return self::API_PLATFORM_URI_RBC_SANDBOX;
+                }
+                break;
+            case 'CORE':
+            default:
+                if ($env === 'LIVE') {
+                    return self::API_PLATFORM_URI_CORE_LIVE;
+                } else {
+                    return self::API_PLATFORM_URI_CORE_SANDBOX;
+                }
+        }
+    }
+    
+    /**
+     * @since 2.1.0
+     * @param null $storeCode
+     * @param $store
+     * @return string
+     */
+    public function getApiVersion($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if($this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode);
+        } else {
+            return 'bread_2';
+        }
+    }
+    
+    /**
+     * Returns the tenant name from the database
+     * 
+     * @since 2.1.0
+     * @return string
+     */
+    public function getConfigClient($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return strtoupper($this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode));
+    }
+    
+    /**
+     * @since 2.1.0
+     * @param null $storeCode
+     * @param string $store
+     * @return string
+     */
+    public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_INTEGRATION_KEY, $store, $storeCode);
+        } else {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY, $store, $storeCode);
+        }
+    }
+    
+    /**
+     * @since 2.1.0
+     * @param type $storeCode
+     * @param type $store
+     * @return type
+     */
+    public function getAuthToken($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
+    }
+    
+    /**
+     * Get the merchant country code
+     * 
+     * @since 2.1.0
+     * @return string
+     */
+    public function getMerchantCountry($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $client = $this->getConfigClient();
+        switch($client) {
+            case 'RBC':
+                return 'CA';
+            case 'CORE':
+                return 'US';
+            default:    
+                return $this->scopeConfig->getValue('general/country/default', $store, $storeCode);
+        }
+    }
+    
+    /**
+     * 
+     * Get the current selected currency
+     * 
+     * @since 2.1.0
+     * @return string
+     */
+    public function getCurrentCurrencyCode() {
+        error_log('NIAJEJ NIAHE NIAHE');
+        error_log($this->storeManager->getStore()->getCurrentCurrencyCode());
+        return $this->storeManager->getStore()->getCurrentCurrencyCode();
+    }
+
 }

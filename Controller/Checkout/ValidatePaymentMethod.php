@@ -75,19 +75,37 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
      */
     public function execute()
     {
+        $result = null;
         try {
             $token = $this->getRequest()->getParam('token');
             $newData = [];
 
             if ($token) {
                 $data = $this->paymentApiClient->getInfo($token);
-                if ($data['breadTransactionId']) {
-                    $this->checkoutSession->setBreadTransactionId($token);
-                    $newData = $this->updateQuote($token);
+                $apiVersion = $this->helper->getApiVersion();
+                if($apiVersion === 'bread_2') {
+                    $this->logger->log([
+                        'Validate Payment',
+                        'DATA' => $data
+                    ]);
+                    if(isset($data['id'])) {
+                        $this->checkoutSession->setBreadTransactionId($token);
+                        $newData = $this->updateQuotePlatform($data);
+                    }
+                      
+                    if(isset($data['adjustedAmount'])) {
+                        $this->helper->setBreadTransactionAmount($data['adjustedAmount']['value']);
+                    }
+                } else {
+                    if ($data['breadTransactionId']) {
+                        $this->checkoutSession->setBreadTransactionId($token);
+                        $newData = $this->updateQuote($token);
+                    }
+                    if ($data['adjustedTotal']) {
+                        $this->helper->setBreadTransactionAmount($data['adjustedTotal']);
+                    }
                 }
-                if ($data['adjustedTotal']) {
-                    $this->helper->setBreadTransactionAmount($data['adjustedTotal']);
-                }
+                
             }
 
             $result = $newData;
@@ -115,6 +133,20 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
 
         return ['billingAddress' => $quote->getBillingAddress()->getData()];
     }
+    
+    /**
+     * @since 2.0.2
+     * @param array $data
+     * @return array
+     */
+    protected function updateQuotePlatform($data) {
+        $billingData = $this->getFormattedAddress($data['billingContact']);
+
+        $quote = $this->checkoutSession->getQuote();
+        $quote->getBillingAddress()->addData($billingData);
+
+        return ['billingAddress' => $quote->getBillingAddress()->getData()];
+    }
 
     /**
      * Get address in correct format to add to Address object
@@ -124,20 +156,39 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
      */
     protected function getFormattedAddress(array $data)
     {
-        $name = explode(' ', trim($data['fullName']));
-        $regionId = $this->regionFactory->create()->loadByCode($data['state'], 'US')->getId();
+        $breadVersion = $this->helper->getApiVersion();
+        if ($breadVersion === 'bread_2') {
+            $merchantCountry = $this->helper->getMerchantCountry();
+            $regionId = $this->regionFactory->create()->loadByCode($data['address']['region'], $merchantCountry)->getId();
+            return [
+                'firstname' => $data['name']['givenName'],
+                'lastname' => $data['name']['familyName'],
+                'street' => $data['address']['address1'],
+                'city' => $data['address']['locality'],
+                'country_id' => $merchantCountry,
+                'region' => $data['address']['region'],
+                'region_id' => $regionId,
+                'postcode' => $data['address']['postalCode'],
+                'telephone' => $data['phone'],
+                'save_in_address_book' => 1
+            ];
+            
+        } else {
+            $name = explode(' ', trim($data['fullName']));
+            $regionId = $this->regionFactory->create()->loadByCode($data['state'], 'US')->getId();
 
-        return [
-            'firstname' => $name[0],
-            'lastname' => $name[1],
-            'street' => $data['address'],
-            'city' => $data['city'],
-            'country_id' => 'US',
-            'region' => $data['state'],
-            'region_id' => $regionId,
-            'postcode' => $data['zip'],
-            'telephone' => $data['phone'],
-            'save_in_address_book' => 1
-        ];
+            return [
+                'firstname' => $name[0],
+                'lastname' => $name[1],
+                'street' => $data['address'],
+                'city' => $data['city'],
+                'country_id' => 'US',
+                'region' => $data['state'],
+                'region_id' => $regionId,
+                'postcode' => $data['zip'],
+                'telephone' => $data['phone'],
+                'save_in_address_book' => 1
+            ];
+        }
     }
 }

@@ -502,4 +502,12 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     {
         return $this->getProduct()->getTypeId() === \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE;
     }
+    
+    /**
+     * @since 2.1.0
+     * @return type
+     */
+    public function getApiVersion() {
+        return (string) $this->dataHelper->getApiVersion();
+    }
 }

@@ -22,7 +22,7 @@ define(
                     disableEditShipping: true,
                     onShowCheckoutError: function (message) {
                         var errorInfo = {
-                            bread_config: window.checkoutConfig.payment.breadcheckout.breadConfig,
+                            bread_config: window.checkoutConfig.payment.breadcheckout.breadConfig
                         };
                         document.logBreadIssue('error', errorInfo, 'onShowCheckoutError triggered');
 

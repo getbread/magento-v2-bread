@@ -6,6 +6,8 @@ require(
     ],
     function ($, alert) {
         var apiMode = $("#payment_us_breadcheckout_api_mode").val(),
+            apiVersion = $("#payment_us_breadcheckout_api_version").val(),    
+            tenant = $("#payment_us_breadcheckout_tenant").val(),
             prodKey = "#payment_us_breadcheckout_api_public_key",
             prodSecret = "#payment_us_breadcheckout_api_secret_key",
             sandKey = "#payment_us_breadcheckout_api_sandbox_public_key",
@@ -29,8 +31,10 @@ require(
                                 form_key: window.FORM_KEY,
                                 apiMode: apiMode,
                                 pubKey: key,
-                                secKey: secret
-                            },
+                                secKey: secret,
+                                apiVersion: apiVersion,
+                                tenant: tenant
+                            }
                         }
                     ).done(
                         function (response) {

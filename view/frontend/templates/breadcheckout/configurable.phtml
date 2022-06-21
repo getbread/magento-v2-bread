@@ -5,31 +5,31 @@
 
 
 
-    require(['jquery', 'underscore'], function($, _) {
+    require(['jquery', 'underscore'], function ($, _) {
         $(document).ready(function () {
-
+            let apiVersion = <?= /* @noEscape */ $block->getApiVersion(); ?>;
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
              */
 
-            $('#product_addtocart_form').on('change', function() {
+            $('#product_addtocart_form').on('change', function () {
                 spConfig.updateButton(this);
             });
 
 
-            spConfig.updateButton = function(form) {
+            spConfig.updateButton = function (form) {
                 /**
                  * Get values from hidden inputs
                  */
                 var selectedOptions = {};
                 var validSuperAttribute = '';
-                $('[name^="super_attribute"]').each(function() {
+                $('[name^="super_attribute"]').each(function () {
                     var attributeId = $(this).attr('name').match(/\[(\d+)\]/)[1];
                     selectedOptions[attributeId] = $(this).val();
                     validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
                 });
-                validSuperAttribute =  Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
+                validSuperAttribute = Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
 
                 if (validSuperAttribute) {
 
@@ -38,9 +38,11 @@
                         /** Reconfigure Bread button if we narrowed it down to 1 product */
                         document.selectedSimpleProductId = newProductId;
                         document.selectedSku = document.baseProductSku + "///" +
-                            document.Skus[document.selectedSimpleProductId];
+                        document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
-                        document.splitPayResetPriceAndSku(true);
+                        if (apiVersion !== 'bread_2') {
+                            document.splitPayResetPriceAndSku(true);
+                        }
                     }
                 }
             };
@@ -53,7 +55,7 @@
              * @param object selectedOptions
              * @returns mixed
              */
-            spConfig.getIdOfSelectedProduct = function(selectedOptions) {
+            spConfig.getIdOfSelectedProduct = function (selectedOptions) {
                 if ($.isEmptyObject(selectedOptions)) {
                     return null;
                 }
@@ -64,7 +66,7 @@
                     return null;
                 }
 
-                var selectedProductId = Object.keys(productsIndex).find(function(productId) {
+                var selectedProductId = Object.keys(productsIndex).find(function (productId) {
                     var currentProductOptions = productsIndex[productId];
 
                     return _.isEqual(currentProductOptions, selectedOptions);
@@ -73,31 +75,31 @@
                 return selectedProductId || this.getIdOfSelectedProductOLDVERSION(selectedOptions);
             };
 
-            spConfig.getIdOfSelectedProductOLDVERSION = function(selectedOptions) {
+            spConfig.getIdOfSelectedProductOLDVERSION = function (selectedOptions) {
                 var logInfo = {
                     index: this.index,
                     attributes: this.attributes,
                     selected_options: selectedOptions
                 };
 
-                $.each(this.attributes, function(attrId, attrVal) {
+                $.each(this.attributes, function (attrId, attrVal) {
                     var optionId = selectedOptions[attrId];
 
-                    $.each(attrVal.options, function(i, optionData) {
-                       if (optionData.id === optionId) {
-                           if (spConfig.productIds.length === 0) {
-                               spConfig.productIds = optionData.products;
-                           } else {
-                               var updatedProductIds = [];
-                               $.each(optionData.products, function(j, productId) {
-                                   if ($.inArray(productId, spConfig.productIds) !== -1) {
-                                       updatedProductIds.push(productId);
-                                   }
-                               });
-                               spConfig.productIds = updatedProductIds;
-                           }
-                           return false; // breaks $.each loop
-                       }
+                    $.each(attrVal.options, function (i, optionData) {
+                        if (optionData.id === optionId) {
+                            if (spConfig.productIds.length === 0) {
+                                spConfig.productIds = optionData.products;
+                            } else {
+                                var updatedProductIds = [];
+                                $.each(optionData.products, function (j, productId) {
+                                    if ($.inArray(productId, spConfig.productIds) !== -1) {
+                                        updatedProductIds.push(productId);
+                                    }
+                                });
+                                spConfig.productIds = updatedProductIds;
+                            }
+                            return false; // breaks $.each loop
+                        }
                     });
                 });
 
@@ -109,17 +111,17 @@
                 }
             };
 
-            <?php
-            $itemIds = $block->getChildProductIds($block->getProduct());
+<?php
+$itemIds = $block->getChildProductIds($block->getProduct());
 
-            if (!empty($itemIds)) {
-                foreach ($itemIds as $val) {
-                    foreach ($val as $k => $v) {
-                        /* @noEscape */ echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
-                    }
-                }
-            }
-            ?>
+if (!empty($itemIds)) {
+    foreach ($itemIds as $val) {
+        foreach ($val as $k => $v) {
+            /* @noEscape */ echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
+        }
+    }
+}
+?>
         });
     });
 </script>

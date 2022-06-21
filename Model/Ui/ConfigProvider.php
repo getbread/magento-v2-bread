@@ -1,16 +1,19 @@
 <?php
+
 /**
  * Config provider for the payment method
  *
- * @author Bread   copyright   2016
+ * @author Bread   copyright
  * @author Miranda @Mediotype
+ * @author Kip, Maritim @BreadFinancial
  */
+
 namespace Bread\BreadCheckout\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 
-class ConfigProvider implements ConfigProviderInterface
-{
+class ConfigProvider implements ConfigProviderInterface {
+
     const CODE = 'breadcheckout';
 
     /**
@@ -28,14 +31,28 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public $breadMethod;
 
+    /**
+     *
+     * @var \Bread\BreadCheckout\Helper\Catalog
+     */
+    public $catalog;
+
+    /**
+     * 
+     * @param \Bread\BreadCheckout\Helper\Quote $helper
+     * @param \Bread\BreadCheckout\Helper\Data $helperData
+     * @param \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
+     */
     public function __construct(
-        \Bread\BreadCheckout\Helper\Quote $helper,
-        \Bread\BreadCheckout\Helper\Data $helperData,
-        \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
+            \Bread\BreadCheckout\Helper\Quote $helper,
+            \Bread\BreadCheckout\Helper\Data $helperData,
+            \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
+            \Bread\BreadCheckout\Helper\Catalog $catalog
     ) {
         $this->helper = $helper;
         $this->helperData = $helperData;
         $this->breadMethod = $breadMethod;
+        $this->catalog = $catalog;
     }
 
     /**
@@ -44,12 +61,13 @@ class ConfigProvider implements ConfigProviderInterface
      *
      * @return array
      */
-    public function getConfig()
-    {
+    public function getConfig() {
         return [
             'payment' => [
                 self::CODE => [
                     'active' => $this->helper->isPaymentMethodAtCheckout(),
+                    'apiVersion' => $this->helper->getApiVersion(),
+                    'integrationKey' => $this->helper->getIntegrationKey(),
                     'defaultSize' => $this->helper->useDefaultButtonSize(),
                     'buttonCss' => $this->helper->getButtonDesign(),
                     'configDataUrl' => $this->helper->getConfigDataUrl(),
@@ -57,6 +75,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'transactionId' => $this->helper->getBreadTransactionId(),
                     'validateTotalsUrl' => $this->helper->getValidateTotalsUrl(),
                     'isHealthcare' => $this->helper->isHealthcare(),
+                    'country' => $this->helper->getMerchantCountry(),
+                    'client' => $this->helperData->getConfigClient(),
                     'breadConfig' => [
                         'buttonId' => 'bread-checkout-btn',
                         'formId' => 'bread-checkout-embedded',
@@ -77,10 +97,12 @@ class ConfigProvider implements ConfigProviderInterface
                         'productTypeMessage' => $this->helperData->getProductTypeMessage(),
                         'cartValidation' => $this->helper->validateAllowedProductTypes(),
                         'methodTitle' => $this->breadMethod->getTitle(),
-                        'showSplitpayLabel' => $this->helper->showSplitpayLabelOnCheckout()
+                        'showSplitpayLabel' => $this->helper->showSplitpayLabelOnCheckout(),
+                        'currencyCode' => $this->catalog->getCurrentCurrencyCode()
                     ]
                 ]
             ]
         ];
     }
+
 }
