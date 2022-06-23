@@ -20,16 +20,7 @@ Installation
 
 2. Unzip contents into `app/code/Bread/BreadCheckout` folder
 
-3. Setup files
-
-For US Merchants
------------------
-
-- Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.us.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
-- Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.us.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
-
-For Canada Merchants
---------------------
+3. Setup files ( For Canada Merchants )
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.ca.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.ca.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
@@ -51,14 +42,7 @@ For Canada Merchants
      ```bash
      composer require breadfinance/module-breadcheckout
      ```
-3. For US Merchants
------------------
-
-- Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.us.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
-- Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.us.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
-
-For Canada Merchants
---------------------
+3. For Canada Merchants only
 
 - Copy file `app/code/Bread/BreadCheckout/etc/adminhtml/system.ca.xml` to `app/code/Bread/BreadCheckout/etc/adminhtml/system.xml`
 - Copy file `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.ca.js` to `app/code/Bread/BreadCheckout/view/adminhtml/web/js/validation.js`
