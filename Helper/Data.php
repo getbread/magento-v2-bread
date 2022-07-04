@@ -1051,8 +1051,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getCurrentCurrencyCode() {
-        error_log('NIAJEJ NIAHE NIAHE');
-        error_log($this->storeManager->getStore()->getCurrentCurrencyCode());
         return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 

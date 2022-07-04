@@ -54,7 +54,7 @@ define(
                             }
 
                             if (data.embeddedCheckout) {
-                                this.config.formId = data.formId;
+                                this.config.buttonId = data.formId;
                             } else {
                                 this.config.buttonId = data.buttonId;
                             }
@@ -86,12 +86,14 @@ define(
                                 }
                             }
                             this.config.items = itemsObject;
-                            console.log('Niaje');
-                            console.log(this.config);
                         },
 
                         init: function () {
                             this.setShippingInformation();
+                        },
+                        initEmbedded() {
+                            this.setShippingInformation();
+                            fullScreenLoader.stopLoader();
                         },
                         _init: function() {
                             var self = this;
@@ -133,7 +135,7 @@ define(
                                         
                                         let placementObject = {
                                             allowCheckout: true,
-                                            domID: 'bread-checkout-btn', //window.checkoutConfig.payment.breadcheckout.breadConfig.buttonId,
+                                            domID: self.config.buttonId,
                                             order: {
                                                 currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
                                                 items: self.config.items,
@@ -149,7 +151,7 @@ define(
                                         };
                                         if (window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout) {
                                             bread_sdk.__internal__.setEmbedded(true);
-                                        }
+                                        }                                       
                                         bread_sdk.__internal__.setAutoRender(false);
                                         bread_sdk.registerPlacements([placementObject]);
                                         bread_sdk.__internal__.setInitMode('manual');
