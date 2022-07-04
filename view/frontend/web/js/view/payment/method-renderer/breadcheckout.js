@@ -134,6 +134,10 @@ define(
                                 if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                                     //Load platform bread config 
                                     buttonPlatform.configure(data, this);
+                                    if(data.embeddedCheckout && checkoutData.getSelectedPaymentMethod() === 'breadcheckout') {
+                                        buttonPlatform.setCouponDiscounts();
+                                        buttonPlatform.initEmbedded();
+                                    }
                                 }
                                 return true;
                             } else {
