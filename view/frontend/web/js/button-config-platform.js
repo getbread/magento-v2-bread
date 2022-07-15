@@ -108,6 +108,7 @@ define(
                                         }
                                         bread_sdk.setup({
                                             integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
+                                            containerID: self.config.buttonId,
                                             buyer: {
                                                 shippingAddress: {
                                                     address1: self.config.billingContact.address,
@@ -119,10 +120,7 @@ define(
                                                 }
                                             }
                                         });
-
-                                        bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', self.config.onApproval);
-                                        bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', self.config.onCheckout);
-                                        
+                                                                                
                                         let shippingOptions = {
                                             value: 0,
                                             currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode
@@ -135,6 +133,8 @@ define(
                                         
                                         let placementObject = {
                                             allowCheckout: true,
+                                            financingType: "installment",
+                                            locationType: "checkout",
                                             domID: self.config.buttonId,
                                             order: {
                                                 currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
@@ -149,13 +149,19 @@ define(
                                                 totalTax: {currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode, value: self.config.tax}
                                             }
                                         };
+                                        bread_sdk.setInitMode('manual');
                                         if (window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout) {
-                                            bread_sdk.__internal__.setEmbedded(true);
-                                        }                                       
+                                            bread_sdk.setEmbedded(true);
+                                        }     
+                                        
                                         bread_sdk.__internal__.setAutoRender(false);
-                                        bread_sdk.registerPlacements([placementObject]);
-                                        bread_sdk.__internal__.setInitMode('manual');
-                                        bread_sdk.__internal__.init();
+                                        bread_sdk.registerPlacements([placementObject]);   
+                                        
+                                        bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', self.config.onApproval);
+                                        bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', self.config.onCheckout);
+                                        
+                                        bread_sdk.init();
+                                        bread_sdk.openExperienceForPlacement([placementObject]);
                                         fullScreenLoader.stopLoader();
                                     }
                                 });
