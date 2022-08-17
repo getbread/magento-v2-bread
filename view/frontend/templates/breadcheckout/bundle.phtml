@@ -9,7 +9,7 @@ require([
         'mage/validation'
    ], function($, bundleHelper) {
         'use strict';
-        let apiVersion = <?= /* @noEscape */ $block->getApiVersion(); ?>;
+        let apiVersion = "<?= /* @noEscape */ $block->getApiVersion(); ?>";
         var globalConfig = {
             optionConfig:               <?= /* @noEscape */ $block->getJsonConfig(); ?>,
             optionConfigBundle:         <?= /* @noEscape */ $block->getBundleProductDataJson(); ?>,

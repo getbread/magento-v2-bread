@@ -105,18 +105,18 @@ define(
                                             bread_sdk = window.RBCPayPlan;
                                         } else {
                                             bread_sdk = window.BreadPayments;
-                                        }
+                                        }                                        
                                         bread_sdk.setup({
                                             integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
                                             containerID: self.config.buttonId,
                                             buyer: {
                                                 shippingAddress: {
-                                                    address1: self.config.billingContact.address,
-                                                    address2: self.config.billingContact.address2,
+                                                    address1: self.config.shippingContact.address,
+                                                    address2: self.config.shippingContact.address2,
                                                     country: window.checkoutConfig.payment.breadcheckout.country,
-                                                    locality: self.config.billingContact.city,
-                                                    region: self.config.billingContact.state,
-                                                    postalCode: self.config.billingContact.zip
+                                                    locality: self.config.shippingContact.city,
+                                                    region: self.config.shippingContact.state,
+                                                    postalCode: self.config.shippingContact.zip
                                                 }
                                             }
                                         });
