@@ -7,7 +7,7 @@
 
     require(['jquery', 'underscore'], function ($, _) {
         $(document).ready(function () {
-            let apiVersion = <?= /* @noEscape */ $block->getApiVersion(); ?>;
+            let apiVersion = "<?= /* @noEscape */ $block->getApiVersion(); ?>";
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
