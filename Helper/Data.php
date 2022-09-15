@@ -54,6 +54,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const XML_CONFIG_ACTIVE_ON_CAT = 'payment/breadcheckout/bread_category/enabled_on_category_page';
     const XML_CONFIG_ACTIVE_ON_CART_VIEW = 'payment/breadcheckout/enabled_on_cart_page';
     const XML_CONGIG_MINICART_CHECKOUT = 'payment/breadcheckout/allowminicartcheckout';
+    const XML_CONFIG_SHOW_MINICART_LINK = 'payment/breadcheckout/enableonminicart';
     const XML_CONFIG_ENABLE_AS_PAYMENT_METHOD = 'payment/breadcheckout/display_as_payment_method';
     const XML_CONFIG_CHECKOUT_TITLE = 'payment/breadcheckout/title';
     const XML_CONFIG_CHECKOUT_PER_MONTH = 'payment/breadcheckout/per_month';
@@ -922,6 +923,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) $this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
+    }
+    
+    /**
+     * Show link on minicart page for bread_2
+     * 
+     * @param  string $store
+     * @return bool
+     */
+    public function showMinicartLink($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_SHOW_MINICART_LINK, $store);
     }
 
     /**
