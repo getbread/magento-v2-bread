@@ -212,18 +212,25 @@
                         <field id="api_version">classic</field>
                     </depends>
                 </field>
-                <field id="allowminicartcheckout" type="select" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enableonminicart" type="select" sortOrder="24" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled on Minicart page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="allowminicartcheckout" type="select" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Allow checkout from mini cart</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="api_version">classic</field>
                     </depends>
                 </field>
-                <field id="embedded" type="select" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="embedded" type="select" sortOrder="26" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="split_auto_cancel" type="select" sortOrder="26" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="split_auto_cancel" type="select" sortOrder="27" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Auto-cancel Failed Split-Pay Orders</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -237,7 +244,7 @@
                         <field id="api_version">classic</field>
                     </depends>    
                 </field>
-                <field id="per_month" type="select" sortOrder="27" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="per_month" type="select" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label><![CDATA[Show "As Low As" price]]></label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -251,7 +258,7 @@
                         <field id="api_version">classic</field>
                     </depends>
                 </field>
-                <field id="product_type_msg" type="textarea" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="product_type_msg" type="textarea" sortOrder="29" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Invalid product type message</label>
                     <comment>
                         <![CDATA[
@@ -261,11 +268,11 @@
 				            ]]>
                     </comment>
                 </field>
-                <field id="tenant" type="select" sortOrder="29" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="tenant" type="select" sortOrder="30" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Tenant</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\Tenant</source_model>
                 </field>
-                <group id="bread_advanced" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                <group id="bread_advanced" type="text" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>Bread Advanced Settings</label>
                     <field id="targeted_financing" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Enable Targeted Financing</label>

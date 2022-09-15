@@ -83,8 +83,8 @@
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="allowminicartcheckout" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Allow checkout from mini cart</label>
+                <field id="enableonminicart" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled on Minicart page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>

@@ -126,11 +126,18 @@ class Minicart extends Overview implements ShortcutInterface
     {
 
         $aboveThreshold = $this->quoteHelper->aboveThreshold($this->quoteHelper->getGrandTotal()/100);
-
-        return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
-            $this->helperData->allowMinicartCheckout() &&
-            !$this->isCartView() &&
-            $aboveThreshold;
+        $apiVersion = $this->helperData->getApiVersion();
+        if($apiVersion === 'bread_2') {
+            return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
+                    $this->helperData->showMinicartLink() &&
+                    !$this->isCartView() &&
+                    $aboveThreshold;
+        } else {
+            return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
+                    $this->helperData->allowMinicartCheckout() &&
+                    !$this->isCartView() &&
+                    $aboveThreshold;
+        }       
     }
 
     /**
