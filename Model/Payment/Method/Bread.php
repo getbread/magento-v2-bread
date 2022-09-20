@@ -179,7 +179,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     public function validate()
     {
         $paymentInfo   = $this->getInfoInstance();
-        $this->breadLogger->info('got payment info');
+        $this->breadLogger->info('Validating payment method');
         if ($paymentInfo instanceof \Magento\Sales\Model\Order\Payment) {
             $this->breadLogger->info('payment info instance of payment');
             $billingCountry    = $paymentInfo->getOrder()->getBillingAddress()->getCountryId();
@@ -189,7 +189,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         if (!$this->canUseForCountry($billingCountry)) {
-            $this->breadLogger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY'. $billingCountry);
+            $this->breadLogger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY '. $billingCountry);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __(
                     'This financing program is available to US residents, please click the finance button 
@@ -197,7 +197,6 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 )
             );
         }
-        $this->breadLogger->info('can use billing country');
 
         $token = $this->getToken();
         if (empty($token)) {
@@ -223,6 +222,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function cancel(\Magento\Payment\Model\InfoInterface $payment)
     {
+        $this->breadLogger->info('Process cancel payment');
         return $this->void($payment);
     }
 
