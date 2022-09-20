@@ -646,9 +646,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getTargetedFinancingThreshold($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return round($this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store, $storeCode), 2);
+        $financingThreshold = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store, $storeCode);
+        if(!is_null($financingThreshold)) {
+            return round($financingThreshold, 2);
+        } else {
+            return 0;
+        }       
     }
-
     /**
      * Return list of SKU's for which financing is enabled
      *
@@ -657,8 +661,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function getTargetedFinancingSkus($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store, $storeCode);
+        if(is_null($list)) {
+            return array();
+        } 
         $list = preg_replace('/\s/', '', $list);
-
         return explode(',', $list);
     }
 

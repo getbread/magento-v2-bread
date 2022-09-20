@@ -105,25 +105,28 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function cancel($breadTransactionId, $amount = 0, $lineItems = [])
     {
+        $this->logger->info('Call API Cancel method. Bread trxId: '. $breadTransactionId);
         /* Check if already canceled in bread */
         $transaction = $this->getInfo($breadTransactionId);
         if (strtoupper($transaction['status']) === self::STATUS_CANCELED || strtoupper($transaction['status']) === 'CANCELLED') {
+            $this->logger->info('Transaction is already canceled in Bread. Bread trxId: '. $breadTransactionId);
             return $transaction;
         }
         
         $apiVersion = $this->helper->getApiVersion();
 
         if ($apiVersion === 'bread_2') {
+            $this->logger->info('Bread platform transaction. Bread trxId: '. $breadTransactionId);
             $currency = $transaction['totalAmount']['currency'];
             $data = '{"amount": {"currency":"'.$currency.'","value":' . $transaction['totalAmount']['value'] . '}}';
-            
+            $this->logger->info('Payload data: ' . $data . ' Bread trxId: '. $breadTransactionId);
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($breadTransactionId, 'cancel'),
                     $data,
                     \Zend_Http_Client::POST,
                     false
             );
-
+            $this->logger->info('Result: ' . json_encode($result). ' Bread trxId: '. $breadTransactionId);
 
             if ($result['status'] !== 'CANCELLED') {
                 $this->logger->log(['ERROR' => 'Transaction cancel failed', 'RESULT' => $result]);
@@ -134,6 +137,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
             return $result;
         } else {
+            $this->logger->info('Bread classic transaction. Bread trxId: '. $breadTransactionId);
             $data = ['type' => 'cancel'];
 
             if (!$amount == 0) {
@@ -143,9 +147,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
             if (!empty($lineItems)) {
                 $data['lineItems'] = $lineItems;
             }
-
+            $this->logger->info('Payload: ' . json_encode($data) .' Bread trxId: '. $breadTransactionId);
             $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
-
+            $this->logger->info('Result: ' . json_encode($result). ' Bread trxId: '. $breadTransactionId);
             if ($result['status'] != self::STATUS_CANCELED) {
                 $this->logger->log(['ERROR' => 'Transaction cancel failed', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
@@ -170,7 +174,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
     {
+        $this->logger->info('Call API Authorize method. Bread trxId: '. $breadTransactionId);
         $validateAmount = $this->getInfo($breadTransactionId);
+        $this->logger->info('Trx: ' . json_encode($validateAmount));
         $apiVersion = $this->helper->getApiVersion();
 
         // set transaction id so it can be fetched for split payment cancel
@@ -197,9 +203,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
                         )
                 );
             }
-
-
+            
             $data = '{"amount": {"currency":"'.$currency.'","value":' . $amount . '}}';
+            $this->logger->info(['TrxId' => $breadTransactionId,
+                    'Payload' => $data
+                    ]);
 
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($breadTransactionId, 'authorize'),
@@ -207,7 +215,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     \Zend_Http_Client::POST,
                     false
             );
-
+            $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
             if ($result['status'] != self::STATUS_AUTHORIZED) {
                 $this->logger->log(['ERROR' => 'AUTHORIZATION FAILED', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
@@ -246,7 +254,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     $this->getUpdateTransactionUrl($breadTransactionId),
                     $data_array
             );
-
+            $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
             if ($result['status'] != self::STATUS_AUTHORIZED) {
                 $this->logger->log(['ERROR' => 'AUTHORIZATION FAILED', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
@@ -287,19 +295,20 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function settle($breadTransactionId, $amount = null, $currency = null)
     {
+        $this->logger->info('Call API settle method. Bread trxId: '. $breadTransactionId);
         $apiVersion = $this->helper->getApiVersion();
         if ($apiVersion === 'bread_2') {
             $validateAmount = $this->getInfo($breadTransactionId);
             $currency = trim($validateAmount['totalAmount']['currency']);
             $data = '{"amount": {"currency":"'.$currency.'","value":' . $amount . '}}';
-
+            $this->logger->info('Payload: ' . $data . 'Bread trxId: '. $breadTransactionId);
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($breadTransactionId, 'settle'),
                     $data,
                     \Zend_Http_Client::POST,
                     false
             );
-
+            $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
             if ($result['status'] != self::STATUS_SETTLED) {
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __('Transaction settle failed (current transaction status :' . $result['status'] . ')')
@@ -312,7 +321,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     $this->getUpdateTransactionUrl($breadTransactionId),
                     ['type' => 'settle']
             );
-
+            $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
             if ($result['status'] != self::STATUS_SETTLED) {
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __('Transaction settle failed (current transaction status :' . $result['status'] . ')')
@@ -334,6 +343,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function refund($breadTransactionId, $amount = 0, $lineItems = [], $currency = null)
     {
+        $this->logger->info('Call API refund method. Bread trxId: '. $breadTransactionId);
         $apiVersion = $this->helper->getApiVersion();
         if ($apiVersion === 'bread_2') {
             $validateAmount = $this->getInfo($breadTransactionId);
@@ -346,7 +356,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     \Zend_Http_Client::POST,
                     false
             );
-
+            $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
             return $result;
         } else {
             $data = ['type' => 'refund'];
@@ -359,7 +369,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 $data['lineItems'] = $lineItems;
             }
 
-            return $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
+            $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
+            $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
+            return $result;
+            
         }
     }
 
@@ -372,6 +385,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function getInfo($breadTransactionId)
     {
+        $this->logger->info('Call API getInfo method. Bread trxId: '. $breadTransactionId);
         return $this->call(
             $this->getTransactionInfoUrl($breadTransactionId),
             [],
@@ -455,14 +469,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
                     $getToken = $this->generateAuthToken($authTokenUrl, $username, $password);
                     if (isset($getToken['token'])) {
-
                         $authToken = $getToken['token'];
                         $this->configWriter->save('payment/breadcheckout/bread_auth_token', $authToken, 'default');
 
                         $response = $this->callBread($url, $authToken, $data, $method, $jsonEncode);
 
                         if ((isset($response['error']) && $response['error'] === 'jwt_auth_error')) {
-
+                            $this->logger->info('Error generating token. ' . json_encode($response));
                             $errorMessage = 'Call to Bread APIs failed.';
                             throw new \Magento\Framework\Exception\LocalizedException(
                                     __($errorMessage)
@@ -472,13 +485,17 @@ class Client extends \Magento\Framework\Model\AbstractModel
                         }
                     } else {
                         $errorMessage = 'Call to Bread API failed. Auth token generate';
+                        $this->logger->info('Error generating token. ' . $errorMessage);
                         throw new \Magento\Framework\Exception\LocalizedException(
                                 __($errorMessage)
                         );
                     }
                 } elseif (isset($response['data'])) {
-                    return $this->jsonHelper->jsonDecode($response['data']);
+                    $result = $this->jsonHelper->jsonDecode($response['data']);
+                    $this->logger->info('Response: ' . $result);
+                    return $result;
                 } else {
+                    $this->logger->info('Call to Bread API failed. ' . json_encode($response));
                     $errorMessage = 'Call to Bread API failed.';
                     throw new \Magento\Framework\Exception\LocalizedException(
                             __($errorMessage)
@@ -515,7 +532,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 $result = curl_exec($curl);
                 $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
+                $this->logger->info('Sending request to Bread classic APIs');
+                $this->logger->info('Response: ' . json_encode($result));
                 if ($status != 200) {
                     $this->logger->log(curl_error($curl));
 
@@ -524,7 +542,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     $isSplitPayDecline = strpos($result, "There's an issue with authorizing the credit card portion") !== false;
 
                     if ($isSplitPayDecline) {
+                        $this->logger->info('Is Split pay decline');
                         if ($this->helper->isSplitPayAutoDecline()) {
+                            $this->logger->info('Split pay auto-decline enabled. Transaction will be cancelled');
                             $this->cancel($this->getBreadTransactionId());
                         }
 
