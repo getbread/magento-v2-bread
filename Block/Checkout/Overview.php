@@ -165,8 +165,11 @@ class Overview extends \Bread\BreadCheckout\Block\Product\View
      */
     public function getButtonDesign()
     {
-        $design = $this->dataHelper->escapeCustomCSS($this->catalogHelper->getCartButtonDesign());
-        return $design ? $design : parent::getButtonDesign();
+        $buttonDesign = $this->catalogHelper->getCartButtonDesign();
+        if(!is_null($buttonDesign)) {
+            return $this->dataHelper->escapeCustomCSS($buttonDesign);
+        }    
+        return parent::getButtonDesign();
     }
 
     /**

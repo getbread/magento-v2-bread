@@ -908,7 +908,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function escapeCustomCSS($input) {
-        return str_replace("'", '"', $input);
+        if(!is_null($input)) {
+            return str_replace("'", '"', $input);
+        }
+        return "";
     }
 
     /**

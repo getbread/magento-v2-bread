@@ -380,26 +380,29 @@ class Quote extends Data
         $apiVersion = $this->getApiVersion();
         
         if ($apiVersion !== 'bread_2') {
-            if (strtotime($session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY)) < strtotime($quote->getUpdatedAt())) {
+            $sessionQuoteUpdatedKey = $session->getData(self::BREAD_SESSION_QUOTE_UPDATED_KEY);
+            if(!is_null($sessionQuoteUpdatedKey)) {
+                if (strtotime($sessionQuoteUpdatedKey) < strtotime($quote->getUpdatedAt())) {
 
-                $arr = [];
-                $arr['customTotal'] = (int) (floatval($quote->getGrandTotal()) * 100);
-
-                $targetedFinancingStatus = $this->getTargetedFinancingStatus();
-
-                if ($targetedFinancingStatus['shouldUseFinancingId']) {
-                    $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+                    $arr = [];
+                    $arr['customTotal'] = (int) (floatval($quote->getGrandTotal()) * 100);
+    
+                    $targetedFinancingStatus = $this->getTargetedFinancingStatus();
+    
+                    if ($targetedFinancingStatus['shouldUseFinancingId']) {
+                        $arr['financingProgramId'] = $targetedFinancingStatus['id'];
+                    }
+    
+                    try {
+                        $result = $this->paymentApiClient->getAsLowAs($arr);
+                    } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                        $result = [];
+                    }
+    
+                    $session->setData(self::BREAD_SESSION_QUOTE_RESULT_KEY, $result);
+                    $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
                 }
-
-                try {
-                    $result = $this->paymentApiClient->getAsLowAs($arr);
-                } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                    $result = [];
-                }
-
-                $session->setData(self::BREAD_SESSION_QUOTE_RESULT_KEY, $result);
-                $session->setData(self::BREAD_SESSION_QUOTE_UPDATED_KEY, $quote->getUpdatedAt());
-            }
+            }            
         }
         return $session->getData(self::BREAD_SESSION_QUOTE_RESULT_KEY);
     }
