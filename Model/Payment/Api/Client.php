@@ -492,7 +492,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     }
                 } elseif (isset($response['data'])) {
                     $result = $this->jsonHelper->jsonDecode($response['data']);
-                    $this->logger->info('Response: ' . $result);
+                    $this->logger->info('Response: ' . $response['data']);
                     return $result;
                 } else {
                     $this->logger->info('Call to Bread API failed. ' . json_encode($response));
