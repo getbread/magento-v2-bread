@@ -223,6 +223,20 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 );
             }
 
+            //Attach an orderId to this transaction
+            $this->logger->log([
+                'MESSAGE' => 'Running transaction update with merchantOrderId',
+                'orderId' => $merchantOrderId
+            ]);
+            $data = '{"externalID":"' . $merchantOrderId . '","metadata":{"externalMerchantData":"externalInfo"}}';
+            $updateMerchantOrderIdResult = $this->call(
+                    $this->getTransactionInfoUrl($breadTransactionId),
+                    $data,
+                    \Zend_Http_Client::PUT,
+                    false
+            );
+            $this->logger->info('Response: ' . json_encode($updateMerchantOrderIdResult) . 'Bread trxId: '. $breadTransactionId);
+
             return $result;
         } else {
             $breadAmount = trim($validateAmount['total']);
@@ -284,7 +298,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
 
         return $result;
     }
-
+    
     /**
      * Call API Update Order Id Capture Authorized Transaction Method
      *
@@ -434,7 +448,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @TODO switch over to using \Magento\Framework\HTTP\Client\Curl
      *
      * @param  $url
-     * @param  array  $data
+     * @param  $data
      * @param  string $method
      * @return mixed
      * @throws \Exception
@@ -618,14 +632,20 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 $authorization = "Authorization: Bearer " . $authToken;
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [
                     'Content-Type: application/json',
-                    'Content-Length: ' . strlen($data),
                     $authorization]);
+                if(is_array($data)) {
+                    $data = $this->jsonHelper->jsonEncode($data);
+                }
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
             }
 
             if ($method == \Zend_Http_Client::PUT) {
+                $authorization = "Authorization: Bearer " . $authToken;
+                curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    $authorization]);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
             }
 
             if ($method == \Zend_Http_Client::GET) {
