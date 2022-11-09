@@ -79,13 +79,14 @@ define(
                                         unitPrice: {
                                             currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
                                             value: items[i].price
-                                        }
+                                        },
+                                        itemUrl: items[i].detailUrl
                                     };
-
+                                    
                                     itemsObject.push(item);
                                 }
                             }
-                            this.config.items = itemsObject;
+                            this.config.items = itemsObject;     
                         },
 
                         init: function () {
