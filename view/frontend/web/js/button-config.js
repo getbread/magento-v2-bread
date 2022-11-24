@@ -11,7 +11,7 @@ define(
     ], function ($, fullScreenLoader, quote, checkout, alert) {
 
         return {
-            breadConfig: undefined,
+            breadConfig: {},
 
             configure: function (data, context) {
                 this.breadConfig = {
@@ -224,7 +224,7 @@ define(
              * Sets coupon discount
              */
             setCouponDiscounts: function () {
-
+                
                 var discountAmount =- this.round(quote.getTotals()._latestValue.discount_amount);
                 if (discountAmount > 0) {
                     this.breadConfig.discounts = [{

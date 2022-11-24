@@ -198,16 +198,24 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             );
         }
 
-        $token = $this->getToken();
-        if (empty($token)) {
-            $this->breadLogger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __(
-                    'This financing program is unavailable, please complete the application. 
-                If the problem persists, please contact us.'
-                )
-            );
-        }
+        /**
+         * 
+         * Initial purpose of this message was to notify customer to continue with placeOrder action
+         * 
+         * This has no side effect on the checkout experience
+         * 
+          $token = $this->getToken();
+          if (empty($token)) {
+          $this->breadLogger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
+          throw new \Magento\Framework\Exception\LocalizedException(
+          __(
+          'This financing program is unavailable, please complete the application.
+          If the problem persists, please contact us.'
+          )
+          );
+          }
+         * 
+         */
         $this->breadLogger->info('validate succeeded');
 
         return $this;
