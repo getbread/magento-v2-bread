@@ -398,6 +398,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function order(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        $this->breadLogger->info('Place order called');
         $transaction = $this->transactionBuilder->setPayment($payment)
             ->setOrder($payment->getOrder())
             ->setTransactionId($payment->getTransactionId())
@@ -424,7 +425,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     protected function _place(\Magento\Payment\Model\InfoInterface $payment, $amount, $requestType, $currency = null)
     {
         $this->apiClient->setOrder($payment->getOrder());
-        $this->breadLogger->info('api client order was set');
+        $this->breadLogger->info($requestType . ' API client request. ');
         $apiVersion = $this->helper->getApiVersion();
         $client = $this->helper->getConfigClient() !== 'CORE' ? $this->helper->getConfigClient() : 'Bread Financial';
 
@@ -450,9 +451,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                     $orderId
                 );
                 $this->breadLogger->info('called api client authorize');
-
+                $this->breadLogger->info('Response: ' . json_encode($result));
+                $breadTransactionId = null;
                 if($apiVersion === 'bread_2') {
-                    $payment->setTransactionId($result['id']);
+                    $breadTransactionId = $result['id'];
                     $this->addTransactionInfo(
                             $payment,
                             ['bread_version' => 'bread_2'],
@@ -460,8 +462,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                             $client . ' platform transaction'
                     );
                 } else {
-                    $payment->setTransactionId($result['breadTransactionId']);
+                    $breadTransactionId = $result['breadTransactionId'];
                 }
+                $payment->setTransactionId($breadTransactionId);
                 $this->addTransactionInfo(
                     $payment,
                     ['is_closed' => false, 'authorize_result' => $this->jsonHelper->jsonEncode($result)],
@@ -470,12 +473,16 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 );
                 break;
             case self::ACTION_CAPTURE:
+                $this->breadLogger->info('called api client capture.');
                 $result     = $this->apiClient->settle($this->getValidatedTxId($payment), $amount, $currency);
+                $breadTransactionId = null;
                 if($apiVersion === 'bread_2') {
-                    $payment->setTransactionId($result['id']);
+                    $breadTransactionId = $result['id'];
                 } else {
-                    $payment->setTransactionId($result['breadTransactionId']);
+                    $breadTransactionId = $result['breadTransactionId'];                    
                 }
+                $payment->setTransactionId($breadTransactionId);
+                $this->breadLogger->info('Bread Transaction Id: ' . $breadTransactionId);
                 $payment->setAmount($amount);
                 $this->addTransactionInfo(
                     $payment,
@@ -485,6 +492,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 );
                 break;
             case self::ACTION_REFUND:
+                $this->breadLogger->info('called api client refund transaction.');
                 $result     = $this->apiClient->refund(
                     $this->getValidatedTxId($payment),
                     ($this->priceCurrency->round($amount) * 100),
@@ -495,6 +503,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                     ->setAmount($amount)
                     ->setIsTransactionClosed(1)
                     ->setShouldCloseParentTransaction(1);
+                $this->breadLogger->info('breadTransactionId: ' . $this->getValidatedTxId($payment));
+                $this->breadLogger->info('Response: ' . json_encode($result));
                 $this->addTransactionInfo(
                     $payment,
                     ['is_closed' => false, 'refund_result' => $this->jsonHelper->jsonEncode($result)],
@@ -503,7 +513,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 );
                 break;
             case self::ACTION_VOID:
+                $this->breadLogger->info('called api client void/cancel transaction.');
+                $this->breadLogger->info('breadTransactionId: ' . $this->getValidatedTxId($payment));
                 $result     = $this->apiClient->cancel($this->getValidatedTxId($payment));
+                $this->breadLogger->info('Response: ' . json_encode($result));
                 $payment->setTransactionId($payment->getTransactionId())
                     ->setIsTransactionClosed(1)
                     ->setShouldCloseParentTransaction(1);
@@ -615,7 +628,19 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     protected function getValidatedTxId(\Magento\Payment\Model\InfoInterface $payment)
     {
         $rawTransId = $payment->getTransactionId();
-
+        
+        /**
+         * When creating breadCarts, breadTrxId does not exist. preg_match will throw an error
+         * 
+         * @since 2.1.9
+         */
+        if(is_null($rawTransId)) {
+            $this->breadLogger->log('INVALID TRANSACTION ID PROVIDED: '. $rawTransId);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Unable to process request because an invalid transaction ID was provided.')
+            );
+        }
+        
         if (preg_match('/^[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/', $rawTransId, $matches)) {
             return $matches[0];
         } else {

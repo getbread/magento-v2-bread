@@ -80,7 +80,8 @@ define(
                                             currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
                                             value: items[i].price
                                         },
-                                        itemUrl: items[i].detailUrl
+                                        itemUrl: items[i].detailUrl,
+                                        sku: items[i].sku
                                     };
                                     
                                     itemsObject.push(item);
