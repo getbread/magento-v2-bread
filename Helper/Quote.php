@@ -202,7 +202,7 @@ class Quote extends Data
             }
 
             $itemsData[]       = $this->helperCatalog
-                ->getProductDataArray($thisProduct, $baseProduct, $item->getQty(), $price);
+                ->getProductDataArray($thisProduct, $baseProduct, (int) $item->getQty(), $price);
         }
 
         return $itemsData;
