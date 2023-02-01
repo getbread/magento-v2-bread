@@ -36,6 +36,12 @@ class Category extends \Magento\Framework\View\Element\Template
      * @var \Bread\BreadCheckout\Helper\Quote
      */
     private $quoteHelper;
+    
+    /**
+     * 
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
+    private $dataHelper;
 
     /**
      * Category constructor.
@@ -47,6 +53,7 @@ class Category extends \Magento\Framework\View\Element\Template
      * @param \Magento\Framework\Module\ModuleListInterface    $moduleList
      * @param \Magento\Framework\Json\Helper\Data              $jsonHelper
      * @param \Bread\BreadCheckout\Helper\Quote                $quoteHelper
+     * @param \Bread\BreadCheckout\Helper\Data                 $dataHelper
      * @param array                                            $data
      */
     public function __construct(
@@ -57,6 +64,7 @@ class Category extends \Magento\Framework\View\Element\Template
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
+        \Bread\BreadCheckout\Helper\Data $dataHelper,    
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -66,6 +74,7 @@ class Category extends \Magento\Framework\View\Element\Template
         $this->jsonHelper     = $jsonHelper;
         $this->moduleList     = $moduleList;
         $this->quoteHelper    = $quoteHelper;
+        $this->dataHelper = $dataHelper;
     }
 
     public function _toHtml()
@@ -222,5 +231,37 @@ class Category extends \Magento\Framework\View\Element\Template
     public function jsonEncode($data)
     {
         return $this->jsonHelper->jsonEncode($data);
+    }
+    
+    /**
+     * @since 2.2.0
+     * @return type
+     */
+    public function getApiVersion() {
+        return (string) $this->dataHelper->getApiVersion();
+    }
+    
+    /**
+     * @since 2.2.0
+     * @return string
+     */
+    public function getIntegrationKey() {
+        return $this->dataHelper->getIntegrationKey();
+    }
+
+    /**
+     * @since 2.2.0
+     * @return string
+     */
+    public function getConfigClient() {
+        return $this->dataHelper->getConfigClient();
+    }
+
+    /**
+     * @since 2.2.0
+     * @return string
+     */
+    public function getCurrentCurrencyCode() {
+        return $this->catalogHelper->getCurrentCurrencyCode();
     }
 }

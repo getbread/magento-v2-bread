@@ -3,4 +3,9 @@
     <head>
         <css src="Bread_BreadCheckout::bread/css/bread.css"/>
     </head>
+    <body>
+        <referenceBlock name="content">
+            <block class="Bread\BreadCheckout\Block\CatalogProductCollection" template="Bread_BreadCheckout::breadcheckout/catalog/product/view.phtml" as="breadcheckout.catalog.prod.collection" name="breadcheckout.catalog.prod.collection"/>
+        </referenceBlock>
+    </body>
 </page>
