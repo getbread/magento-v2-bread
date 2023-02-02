@@ -1,11 +1,13 @@
 <?php
 /**
- * @copyright DEVIMAGE
+ * @author Maritim, Kip
+ * @copyright (c) 2023, Bread Financial
  *
- * @see PROJECT_LICENSE.txt
+ * Manage Catalog page product collection listing
+ * 
  */
 
-namespace Bread\BreadCheckout\Block;
+namespace Bread\BreadCheckout\Block\Catalog;
 
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\categoryFactory;
@@ -21,28 +23,38 @@ use Magento\Framework\ObjectManagerInterface;
 /**
  * Class CatProductCollection
  */
-class CatalogProductCollection extends Template
+class ProductCollection extends Template
 {
-    /** @var Registry  */
+    /** 
+     * @var Registry  
+     */
     private $_registry;
 
-    /** @var categoryFactory  */
+    /** 
+     * @var categoryFactory  
+     */
     private $_categoryFactory;
 
-    /** @var CollectionFactory  */
+    /** 
+     * @var CollectionFactory  
+     */
     protected $_productCollectionFactory;
 
-    /** @var Category  */
+    /** 
+     * @var Category  
+     */
     protected $_category;
 
-    /** @var **/
+    /** 
+     * @var 
+     */
     protected $categoryRepository;
-    
+
     /**
      * @var \Bread\BreadCheckout\Helper\Quote
      */
     private $quoteHelper;
-    
+
     /**
      * 
      * @var \Bread\BreadCheckout\Helper\Data
@@ -62,7 +74,9 @@ class CatalogProductCollection extends Template
     
     /**
      * @var \Bread\BreadCheckout\Helper\Catalog
-
+     */
+    public $catalogHelper;
+    
     protected $_objectManager = null;
     /**
      * CatProductCollection constructor.

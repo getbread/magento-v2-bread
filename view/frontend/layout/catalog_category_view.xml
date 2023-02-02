@@ -5,7 +5,7 @@
     </head>
     <body>
         <referenceBlock name="content">
-            <block class="Bread\BreadCheckout\Block\CatalogProductCollection" template="Bread_BreadCheckout::breadcheckout/catalog/product/view.phtml" as="breadcheckout.catalog.prod.collection" name="breadcheckout.catalog.prod.collection"/>
+            <block class="Bread\BreadCheckout\Block\Catalog\ProductCollection" template="Bread_BreadCheckout::breadcheckout/catalog/product/view.phtml" as="breadcheckout.catalog.prod.collection" name="breadcheckout.catalog.prod.collection"/>
         </referenceBlock>
     </body>
 </page>

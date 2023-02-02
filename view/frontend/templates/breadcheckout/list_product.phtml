@@ -3,13 +3,20 @@
 <?php
 $product   = $block->getProduct();
 $productId = $product->getId();
+$apiVersion = $block->getApiVersion();
+
 ?>
 <div id="bread-btn-cntnr-<?= /* @noEscape */ $productId; ?>">
-    <div id='bread-checkout-btn-<?= /* @noEscape */ $productId; ?>'
+    <div id='bread-checkout-btn-<?= /* @noEscape */ $productId; ?>' title="Bread Checkout"
          class="button" <?= /* @noEscape */ $block->useDefaultButtonSizeCategory(); ?>>
+        <?php if($apiVersion !== 'bread_2') :?> 
+        <span>
+            <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
+        </span>
+        <?php endif; ?>
     </div>
 </div>
-<?php if($block->getApiVersion() !== 'bread_2') :?> 
+<?php if($apiVersion !== 'bread_2') :?> 
 <script type="text/javascript">
     require(['jquery'], function ($) {
         document.configureButton<?= /* @noEscape */ $productId;?> = function (items) {
