@@ -100,8 +100,7 @@ class ProductCollection extends Template
         \Bread\BreadCheckout\Helper\Catalog $catalogHelper,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Data $dataHelper,    
-        array $data = [],
-        
+        array $data = []
     ) {
         parent::__construct($context, $data);
 
