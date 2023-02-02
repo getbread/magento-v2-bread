@@ -1,0 +1,73 @@
+<?php
+/**
+ * @author Maritim, Kip 
+ * @copyright (c) 2023, Bread Financial
+ *
+ * @var Bread\BreadCheckout\Block\CatalogProductCollection $block 
+ */
+$collection = $block->getCategoryProductCollection();
+$products = array();
+foreach ($collection as $product):
+    $products[] = $block->catalogHelper->getProductDataArray($product);
+endforeach;
+?>
+<?php if ($block->getApiVersion() === 'bread_2') : ?> 
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            $(document).ready(function () {
+                var allowCheckout = false;
+                var buttonLocation = '<?= /* @noEscape */ $block->getCategoryPageLocation(); ?>';
+                var integrationKey = '<?= /* @noEscape */ $block->getIntegrationKey(); ?>';
+                var currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>"; 
+                var placementObject = [];
+                <?php foreach ($products as $product) : ?>
+                   var itemPlacement = {
+                        "allowCheckout": allowCheckout,
+                        "financingType": "installment",
+                        "domID": 'bread-checkout-btn-<?= /* @noEscape */ $product['id'];?>',
+                        "locationType": buttonLocation,
+                        "order": {
+                            "items": [
+                                {
+                                    "name": "<?= /* @noEscape */ $product['name']?>",
+                                    "quantity": <?= /* @noEscape */ $product['quantity']?>,
+                                    "shippingCost": {"currency": currentCurrencyCode, "value": 0},
+                                    "shippingDescription": "",
+                                    "unitTax": {"currency": currentCurrencyCode, "value": 0},
+                                    "unitPrice": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>}
+                                }
+                            ],
+                            "subTotal": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>},
+                            "totalPrice": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>},
+                            "totalDiscounts": {"currency": currentCurrencyCode, "value": 0},
+                            "totalShipping": {"currency": currentCurrencyCode, "value": 0},
+                            "totalTax": {"currency": currentCurrencyCode, "value": 0}
+                        }
+                    };
+                    placementObject.push(itemPlacement);
+                <?php endforeach; ?>
+                if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                    var bread_sdk = null;
+                    var config_client = '<?= /* @noEscape */ $block->getConfigClient(); ?>';
+                    if (config_client === 'RBC') {
+                        bread_sdk = window.RBCPayPlan;
+                    } else {
+                        bread_sdk = window.BreadPayments;
+                    }
+                    var onApproved = function onApproved(application) {};
+                    var onCheckout = function onCheckout(application) {};
+                
+                    bread_sdk.setup({
+                        integrationKey: integrationKey
+                    });
+                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                
+                    bread_sdk.registerPlacements(placementObject);
+                    bread_sdk.__internal__.setInitMode('manual');
+                    bread_sdk.__internal__.init();
+                }  
+            });
+        });
+    </script>
+<?php endif; ?>

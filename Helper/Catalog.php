@@ -81,6 +81,7 @@ class Catalog extends Data
             'sku'       => ( $baseProduct == null ) ? $skuString : ($baseProduct['sku'].'///'.$skuString),
             'detailUrl' => $theProduct->getProductUrl(),
             'quantity'  => $qty,
+            'id' => $theProduct->getId()
         ];
 
         $imgSrc = $this->getImgSrc($product);
