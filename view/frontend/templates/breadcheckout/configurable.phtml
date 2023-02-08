@@ -1,13 +1,135 @@
-<?php /** @var $this Bread\BreadCheckout\Block\Product\View */ ?>
+<?php 
+/** 
+ * @var $this Bread\BreadCheckout\Block\Product\View 
+ * @var $block Bread\BreadCheckout\Block\Product\View
+ *  
+ */ 
+?>
+<?php if($block->getApiVersion() === 'bread_2') : ?>
+<script type="text/javascript">
+    document.Skus = {};
+    spConfig = <?= /* @noEscape */ $block->getJsonConfig(); ?>;
+    require(['jquery', 'underscore'], function ($, _) {
+        $(document).ready(function () {
+            /**
+             * Overlay element onto bread button to prevent
+             * it from being clicked until options are selected
+             */
+
+            $('#product_addtocart_form').on('change', function () {
+                spConfig.updateButton(this);
+            });
+            
+            spConfig.updateButton = function (form) {
+                /**
+                 * Get values from hidden inputs
+                 */
+                var selectedOptions = {};
+                var validSuperAttribute = '';
+                $('[name^="super_attribute"]').each(function () {
+                    var attributeId = $(this).attr('name').match(/\[(\d+)\]/)[1];
+                    selectedOptions[attributeId] = $(this).val();
+                    validSuperAttribute = validSuperAttribute + Boolean(selectedOptions[attributeId]);
+                });
+                validSuperAttribute = Boolean(validSuperAttribute && validSuperAttribute.search("false") === -1);
+
+                if (validSuperAttribute) {
+
+                    var newProductId = spConfig.getIdOfSelectedProduct(selectedOptions);
+                    if (newProductId !== null) {
+                        /** Reconfigure Bread button if we narrowed it down to 1 product */
+                        document.selectedSimpleProductId = newProductId;
+                        document.selectedSku = document.baseProductSku + "///" +
+                        document.Skus[document.selectedSimpleProductId];
+                        document.resetPriceAndSku(true);
+                    }
+                }
+            };
+            
+            spConfig.productIds = [];
+
+            /**
+             * Get product ID for selected attributes
+             *
+             * @param object selectedOptions
+             * @returns mixed
+             */
+            spConfig.getIdOfSelectedProduct = function (selectedOptions) {
+                if ($.isEmptyObject(selectedOptions)) {
+                    return null;
+                }
+
+                var productsIndex = this.index;
+
+                if (!productsIndex || productsIndex === []) {
+                    return null;
+                }
+
+                var selectedProductId = Object.keys(productsIndex).find(function (productId) {
+                    var currentProductOptions = productsIndex[productId];
+
+                    return _.isEqual(currentProductOptions, selectedOptions);
+                });
+
+                return selectedProductId || this.getIdOfSelectedProductOLDVERSION(selectedOptions);
+            };
+            
+            spConfig.getIdOfSelectedProductOLDVERSION = function (selectedOptions) {
+                var logInfo = {
+                    index: this.index,
+                    attributes: this.attributes,
+                    selected_options: selectedOptions
+                };
+
+                $.each(this.attributes, function (attrId, attrVal) {
+                    var optionId = selectedOptions[attrId];
+
+                    $.each(attrVal.options, function (i, optionData) {
+                        if (optionData.id === optionId) {
+                            if (spConfig.productIds.length === 0) {
+                                spConfig.productIds = optionData.products;
+                            } else {
+                                var updatedProductIds = [];
+                                $.each(optionData.products, function (j, productId) {
+                                    if ($.inArray(productId, spConfig.productIds) !== -1) {
+                                        updatedProductIds.push(productId);
+                                    }
+                                });
+                                spConfig.productIds = updatedProductIds;
+                            }
+                            return false; // breaks $.each loop
+                        }
+                    });
+                });
+
+                if (this.productIds.length === 1) {
+                    document.logBreadIssue('info', logInfo, 'Old version of getIdOfSelectedProduct found item');
+                    return this.productIds[0];
+                } else {
+                    return null;
+                }
+            };
+            <?php
+$itemIds = $block->getChildProductIds($block->getProduct());
+
+if (!empty($itemIds)) {
+    foreach ($itemIds as $val) {
+        foreach ($val as $k => $v) {
+            /* @noEscape */ echo 'document.Skus[' . $k . '] = "' . $v . '";' . "\n";
+        }
+    }
+}
+?>
+        });
+    });    
+</script>
+<?php else : ?>
 <script>
     document.Skus = {};
     spConfig = <?= /* @noEscape */ $block->getJsonConfig(); ?>;
 
-
-
     require(['jquery', 'underscore'], function ($, _) {
         $(document).ready(function () {
-            let apiVersion = "<?= /* @noEscape */ $block->getApiVersion(); ?>";
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
@@ -40,9 +162,7 @@
                         document.selectedSku = document.baseProductSku + "///" +
                         document.Skus[document.selectedSimpleProductId];
                         document.resetPriceAndSku(true);
-                        if (apiVersion !== 'bread_2') {
-                            document.splitPayResetPriceAndSku(true);
-                        }
+                        document.splitPayResetPriceAndSku(true);
                     }
                 }
             };
@@ -125,3 +245,4 @@ if (!empty($itemIds)) {
         });
     });
 </script>
+<?php endif; ?>
