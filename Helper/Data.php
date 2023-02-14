@@ -1018,7 +1018,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getConfigClient($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return strtoupper($this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode));
+        $configClient = $this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode);
+        if(is_null($configClient)) {
+            return strtoupper('core');
+        } else {
+            return strtoupper($configClient);
+        }
     }
     
     /**
