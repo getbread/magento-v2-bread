@@ -67,7 +67,11 @@ class Category extends Data
      */
     public function getBreadCategories($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return explode(",", $this->scopeConfig->getValue(self::XML_CONFIG_SELECT_CATEGORIES, $store));
+        $selectedCategories  =$this->scopeConfig->getValue(self::XML_CONFIG_SELECT_CATEGORIES, $store);
+        if(!is_null($selectedCategories)) {
+            return explode(",", $this->scopeConfig->getValue(self::XML_CONFIG_SELECT_CATEGORIES, $store));
+        }
+        return array();
     }
 
     /**
@@ -105,6 +109,11 @@ class Category extends Data
         if (!$this->isActive() || !$this->isEnabledOnCAT() || empty($category)) {
             return false;
         }
+        $breadCategories = $this->getBreadCategories();
+        if(count($breadCategories) < 1) {
+            return true;
+        }
+
         return in_array($category->getId(), $this->getBreadCategories());
     }
 }

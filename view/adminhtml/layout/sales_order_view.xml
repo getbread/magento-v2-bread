@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="payment_additional_info">
+            <block class="Bread\BreadCheckout\Block\Adminhtml\Order\View\BreadApiVersionInfo" name="bread_breadcheckout_api_infos" template="Bread_BreadCheckout::breadcheckout/api_version_info.phtml" />
+        </referenceContainer>
+    </body>
+</page>
