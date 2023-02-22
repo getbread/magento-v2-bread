@@ -106,15 +106,23 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function cancel($breadTransactionId, $amount = 0, $lineItems = [])
     {
         $this->logger->info('Call API Cancel method. Bread trxId: '. $breadTransactionId);
+             
+        $apiVersion = $this->helper->getApiVersion();
+        $payment = $this->order->getPayment();
+        $paymentApiVersion = $payment->getData('bread_api_version');
+        $this->logger->info('Payment API version: '. $paymentApiVersion);
+        if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
+            $apiVersion = strtolower($paymentApiVersion);
+        }
+        
         /* Check if already canceled in bread */
-        $transaction = $this->getInfo($breadTransactionId);
+        $transaction = $this->getInfo($breadTransactionId, $apiVersion);
         if (strtoupper($transaction['status']) === self::STATUS_CANCELED || strtoupper($transaction['status']) === 'CANCELLED') {
             $this->logger->info('Transaction is already canceled in Bread. Bread trxId: '. $breadTransactionId);
             return $transaction;
         }
         
-        $apiVersion = $this->helper->getApiVersion();
-
+        
         if ($apiVersion === 'bread_2') {
             $this->logger->info('Bread platform transaction. Bread trxId: '. $breadTransactionId);
             $currency = $transaction['totalAmount']['currency'];
@@ -178,6 +186,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $validateAmount = $this->getInfo($breadTransactionId);
         $this->logger->info('Trx: ' . json_encode($validateAmount));
         $apiVersion = $this->helper->getApiVersion();
+        
+        $payment = $this->order->getPayment();
+        $paymentApiVersion = $payment->getData('bread_api_version');
+        if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
+            $apiVersion = strtolower($paymentApiVersion);
+        }
 
         // set transaction id so it can be fetched for split payment cancel
         $this->setBreadTransactionId($breadTransactionId);
@@ -229,13 +243,20 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 'orderId' => $merchantOrderId
             ]);
             $data = '{"externalID":"' . $merchantOrderId . '","metadata":{"externalMerchantData":"externalInfo"}}';
+            
+            /**
+             * temporary
+             * @remove after API scopes added
+             *
             $updateMerchantOrderIdResult = $this->call(
                     $this->getTransactionInfoUrl($breadTransactionId),
                     $data,
-                    \Zend_Http_Client::PUT,
+                    \Zend_Http_Client::PATCH,
                     false
             );
             $this->logger->info('Response: ' . json_encode($updateMerchantOrderIdResult) . 'Bread trxId: '. $breadTransactionId);
+             *      
+             */
 
             return $result;
         } else {
@@ -311,6 +332,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
     {
         $this->logger->info('Call API settle method. Bread trxId: '. $breadTransactionId);
         $apiVersion = $this->helper->getApiVersion();
+        
+        $payment = $this->order->getPayment();
+        $paymentApiVersion = $payment->getData('bread_api_version');
+        if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
+            $apiVersion = strtolower($paymentApiVersion);
+        }
+        
         if ($apiVersion === 'bread_2') {
             $validateAmount = $this->getInfo($breadTransactionId);
             $currency = trim($validateAmount['totalAmount']['currency']);
@@ -358,7 +386,14 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function refund($breadTransactionId, $amount = 0, $lineItems = [], $currency = null)
     {
         $this->logger->info('Call API refund method. Bread trxId: '. $breadTransactionId);
-        $apiVersion = $this->helper->getApiVersion();
+        $apiVersion = $this->helper->getApiVersion();  
+        
+        $payment = $this->order->getPayment();
+        $paymentApiVersion = $payment->getData('bread_api_version');
+        if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
+            $apiVersion = strtolower($paymentApiVersion);
+        }
+        
         if ($apiVersion === 'bread_2') {
             $validateAmount = $this->getInfo($breadTransactionId);
             $currency = trim($validateAmount['totalAmount']['currency']);
@@ -397,11 +432,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    public function getInfo($breadTransactionId)
+    public function getInfo($breadTransactionId, $apiVersion = null)
     {
         $this->logger->info('Call API getInfo method. Bread trxId: '. $breadTransactionId);
         return $this->call(
-            $this->getTransactionInfoUrl($breadTransactionId),
+            $this->getTransactionInfoUrl($breadTransactionId, $apiVersion),
             [],
             \Zend_Http_Client::GET
         );
@@ -433,7 +468,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     public function getAsLowAs($data)
     {
-        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        $baseUrl = $this->helper->getTransactionApiUrl('classic', $this->getStoreId());
         $asLowAsUrl = join('/', [ trim($baseUrl, '/'), 'aslowas' ]);
         return $this->call(
             $asLowAsUrl,
@@ -455,11 +490,21 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function call($url, $data, $method = \Zend_Http_Client::POST, $jsonEncode = true)
     {
+        $this->logger->info('We are at call');
         $storeId = $this->getStoreId();
-        $username   = $this->helper->getApiPublicKey($storeId);
-        $password   = $this->helper->getApiSecretKey($storeId);
         $apiVersion = $this->helper->getApiVersion();
         
+        if(!is_null($this->order)) {
+            $payment = $this->order->getPayment();
+            $paymentApiVersion = $payment->getData('bread_api_version');
+            if (!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic', 'bread_2'])) {
+                $apiVersion = strtolower($paymentApiVersion);
+            }
+        }
+        $this->logger->info("API Version :: " . $apiVersion );
+        $username   = $this->helper->getApiPublicKey($apiVersion, $storeId);
+        $password   = $this->helper->getApiSecretKey($apiVersion, $storeId);
+            
         if($apiVersion === 'bread_2') {
             try {
                 $authToken = $this->helper->getAuthToken();
@@ -764,7 +809,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function setShippingDetails($transactionId, $trackingNumber, $carrierName)
     {
         $apiVersion = $this->helper->getApiVersion();
-        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        $baseUrl = $this->helper->getTransactionApiUrl(null, $this->getStoreId());
 
         if ($apiVersion === 'bread_2') {
 
@@ -797,10 +842,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param  $transactionId
      * @return string
      */
-    protected function getTransactionInfoUrl($transactionId)
-    {
+    protected function getTransactionInfoUrl($transactionId, $breadApiVersion = null)
+    {   
         $apiVersion = $this->helper->getApiVersion();
-        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        if(!is_null($breadApiVersion)) {
+            $apiVersion = $breadApiVersion;
+        }
+        $baseUrl = $this->helper->getTransactionApiUrl($apiVersion, $this->getStoreId());
         if ($apiVersion === 'bread_2') {
             return join('/', [trim($baseUrl, '/'), 'transaction', trim($transactionId, '/')]);
         } else {
@@ -816,7 +864,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getUpdateTransactionUrl($transactionId)
     {
-        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        $baseUrl = $this->helper->getTransactionApiUrl(null, $this->getStoreId());
         return join(
             '/',
             [ trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/') ]
@@ -830,8 +878,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return string
      */
     protected function getAuthTokenUrl() {
-        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
-        return join('/', [trim($baseUrl, '/'), 'auth/sa/authenticate']);
+        $baseUrl = $this->helper->getTransactionApiUrl('bread_2', $this->getStoreId());
+        return join('/', [trim($baseUrl, '/'), 'auth/service/authorize']);
     }
     
     /**
@@ -851,6 +899,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $curl = curl_init($url);
         try {
             curl_setopt($curl, CURLOPT_HEADER, 0);
+            curl_setopt($curl, CURLOPT_USERPWD, $apiKey. ':' . $apiSecret);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
             curl_setopt($curl, CURLOPT_POST, 1);
             curl_setopt($curl, CURLOPT_HTTPHEADER, [
@@ -948,7 +997,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @param type $action
      */
     protected function getUpdateTransactionUrlPlatform($transactionId, $action) {
-        $baseUrl = $this->helper->getTransactionApiUrl($this->getStoreId());
+        $baseUrl = $this->helper->getTransactionApiUrl('bread_2', $this->getStoreId());
         $url = join('/', [trim($baseUrl, '/'), 'transaction', $transactionId, $action]);
         return $url;
     }
