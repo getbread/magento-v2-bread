@@ -244,10 +244,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
             ]);
             $data = '{"externalID":"' . $merchantOrderId . '","metadata":{"externalMerchantData":"externalInfo"}}';
             
-            /**
-             * temporary
-             * @remove after API scopes added
-             *
             $updateMerchantOrderIdResult = $this->call(
                     $this->getTransactionInfoUrl($breadTransactionId),
                     $data,
@@ -255,8 +251,6 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     false
             );
             $this->logger->info('Response: ' . json_encode($updateMerchantOrderIdResult) . 'Bread trxId: '. $breadTransactionId);
-             *      
-             */
 
             return $result;
         } else {
@@ -684,7 +678,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
             }
 
-            if ($method == \Zend_Http_Client::PUT) {
+            if ($method == \Zend_Http_Client::PUT || $method == \Zend_Http_Client::PATCH) {
                 $authorization = "Authorization: Bearer " . $authToken;
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [
                     'Content-Type: application/json',
@@ -879,7 +873,8 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getAuthTokenUrl() {
         $baseUrl = $this->helper->getTransactionApiUrl('bread_2', $this->getStoreId());
-        return join('/', [trim($baseUrl, '/'), 'auth/service/authorize']);
+        //return join('/', [trim($baseUrl, '/'), 'auth/service/authorize']);
+        return join('/', [trim($baseUrl, '/'), 'auth/sa/authenticate']);
     }
     
     /**
