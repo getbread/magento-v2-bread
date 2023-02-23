@@ -858,7 +858,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getUpdateTransactionUrl($transactionId)
     {
-        $baseUrl = $this->helper->getTransactionApiUrl(null, $this->getStoreId());
+        $baseUrl = $this->helper->getTransactionApiUrl('classic', $this->getStoreId());
         return join(
             '/',
             [ trim($baseUrl, '/'), 'transactions/actions', trim($transactionId, '/') ]
