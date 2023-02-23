@@ -63,6 +63,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const XML_CONFIG_API_SECRET_KEY = 'payment/breadcheckout/api_secret_key';
     const XML_CONFIG_API_SANDBOX_PUB_KEY = 'payment/breadcheckout/api_sandbox_public_key';
     const XML_CONFIG_API_SANDBOX_SECRET_KEY = 'payment/breadcheckout/api_sandbox_secret_key';
+    const XML_CONFIG_CLASSIC_API_PUB_KEY = 'payment/breadcheckout/classic_api_public_key';
+    const XML_CONFIG_CLASSIC_API_SECRET_KEY = 'payment/breadcheckout/classic_api_secret_key';
+    const XML_CONFIG_CLASSIC_API_SANDBOX_PUB_KEY = 'payment/breadcheckout/classic_api_sandbox_public_key';
+    const XML_CONFIG_CLASSIC_API_SANDBOX_SECRET_KEY = 'payment/breadcheckout/classic_api_sandbox_secret_key';
     const XML_CONFIG_JS_LIB_LOCATION = 'payment/breadcheckout/js_location';
     const XML_CONFIG_BUTTON_ON_PRODUCTS = 'payment/breadcheckout/button_on_products';
     const XML_CONFIG_BUTTON_DESIGN = 'payment/breadcheckout/button_design';
@@ -238,12 +242,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @param  null $store
      * @return mixed
      */
-    public function getApiPublicKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
-            return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store, $storeCode);
-        } else {
-            return $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_PUB_KEY, $store, $storeCode);
+    public function getApiPublicKey($breadApiVersion = null,  $storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $apiVersion = $this->getApiVersion();
+        if(!is_null($breadApiVersion)) {
+            $apiVersion = $breadApiVersion;
         }
+        if($apiVersion === 'bread_2') {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store, $storeCode);
+            } else {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_PUB_KEY, $store, $storeCode);
+            }
+        } else {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_PUB_KEY, $store, $storeCode);
+            } else {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_SANDBOX_PUB_KEY, $store, $storeCode);
+            }
+        }
+        
     }
 
     /**
@@ -252,15 +269,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @param  null $store
      * @return string
      */
-    public function getApiSecretKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
-            return (string) $this->encryptor->decrypt(
-                            $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
-            );
+    public function getApiSecretKey($breadApiVersion = null, $storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $apiVersion = $this->getApiVersion();
+        if(!is_null($breadApiVersion)) {
+            $apiVersion = $breadApiVersion;
+        }
+        if($apiVersion === 'bread_2') {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return (string) $this->encryptor->decrypt(
+                                $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
+                );
+            } else {
+                return (string) $this->encryptor->decrypt(
+                                $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_SECRET_KEY, $store, $storeCode)
+                );
+            }
         } else {
-            return (string) $this->encryptor->decrypt(
-                            $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_SECRET_KEY, $store, $storeCode)
-            );
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return (string) $this->encryptor->decrypt(
+                                $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_SECRET_KEY, $store, $storeCode)
+                );
+            } else {
+                return (string) $this->encryptor->decrypt(
+                                $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_SANDBOX_SECRET_KEY, $store, $storeCode)
+                );
+            }
         }
     }
 
@@ -307,8 +340,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @param  null $store
      * @return mixed
      */
-    public function getTransactionApiUrl($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+    public function getTransactionApiUrl($breadApiVersion = null, $storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $apiVersion = null) {
         $apiVersion = $this->getApiVersion($storeCode, $store);
+        if(!is_null($breadApiVersion)) {
+            $apiVersion = $breadApiVersion;
+        }
         if($apiVersion === 'bread_2') {
             $tenant = strtoupper($this->getConfigClient($storeCode, $store));
             if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
@@ -1004,8 +1040,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getApiVersion($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if($this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode)) {
-            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode);
+        $apiVersion = $this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode);
+        if($apiVersion) {
+            return (string) $apiVersion;
         } else {
             return 'bread_2';
         }

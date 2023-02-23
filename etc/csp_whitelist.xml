@@ -3,32 +3,30 @@
     <policies>
         <policy id="script-src">
             <values>
-                <value id="classic-sandbox-base" type="host">https://checkout-sandbox.getbread.com/bread.js</value>
-                <value id="classic-production-base" type="host">https://checkout.getbread.com/bread.js</value>
-                <value id="platform-sandbox-base" type="host">https://connect-preview.breadpayments.com/sdk.js</value>
-                <value id="platform-production-base" type="host">https://connect.breadpayments.com/sdk.js</value>
-                <value id="platform-sandbox-rbc-base" type="host">https://connect-preview.rbc.breadpayments.com/sdk.js</value>
-                <value id="platform-production-rbc-base" type="host">https://connect.rbcpayplan.com/sdk.js</value>
+                <value id="bread_classic_script" type="host">*.getbread.com</value>
+                <value id="bread_platform_script" type="host">*.breadpayments.com</value>
+                <value id="bread_platform_script_ca" type="host">*.rbcpayplan.com</value>
             </values>
         </policy>
         <policy id="connect-src">
             <values>
-                <value id="bread-sandbox" type="host">https://checkout-sandbox.getbread.com</value>
-                <value id="bread-production" type="host">https://checkout.getbread.com</value>
-                <value id="platform-sandbox-rbc" type="host">https://api-preview.rbc.breadpayments.com</value>
-                <value id="platform-production-rbc" type="host">https://api.rbcpayplan.com</value>
-                <value id="platform-sandbox-core" type="host">https://api-preview.platform.breadpayments.com</value>
-                <value id="platform-production-core" type="host">https://api.platform.breadpayments.com</value>
+                <value id="bread_classic_connect" type="host">*.getbread.com</value>
+                <value id="bread_platform_connect" type="host">*.breadpayments.com</value>
+                <value id="bread_platform_connect_ca" type="host">*.rbcpayplan.com</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
-                <value id="bread-sandbox" type="host">https://checkout-sandbox.getbread.com</value>
-                <value id="bread-production" type="host">https://checkout.getbread.com</value>
-                <value id="platform-sandbox" type="host">https://api-preview.platform.breadpayments.com</value>
-                <value id="platform-production" type="host">https://api.platform.breadpayments.com</value>
-                <value id="platform-sandbox-rbc" type="host">https://api-preview.rbc.breadpayments.com</value>
-                <value id="platform-production-rbc" type="host">https://api.rbcpayplan.com</value>
+                <value id="bread_classic_frame" type="host">*.getbread.com</value>
+                <value id="bread_platform_frame" type="host">*.breadpayments.com</value>
+                <value id="bread_platform_frame_ca" type="host">*.rbcpayplan.com</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="bread_classic_img" type="host">*.getbread.com</value>
+                <value id="bread_platform_img" type="host">*.breadpayments.com</value>
+                <value id="bread_platform_img_ca" type="host">*.rbcpayplan.com</value>
             </values>
         </policy>
     </policies>
