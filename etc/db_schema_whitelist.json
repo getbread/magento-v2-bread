@@ -1,0 +1,12 @@
+{
+    "quote_payment": {
+        "column": {
+            "bread_api_version": true
+        }
+    },
+    "sales_order_payment": {
+        "column": {
+            "bread_api_version": true
+        }
+    }
+}
