@@ -146,7 +146,7 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
             $tenantLoaded = false;
             $response = null;
 
-            $url = join('/', [trim($link, '/'), 'auth/sa/authenticate']);
+            $url = join('/', [trim($link, '/'), 'auth/service/authorize']);
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
