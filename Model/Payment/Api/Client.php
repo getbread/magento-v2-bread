@@ -131,12 +131,12 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($breadTransactionId, 'cancel'),
                     $data,
-                    \Zend_Http_Client::POST,
+                    \Laminas\Http\Request::METHOD_POST,
                     false
             );
             $this->logger->info('Result: ' . json_encode($result). ' Bread trxId: '. $breadTransactionId);
 
-            if ($result['status'] !== 'CANCELLED') {
+            if (strtoupper($result['status']) !== 'CANCELLED') {
                 $this->logger->log(['ERROR' => 'Transaction cancel failed', 'RESULT' => $result]);
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __('Transaction cancel failed (current transaction status :' . $result['status'] . ')')
@@ -226,7 +226,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($breadTransactionId, 'authorize'),
                     $data,
-                    \Zend_Http_Client::POST,
+                    \Laminas\Http\Request::METHOD_POST,
                     false
             );
             $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
@@ -247,7 +247,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $updateMerchantOrderIdResult = $this->call(
                     $this->getTransactionInfoUrl($breadTransactionId),
                     $data,
-                    \Zend_Http_Client::PATCH,
+                    \Laminas\Http\Request::METHOD_PATCH,
                     false
             );
             $this->logger->info('Response: ' . json_encode($updateMerchantOrderIdResult) . 'Bread trxId: '. $breadTransactionId);
@@ -308,7 +308,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $result = $this->call(
             $this->getTransactionInfoUrl($breadTransactionId),
             ['merchantOrderId' => $merchantOrderId],
-            \Zend_Http_Client::PUT
+            \Laminas\Http\Request::METHOD_PUT
         );
 
         return $result;
@@ -341,7 +341,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($breadTransactionId, 'settle'),
                     $data,
-                    \Zend_Http_Client::POST,
+                    \Laminas\Http\Request::METHOD_POST,
                     false
             );
             $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
@@ -396,7 +396,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($breadTransactionId, 'refund'),
                     $data,
-                    \Zend_Http_Client::POST,
+                    \Laminas\Http\Request::METHOD_POST,
                     false
             );
             $this->logger->info('Response: ' . json_encode($result) . 'Bread trxId: '. $breadTransactionId);
@@ -432,7 +432,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         return $this->call(
             $this->getTransactionInfoUrl($breadTransactionId, $apiVersion),
             [],
-            \Zend_Http_Client::GET
+            \Laminas\Http\Request::METHOD_GET
         );
     }
 
@@ -448,7 +448,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         return $this->call(
             $this->helper->getCartCreateApiUrl($this->getStoreId()),
             $data,
-            \Zend_Http_Client::POST
+            \Laminas\Http\Request::METHOD_POST
         );
     }
 
@@ -467,7 +467,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         return $this->call(
             $asLowAsUrl,
             $data,
-            \Zend_Http_Client::POST
+            \Laminas\Http\Request::METHOD_POST
         );
     }
 
@@ -482,7 +482,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @return mixed
      * @throws \Exception
      */
-    protected function call($url, $data, $method = \Zend_Http_Client::POST, $jsonEncode = true)
+    protected function call($url, $data, $method = \Laminas\Http\Request::METHOD_POST, $jsonEncode = true)
     {
         $this->logger->info('We are at call');
         $storeId = $this->getStoreId();
@@ -569,7 +569,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_USERPWD, $username . ':' . $password);
                 curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
-                if ($method == \Zend_Http_Client::POST) {
+                if ($method == \Laminas\Http\Request::METHOD_POST) {
                     curl_setopt($curl, CURLOPT_POST, 1);
                     curl_setopt($curl, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json',
@@ -577,7 +577,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
                 }
 
-                if ($method == \Zend_Http_Client::PUT) {
+                if ($method == \Laminas\Http\Request::METHOD_PUT) {
                     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $this->jsonHelper->jsonEncode($data));
                 }
@@ -659,13 +659,13 @@ class Client extends \Magento\Framework\Model\AbstractModel
      * @throws \Throwable
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function callBread($url, $authToken, $data, $method = \Zend_Http_Client::POST, $jsonEncode = true) {
+    protected function callBread($url, $authToken, $data, $method = \Laminas\Http\Request::METHOD_POST, $jsonEncode = true) {
         $curl = curl_init($url);
         try {
             curl_setopt($curl, CURLOPT_HEADER, 0);
             curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
-            if ($method == \Zend_Http_Client::POST) {
+            if ($method == \Laminas\Http\Request::METHOD_POST) {
 
                 curl_setopt($curl, CURLOPT_POST, 1);
                 $authorization = "Authorization: Bearer " . $authToken;
@@ -678,7 +678,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
             }
 
-            if ($method == \Zend_Http_Client::PUT || $method == \Zend_Http_Client::PATCH) {
+            if ($method == \Laminas\Http\Request::METHOD_PUT || $method == \Laminas\Http\Request::METHOD_PATCH) {
                 $authorization = "Authorization: Bearer " . $authToken;
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [
                     'Content-Type: application/json',
@@ -687,7 +687,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
             }
 
-            if ($method == \Zend_Http_Client::GET) {
+            if ($method == \Laminas\Http\Request::METHOD_GET) {
                 $authorization = "Authorization: Bearer " . $authToken;
                 curl_setopt($curl, CURLOPT_HTTPHEADER, [$authorization]);
             }
@@ -767,7 +767,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         return $this->call(
             $sendSmsUrl,
             $data,
-            \Zend_Http_Client::POST
+            \Laminas\Http\Request::METHOD_POST
         );
     }
 
@@ -788,7 +788,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         return $this->call(
             $sendEmailUrl,
             $data,
-            \Zend_Http_Client::POST
+            \Laminas\Http\Request::METHOD_POST
         );
     }
 
@@ -811,7 +811,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $result = $this->call(
                     $this->getUpdateTransactionUrlPlatform($transactionId, 'fulfillment'),
                     $data,
-                    \Zend_Http_Client::POST,
+                    \Laminas\Http\Request::METHOD_POST,
                     false
             );
 
@@ -825,7 +825,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             return $this->call(
                             $setShippingDetailsUrl,
                             $data,
-                            \Zend_Http_Client::POST
+                            \Laminas\Http\Request::METHOD_POST
             );
         }
     }

@@ -1,7 +1,11 @@
 == Changelog ==
 
-= 2.3.1
+= 2.3.2
 * Current release
+* Replaced Zend_Http_Client with Laminas_Http
+* Minor bug fixes
+
+= 2.3.1
 * ALA button now shows correctly for Bundled products under the view category section
 * Fixed the fetch Auth token API end-point
 * Extension is now PHP 8.2 compatible
