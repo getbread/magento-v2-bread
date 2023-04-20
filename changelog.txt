@@ -1,0 +1,7 @@
+== Changelog ==
+
+= 2.3.1
+* Current release
+* ALA button now shows correctly for Bundled products under the view category section
+* Fixed the fetch Auth token API end-point
+* Extension is now PHP 8.2 compatible

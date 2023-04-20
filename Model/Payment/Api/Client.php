@@ -873,8 +873,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
      */
     protected function getAuthTokenUrl() {
         $baseUrl = $this->helper->getTransactionApiUrl('bread_2', $this->getStoreId());
-        //return join('/', [trim($baseUrl, '/'), 'auth/service/authorize']);
-        return join('/', [trim($baseUrl, '/'), 'auth/sa/authenticate']);
+        return join('/', [trim($baseUrl, '/'), 'auth/service/authorize']);
     }
     
     /**

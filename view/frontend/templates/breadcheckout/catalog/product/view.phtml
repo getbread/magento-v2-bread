@@ -3,7 +3,7 @@
  * @author Maritim, Kip 
  * @copyright (c) 2023, Bread Financial
  *
- * @var Bread\BreadCheckout\Block\CatalogProductCollection $block 
+ * @var Bread\BreadCheckout\Block\Catalog\ProductCollection $block 
  */
 $collection = $block->getCategoryProductCollection();
 $products = array();
@@ -21,30 +21,33 @@ endforeach;
                 var currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>"; 
                 var placementObject = [];
                 <?php foreach ($products as $product) : ?>
-                   var itemPlacement = {
-                        "allowCheckout": allowCheckout,
-                        "financingType": "installment",
-                        "domID": 'bread-checkout-btn-<?= /* @noEscape */ $product['id'];?>',
-                        "locationType": buttonLocation,
-                        "order": {
-                            "items": [
-                                {
-                                    "name": "<?= /* @noEscape */ $product['name']?>",
-                                    "quantity": <?= /* @noEscape */ $product['quantity']?>,
-                                    "shippingCost": {"currency": currentCurrencyCode, "value": 0},
-                                    "shippingDescription": "",
-                                    "unitTax": {"currency": currentCurrencyCode, "value": 0},
-                                    "unitPrice": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>}
+                    var price = <?= /* @noEscape */ $product['price']?>;
+                    if(price != 0) {
+                        var itemPlacement = {
+                                "allowCheckout": allowCheckout,
+                                "financingType": "installment",
+                                "domID": 'bread-checkout-btn-<?= /* @noEscape */ $product['id'];?>',
+                                "locationType": buttonLocation,
+                                "order": {
+                                    "items": [
+                                        {
+                                            "name": "<?= /* @noEscape */ $product['name']?>",
+                                            "quantity": <?= /* @noEscape */ $product['quantity']?>,
+                                            "shippingCost": {"currency": currentCurrencyCode, "value": 0},
+                                            "shippingDescription": "",
+                                            "unitTax": {"currency": currentCurrencyCode, "value": 0},
+                                            "unitPrice": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>}
+                                        }
+                                    ],
+                                    "subTotal": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>},
+                                    "totalPrice": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>},
+                                    "totalDiscounts": {"currency": currentCurrencyCode, "value": 0},
+                                    "totalShipping": {"currency": currentCurrencyCode, "value": 0},
+                                    "totalTax": {"currency": currentCurrencyCode, "value": 0}
                                 }
-                            ],
-                            "subTotal": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>},
-                            "totalPrice": {"currency": currentCurrencyCode, "value": <?= /* @noEscape */ $product['price']?>},
-                            "totalDiscounts": {"currency": currentCurrencyCode, "value": 0},
-                            "totalShipping": {"currency": currentCurrencyCode, "value": 0},
-                            "totalTax": {"currency": currentCurrencyCode, "value": 0}
-                        }
-                    };
-                    placementObject.push(itemPlacement);
+                       };
+                       placementObject.push(itemPlacement);
+                    }     
                 <?php endforeach; ?>
                 if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                     var bread_sdk = null;
