@@ -510,4 +510,28 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
     public function getApiVersion() {
         return (string) $this->dataHelper->getApiVersion();
     }
+
+    /**
+     * @since 2.1.0
+     * @return string
+     */
+    public function getIntegrationKey() {
+        return $this->dataHelper->getIntegrationKey();
+    }
+
+    /**
+     * @since 2.1.0
+     * @return string
+     */
+    public function getConfigClient() {
+        return $this->dataHelper->getConfigClient();
+    }
+
+    /**
+     * @since 2.1.0
+     * @return string
+     */
+    public function getCurrentCurrencyCode() {
+        return $this->catalogHelper->getCurrentCurrencyCode();
+    }
 }
