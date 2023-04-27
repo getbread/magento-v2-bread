@@ -1,7 +1,12 @@
 == Changelog ==
 
-= 2.3.2
+= 2.3.3
 * Current release
+* Removed Healthcare checks from views, this has been moved to the SDK
+* Minicart placement issue fix
+* Update SDK init methods on placements for PDP and Minicart
+
+= 2.3.2
 * Replaced Zend_Http_Client with Laminas_Http
 * Minor bug fixes
 

@@ -167,7 +167,7 @@
                     <comment>
                             <![CDATA[
 				                <div>
-				                    <p>If value is set, Payplan by RBC checkout will be disabled for all items or orders below the given dollar amount</p>
+				                    <p>If value is set, Payplan by RBC checkout will be disabled on the minicart page for all items or orders below the given dollar amount</p>
 				                </div>
 				            ]]>
                     </comment>
