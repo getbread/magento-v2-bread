@@ -51,7 +51,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const XML_CONFIG_HEALTHCARE_MODE = 'payment/breadcheckout/healthcare_mode';
     const XML_CONFIG_SHOW_SPLITPAY_LABEL = 'payment/breadcheckout/show_splitpay_label';
     const XML_CONFIG_ACTIVE_ON_PDP = 'payment/breadcheckout/enabled_on_product_page';
-    const XML_CONFIG_ACTIVE_ON_CAT = 'payment/breadcheckout/bread_category/enabled_on_category_page';
+    const XML_CONFIG_ACTIVE_ON_CAT = 'payment/breadcheckout/enabled_on_category_page';
     const XML_CONFIG_ACTIVE_ON_CART_VIEW = 'payment/breadcheckout/enabled_on_cart_page';
     const XML_CONGIG_MINICART_CHECKOUT = 'payment/breadcheckout/allowminicartcheckout';
     const XML_CONFIG_SHOW_MINICART_LINK = 'payment/breadcheckout/enableonminicart';
