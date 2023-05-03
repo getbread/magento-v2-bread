@@ -233,7 +233,7 @@ class Quote extends Data
             'city'          => $billingAddress->getCity(),
             'state'         => $billingAddress->getRegionCode(),
             'zip'           => $billingAddress->getPostcode(),
-            'phone'         => substr(preg_replace('/[^0-9]+/', '', $billingAddress->getTelephone()), -10),
+            'phone'         => is_null($billingAddress->getTelephone()) ? '' : substr(preg_replace('/[^0-9]+/', '', $billingAddress->getTelephone()), -10),
             'email'         => $billingAddress->getEmail(),
             'firstName'     => trim($billingAddress->getFirstname()),
             'lastName'      => trim($billingAddress->getLastname()),
@@ -268,7 +268,7 @@ class Quote extends Data
             'email'         => $shippingAddress->getEmail(),
             'state'         => $shippingAddress->getRegionCode(),
             'zip'           => $shippingAddress->getPostcode(),
-            'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
+            'phone'         => is_null($shippingAddress->getTelephone()) ? '' : substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
         ];
     }
 
@@ -298,7 +298,7 @@ class Quote extends Data
             'city'          => $shippingAddress->getCity(),
             'state'         => $shippingAddress->getRegionCode(),
             'zip'           => $shippingAddress->getPostcode(),
-            'phone'         => substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
+            'phone'         => is_null($shippingAddress->getTelephone()) ? '' : substr(preg_replace('/[^0-9]+/', '', $shippingAddress->getTelephone()), -10)
         ];
         // @codingStandardsIgnoreEnd
     }
