@@ -48,7 +48,6 @@
                     bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
                     let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
                     let itemsObject = [];
-                    <?php if(!$block->isHealthcare()) : ?>
                     for (var i = 0; i < items.length; i++) {
                         let item = {
                             name: items[i].name,
@@ -71,7 +70,6 @@
 
                         itemsObject.push(item);
                     }
-                    <?php endif; ?>
                     bread_sdk.registerPlacements([{
                         allowCheckout: false,
                         domID: 'bread-checkout-btn',
@@ -101,8 +99,8 @@
                         }
                     }]);
 
-                    bread_sdk.__internal__.setInitMode('manual');
-                    bread_sdk.__internal__.init();
+                    bread_sdk.setInitMode('manual');
+                    bread_sdk.init();
 
 
                 } else {

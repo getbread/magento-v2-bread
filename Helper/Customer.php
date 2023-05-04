@@ -134,7 +134,7 @@ class Customer extends Data
             'city'          => $defaultShippingAddress->getCity(),
             'state'         => $defaultShippingAddress->getRegionCode(),
             'zip'           => $defaultShippingAddress->getPostcode(),
-            'phone'         => substr(preg_replace('/[^0-9]+/', '', $defaultShippingAddress->getTelephone()), -10)
+            'phone'         => is_null($defaultShippingAddress->getTelephone()) ? "": substr(preg_replace('/[^0-9]+/', '', $defaultShippingAddress->getTelephone()), -10)
         ];
 
         return $primaryData;
@@ -171,7 +171,7 @@ class Customer extends Data
             'state'         => $defaultBillingAddress->getRegionCode(),
             'zip'           => $defaultBillingAddress->getPostcode(),
             'email'         => $customer->getEmail(),
-            'phone'         => substr(preg_replace('/[^0-9]+/', '', $defaultBillingAddress->getTelephone()), -10)
+            'phone'         => is_null($defaultBillingAddress->getTelephone()) ? "" : substr(preg_replace('/[^0-9]+/', '', $defaultBillingAddress->getTelephone()), -10)
         ];
 
         return $primaryData;

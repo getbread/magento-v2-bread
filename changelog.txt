@@ -1,5 +1,11 @@
 == Changelog ==
 
+= 2.3.3
+* Current release
+* PHP 8.2 comaptibility updates
+* Healthcare mode refactor, healthcare checks have been moved to the SDK
+* Closed https://github.com/getbread/magento-v2-bread/issues/189
+
 = 2.3.2
 * Current release
 * Replaced Zend_Http_Client with Laminas_Http
