@@ -1,7 +1,10 @@
 == Changelog ==
 
-= 2.3.3
+= 2.3.4
 * Current release
+* Category page slow load bug fix
+
+= 2.3.3
 * PHP 8.2 comaptibility updates
 * Healthcare mode refactor, healthcare checks have been moved to the SDK
 * Closed https://github.com/getbread/magento-v2-bread/issues/189
