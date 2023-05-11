@@ -131,11 +131,21 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $transactionId = $this->request->getParam("transactionId");
+        $apiVersion = $this->customerHelper->getApiVersion();
+        $transactionId = null;
+        if($apiVersion === 'bread_2') {
+            $transactionId = $this->request->getParam("transactionID");
+        } else {
+            $transactionId = $this->request->getParam("transactionId");
+        }
+        $this->logger->log('Getting all request params');
+        $this->logger->log(json_encode($this->request->getParams()));
+        $this->logger->log('API Version :: ' . $apiVersion . ' BreadID :: ' . $transactionId); 
+        
         $orderRef = $this->request->getParam("orderRef");
 
         if ($transactionId && $orderRef && !$this->request->getParam("error")) {
-            $this->validateBackendOrder($transactionId, $orderRef);
+            $this->validateBackendOrder($transactionId, $orderRef, $apiVersion);
         } else {
             $this->_redirect("/");
         }
@@ -144,11 +154,12 @@ class LandingPage extends \Magento\Framework\App\Action\Action
     /**
      * Create Magento Order From Backend Quote
      */
-    public function validateBackendOrder($transactionId, $orderRef)
+    public function validateBackendOrder($transactionId, $orderRef, $apiVersion = null)
     {
         try {
             if ($transactionId) {
-                $data       = $this->paymentApiClient->getInfo($transactionId);
+                $data       = $this->paymentApiClient->getInfo($transactionId, $apiVersion);
+                $this->logger->log('Trx details :: ' . json_encode($data));
 
                 $customer   = $this->customerFactory->create();
 
@@ -159,7 +170,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
                     $this->customerSession->setCustomerAsLoggedIn($customer);
                 }
 
-                $this->processBackendOrder($orderRef, $data);
+                $this->processBackendOrder($orderRef, $data, $transactionId);
 
                 $this->_redirect('checkout/onepage/success');
             }
@@ -180,7 +191,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      * @param  $data
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function processBackendOrder($orderRef, $data)
+    protected function processBackendOrder($orderRef, $data, $transactionId)
     {
         $quote = $this->quoteFactory->create()->loadByIdWithoutStore($orderRef);
 
@@ -193,7 +204,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
         $customer = $this->customerHelper->createCustomer($quote, $billingAddress, $shippingAddress, true);
 
-        $this->checkoutSession->setBreadTransactionId($data['breadTransactionId']);
+        $this->checkoutSession->setBreadTransactionId($transactionId);
 
         if (!$quote->getPayment()->getQuote()) {
             $quote->getPayment()->setQuote($quote);
@@ -207,7 +218,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         $quote->setTotalsCollectedFlag(false)->collectTotals()->save();
 
         $quote->getPayment()->importData(['method' => 'breadcheckout']);
-        $quote->getPayment()->setTransactionId($data['breadTransactionId']);
+        $quote->getPayment()->setTransactionId($transactionId);
         $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
 
         try {
