@@ -123,10 +123,10 @@ class ProductCollection extends Template
      */
     public function getCategoryProductCollection()
     {
-        if ($this->categoryHelper->isEnabledOnCAT()) {
-            //get current category ID
-            $category_load = $this->_registry->registry('current_category');
-            $categoryId = $category_load->getId();
+        //get current category ID
+        $category_load = $this->_registry->registry('current_category');
+        $categoryId = $category_load->getId();
+        if ($this->categoryHelper->isEnabledForCategory($category_load)) {
             //load product collection of category id wise
             $category_product_collection = $this->_categoryFactory->create()->load($categoryId);
             $collection = $this->_productCollectionFactory->create();
@@ -181,6 +181,6 @@ class ProductCollection extends Template
     }
     
     public function isEnabledOnCAT() {
-        return $this->categoryHelper->isEnabledOnCAT();
+        return $this->categoryHelper->is;
     }
 }
