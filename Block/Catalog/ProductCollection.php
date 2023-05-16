@@ -181,6 +181,6 @@ class ProductCollection extends Template
     }
     
     public function isEnabledOnCAT() {
-        return $this->categoryHelper->is;
+        return $this->categoryHelper->isEnabledOnCAT();
     }
 }
