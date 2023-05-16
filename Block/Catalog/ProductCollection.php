@@ -126,15 +126,25 @@ class ProductCollection extends Template
         //get current category ID
         $category_load = $this->_registry->registry('current_category');
         $categoryId = $category_load->getId();
-        //load product collection of category id wise
-        $category_product_collection = $this->_categoryFactory->create()->load($categoryId);
-        $collection = $this->_productCollectionFactory->create();
-        $collection->addAttributeToSelect('*');
-        $collection->addCategoryFilter($category_product_collection);
-        $collection->addAttributeToFilter('visibility', Visibility::VISIBILITY_BOTH);
-        $collection->addAttributeToFilter('status',Status::STATUS_ENABLED);
+        if ($this->categoryHelper->isEnabledForCategory($category_load)) {
+            //load product collection of category id wise
+            $category_product_collection = $this->_categoryFactory->create()->load($categoryId);
+            $collection = $this->_productCollectionFactory->create();
+            
+            //Paginate collection
+            $page = ($this->getRequest()->getParam('p')) ? $this->getRequest()->getParam('p') : 1;
+            $pageSize = ($this->getRequest()->getParam('limit')) ? $this->getRequest
+                    ()->getParam('limit') : 12;
+            $collection->addAttributeToSelect('*');
+            $collection->addCategoryFilter($category_product_collection);
+            $collection->addAttributeToFilter('visibility', Visibility::VISIBILITY_BOTH);
+            $collection->addAttributeToFilter('status', Status::STATUS_ENABLED);
+            $collection->setPageSize($pageSize);
+            $collection->setCurPage($page);
 
-        return $collection;
+            return $collection;
+        }
+        return array();
     }
 
 
@@ -168,5 +178,9 @@ class ProductCollection extends Template
      */
     public function getCurrentCurrencyCode() {
         return $this->catalogHelper->getCurrentCurrencyCode();
+    }
+    
+    public function isEnabledOnCAT() {
+        return $this->categoryHelper->isEnabledOnCAT();
     }
 }
