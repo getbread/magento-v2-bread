@@ -83,6 +83,13 @@
                         <field id="active">1</field>
                     </depends>
                 </field>
+                <field id="enableonminicart" type="select" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled on Minicart page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
                 <field id="enabled_on_cart_page" type="select" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Cart Overview Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
