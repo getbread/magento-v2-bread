@@ -1,7 +1,10 @@
 == Changelog ==
 
-= 2.3.4
+= 2.3.5
 * Current release
+* Bread platform admin carts support
+
+= 2.3.4
 * Category page slow load bug fix
 
 = 2.3.3

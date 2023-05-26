@@ -493,4 +493,41 @@ class Customer extends Data
 
         return $addressData;
     }
+    
+    public function processPlatformAddress($contactData) {
+        $regionId = null;
+        if (isset($contactData['region'])) {
+            /**
+             * @var \Magento\Directory\Model\RegionFactory
+             */
+            $region = $this->regionFactory->create();
+            $region->loadByCode($contactData['region'], $this->getDefaultCountry());
+            if ($region->getId()) {
+                $regionId = $region->getId();
+            }
+        }
+
+        $addressData = [
+            'firstname' => isset($contactData['name']['givenName']) ? $contactData['name']['givenName'] : '',
+            'lastname' => isset($contactData['name']['familyName']) ? $contactData['name']['familyName'] : '',
+            'street' => $contactData['address']['address1'] . (isset($contactData['address']['address2']) ?
+            (' ' . $contactData['address']['address2']) : ''),
+            'city' => $contactData['address']['locality'],
+            'postcode' => $contactData['address']['postalCode'],
+            'telephone' => $contactData['phone'],
+            'country_id' => $this->getDefaultCountry()
+        ];
+
+        if (null !== $regionId) {
+            $addressData['region'] = $contactData['address']['region'];
+            $addressData['region_id'] = $regionId;
+        }
+
+        if (isset($contactData['email'])) {
+            $addressData['email'] = $contactData['email'];
+        }
+
+        return $addressData;
+    }
+
 }

@@ -93,18 +93,18 @@ class GenerateCart extends \Magento\Backend\App\Action {
                       
             //Build 2.0 specific data
             if($apiVersion === 'bread_2') {    
+                $orderRef = $quote->getId();
                 $this->logger->info('Bread 2.0');
                 //Callbacks
-                $request['callbackURL'] = $this->urlHelper->getLandingPageURL();
-                $request['checkoutCompleteUrl'] = $this->urlHelper->getLandingPageURL();
-                //@todo ahndle error
-                $request['checkoutErrorUrl'] = $this->urlHelper->getLandingPageURL();
+                $request['callbackURL'] = $this->urlHelper->getLandingPageURL() . '?orderRef=' . $orderRef . '&action=callback';
+                $request['checkoutCompleteUrl'] = $this->urlHelper->getLandingPageURL(). '?orderRef=' . $orderRef . '&action=checkout-complete';
+                $request['checkoutErrorUrl'] = $this->urlHelper->getLandingPageURL(). '?orderRef=' . $orderRef . '&action=checkout-error';
                 
                 //Hipaa Restriction
                 $request['isHipaaRestricted'] = true;
                 
                 //Order Identifier
-                $request['orderReference'] = $quote->getId();
+                $request['orderReference'] = $orderRef;
                 
                 //Format the date to RFC-3339
                 $datetime = \DateTime::createFromFormat("Y-m-d H:i:s", date('Y-m-d H:i:s', strtotime('+7 days')));
