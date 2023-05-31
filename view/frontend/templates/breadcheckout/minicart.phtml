@@ -2,11 +2,6 @@
 <?= /* @noEscape */ $block->getBeforeHtml(); ?>
 <div id="bread-btn-cntnr-minicart">
     <div id="bread-checkout-btn-minicart" title="Bread Checkout" class="button" <?= /* @noEscape */ $block->getIsDefaultSize(); ?>>
-        <?php if ($block->getApiVersion() !== 'bread_2') : ?>
-        <span>
-            <span><?= /* @noEscape */ __('Bread Checkout'); ?></span>
-        </span>
-        <?php endif; ?>
     </div>
     <div class="button-prevent" id="button-prevent">
         <span class="buy_error_tip override_tip" data-content="<?= /* @noEscape */ $block->productTypeErrorMessage() ?>">&nbsp;</span>
@@ -14,7 +9,84 @@
 </div>
 
 <script type="text/javascript">
-    <?php if ($block->getApiVersion() !== 'bread_2') : ?>     
+    <?php if ($block->getApiVersion() === 'bread_2') : ?>
+    require(['jquery'], function($) {
+        document.configureButton = function (items) {
+            if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
+                var currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
+                var configClient = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                var breadSdk = null;
+                var configClient = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                if (configClient === 'RBC') {
+                    breadSdk = window.RBCPayPlan;
+                } else {
+                    breadSdk = window.BreadPayments;
+                }
+                var total = 0;
+                var itemsObject = [];
+                for(var i = 0; i < items.length; i++) {
+                    total += items[i]['price'] * items[i]['quantity'];
+                    var item = {
+                                name: items[i].name,
+                                quantity: items[i].quantity,
+                                shippingCost: {
+                                    value: 0,
+                                    currency: currentCurrencyCode
+                                },
+                                shippingDescription: '',
+                                unitTax: {
+                                    value: 0,
+                                    currency: currentCurrencyCode
+                                },
+                                unitPrice: {
+                                    currency: currentCurrencyCode,
+                                    value: items[i].price
+                                },
+                                itemUrl: items[i].detailUrl
+                            };
+
+                            itemsObject.push(item);
+                }
+                var placementObject = {
+                    allowCheckout: false,
+                    domID: 'bread-checkout-btn-minicart',
+                    order: {
+                        currency: currentCurrencyCode,
+                        items: itemsObject,
+                        subTotal: {
+                            value: total,
+                            currency: currentCurrencyCode
+                        },
+                        totalPrice: {
+                            value: total,
+                            currency: currentCurrencyCode
+                        },
+                        totalDiscounts: {
+                            value: 0,
+                            currency: currentCurrencyCode
+                        },
+                        totalShipping: {
+                            value: 0,
+                            currency: currentCurrencyCode
+                        },
+                        totalTax: {
+                            value: 0,
+                            currency: currentCurrencyCode
+                        }
+                    }
+                };
+                breadSdk.placements.push(placementObject);
+                breadSdk.init();
+            }
+            
+        };
+        
+        $(document).ready(function() {
+            var minicartItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
+            document.configureButton(minicartItems);
+        });
+    });    
+    <?php else: ?>    
     require(['jquery', 'jquery/validate', 'mage/validation'], function($){
 
         var validateProductTypes = Boolean(<?= /* @noEscape */ $block->validateAllowedProductTypes() ?>);
