@@ -1,7 +1,13 @@
 <?php
+
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-class LandingPage extends \Magento\Framework\App\Action\Action
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
+
+
+class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface
 {
 
     /**
@@ -328,12 +334,17 @@ class LandingPage extends \Magento\Framework\App\Action\Action
             $quote->removeItem($item->getId())->save();
         }
         
-        //Authorize this transaction for Bread 2 
-        if($apiVersion === 'bread_2') {
-            $this->paymentApiClient->authorize($transactionId, $data['adjustedAmount']['value'], $quote->getId());
-        }
         // @codingStandardsIgnoreEnd
 
         $this->_redirect('checkout/onepage/success');
     }
+    
+    public function createCsrfValidationException(RequestInterface $request): ? InvalidRequestException {
+        return null;
+    }
+
+    public function validateForCsrf(RequestInterface $request): ?bool {
+        return true;
+    }
+
 }
