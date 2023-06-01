@@ -96,6 +96,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const XML_CONFIG_CP_BUTTON_DESIGN = 'payment/breadcheckout/bread_cartpage/button_design';
     const XML_CONFIG_PDP_BUTTON_DESIGN = 'payment/breadcheckout/bread_productdetail/button_design';
     const XML_SENTRY_LOG_ENABLED = 'payment/breadcheckout/bread_advanced/sentry_enabled';
+    const XML_SANDBOX_MERCHANT_ID = 'payment/breadcheckout/bread_advanced/sandbox_merchant_id';
+    const XML_PRODUCTION_MERCHANT_ID = 'payment/breadcheckout/bread_advanced/production_merchant_id';
+    const XML_SANDBOX_PROGRAM_ID = 'payment/breadcheckout/bread_advanced/sandbox_program_id';
+    const XML_PRODUCTION_PROGRAM_ID = 'payment/breadcheckout/bread_advanced/production_program_id';
     const BLOCK_CODE_PRODUCT_VIEW = 'product_view';
     const BLOCK_CODE_CHECKOUT_OVERVIEW = 'checkout_overview';
     // Bread button locations
@@ -1076,6 +1080,35 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY, $store, $storeCode);
         }
     }
+    
+    /**
+     * @since 2.3.4
+     * @param null $storeCode
+     * @param string $store
+     * @return string
+     */
+    public function getMerchantId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_PRODUCTION_MERCHANT_ID, $store, $storeCode);
+        } else {
+            return (string) $this->scopeConfig->getValue(self::XML_SANDBOX_MERCHANT_ID, $store, $storeCode);
+        }
+    }
+    
+    /**
+     * @since 2.3.4
+     * @param null $storeCode
+     * @param string $store
+     * @return string
+     */
+    public function getProgramId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_PRODUCTION_PROGRAM_ID, $store, $storeCode);
+        } else {
+            return (string) $this->scopeConfig->getValue(self::XML_SANDBOX_PROGRAM_ID, $store, $storeCode);
+        }
+    }
+    
     
     /**
      * @since 2.1.0

@@ -55,7 +55,16 @@ class SendBreadEmail extends \Magento\Backend\App\Action
         $name  = $quote->getShippingAddress()->getName();
 
         try {
-            $this->paymentApiClient->sendEmail($cartId, $email, $name);
+            $apiVersion = $this->helper->getApiVersion();
+            if($apiVersion === 'bread_2') {
+                $data = [
+                    'merchantID' => "'".$this->helper->getMerchantId()."'",
+                    'programID'  => "'".$this->helper->getProgramId()."'"
+                ];                
+                $this->paymentApiClient->sendPlatformEmail($cartId, $data);
+            } else {
+                $this->paymentApiClient->sendEmail($cartId, $email, $name);
+            }
             $ret['successRows'][] = __('Email was successfully sent to your customer.');
         } catch (\Throwable $e) {
             $ret['error'] = true;

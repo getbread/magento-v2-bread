@@ -1,7 +1,13 @@
 <?php
+
 namespace Bread\BreadCheckout\Controller\Checkout;
 
-class LandingPage extends \Magento\Framework\App\Action\Action
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
+
+
+class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface
 {
 
     /**
@@ -131,12 +137,80 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $transactionId = $this->request->getParam("transactionId");
+        $apiVersion = $this->customerHelper->getApiVersion();
         $orderRef = $this->request->getParam("orderRef");
-
-        if ($transactionId && $orderRef && !$this->request->getParam("error")) {
-            $this->validateBackendOrder($transactionId, $orderRef);
+        $this->logger->log('Checkout Request: ' . $orderRef);
+        if($apiVersion === 'bread_2') {
+            $action = $this->request->getParam("action");
+            $this->logger->log('Bread 2 checkout action: ' . $action);
+            if($action === 'checkout-error') {
+                $this->logger->log('Checkout could not be completed for orderRef: ' . $orderRef);
+                $this->messageManager->addErrorMessage(
+                        __('There was an error with your financing program. Notification was sent to merchant.')
+                );
+                $this->_redirect("/");
+            }
+            
+            if($action === 'checkout-complete') {
+                $this->logger->log('Checkout completed for orderRef: ' . $orderRef);
+                $this->_redirect('checkout/onepage/success');
+            }
+            
+            if($action === 'callback') {
+                $this->logger->log('Callback action for orderRef: ' . $orderRef);
+                $tx_id = null;
+                $data = json_decode(file_get_contents('php://input'), true);
+                $this->logger->log('Request Data: ' . json_encode($data));
+                if (isset($data['transactionId'])) {
+                    $tx_id = trim($data['transactionId']);
+                }
+                
+                if($orderRef && $tx_id) {
+                    $this->processPlatformCartOrder($tx_id, $orderRef, $apiVersion);
+                } else {
+                    $this->_redirect("/");
+                }
+            }
         } else {
+            $transactionId = $this->request->getParam("transactionId");
+            if ($transactionId && $orderRef && !$this->request->getParam("error")) {
+                $this->validateBackendOrder($transactionId, $orderRef);
+            } else {
+                $this->_redirect("/");
+            }
+        }
+    }
+    
+    /**
+     * Process platform backend order
+     * 
+     * @param string $transactionId
+     * @param string $orderRef
+     */
+    public function processPlatformCartOrder($transactionId, $orderRef, $apiVersion) {
+        try {
+            //Fetch the Trx
+            $data = $this->paymentApiClient->getInfo($transactionId, $apiVersion);
+            $this->logger->log('Trx details :: ' . json_encode($data));
+            
+            //Create the customer
+            $customer = $this->customerFactory->create();
+            $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
+            $customer->loadByEmail($data["billingContact"]["email"]);
+
+            if ($customer->getId()) {
+                $this->customerSession->setCustomerAsLoggedIn($customer);
+            }
+            
+            $this->processBackendOrder($orderRef, $data, $transactionId, $apiVersion);
+            
+            $this->_redirect('checkout/onepage/success');
+        } catch (\Throwable $e) {
+            $this->logger->log(['ERROR' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
+            $this->customerHelper->sendCustomerErrorReportToMerchant($e, "", $orderRef, $transactionId);
+            $this->messageManager->addErrorMessage(
+                __('There was an error with your financing program. Notification was sent to merchant.')
+            );
             $this->_redirect("/");
         }
     }
@@ -149,6 +223,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         try {
             if ($transactionId) {
                 $data       = $this->paymentApiClient->getInfo($transactionId);
+                $this->logger->log('Trx details :: ' . json_encode($data));
 
                 $customer   = $this->customerFactory->create();
 
@@ -159,7 +234,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
                     $this->customerSession->setCustomerAsLoggedIn($customer);
                 }
 
-                $this->processBackendOrder($orderRef, $data);
+                $this->processBackendOrder($orderRef, $data, $transactionId);
 
                 $this->_redirect('checkout/onepage/success');
             }
@@ -180,12 +255,19 @@ class LandingPage extends \Magento\Framework\App\Action\Action
      * @param  $data
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function processBackendOrder($orderRef, $data)
+    protected function processBackendOrder($orderRef, $data, $transactionId, $apiVersion = null)
     {
         $quote = $this->quoteFactory->create()->loadByIdWithoutStore($orderRef);
 
-        $billingAddress = $this->customerHelper->processAddress($data['billingContact']);
-        $shippingAddress = $this->customerHelper->processAddress($data['shippingContact']);
+        $billingAddress = null;
+        $shippingAddress = null;
+        if($apiVersion === 'bread_2') {
+            $billingAddress = $this->customerHelper->processPlatformAddress($data['billingContact']);
+            $shippingAddress = $this->customerHelper->processPlatformAddress($data['shippingContact']);
+        } else {
+            $billingAddress = $this->customerHelper->processAddress($data['billingContact']);
+            $shippingAddress = $this->customerHelper->processAddress($data['shippingContact']);
+        }
 
         if (!isset($shippingAddress['email'])) {
             $shippingAddress['email'] = $billingAddress['email'];
@@ -193,7 +275,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
 
         $customer = $this->customerHelper->createCustomer($quote, $billingAddress, $shippingAddress, true);
 
-        $this->checkoutSession->setBreadTransactionId($data['breadTransactionId']);
+        $this->checkoutSession->setBreadTransactionId($transactionId);
 
         if (!$quote->getPayment()->getQuote()) {
             $quote->getPayment()->setQuote($quote);
@@ -207,7 +289,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         $quote->setTotalsCollectedFlag(false)->collectTotals()->save();
 
         $quote->getPayment()->importData(['method' => 'breadcheckout']);
-        $quote->getPayment()->setTransactionId($data['breadTransactionId']);
+        $quote->getPayment()->setTransactionId($transactionId);
         $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
 
         try {
@@ -251,8 +333,18 @@ class LandingPage extends \Magento\Framework\App\Action\Action
         foreach ($cartItems as $item) {
             $quote->removeItem($item->getId())->save();
         }
+        
         // @codingStandardsIgnoreEnd
 
         $this->_redirect('checkout/onepage/success');
     }
+    
+    public function createCsrfValidationException(RequestInterface $request): ? InvalidRequestException {
+        return null;
+    }
+
+    public function validateForCsrf(RequestInterface $request): ?bool {
+        return true;
+    }
+
 }

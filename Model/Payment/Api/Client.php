@@ -451,6 +451,22 @@ class Client extends \Magento\Framework\Model\AbstractModel
             \Laminas\Http\Request::METHOD_POST
         );
     }
+    
+    /**
+     * Submit platform cart data
+     * 
+     * @param $data 
+     * @return mixed
+     */
+    public function submitPlatformCartData($data) {
+        $baseUrl = $this->helper->getTransactionApiUrl('bread_2', $this->getStoreId());
+        return $this->call(
+                        $baseUrl . '/cart',
+                        $data,
+                        \Laminas\Http\Request::METHOD_POST,
+                        true
+        );
+    }
 
     /**
      * Use the “As low as” endpoint to calculate an “as low as” amount with compliant
@@ -715,9 +731,9 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 ];
             }
 
-            if ($status != 200) {
+            if (!in_array($status, [200,201,204])) {
                 $this->logger->log([
-                    'ERROR' => 'Code is not equal to 200',
+                    'ERROR' => 'Code is not equal to 200 or 201 or 204',
                     'STATUS' => $status,
                     'RESULT' => $result,
                     'TOKEN' => $authToken,
@@ -728,6 +744,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __($errorMessage)
                 );
+            }
+            
+            if($status == 204) {
+                $result = json_encode(['STATUS' => 204]);
             }
 
             $this->logger->log([
@@ -789,6 +809,19 @@ class Client extends \Magento\Framework\Model\AbstractModel
             $sendEmailUrl,
             $data,
             \Laminas\Http\Request::METHOD_POST
+        );
+    }
+    
+    /**
+     * Send platform email
+     */
+    public function sendPlatformEmail($cartId, $data) {
+        $baseUrl = $this->helper->getTransactionApiUrl('bread_2', $this->getStoreId());
+        return $this->call(
+                        $baseUrl . '/cart/' . $cartId . '/notify',
+                        $data,
+                        \Laminas\Http\Request::METHOD_POST,
+                        true
         );
     }
 

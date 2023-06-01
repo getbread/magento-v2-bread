@@ -104,4 +104,8 @@ class Form extends \Magento\Payment\Block\Form
         $this->cache->save($storeId, 'admin_store_id');
         return $storeId;
     }
+        
+    public function getApiVersion() {
+        return $this->helper->getApiVersion();
+    }
 }
