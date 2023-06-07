@@ -60,11 +60,14 @@ class CopyApiCredentials implements DataPatchInterface
                 'path',
                 'payment/breadcheckout/' . $classic
             );
-            $this->config->saveConfig(
-                'payment/breadcheckout/' . $platform, $row['value'],
-                ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
-                0
-            );
+            //Check for new setups
+            if (isset($row['value'])) {
+                $this->config->saveConfig(
+                        'payment/breadcheckout/' . $platform, $row['value'],
+                        ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                        0
+                );
+            }
         }
         
         //Clear config cache
