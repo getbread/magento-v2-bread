@@ -1,7 +1,10 @@
 == Changelog ==
 
-= 2.3.5
+= 2.3.6
 * Current release
+* Mageplaza One Step Checkout compatibility
+
+= 2.3.5
 * Bread platform admin carts support
 
 = 2.3.4
