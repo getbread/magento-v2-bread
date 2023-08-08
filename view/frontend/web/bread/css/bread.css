@@ -71,3 +71,10 @@
     margin: 0 auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
+
+/* Mageplaza One Step Checkout plugin compatibility 
+   https://github.com/mageplaza/m2-one-step-checkout-releases/blob/e9de9ee0595e585cf726fd9339a66efaa30a9c59/m2-one-step-checkout-v2.0.1-v2.1.0-patch.sh#L6176
+*/
+.payment-method-content .actions-toolbar {
+    display: block !important;
+}
