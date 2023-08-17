@@ -165,6 +165,7 @@ define(
                                             bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', self.config.onCheckout);
                                             
                                             bread_sdk.init();
+                                            wasSetup = true;
                                             fullScreenLoader.stopLoader();
                                         } else {
                                             bread_sdk.registerPlacements([placementObject]);
