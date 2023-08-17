@@ -54,24 +54,30 @@
                     <?php endforeach; ?>
                     if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                         var bread_sdk = null;
-                        var config_client = '<?= /* @noEscape */ $block->getConfigClient(); ?>';
-                        if (config_client === 'RBC') {
-                            bread_sdk = window.RBCPayPlan;
+                        let wasSetup = false;
+                        if (!wasSetup) {
+                            var config_client = '<?= /* @noEscape */ $block->getConfigClient(); ?>';
+                            if (config_client === 'RBC') {
+                                bread_sdk = window.RBCPayPlan;
+                            } else {
+                                bread_sdk = window.BreadPayments;
+                            }
+                            var onApproved = function onApproved(application) {};
+                            var onCheckout = function onCheckout(application) {};
+
+                            bread_sdk.setup({
+                                integrationKey: integrationKey
+                            });
+                            bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                            bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+
+                            bread_sdk.registerPlacements(placementObject);
+                            bread_sdk.setInitMode('manual');
+                            bread_sdk.init();
                         } else {
-                            bread_sdk = window.BreadPayments;
+                            bread_sdk.registerPlacements(placementObject);
+                            bread_sdk.openExperienceForPlacement(placementObject);
                         }
-                        var onApproved = function onApproved(application) {};
-                        var onCheckout = function onCheckout(application) {};
-
-                        bread_sdk.setup({
-                            integrationKey: integrationKey
-                        });
-                        bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
-                        bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
-
-                        bread_sdk.registerPlacements(placementObject);
-                        bread_sdk.setInitMode('manual');
-                        bread_sdk.init();
                     }
             });
         });

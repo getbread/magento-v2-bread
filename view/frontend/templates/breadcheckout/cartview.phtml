@@ -28,80 +28,87 @@
             document.configureButton = function (items) {
                 if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                     let bread_sdk = null;
-                    let config_client = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
-                    if (config_client === 'RBC') {
-                        bread_sdk = window.RBCPayPlan;
-                    } else {
-                        bread_sdk = window.BreadPayments;
-                    }
-                    let onApproved = function onApproved(application) {};
-                    let onCheckout = function onCheckout(application) {};
-                    bread_sdk.setup({
-                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
-                    });
-                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
-                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
-                    let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
-                    let itemsObject = [];
-                    let total = 0;
-                    for (var i = 0; i < items.length; i++) {
-                        total += items[i]['price'] * items[i]['quantity'];
-                    }
-                    <?php if(!$block->isHealthcare()) : ?>
-                    for (var i = 0; i < items.length; i++) {
-                        let item = {
-                            name: items[i]['name'],
-                            quantity: items[i]['quantity'],
-                            shippingCost: {
-                                value: 0,
-                                currency: currentCurrencyCode
-                            },
-                            shippingDescription: '',
-                            unitTax: {
-                                value: 0,
-                                currency: currentCurrencyCode
-                            },
-                            unitPrice: {
-                                currency: currentCurrencyCode,
-                                value: items[i]['price']
-                            },
-                            itemUrl: items[i].detailUrl
-                        };
-
-                        itemsObject.push(item);
-                    }
-                    <?php endif; ?>
-                    bread_sdk.registerPlacements([{
-                        allowCheckout: false,
-                        domID: 'bread-checkout-btn',
-                        order: {
-                            currency: currentCurrencyCode,
-                            items: itemsObject,
-                            subTotal: {
-                                value: total,
-                                currency: currentCurrencyCode
-                            },
-                            totalPrice: {
-                                value: total,
-                                currency: currentCurrencyCode
-                            },
-                            totalDiscounts: {
-                                value: 0,
-                                currency: currentCurrencyCode
-                            },
-                            totalShipping: {
-                                value: 0,
-                                currency: currentCurrencyCode
-                            },
-                            totalTax: {
-                                value: 0,
-                                currency: currentCurrencyCode
-                            }
+                    let wasSetup = false;
+                    if (!wasSetup) {
+                        let config_client = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
+                        if (config_client === 'RBC') {
+                                bread_sdk = window.RBCPayPlan;
+                        } else {
+                                bread_sdk = window.BreadPayments;
                         }
-                    }]);
+                        let onApproved = function onApproved(application) {};
+                        let onCheckout = function onCheckout(application) {};
+                        bread_sdk.setup({
+                                integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                        });
+                        bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                        bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                        let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
+                        let itemsObject = [];
+                        let total = 0;
+                        for (var i = 0; i < items.length; i++) {
+                                total += items[i]['price'] * items[i]['quantity'];
+                        }
+                        <?php if(!$block->isHealthcare()) : ?>
+                        for (var i = 0; i < items.length; i++) {
+                                let item = {
+                                name: items[i]['name'],
+                                quantity: items[i]['quantity'],
+                                shippingCost: {
+                                        value: 0,
+                                        currency: currentCurrencyCode
+                                },
+                                shippingDescription: '',
+                                unitTax: {
+                                        value: 0,
+                                        currency: currentCurrencyCode
+                                },
+                                unitPrice: {
+                                        currency: currentCurrencyCode,
+                                        value: items[i]['price']
+                                },
+                                itemUrl: items[i].detailUrl
+                                };
 
-                    bread_sdk.__internal__.setInitMode('manual');
-                    bread_sdk.__internal__.init();
+                                itemsObject.push(item);
+                        }
+                        <?php endif; ?>
+                        let data = {
+                                allowCheckout: false,
+                                domID: 'bread-checkout-btn',
+                                order: {
+                                currency: currentCurrencyCode,
+                                items: itemsObject,
+                                subTotal: {
+                                        value: total,
+                                        currency: currentCurrencyCode
+                                },
+                                totalPrice: {
+                                        value: total,
+                                        currency: currentCurrencyCode
+                                },
+                                totalDiscounts: {
+                                        value: 0,
+                                        currency: currentCurrencyCode
+                                },
+                                totalShipping: {
+                                        value: 0,
+                                        currency: currentCurrencyCode
+                                },
+                                totalTax: {
+                                        value: 0,
+                                        currency: currentCurrencyCode
+                                }
+                                }
+                        };
+                        bread_sdk.registerPlacements([data]);
+                        bread_sdk.setInitMode('manual');
+                        bread_sdk.init();
+                        wasSetup = true;
+                } else {
+                        bread_sdk.registerPlacements([data]);
+                        bread_sdk.openExperienceForPlacement([data]);
+                }
                 } else {
                     let errorInfo = {
                         err: 'err'

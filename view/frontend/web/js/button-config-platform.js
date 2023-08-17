@@ -103,68 +103,73 @@ define(
                                 this.checkShippingOptions(function () {
                                     if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                                         let bread_sdk = null;
-                                        if (window.checkoutConfig.payment.breadcheckout.client === 'RBC') {
-                                            bread_sdk = window.RBCPayPlan;
-                                        } else {
-                                            bread_sdk = window.BreadPayments;
-                                        }                                        
-                                        bread_sdk.setup({
-                                            integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
-                                            containerID: self.config.buttonId,
-                                            buyer: {
-                                                shippingAddress: {
-                                                    address1: self.config.shippingContact.address,
-                                                    address2: self.config.shippingContact.address2,
-                                                    country: window.checkoutConfig.payment.breadcheckout.country,
-                                                    locality: self.config.shippingContact.city,
-                                                    region: self.config.shippingContact.state,
-                                                    postalCode: self.config.shippingContact.zip
+                                        let wasSetup = false;
+                                        if (!wasSetup) {
+                                            if (window.checkoutConfig.payment.breadcheckout.client === 'RBC') {
+                                                bread_sdk = window.RBCPayPlan;
+                                            } else {
+                                                bread_sdk = window.BreadPayments;
+                                            }                                        
+                                            bread_sdk.setup({
+                                                integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
+                                                containerID: self.config.buttonId,
+                                                buyer: {
+                                                    shippingAddress: {
+                                                        address1: self.config.shippingContact.address,
+                                                        address2: self.config.shippingContact.address2,
+                                                        country: window.checkoutConfig.payment.breadcheckout.country,
+                                                        locality: self.config.shippingContact.city,
+                                                        region: self.config.shippingContact.state,
+                                                        postalCode: self.config.shippingContact.zip
+                                                    }
                                                 }
+                                            });
+                                                                                    
+                                            let shippingOptions = {
+                                                value: 0,
+                                                currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode
+                                            };
+                                            if (self.config.shippingOptions.length > 0) {
+                                                shippingOptions.value = self.config.shippingOptions[0].cost;
                                             }
-                                        });
-                                                                                
-                                        let shippingOptions = {
-                                            value: 0,
-                                            currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode
-                                        };
-                                        if (self.config.shippingOptions.length > 0) {
-                                            shippingOptions.value = self.config.shippingOptions[0].cost;
-                                        }
 
-                                        let subTotalPrice = (self.config.customTotal + self.config.discounts.value) - (shippingOptions.value + self.config.tax);
-                                        
-                                        let placementObject = {
-                                            allowCheckout: true,
-                                            financingType: "installment",
-                                            locationType: "checkout",
-                                            domID: self.config.buttonId,
-                                            order: {
-                                                currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
-                                                items: self.config.items,
-                                                subTotal: {
+                                            let subTotalPrice = (self.config.customTotal + self.config.discounts.value) - (shippingOptions.value + self.config.tax);
+                                            
+                                            let placementObject = {
+                                                allowCheckout: true,
+                                                financingType: "installment",
+                                                locationType: "checkout",
+                                                domID: self.config.buttonId,
+                                                order: {
                                                     currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
-                                                    value: subTotalPrice
-                                                },
-                                                totalPrice: {value: self.config.customTotal, currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode},
-                                                totalDiscounts: self.config.discounts,
-                                                totalShipping: shippingOptions,
-                                                totalTax: {currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode, value: self.config.tax}
-                                            }
-                                        };
-                                        bread_sdk.setInitMode('manual');
-                                        if (window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout) {
-                                            bread_sdk.setEmbedded(true);
-                                        }     
-                                        
-                                        bread_sdk.__internal__.setAutoRender(false);
-                                        bread_sdk.registerPlacements([placementObject]);   
-                                        
-                                        bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', self.config.onApproval);
-                                        bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', self.config.onCheckout);
-                                        
-                                        bread_sdk.init();
-                                        bread_sdk.openExperienceForPlacement([placementObject]);
-                                        fullScreenLoader.stopLoader();
+                                                    items: self.config.items,
+                                                    subTotal: {
+                                                        currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode,
+                                                        value: subTotalPrice
+                                                    },
+                                                    totalPrice: {value: self.config.customTotal, currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode},
+                                                    totalDiscounts: self.config.discounts,
+                                                    totalShipping: shippingOptions,
+                                                    totalTax: {currency: window.checkoutConfig.payment.breadcheckout.breadConfig.currencyCode, value: self.config.tax}
+                                                }
+                                            };
+                                            bread_sdk.setInitMode('manual');
+                                            if (window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout) {
+                                                bread_sdk.setEmbedded(true);
+                                            }     
+                                            
+                                            bread_sdk.__internal__.setAutoRender(false);
+                                            bread_sdk.registerPlacements([placementObject]);   
+                                            
+                                            bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', self.config.onApproval);
+                                            bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', self.config.onCheckout);
+                                            
+                                            bread_sdk.init();
+                                            fullScreenLoader.stopLoader();
+                                        } else {
+                                            bread_sdk.registerPlacements([placementObject]);
+                                            bread_sdk.openExperienceForPlacement([placementObject]);
+                                        }
                                     }
                                 });
                             }
