@@ -11,12 +11,12 @@
 <script type="text/javascript">
     <?php if ($block->getApiVersion() === 'bread_2') : ?>
     require(['jquery'], function($) {
+        let wasSetup = false;
         document.configureButton = function (items) {
             if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                 var currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
                 var configClient = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
                 var breadSdk = null;
-                var configClient = "<?= /* @noEscape */ $block->getConfigClient(); ?>";
                 if (configClient === 'RBC') {
                     breadSdk = window.RBCPayPlan;
                 } else {
