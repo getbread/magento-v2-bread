@@ -21,6 +21,7 @@
 <script>
     <?php if ($block->getApiVersion() === 'bread_2') : ?>
         require(['jquery'], function($) {
+            let wasSetup = false;
             document.configureButton = function (items) {
                 if (typeof window.BreadPayments !== 'undefined' || typeof window.RBCPayPlan !== 'undefined') {
                     let bread_sdk = null;
@@ -30,13 +31,7 @@
                     } else {
                         bread_sdk = window.BreadPayments;
                     }
-                    let onApproved = function onApproved(application) {};
-                    let onCheckout = function onCheckout(application) {};
-                    bread_sdk.setup({
-                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
-                    });
-                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
-                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                    
                     let currentCurrencyCode = "<?= /* @noEscape */ $block->getCurrentCurrencyCode(); ?>";
                     let itemsObject = [];
                     var total = 0;
@@ -66,7 +61,7 @@
                         itemsObject.push(item);
                     }
                     <?php endif; ?>
-                    bread_sdk.registerPlacements([{
+                    let data = {
                         allowCheckout: false,
                         domID: 'bread-checkout-btn',
                         order: {
@@ -93,9 +88,22 @@
                                 currency: currentCurrencyCode
                             }
                         }
-                    }]);
-                    bread_sdk.__internal__.setInitMode('manual');
-                    bread_sdk.__internal__.init();    
+                    };
+                    let onApproved = function onApproved(application) {};
+                    let onCheckout = function onCheckout(application) {};
+                    bread_sdk.setup({
+                        integrationKey: "<?= /* @noEscape */ $block->getIntegrationKey(); ?>"
+                    });
+                    bread_sdk.on('INSTALLMENT:APPLICATION_DECISIONED', onApproved);
+                    bread_sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', onCheckout);
+                    if (!wasSetup) {
+                        bread_sdk.registerPlacements([data]);
+                        bread_sdk.setInitMode('manual');
+                        bread_sdk.init();
+                        wasSetup = true;
+                    } else {
+                        bread_sdk.registerPlacements([data]);
+                    } 
                 }
             };
             $(document).ready(function() {
