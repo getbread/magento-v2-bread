@@ -1,7 +1,10 @@
 == Changelog ==
 
-= 2.3.6
+= 2.3.7
 * Current release
+* Fixed issue with configurable products
+
+= 2.3.6
 * Mageplaza One Step Checkout compatibility
 
 = 2.3.5
@@ -16,7 +19,6 @@
 * Closed https://github.com/getbread/magento-v2-bread/issues/189
 
 = 2.3.2
-* Current release
 * Replaced Zend_Http_Client with Laminas_Http
 * Minor bug fixes
 
