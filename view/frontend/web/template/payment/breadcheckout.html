@@ -11,6 +11,12 @@
 
     <div class="payment-method-content" data-bind="css: getCode()">
 
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        
         <!-- ko if: isEmbeddedCheckout() -->
         <div id="bread-checkout-embedded"></div>
         <!-- /ko -->
