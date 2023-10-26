@@ -1,7 +1,10 @@
 == Changelog ==
 
-= 2.3.7
+= 2.3.8
 * Current release
+* Show billing address in payment method when using Amasty One Step Checkout
+
+= 2.3.7
 * Fixed issue with configurable products
 
 = 2.3.6
