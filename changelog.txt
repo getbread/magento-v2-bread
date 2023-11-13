@@ -1,7 +1,10 @@
 == Changelog ==
 
-= 2.3.7
+= 2.3.8
 * Current release
+* Add compatibility with Mageplaza OSC
+
+= 2.3.7
 * Fixed issue with configurable products
 
 = 2.3.6

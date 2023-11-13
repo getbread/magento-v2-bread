@@ -281,6 +281,12 @@ define(
                          */
                         updateAddress: function (data, errorInfo) {
                             var self = this;
+                            
+                            // Bypass update address if using Mageplaza OSC
+                            if (self.isOscMagePlaza()) {
+                                return;
+                            }
+                            
                             /**
                              * Billing address
                              */
@@ -308,6 +314,10 @@ define(
                             var defaultProcessorSavedShipping = defaultProcessor.saveShippingInformation();
                             document.logBreadIssue('info', $.extend(true, {}, errorInfo, {defaultProcessorSavedShipping: defaultProcessorSavedShipping}), 'default processor saved shipping info');
                             return defaultProcessorSavedShipping;
+                        },
+
+                        isOscMagePlaza: function() {
+                            return window.checkoutConfig && window.checkoutConfig.oscConfig;
                         },
 
                         /**
