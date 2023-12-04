@@ -75,7 +75,8 @@ class Quote extends Data
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\Store\Model\StoreManagerInterface $storeManager    
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Session\SessionManagerInterface $session 
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->helperCatalog = $helperCatalog;
@@ -90,7 +91,8 @@ class Quote extends Data
             $request,
             $encryptor,
             $urlInterfaceFactory,
-            $storeManager    
+            $storeManager,
+            $session
         );
     }
 
@@ -477,7 +479,7 @@ class Quote extends Data
      */
     public function checkDisabledForSku($sku = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        $disabledSkus = $this->scopeConfig->getValue(self::XML_CONFIG_DISABLED_FOR_SKUS, $store);
+        $disabledSkus = $this->scopeConfig->getValue($this->getConfigValue('xml_config_disabled_for_skus'), $store);
         if(is_null($disabledSkus)) {
             return false;
         }
