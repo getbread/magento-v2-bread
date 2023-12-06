@@ -230,7 +230,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         'xml_config_bread_integration_key' => 'payment/breadcheckout/api_integration_key',
         'xml_config_bread_api_sandbox_pub_key' => 'payment/breadcheckout/api_sandbox_public_key',
         'xml_config_bread_api_sandbox_secret_key' => 'payment/breadcheckout/api_sandbox_secret_key',
-        'xml_config_bread_api_sandbox_integration_key' => 'payment/breadcheckout/api_sandbox_integration_key'
+        'xml_config_bread_api_sandbox_integration_key' => 'payment/breadcheckout/api_sandbox_integration_key',
+        'xml_config_multi_tenant' => 'payment/breadcheckout/multi_tenant'
+    ];
+
+    protected $currencyToTenantMap = [
+        'CAD' => 'RBC',
+        'USD' => 'CORE'
     ];
 
     /**
@@ -1126,21 +1132,42 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     }
     
     /**
-     * Returns the tenant name from the database
+     * Returns the tenant name from the database. For merchants who are
+     * multi tenant, it will return tenant name based on currency
      * 
      * @since 2.1.0
      * @return string
      */
     public function getConfigClient($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->getCurrentCurrencyCode() === 'CAD') {
-            return 'RBC';
+        $tenant = $this->getTenantForCurrency();
+        if ($tenant) {
+            return $tenant;
         }
+
         $configClient = $this->scopeConfig->getValue($this->getConfigValue('xml_config_client'), $store, $storeCode);
         if(is_null($configClient)) {
             return strtoupper('core');
         } else {
             return strtoupper($configClient);
         }
+    }
+
+    /**
+     * 
+     * Get tenant name from $currencyToTenantMap array based on current store
+     * currency. Mult-tenant settings needs to be enabled in CORE tenant.
+     * 
+     * @since 2.4.0
+     * @return string
+     */
+    public function getTenantForCurrency($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+        $currencyCode = $this->getCurrentCurrencyCode();
+        $isMultiTenant = (bool) $this->scopeConfig->getValue($this->configPaths['xml_config_multi_tenant'], $store);
+        $tenant = null;
+        if ($isMultiTenant && in_array($currencyCode, array_keys($this->currencyToTenantMap))) {
+            $tenant = $this->currencyToTenantMap[$currencyCode];
+        }
+        return $tenant;
     }
     
     /**
@@ -1225,17 +1252,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 
-    public function getConfigValue($key, $tenant = null)
+    /**
+     * 
+     * Gets config value from $configPaths array. For tenants other than CORE,
+     * the group ID will be replaced by tenant name. For example:
+     * payment/breadcheckout/as_low_as -> payment/rbccheckout/as_low_as
+     * 
+     * @since 2.4.0
+     * @return string
+     */
+    public function getConfigValue($key)
     {
         if (!isset($this->configPaths[$key])) {
             throw new \InvalidArgumentException("Invalid configuration key: {$key}");
         }
+        $tenant = $this->getTenantForCurrency();
 
         $path = $this->configPaths[$key];
 
-        if ($tenant) {
+        if ($tenant && $tenant !== 'CORE') {
             $pathParts = explode('/', $path);
-            $pathParts[1] = $tenant;
+            $pathParts[1] = strtolower($tenant) . 'checkout';
             $path = implode('/', $pathParts);
         }
 
