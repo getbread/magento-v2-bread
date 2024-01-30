@@ -140,7 +140,6 @@ define(
                             } else {
                                 bread_sdk = window.BreadPayments;
                             }
-                            console.log(self.config.shippingContact);
                             bread_sdk.setup({
                                 integrationKey: window.checkoutConfig.payment.breadcheckout.integrationKey,
                                 containerID: self.config.buttonId,
@@ -180,15 +179,10 @@ define(
             },
             createBopisPayload: function(fulfillmentType, hasPickupInformation = true) {
                 var self = this;
+                console.log(self.config.billingContact);
                 if (fulfillmentType === 'PICKUP' && hasPickupInformation) {
                     return {
                         pickupInformation: {
-                            name: {
-                                givenName: self.config.billingContact.firstName,
-                                familyName: self.config.billingContact.lastName,
-                                additionalName: self.config.billingContact.firstName,
-                            },
-                            phone: self.config.billingContact.phone,
                             address: {
                                 address1: self.config.pickupInformation.address,
                                 address2: self.config.pickupInformation.address2,
@@ -197,7 +191,6 @@ define(
                                 region: self.config.pickupInformation.state,
                                 country: window.checkoutConfig.payment.breadcheckout.country,
                             },
-                            email: self.config.billingContact.email,
                         },
                         fulfillmentType: fulfillmentType,
                     };
