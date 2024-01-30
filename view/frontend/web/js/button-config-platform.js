@@ -179,7 +179,6 @@ define(
             },
             createBopisPayload: function(fulfillmentType, hasPickupInformation = true) {
                 var self = this;
-                console.log(self.config.billingContact);
                 if (fulfillmentType === 'PICKUP' && hasPickupInformation) {
                     return {
                         pickupInformation: {
