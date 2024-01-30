@@ -12,6 +12,7 @@ class Quote extends Data
 {
     const BREAD_SESSION_QUOTE_RESULT_KEY  = "bread_quote_result";
     const BREAD_SESSION_QUOTE_UPDATED_KEY = "bread_quote_updated_at";
+    const BREAD_SESSION_QUOTE_SHIPPING_METHOD_PICKUP_KEY = "instore_pickup";
 
     /**
      * @var \Magento\Sales\Model\Quote
@@ -241,6 +242,43 @@ class Quote extends Data
     }
 
     /**
+     * Get shipping method from session quote
+     *
+    */
+    public function getShippingMethod()
+    {
+        if ($this->isInAdmin()) {
+            $shippingAddress = $this->orderCreateModel->getShippingAddress();
+        } else {
+            $shippingAddress = $this->getSessionQuote()->getShippingAddress();
+        }
+        $shippingMethod = $shippingAddress->getShippingMethod();
+
+        return $shippingMethod;
+    }
+
+    /**
+     * Checks if shipping method is store pickup
+     *
+     * @return boolean
+     */
+    public function isStorePickup()
+    {
+        $shippingMethod = $this->getShippingMethod();
+        return $shippingMethod === self::BREAD_SESSION_QUOTE_SHIPPING_METHOD_PICKUP_KEY;
+    }
+
+    public function getFulfillmentType()
+    {
+        $fulfillmentType = 'DELIVERY';
+        $shippingMethod = $this->getShippingMethod();
+        if ($shippingMethod === self::BREAD_SESSION_QUOTE_SHIPPING_METHOD_PICKUP_KEY) {
+            $fulfillmentType = 'PICKUP';
+        }
+        return $fulfillmentType;
+    }
+
+    /**
      * Get Bread Formatted Shipping Address Data From Address Model
      *
      * @return array
@@ -259,6 +297,7 @@ class Quote extends Data
         }
 
         return [
+            'fulfillmentType' => $this->getFulfillmentType(),
             'fullName'      => trim($shippingAddress->getName()),
             'address'       => $shippingAddress->getStreetLine(1) .
                 ($shippingAddress->getStreetLine(2) == '' ? '' : (' ' . $shippingAddress->getStreetLine(2))),
