@@ -29,7 +29,7 @@ define(
 
                         configure: function (data, context) {
                             this.config = {
-                                customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
+                                customTotal: this.round(quote.getTotals()._latestValue.grand_total),
                                 buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
 
                                 //Bread SDK API onCheckout callback
@@ -49,7 +49,7 @@ define(
                              */
                             if (!quote.isVirtual()) {
                                 this.config.shippingOptions = [data.shippingOptions];
-                                this.config.tax = this.round(quote.getTotals()._latestValue.base_tax_amount);
+                                this.config.tax = this.round(quote.getTotals()._latestValue.tax_amount);
                             } else {
                                 this.config.requireShippingContact = false;
                             }
@@ -187,7 +187,7 @@ define(
                              cb();
                              } else */
                             if (typeof this.config.shippingOptions === "undefined" && quote.isVirtual()) {
-                                this.config.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+                                this.config.customTotal = this.round(quote.getTotals()._latestValue.grand_total);
                                 cb();
                             } else {
                                 /* ocs save selected shipping method */
@@ -201,7 +201,7 @@ define(
                                 ).done(
                                         function (data) {
                                             self.config.shippingOptions = [data];
-                                            self.config.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
+                                            self.config.customTotal = self.round(quote.getTotals()._latestValue.grand_total);
                                             cb();
                                         }
                                 ).fail(
@@ -234,7 +234,7 @@ define(
                                                 "Discount";
                             }
                             /* this is needed if coupon is removed to update total price */
-                            this.config.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+                            this.config.customTotal = this.round(quote.getTotals()._latestValue.grand_total);
                         },
                         /**
                          * Get updated quote data and initialize
