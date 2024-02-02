@@ -123,7 +123,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
                     'givenName' => $billingAddress['firstName'],
                     'familyName' => $billingAddress['lastName']
                 ];
-                $request['contact']['phone'] = $billingAddress['phone'];
+                $request['contact']['phone'] = $this->helper->getFormattedPhone($billingAddress['phone'], true);
                 $request['contact']['billingAddress'] = [
                     'address1' => $billingAddress['address'],
                     'address2' => $billingAddress['address2'],
@@ -179,6 +179,9 @@ class GenerateCart extends \Magento\Backend\App\Action {
                 
                 //Order details
                 $discountData = $this->helper->getDiscountData();
+                $totalDiscounts = array_reduce($discountData, function($sum, $discount) {
+                    return $sum += $discount['amount'];
+                }, 0);
                 $request['order'] = [
                   'subTotal' => [
                       'currency' => $currency,
@@ -186,7 +189,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
                   ],
                   'totalDiscounts' => [
                       'currency' => $currency,
-                      'value' => isset($discountData['amount']) ? $discountData['amount'] : 0
+                      'value' => $totalDiscounts
                   ],
                   'totalPrice' => [
                       'currency' => $currency,
