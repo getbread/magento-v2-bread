@@ -16,8 +16,8 @@ jobs:
     - name: Clear target directory on EC2
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
+        host: ${{ env.ADS_HOST }}
+        username: ${{ env.ADS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
@@ -26,8 +26,8 @@ jobs:
     - name: Copy plugin to EC2
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
+        host: ${{ env.ADS_HOST }}
+        username: ${{ env.ADS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         source: "."
@@ -36,8 +36,8 @@ jobs:
     - name: SSH commands
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
+        host: ${{ env.ADS_HOST }}
+        username: ${{ env.ADS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
