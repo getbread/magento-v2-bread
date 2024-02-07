@@ -30,7 +30,8 @@ class Checkout extends Quote
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Bread\BreadCheckout\Helper\Log $logger,
-        \Magento\Store\Model\StoreManagerInterface $storeManager    
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Session\SessionManagerInterface $session   
     ) {
         $this->logger = $logger;
         parent::__construct(
@@ -45,7 +46,8 @@ class Checkout extends Quote
             $priceCurrency,
             $paymentApiClient,
             $productRepository,
-            $storeManager    
+            $storeManager,
+            $session
         );
     }
 

@@ -19,7 +19,7 @@ class Category extends Data
      */
     public function isLabelOnlyOnCategories($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_CAT_LABEL_ONLY, $store);
+        return (bool)$this->scopeConfig->getValue($this->getConfigValue('xml_config_cat_label_only'), $store);
     }
 
     /**
@@ -31,7 +31,7 @@ class Category extends Data
      */
     public function getCATButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::XML_CONFIG_CAT_BUTTON_DESIGN, $store);
+        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_cat_button_design'), $store);
     }
 
     /**
@@ -43,7 +43,7 @@ class Category extends Data
      */
     public function getShowInWindowCAT($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_CAT_WINDOW, $store);
+        return (bool)$this->scopeConfig->getValue($this->getConfigValue('xml_config_cat_window'), $store);
     }
 
     /**
@@ -55,7 +55,7 @@ class Category extends Data
      */
     public function useDefaultButtonSizeCategory($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_DEFAULT_BS_CAT, $store);
+        return (bool)$this->scopeConfig->getValue($this->getConfigValue('xml_config_default_bs_cat'), $store);
     }
 
     /**
@@ -67,9 +67,9 @@ class Category extends Data
      */
     public function getBreadCategories($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        $selectedCategories  =$this->scopeConfig->getValue(self::XML_CONFIG_SELECT_CATEGORIES, $store);
+        $selectedCategories  =$this->scopeConfig->getValue($this->getConfigValue('xml_config_select_categories'), $store);
         if(!is_null($selectedCategories)) {
-            return explode(",", $this->scopeConfig->getValue(self::XML_CONFIG_SELECT_CATEGORIES, $store));
+            return explode(",", $this->scopeConfig->getValue($this->getConfigValue('xml_config_select_categories'), $store));
         }
         return array();
     }
@@ -83,7 +83,7 @@ class Category extends Data
      */
     public function isAsLowAsCAT($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_CAT_AS_LOW_AS, $store);
+        return (bool)$this->scopeConfig->getValue($this->getConfigValue('xml_config_cat_as_low_as'), $store);
     }
 
     /**
@@ -96,7 +96,7 @@ class Category extends Data
     public function isEnabledOnCAT($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
 
-        return (bool)$this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_CAT, $store);
+        return (bool)$this->scopeConfig->getValue($this->getConfigValue('xml_config_active_on_cat'), $store);
     }
 
     /**

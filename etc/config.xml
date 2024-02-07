@@ -18,6 +18,7 @@
                 <allowcheckoutcart>1</allowcheckoutcart>
                 <allowspecific>1</allowspecific>
                 <specificcountry>US,CA</specificcountry>
+                <multi_tenant>0</multi_tenant>
                 <create_order_before>1</create_order_before>
                 <product_type_msg>Gift cards cannot be purchased with financing. Please remove any gift cards from your cart and try again.</product_type_msg>
                 <order_shipped>1</order_shipped>
@@ -31,6 +32,35 @@
                     <use_default_button_size>1</use_default_button_size>
                 </bread_category>
             </breadcheckout>
+            <rbccheckout>
+                <active>0</active>
+                <model>Bread\BreadCheckout\Model\Payment\Method\Bread</model>
+                <sort_order>25</sort_order>
+                <order_status>processing</order_status>
+                <title>Pay Over Time</title>
+                <payment_action>authorize</payment_action>
+                <api_mode>0</api_mode>
+                <api_version>bread_2</api_version>
+                <show_splitpay_label>1</show_splitpay_label>
+                <!-- default to sandbox mode -->
+                <incomplete_checkout_message>Please click the pay over time button and complete the finance forms or choose another payment method.</incomplete_checkout_message>
+                <allowcheckoutpdp>1</allowcheckoutpdp>
+                <allowcheckoutcart>1</allowcheckoutcart>
+                <allowspecific>1</allowspecific>
+                <specificcountry>US,CA</specificcountry>
+                <create_order_before>1</create_order_before>
+                <product_type_msg>Gift cards cannot be purchased with financing. Please remove any gift cards from your cart and try again.</product_type_msg>
+                <order_shipped>1</order_shipped>
+                <use_default_button_size>1</use_default_button_size>
+                <bread_advanced>
+                    <order_shipped>1</order_shipped>
+                    <log_enabled>1</log_enabled>
+                    <sentry_enabled>1</sentry_enabled>
+                </bread_advanced>
+                <bread_category>
+                    <use_default_button_size>1</use_default_button_size>
+                </bread_category>
+            </rbccheckout>
         </payment>
     </default>
 </config>

@@ -87,6 +87,7 @@ class Customer extends Data
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
+        \Magento\Framework\Session\SessionManagerInterface $session,
         \Bread\BreadCheckout\Helper\Log $logger  
     ) {
         $this->storeManager = $storeManager;
@@ -101,7 +102,7 @@ class Customer extends Data
         $this->customerRepository = $customerRepository;
         $this->addressRepository = $addressRepository;
         $this->logger = $logger;
-        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager, $session);
     }
     /**
      * Pass Back Bread Formatted Default Customer Address If It Exists
