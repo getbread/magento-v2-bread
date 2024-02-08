@@ -172,6 +172,10 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     private function getSentryDSN()
     {
+        if ($this->helper::URL_LAMBDA_SENTRY_DSN === '') {
+            return '';
+        }
+
         $sentryDSNIdentifier = 'sentry_dsn';
 
         $dsn = $this->cache->load($sentryDSNIdentifier);
