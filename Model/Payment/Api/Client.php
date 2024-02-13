@@ -739,7 +739,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
                     'TOKEN' => $authToken,
                     'URL' => $url
                 ]);
-                $errorMessage = $this->parseApiMessage($result);
+                $errorMessage = 'Call to Bread API failed';
 
                 throw new \Magento\Framework\Exception\LocalizedException(
                         __($errorMessage)
@@ -1027,30 +1027,5 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $baseUrl = $this->helper->getTransactionApiUrl('bread_2', $this->getStoreId());
         $url = join('/', [trim($baseUrl, '/'), 'transaction', $transactionId, $action]);
         return $url;
-    }
-
-    /**
-     * Parse API message and return human readable error message
-     * 
-     * @param string $jsonString
-     * @return string
-     */
-    protected function parseApiMessage($jsonString) {
-        $data = json_decode($jsonString, true);
-
-        if (isset($data['message']) && isset($data['metadata'])) {
-            $output = ucfirst($data['message']) . ". ";
-            foreach ($data['metadata'] as $key => $value) {
-                // Format numeric values to two decimal places
-                if (is_numeric($value)) {
-                    $value = number_format($value / 100, 2, '.', '');
-                }
-                // Append each key-value pair to the output message
-                $output .= ucfirst(str_replace('_', ' ', $key)) . ": " . $value . ", ";
-            }
-            return rtrim($output, ", ");
-        } else {
-            return "Call to Bread API failed. Please check the logs for details";
-        }
     }
 }
