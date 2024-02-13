@@ -1149,25 +1149,4 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 
-    /**
-     * Return cleaned phone number with country code
-     * 
-     * @param string $phone
-     * @param bool $includeCountryCode
-     * @return string
-     */
-    public function getFormattedPhone($phone, $includeCountryCode = false) {
-        if (empty($phone)) {
-            return "";
-        }
-
-        // Check if phone number matches pattern '+<country code><10 digit number>'
-        // In this case, we already have correct format. Just return it
-        $pattern = '/^\+\d{2,4}\d{10}$/';
-        if (preg_match($pattern, $phone) && $includeCountryCode) {
-            return $phone;
-        }
-        $cleanedNumber =  substr(preg_replace('/[^0-9]+/', '', $phone), -10);
-        return $includeCountryCode ? '+1' . $cleanedNumber : $cleanedNumber;
-    }
 }
