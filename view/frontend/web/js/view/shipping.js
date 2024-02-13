@@ -38,7 +38,7 @@ define(
                     window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = {
                         type: quote.shippingMethod().carrier_title + ' - ' + quote.shippingMethod().method_title,
                         typeId: quote.shippingMethod().carrier_code + '_' + quote.shippingMethod().method_code,
-                        cost: this.round(quote.shippingMethod().amount)
+                        cost: this.round(quote.shippingMethod().base_amount)
                     };
                 },
 
