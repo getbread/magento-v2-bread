@@ -34,10 +34,10 @@
             </breadcheckout>
             <rbccheckout>
                 <active>0</active>
-                <model>Bread\BreadCheckout\Model\Payment\Method\Bread</model>
+                <model>Bread\BreadCheckout\Model\Payment\Method\Rbc</model>
                 <sort_order>25</sort_order>
                 <order_status>processing</order_status>
-                <title>Pay Over Time</title>
+                <title>Payplan by RBC</title>
                 <payment_action>authorize</payment_action>
                 <api_mode>0</api_mode>
                 <api_version>bread_2</api_version>

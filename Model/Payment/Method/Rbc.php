@@ -8,7 +8,7 @@
  */
 namespace Bread\BreadCheckout\Model\Payment\Method;
 
-class Bread extends \Magento\Payment\Model\Method\AbstractMethod
+class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
     /* internal action types */
@@ -16,7 +16,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     const ACTION_REFUND                 = 'refund';
     const ACTION_VOID                   = 'void';
 
-    public $_code                       = 'breadcheckout';
+    public $_code                       = 'rbccheckout';
     public $_infoBlockType              = 'Bread\BreadCheckout\Block\Payment\Info';
     public $_formBlockType              = 'Bread\BreadCheckout\Block\Payment\Form';
 
@@ -34,7 +34,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     public $_canFetchTransactionInfo = true;
     public $_canSaveCc               = false;
     public $_canReviewPayment        = true;
-    public $_allowCurrencyCode       = ['USD'];
+    public $_allowCurrencyCode       = ['CAD'];
 
     /**
      * @var \Bread\BreadCheckout\Model\Payment\Api\Client
@@ -192,7 +192,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             $this->breadLogger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY '. $billingCountry);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __(
-                    'This financing program is available to US residents, please click the finance button 
+                    'This financing program is available to CA residents, please click the finance button 
                 and complete the application in order to complete your purchase with the financing payment method.'
                 )
             );
@@ -445,7 +445,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $client = $this->helper->getConfigClient() !== 'CORE' ? $this->helper->getConfigClient() : 'Bread Financial';
         $this->breadLogger->info([
             'MESSAGE' => 'order currency',
-            'currency' => $payment->getOrder()->getOrderCurrencyCode()
+            'amount' => $payment->getOrder()->getOrderCurrencyCode()
         ]);
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:
@@ -589,14 +589,14 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     * Is the 'breadcheckout' payment method available
+     * Is the 'rbccheckout' payment method available
      *
      * @param  \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if ($this->helper->getConfigClient() !== 'CORE') {
+        if ($this->helper->getConfigClient() !== 'RBC') {
             return false;
         }
 
