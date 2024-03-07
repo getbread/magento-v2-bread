@@ -1,8 +1,17 @@
 == Changelog ==
 
-= 2.3.8
+= 2.3.11
 * Current release
+* Fix discount error when creating Admin cart
+
+= 2.3.10
+* Add support for In-store delivery
+
+= 2.3.9
 * Add compatibility with Mageplaza OSC
+
+= 2.3.8
+* Show billing address in payment method when using Amasty One Step Checkout
 
 = 2.3.7
 * Fixed issue with configurable products
