@@ -33,13 +33,12 @@ class Catalog extends Data
         \Magento\Framework\Encryption\Encryptor $encryptor,
         \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
         \Magento\Catalog\Api\ProductRepositoryInterfaceFactory $productRepositoryFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Session\SessionManagerInterface $session
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->productViewBlock = $productViewBlock;
         $this->productRepositoryFactory = $productRepositoryFactory;
         $this->storeManager = $storeManager;
-        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager, $session);
+        parent::__construct($helperContext, $context, $request, $encryptor, $urlInterfaceFactory, $storeManager);
     }
 
     /**

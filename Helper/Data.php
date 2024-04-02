@@ -162,83 +162,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public $storeManager;
 
-    public $configClient = false;
-
-    public $session;
-
-    protected $configPaths = [
-        'xml_config_module_active' => "payment/breadcheckout/active",
-        'xml_config_as_low_as' => 'payment/breadcheckout/as_low_as',
-        'xml_config_payment_action' => 'payment/breadcheckout/payment_action',
-        'xml_config_healthcare_mode' => 'payment/breadcheckout/healthcare_mode',
-        'xml_config_show_splitpay_label' => 'payment/breadcheckout/show_splitpay_label',
-        'xml_config_active_on_pdp' => 'payment/breadcheckout/enabled_on_product_page',
-        'xml_config_active_on_cat' => 'payment/breadcheckout/bread_category/enabled_on_category_page',
-        'xml_config_active_on_cart_view' => 'payment/breadcheckout/enabled_on_cart_page',
-        'xml_congig_minicart_checkout' => 'payment/breadcheckout/allowminicartcheckout',
-        'xml_config_show_minicart_link' => 'payment/breadcheckout/enableonminicart',
-        'xml_config_enable_as_payment_method' => 'payment/breadcheckout/display_as_payment_method',
-        'xml_config_checkout_title' => 'payment/breadcheckout/title',
-        'xml_config_checkout_per_month' => 'payment/breadcheckout/per_month',
-        'xml_config_incomplete_msg' => 'payment/breadcheckout/incomplete_checkout_message',
-        'xml_config_api_pub_key' => 'payment/breadcheckout/api_public_key',
-        'xml_config_api_secret_key' => 'payment/breadcheckout/api_secret_key',
-        'xml_config_api_sandbox_pub_key' => 'payment/breadcheckout/api_sandbox_public_key',
-        'xml_config_api_sandbox_secret_key' => 'payment/breadcheckout/api_sandbox_secret_key',
-        'xml_config_classic_api_pub_key' => 'payment/breadcheckout/classic_api_public_key',
-        'xml_config_classic_api_secret_key' => 'payment/breadcheckout/classic_api_secret_key',
-        'xml_config_classic_api_sandbox_pub_key' => 'payment/breadcheckout/classic_api_sandbox_public_key',
-        'xml_config_classic_api_sandbox_secret_key' => 'payment/breadcheckout/classic_api_sandbox_secret_key',
-        'xml_config_js_lib_location' => 'payment/breadcheckout/js_location',
-        'xml_config_button_on_products' => 'payment/breadcheckout/button_on_products',
-        'xml_config_button_design' => 'payment/breadcheckout/button_design',
-        'xml_config_api_mode' => 'payment/breadcheckout/api_mode',
-        'xml_config_default_button_size' => 'payment/breadcheckout/use_default_button_size',
-        'xml_config_create_customer' => 'payment/breadcheckout/bread_advanced/create_customer_account',
-        'xml_config_allow_checkout_pdp' => 'payment/breadcheckout/allowcheckoutpdp',
-        'xml_config_allow_checkout_cart' => 'payment/breadcheckout/allowcheckoutcart',
-        'xml_config_embedded_checkout' => 'payment/breadcheckout/embedded',
-        'xml_config_product_type_msg' => 'payment/breadcheckout/product_type_msg',
-        'xml_config_order_shipped' => 'payment/breadcheckout/bread_advanced/order_shipped',
-        'xml_config_delete_quote_after' => "checkout/cart/delete_quote_after",
-        'xml_config_threshold_amount' => 'payment/breadcheckout/bread_advanced/threshold_amount',
-        'xml_config_auto_cancel' => 'payment/breadcheckout/split_auto_cancel',
-        'xml_config_enable_targeted_financing' => 'payment/breadcheckout/bread_advanced/targeted_financing',
-        'xml_config_targeted_financing_id' => 'payment/breadcheckout/bread_advanced/financing_program_id',
-        'xml_config_financing_threshold' => 'payment/breadcheckout/bread_advanced/financing_threshold',
-        'xml_config_financing_sku' => 'payment/breadcheckout/bread_advanced/financing_sku',
-        'xml_config_disabled_for_skus' => 'payment/breadcheckout/bread_advanced/disabled_skus',
-        'xml_config_category_group' => 'payment/breadcheckout/bread_category',
-        'xml_config_cat_as_low_as' => 'payment/breadcheckout/bread_category/as_low_as',
-        'xml_config_cat_label_only' => 'payment/breadcheckout/bread_category/label_only',
-        'xml_config_cat_button_design' => 'payment/breadcheckout/bread_category/button_design',
-        'xml_config_cat_window' => 'payment/breadcheckout/bread_category/display_new_window',
-        'xml_config_default_bs_cat' => 'payment/breadcheckout/bread_category/use_default_button_size',
-        'xml_config_select_categories' => 'payment/breadcheckout/bread_category/categories',
-        'xml_config_cp_button_design' => 'payment/breadcheckout/bread_cartpage/button_design',
-        'xml_config_pdp_button_design' => 'payment/breadcheckout/bread_productdetail/button_design',
-        'xml_sentry_log_enabled' => 'payment/breadcheckout/bread_advanced/sentry_enabled',
-        'xml_sandbox_merchant_id' => 'payment/breadcheckout/bread_advanced/sandbox_merchant_id',
-        'xml_production_merchant_id' => 'payment/breadcheckout/bread_advanced/production_merchant_id',
-        'xml_sandbox_program_id' => 'payment/breadcheckout/bread_advanced/sandbox_program_id',
-        'xml_production_program_id' => 'payment/breadcheckout/bread_advanced/production_program_id',
-        'xml_config_client' => 'payment/breadcheckout/tenant',
-        'xml_config_api_version' => 'payment/breadcheckout/api_version',
-        'xml_config_auth_token' => 'payment/breadcheckout/bread_auth_token',
-        'xml_config_bread_api_pub_key' => 'payment/breadcheckout/bread_api_public_key',
-        'xml_config_bread_api_secret_key' => 'payment/breadcheckout/bread_api_secret_key',
-        'xml_config_bread_integration_key' => 'payment/breadcheckout/api_integration_key',
-        'xml_config_bread_api_sandbox_pub_key' => 'payment/breadcheckout/api_sandbox_public_key',
-        'xml_config_bread_api_sandbox_secret_key' => 'payment/breadcheckout/api_sandbox_secret_key',
-        'xml_config_bread_api_sandbox_integration_key' => 'payment/breadcheckout/api_sandbox_integration_key',
-        'xml_config_multi_tenant' => 'payment/breadcheckout/multi_tenant'
-    ];
-
-    protected $currencyToTenantMap = [
-        'CAD' => 'RBC',
-        'USD' => 'CORE'
-    ];
-
     /**
      * 
      * @param \Magento\Framework\App\Helper\Context $helperContext
@@ -254,8 +177,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             \Magento\Framework\App\Request\Http $request,
             \Magento\Framework\Encryption\Encryptor $encryptor,
             \Magento\Framework\UrlInterfaceFactory $urlInterfaceFactory,
-            \Magento\Store\Model\StoreManagerInterface $storeManager,
-            \Magento\Framework\Session\SessionManagerInterface $session
+            \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->context = $context;
         $this->request = $request;
@@ -263,7 +185,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         $this->encryptor = $encryptor;
         $this->urlInterfaceFactory = $urlInterfaceFactory;
         $this->storeManager = $storeManager;
-        $this->session = $session;
         parent::__construct(
                 $helperContext
         );
@@ -277,7 +198,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isActive($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode = null) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_module_active'), $store, $storeCode);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_MODULE_ACTIVE, $store, $storeCode);
     }
 
     /**
@@ -305,7 +226,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return mixed
      */
     public function getProductTypeMessage($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_product_type_msg'), $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_PRODUCT_TYPE_MSG, $store);
     }
 
     /**
@@ -316,7 +237,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     /*    public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
       {
-      return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_log_enabled'), $store);
+      return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_LOG_ENABLED, $store);
       } */
 
     /**
@@ -331,16 +252,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             $apiVersion = $breadApiVersion;
         }
         if($apiVersion === 'bread_2') {
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
-                return $this->scopeConfig->getValue($this->getConfigValue('xml_config_api_pub_key'), $store, $storeCode);
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_API_PUB_KEY, $store, $storeCode);
             } else {
-                return $this->scopeConfig->getValue($this->getConfigValue('xml_config_api_sandbox_pub_key'), $store, $storeCode);
+                return $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_PUB_KEY, $store, $storeCode);
             }
         } else {
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
-                return $this->scopeConfig->getValue($this->getConfigValue('xml_config_classic_api_pub_key'), $store, $storeCode);
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+                return $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_PUB_KEY, $store, $storeCode);
             } else {
-                return $this->scopeConfig->getValue($this->getConfigValue('xml_config_classic_api_sandbox_pub_key'), $store, $storeCode);
+                return $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_SANDBOX_PUB_KEY, $store, $storeCode);
             }
         }
         
@@ -358,23 +279,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             $apiVersion = $breadApiVersion;
         }
         if($apiVersion === 'bread_2') {
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
                 return (string) $this->encryptor->decrypt(
-                                $this->scopeConfig->getValue($this->getConfigValue('xml_config_api_secret_key'), $store, $storeCode)
+                                $this->scopeConfig->getValue(self::XML_CONFIG_API_SECRET_KEY, $store, $storeCode)
                 );
             } else {
                 return (string) $this->encryptor->decrypt(
-                                $this->scopeConfig->getValue($this->getConfigValue('xml_config_api_sandbox_secret_key'), $store, $storeCode)
+                                $this->scopeConfig->getValue(self::XML_CONFIG_API_SANDBOX_SECRET_KEY, $store, $storeCode)
                 );
             }
         } else {
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
                 return (string) $this->encryptor->decrypt(
-                                $this->scopeConfig->getValue($this->getConfigValue('xml_config_classic_api_secret_key'), $store, $storeCode)
+                                $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_SECRET_KEY, $store, $storeCode)
                 );
             } else {
                 return (string) $this->encryptor->decrypt(
-                                $this->scopeConfig->getValue($this->getConfigValue('xml_config_classic_api_sandbox_secret_key'), $store, $storeCode)
+                                $this->scopeConfig->getValue(self::XML_CONFIG_CLASSIC_API_SANDBOX_SECRET_KEY, $store, $storeCode)
                 );
             }
         }
@@ -391,7 +312,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         
         if ($apiVersion === 'bread_2') {
             $client = $this->getConfigClient();
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {               
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {               
                 switch($client) {
                     case 'RBC':
                         return self::JS_LIVE_SDK_RBC;
@@ -409,7 +330,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
                 }        
             }
         } else {
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
                 return self::JS_LIVE_URI;
             } else {
                 return self::JS_SANDBOX_URI;
@@ -430,13 +351,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         }
         if($apiVersion === 'bread_2') {
             $tenant = strtoupper($this->getConfigClient($storeCode, $store));
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store, $storeCode)) {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
                 return $this->getPlatformApiUri($tenant, 'LIVE');
             } else {
                 return $this->getPlatformApiUri($tenant, 'SANDBOX');
             }
         } else {
-            if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store, $storeCode)) {
+            if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store, $storeCode)) {
                 return self::API_LIVE_URI;
             } else {
                 return self::API_SANDBOX_URI;
@@ -613,7 +534,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getPaymentAction($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_config_payment_action'), $store);
+        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_PAYMENT_ACTION, $store);
     }
 
     /**
@@ -623,7 +544,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getPaymentMethodTitle($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (string) $this->__("" . $this->scopeConfig->getValue($this->getConfigValue('xml_config_checkout_title'), $store));
+        return (string) $this->__("" . $this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_TITLE, $store));
     }
 
     /**
@@ -633,7 +554,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function showPerMonthCalculation($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_checkout_per_month'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_CHECKOUT_PER_MONTH, $store);
     }
 
     /**
@@ -643,7 +564,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isAutoCreateCustomerAccountEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_create_customer'), $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_CREATE_CUSTOMER, $store));
     }
 
     /**
@@ -653,7 +574,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isButtonOnProducts($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_button_on_products'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_ON_PRODUCTS, $store);
     }
 
     /**
@@ -663,7 +584,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isEnabledOnPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_active_on_pdp'), $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_PDP, $store));
     }
 
     /**
@@ -673,7 +594,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isEnabledOnCOP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_active_on_cart_view'), $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ACTIVE_ON_CART_VIEW, $store));
     }
 
     /**
@@ -683,7 +604,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isPaymentMethodAtCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_enable_as_payment_method'), $store));
+        return (bool) ($this->isActive($store) && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_AS_PAYMENT_METHOD, $store));
     }
 
     /**
@@ -694,7 +615,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function isHealthcare($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) (
-                $this->isActive($store, $storeCode) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_healthcare_mode'), $store, $storeCode)
+                $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_HEALTHCARE_MODE, $store, $storeCode)
                 );
     }
 
@@ -706,7 +627,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function showSplitpayLabelOnCheckout($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) (
-                $this->isActive($store, $storeCode) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_show_splitpay_label'), $store, $storeCode)
+                $this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_SHOW_SPLITPAY_LABEL, $store, $storeCode)
                 );
     }
 
@@ -717,7 +638,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isAsLowAs($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_as_low_as'), $store, $storeCode));
+        return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_AS_LOW_AS, $store, $storeCode));
     }
 
     /**
@@ -727,7 +648,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function getAllowCheckoutPDP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) ($this->isActive($store) && !$this->isHealthcare() && $this->scopeConfig->getValue($this->getConfigValue('xml_config_allow_checkout_pdp'), $store));
+        return (bool) ($this->isActive($store) && !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_PDP, $store));
     }
 
     /**
@@ -738,7 +659,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function getAllowCheckoutCP($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) ($this->isActive($store) &&
-                !$this->isHealthcare() && $this->scopeConfig->getValue($this->getConfigValue('xml_config_allow_checkout_cart'), $store));
+                !$this->isHealthcare() && $this->scopeConfig->getValue(self::XML_CONFIG_ALLOW_CHECKOUT_CART, $store));
     }
 
     /**
@@ -747,7 +668,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isTargetedFinancing($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue($this->getConfigValue('xml_config_enable_targeted_financing'), $store, $storeCode));
+        return (bool) ($this->isActive($store, $storeCode) && $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode));
     }
 
     /**
@@ -756,7 +677,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getFinancingId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_targeted_financing_id'), $store, $storeCode);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_TARGETED_FINANCING_ID, $store, $storeCode);
     }
 
     /**
@@ -765,7 +686,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getTargetedFinancingThreshold($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $financingThreshold = $this->scopeConfig->getValue($this->getConfigValue('xml_config_financing_threshold'), $store, $storeCode);
+        $financingThreshold = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_THRESHOLD, $store, $storeCode);
         if(!is_null($financingThreshold)) {
             return round($financingThreshold, 2);
         } else {
@@ -779,7 +700,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return array
      */
     public function getTargetedFinancingSkus($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $list = $this->scopeConfig->getValue($this->getConfigValue('xml_config_financing_sku'), $store, $storeCode);
+        $list = $this->scopeConfig->getValue(self::XML_CONFIG_FINANCING_SKU, $store, $storeCode);
         if(is_null($list)) {
             return array();
         } 
@@ -795,7 +716,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return int
      */
     public function checkFinancingMode($mode, $storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $configVal = (int) $this->scopeConfig->getValue($this->getConfigValue('xml_config_enable_targeted_financing'), $store, $storeCode);
+        $configVal = (int) $this->scopeConfig->getValue(self::XML_CONFIG_ENABLE_TARGETED_FINANCING, $store, $storeCode);
         $output = null;
 
         switch ($mode) {
@@ -835,7 +756,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return mixed
      */
     public function getButtonDesign($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_button_design'), $store, $storeCode);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_BUTTON_DESIGN, $store, $storeCode);
     }
 
     /**
@@ -845,7 +766,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return mixed
      */
     public function getCartButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_cp_button_design'), $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_CP_BUTTON_DESIGN, $store);
     }
 
     /**
@@ -855,7 +776,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return mixed
      */
     public function getPDPButtonDesign($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_pdp_button_design'), $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_PDP_BUTTON_DESIGN, $store);
     }
 
     /**
@@ -866,7 +787,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function useDefaultButtonSize($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) ($this->isActive($store) &&
-                $this->scopeConfig->getValue($this->getConfigValue('xml_config_default_button_size'), $store));
+                $this->scopeConfig->getValue(self::XML_CONFIG_DEFAULT_BUTTON_SIZE, $store));
     }
 
     /**
@@ -876,7 +797,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getIncompleteCheckoutMsg($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_config_incomplete_msg'), $store);
+        return (string) $this->scopeConfig->getValue(self::XML_CONFIG_INCOMPLETE_MSG, $store);
     }
 
     /**
@@ -886,7 +807,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return int
      */
     public function embeddedCheckoutEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_embedded_checkout'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_EMBEDDED_CHECKOUT, $store);
     }
 
     /**
@@ -896,7 +817,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function dispatchShipmentData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_order_shipped'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_ORDER_SHIPPED, $store);
     }
 
     /**
@@ -906,7 +827,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isSentryEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_sentry_log_enabled'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_SENTRY_LOG_ENABLED, $store);
     }
 
     /**
@@ -917,7 +838,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getQuoteExpiration($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_delete_quote_after'), $store);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_DELETE_QUOTE_AFTER, $store);
     }
 
     /**
@@ -1050,7 +971,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_congig_minicart_checkout'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
     }
     
     /**
@@ -1060,7 +981,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function showMinicartLink($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_show_minicart_link'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_SHOW_MINICART_LINK, $store);
     }
 
     /**
@@ -1071,7 +992,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function aboveThreshold($cost) {
         $aboveThreshold = true;
-        $thresholdAmount = (int) $this->scopeConfig->getValue($this->getConfigValue('xml_config_threshold_amount'));
+        $thresholdAmount = (int) $this->scopeConfig->getValue(self::XML_CONFIG_THRESHOLD_AMOUNT);
 
         if ($thresholdAmount) {
             $aboveThreshold = (int) $cost >= $thresholdAmount;
@@ -1087,7 +1008,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function isSplitPayAutoDecline($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue($this->getConfigValue('xml_config_auto_cancel'), $store);
+        return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_AUTO_CANCEL, $store);
     }
 
     /**
@@ -1123,7 +1044,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getApiVersion($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $apiVersion = $this->scopeConfig->getValue($this->getConfigValue('xml_config_api_version'), $store, $storeCode);
+        $apiVersion = $this->scopeConfig->getValue(self::XML_CONFIG_API_VERSION, $store, $storeCode);
         if($apiVersion) {
             return (string) $apiVersion;
         } else {
@@ -1132,42 +1053,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     }
     
     /**
-     * Returns the tenant name from the database. For merchants who are
-     * multi tenant, it will return tenant name based on currency
+     * Returns the tenant name from the database
      * 
      * @since 2.1.0
      * @return string
      */
     public function getConfigClient($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $tenant = $this->getTenantForCurrency();
-        if ($tenant) {
-            return $tenant;
-        }
-
-        $configClient = $this->scopeConfig->getValue($this->getConfigValue('xml_config_client'), $store, $storeCode);
+        $configClient = $this->scopeConfig->getValue(self::XML_CONFIG_CLIENT, $store, $storeCode);
         if(is_null($configClient)) {
             return strtoupper('core');
         } else {
             return strtoupper($configClient);
         }
-    }
-
-    /**
-     * 
-     * Get tenant name from $currencyToTenantMap array based on current store
-     * currency. Mult-tenant settings needs to be enabled in CORE tenant.
-     * 
-     * @since 2.4.0
-     * @return string
-     */
-    public function getTenantForCurrency($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $currencyCode = $this->getCurrentCurrencyCode();
-        $isMultiTenant = (bool) $this->scopeConfig->getValue($this->configPaths['xml_config_multi_tenant'], $store);
-        $tenant = null;
-        if ($isMultiTenant && in_array($currencyCode, array_keys($this->currencyToTenantMap))) {
-            $tenant = $this->currencyToTenantMap[$currencyCode];
-        }
-        return $tenant;
     }
     
     /**
@@ -1177,10 +1074,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getIntegrationKey($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
-            return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_config_bread_integration_key'), $store, $storeCode);
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_INTEGRATION_KEY, $store, $storeCode);
         } else {
-            return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_config_bread_api_sandbox_integration_key'), $store, $storeCode);
+            return (string) $this->scopeConfig->getValue(self::XML_CONFIG_BREAD_API_SANDBOX_INTEGRATION_KEY, $store, $storeCode);
         }
     }
     
@@ -1191,10 +1088,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getMerchantId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
-            return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_production_merchant_id'), $store, $storeCode);
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_PRODUCTION_MERCHANT_ID, $store, $storeCode);
         } else {
-            return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_sandbox_merchant_id'), $store, $storeCode);
+            return (string) $this->scopeConfig->getValue(self::XML_SANDBOX_MERCHANT_ID, $store, $storeCode);
         }
     }
     
@@ -1205,10 +1102,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return string
      */
     public function getProgramId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        if ($this->scopeConfig->getValue($this->getConfigValue('xml_config_api_mode'), $store)) {
-            return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_production_program_id'), $store, $storeCode);
+        if ($this->scopeConfig->getValue(self::XML_CONFIG_API_MODE, $store)) {
+            return (string) $this->scopeConfig->getValue(self::XML_PRODUCTION_PROGRAM_ID, $store, $storeCode);
         } else {
-            return (string) $this->scopeConfig->getValue($this->getConfigValue('xml_sandbox_program_id'), $store, $storeCode);
+            return (string) $this->scopeConfig->getValue(self::XML_SANDBOX_PROGRAM_ID, $store, $storeCode);
         }
     }
     
@@ -1220,7 +1117,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return type
      */
     public function getAuthToken($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return $this->scopeConfig->getValue($this->getConfigValue('xml_config_auth_token'), $store, $storeCode);
+        return $this->scopeConfig->getValue(self::XML_CONFIG_AUTH_TOKEN, $store, $storeCode);
     }
     
     /**
@@ -1252,51 +1149,4 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 
-    /**
-     * 
-     * Gets config value from $configPaths array. For tenants other than CORE,
-     * the group ID will be replaced by tenant name. For example:
-     * payment/breadcheckout/as_low_as -> payment/rbccheckout/as_low_as
-     * 
-     * @since 2.4.0
-     * @return string
-     */
-    public function getConfigValue($key)
-    {
-        if (!isset($this->configPaths[$key])) {
-            throw new \InvalidArgumentException("Invalid configuration key: {$key}");
-        }
-        $tenant = $this->getTenantForCurrency();
-
-        $path = $this->configPaths[$key];
-
-        if ($tenant && $tenant !== 'CORE') {
-            $pathParts = explode('/', $path);
-            $pathParts[1] = strtolower($tenant) . 'checkout';
-            $path = implode('/', $pathParts);
-        }
-        return $path;
-    }
-
-    /**
-     * Return cleaned phone number with country code
-     * 
-     * @param string $phone
-     * @param bool $includeCountryCode
-     * @return string
-     */
-    public function getFormattedPhone($phone, $includeCountryCode = false) {
-        if (empty($phone)) {
-            return "";
-        }
-
-        // Check if phone number matches pattern '+<country code><10 digit number>'
-        // In this case, we already have correct format. Just return it
-        $pattern = '/^\+\d{2,4}\d{10}$/';
-        if (preg_match($pattern, $phone) && $includeCountryCode) {
-            return $phone;
-        }
-        $cleanedNumber =  substr(preg_replace('/[^0-9]+/', '', $phone), -10);
-        return $includeCountryCode ? '+1' . $cleanedNumber : $cleanedNumber;
-    }
 }
