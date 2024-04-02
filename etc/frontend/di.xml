@@ -4,6 +4,7 @@
         <arguments>
             <argument name="configProviders" xsi:type="array">
                 <item name="custom_payment_config_provider" xsi:type="object">Bread\BreadCheckout\Model\Ui\ConfigProvider</item>
+                <item name="rbc_payment_config_provider" xsi:type="object">Bread\BreadCheckout\Model\Ui\RbcConfigProvider</item>
             </argument>
         </arguments>
     </type>

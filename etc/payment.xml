@@ -4,5 +4,8 @@
         <method name="breadcheckout">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="rbccheckout">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
     </methods>
 </payment>
