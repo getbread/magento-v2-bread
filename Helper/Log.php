@@ -9,25 +9,29 @@ namespace Bread\BreadCheckout\Helper;
  */
 class Log extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const XML_CONFIG_LOG_ENABLED = 'payment/breadcheckout/bread_advanced/log_enabled';
 
     /**
      * @var \Bread\BreadCheckout\Log\BreadLogger
      */
     private $breadLogger;
+    
+    private $helper;
 
     /**
      * Log constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Bread\BreadCheckout\Log\BreadLogger  $breadLogger
+     * @param \Bread\BreadCheckout\Helper\Data $helper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Bread\BreadCheckout\Log\BreadLogger $breadLogger
+        \Bread\BreadCheckout\Log\BreadLogger $breadLogger,
+        \Bread\BreadCheckout\Helper\Data $helper
     ) {
-        parent::__construct($context);
         $this->breadLogger = $breadLogger;
+        $this->helper = $helper;
+        parent::__construct($context);
     }
 
     /**
@@ -35,9 +39,9 @@ class Log extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return bool
      */
-    private function logEnabled()
+    private function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->isSetFlag(self::XML_CONFIG_LOG_ENABLED);
+        return $this->helper->logEnabled($store);
     }
 
     /**

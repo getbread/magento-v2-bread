@@ -43,10 +43,9 @@ define(
                 template: 'Bread_BreadCheckout/payment/rbccheckout'
             },
 
-            breadTransactionId: ko.observable(window.checkoutConfig.payment[this.getCode()].transactionId),
+            breadTransactionId: ko.observable(window.checkoutConfig.payment.breadcheckout.transactionId),
 
             initialize: function() {
-                debugger;
                 this._super();
                 return this;
             },

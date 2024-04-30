@@ -265,6 +265,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('Authorize action is not available.'));
         }
 
+        $order = $payment->getOrder();
+        if ($order->getOrderCurrencyCode() !== $order->getBaseCurrencyCode()) {
+            $amount = $order->getGrandTotal();
+        }
+
         $this->breadLogger->info([
             'MESSAGE' => 'about to set amount in authorize',
             'amount' => $amount
@@ -315,6 +320,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('Capture action is not available.'));
         }
         $apiVersion = $this->helper->getApiVersion();
+
+        $order = $payment->getOrder();
+        if ($order->getOrderCurrencyCode() !== $order->getBaseCurrencyCode()) {
+            $amount = $order->getGrandTotal();
+        }
 
         if ($this->helper->getPaymentAction() == self::ACTION_AUTHORIZE_CAPTURE) {
             $this->apiClient->setOrder($payment->getOrder());
@@ -383,6 +393,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     {
         if (!$this->canRefund()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Refund action is not available.'));
+        }
+
+        $order = $payment->getOrder();
+        if ($order->getOrderCurrencyCode() !== $order->getBaseCurrencyCode()) {
+            $amount = $order->getGrandTotal();
         }
 
         return $this->_place($payment, $amount, self::ACTION_REFUND);
