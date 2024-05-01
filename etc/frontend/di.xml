@@ -12,15 +12,4 @@
         <plugin name="bread-category"
                 type="Bread\BreadCheckout\Model\Plugin\ListProductPlugin" sortOrder="1"/>
     </type>
-
-    <type name="Bread\BreadCheckout\Block\Checkout\Minicart">
-        <arguments>
-            <argument name="data" xsi:type="array">
-                <item name="template" xsi:type="string">Bread_BreadCheckout::breadcheckout/minicart.phtml</item>
-                <item name="alias" xsi:type="string">breadcheckout.mini-cart</item>
-                <item name="button_id" xsi:type="string">breadcheckout-mini-cart</item>
-            </argument>
-            <argument name="payment" xsi:type="object">Bread\BreadCheckout\Model\Payment\Method\Bread</argument>
-        </arguments>
-    </type>
 </config>
