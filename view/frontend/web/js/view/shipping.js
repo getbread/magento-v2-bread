@@ -38,7 +38,7 @@ define(
                     window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = {
                         type: quote.shippingMethod().carrier_title + ' - ' + quote.shippingMethod().method_title,
                         typeId: quote.shippingMethod().carrier_code + '_' + quote.shippingMethod().method_code,
-                        cost: this.round(quote.shippingMethod().amount)
+                        cost: this.round(quote.shippingMethod().base_amount)
                     };
                 },
 
@@ -59,7 +59,7 @@ define(
                 refreshBreadPaymentMethod: function () {
                     var paymentMethod = quote.paymentMethod();
                     if ( paymentMethod !== null && typeof paymentMethod.method !== 'undefined') {
-                        if (quote.paymentMethod().method === 'breadcheckout' 
+                        if (quote.paymentMethod().method === 'breadcheckout' || quote.paymentMethod().method === 'rbccheckout'
                                 && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
                             //Check if embeddedCheckout is enabled
                             if(window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout) {

@@ -217,7 +217,9 @@ define(
                             'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText
                         );
                     }
-                );
+                ).always(function() {
+                    fullScreenLoader.stopLoader();
+                });
             },
 
             /**
