@@ -194,17 +194,6 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="sentry_enabled" type="select" sortOrder="25" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Send Error Information to RBC</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                            <![CDATA[
-                                <div>
-                                    <p>Proactively sends information about any RBC related issues</p>
-                                </div>
-                        ]]>
-                    </comment>
-                </field>
                 <field id="disabled_skus" type="textarea" sortOrder="26" translate="label" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Disable Payplan by RBC checkout for skus</label>
                     <comment><![CDATA[<div><p>Enter sku list separated by comma with skus of products for which Payplan checkout should not be used or available (example: <strong>sku1,sku2,sku3</strong>)</p></div>]]></comment>

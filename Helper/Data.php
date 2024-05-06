@@ -26,8 +26,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const JS_SANDBOX_URI = 'https://checkout-sandbox.getbread.com/bread.js';
     const JS_LIVE_URI = 'https://checkout.getbread.com/bread.js';
     
-    
-    const URL_LAMBDA_SENTRY_DSN = '';
+
     const URL_VALIDATE_PAYMENT = 'bread/checkout/validatepaymentmethod';
     const URL_VALIDATE_ORDER = 'bread/checkout/validateorder';
     const URL_VALIDATE_TOTALS = 'bread/checkout/validatetotals';
@@ -95,7 +94,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const XML_CONFIG_SELECT_CATEGORIES = 'payment/breadcheckout/bread_category/categories';
     const XML_CONFIG_CP_BUTTON_DESIGN = 'payment/breadcheckout/bread_cartpage/button_design';
     const XML_CONFIG_PDP_BUTTON_DESIGN = 'payment/breadcheckout/bread_productdetail/button_design';
-    const XML_SENTRY_LOG_ENABLED = 'payment/breadcheckout/bread_advanced/sentry_enabled';
     const XML_SANDBOX_MERCHANT_ID = 'payment/breadcheckout/bread_advanced/sandbox_merchant_id';
     const XML_PRODUCTION_MERCHANT_ID = 'payment/breadcheckout/bread_advanced/production_merchant_id';
     const XML_SANDBOX_PROGRAM_ID = 'payment/breadcheckout/bread_advanced/sandbox_program_id';
@@ -818,16 +816,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function dispatchShipmentData($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         return (bool) $this->scopeConfig->getValue(self::XML_CONFIG_ORDER_SHIPPED, $store);
-    }
-
-    /**
-     * Dispatch order shipment details to Bread
-     *
-     * @param  null $store
-     * @return bool
-     */
-    public function isSentryEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue(self::XML_SENTRY_LOG_ENABLED, $store);
     }
 
     /**
