@@ -27,7 +27,7 @@ class RbcConfigProvider implements ConfigProviderInterface {
     public $helperData;
 
     /**
-     * @var \Bread\BreadCheckout\Model\Payment\Method\Bread
+     * @var \Bread\BreadCheckout\Model\Payment\Method\Rbc
      */
     public $breadMethod;
 
@@ -41,12 +41,12 @@ class RbcConfigProvider implements ConfigProviderInterface {
      * 
      * @param \Bread\BreadCheckout\Helper\Quote $helper
      * @param \Bread\BreadCheckout\Helper\Data $helperData
-     * @param \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
+     * @param \Bread\BreadCheckout\Model\Payment\Method\Rbc $breadMethod
      */
     public function __construct(
             \Bread\BreadCheckout\Helper\Quote $helper,
             \Bread\BreadCheckout\Helper\Data $helperData,
-            \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
+            \Bread\BreadCheckout\Model\Payment\Method\Rbc $breadMethod,
             \Bread\BreadCheckout\Helper\Catalog $catalog
     ) {
         $this->helper = $helper;

@@ -516,7 +516,7 @@ class Quote extends Data
      */
     public function checkDisabledForSku($sku = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
     {
-        $disabledSkus = $this->scopeConfig->getValue(self::XML_CONFIG_DISABLED_FOR_SKUS, $store);
+        $disabledSkus = $this->getConfigValue("XML_CONFIG_DISABLED_FOR_SKUS", $store);
         if(is_null($disabledSkus)) {
             return false;
         }

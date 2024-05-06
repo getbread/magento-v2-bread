@@ -31,7 +31,7 @@
                 </bread_category>
             </breadcheckout>
             <rbccheckout>
-                <active>0</active>
+                <active>1</active>
                 <model>Bread\BreadCheckout\Model\Payment\Method\Rbc</model>
                 <sort_order>25</sort_order>
                 <order_status>processing</order_status>

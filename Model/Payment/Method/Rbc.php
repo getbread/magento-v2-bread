@@ -238,7 +238,7 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
      * Process Void Payment
      *
      * @param  \Magento\Payment\Model\InfoInterface $payment
-     * @return \Bread\BreadCheckout\Model\Payment\Method\Bread
+     * @return \Bread\BreadCheckout\Model\Payment\Method\Rbc
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function void(\Magento\Payment\Model\InfoInterface $payment)
@@ -255,7 +255,7 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
      *
      * @param  \Magento\Payment\Model\InfoInterface $payment
      * @param  float                                $amount
-     * @return \Bread\BreadCheckout\Model\Payment\Method\Bread
+     * @return \Bread\BreadCheckout\Model\Payment\Method\Rbc
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -356,7 +356,7 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
         $payment->setAmount($amount);
         if($apiVersion === 'bread_2') {           
             $settledAmount = ($this->priceCurrency->round($amount) * 100);
-            $this->_place($payment, $settledAmount, self::ACTION_CAPTURE, $this->helper->getCurrentCurrencyCode());
+            $this->_place($payment, $settledAmount, self::ACTION_CAPTURE);
         } else {                      
             $this->_place($payment, $amount, self::ACTION_CAPTURE);
         }
@@ -386,7 +386,7 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
      *
      * @param  \Magento\Framework\DataObject $payment
      * @param  float                         $amount
-     * @return \Bread\BreadCheckout\Model\Payment\Method\Bread
+     * @return \Bread\BreadCheckout\Model\Payment\Method\Rbc
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -442,10 +442,12 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
         $this->apiClient->setOrder($payment->getOrder());
         $this->breadLogger->info($requestType . ' API client request. ');
         $apiVersion = $this->helper->getApiVersion();
-        $client = $this->helper->getConfigClient() !== 'CORE' ? $this->helper->getConfigClient() : 'Bread Financial';
+        $client = 'RBC Payplan';
+        if (is_null($currency)) {
+            $currency = $payment->getOrder()->getOrderCurrencyCode();
+        }
         $this->breadLogger->info([
-            'MESSAGE' => 'order currency',
-            'amount' => $payment->getOrder()->getOrderCurrencyCode()
+            'order currency' => $payment->getOrder()->getOrderCurrencyCode()
         ]);
         switch ($requestType) {
             case self::ACTION_AUTHORIZE:

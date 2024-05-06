@@ -12,12 +12,11 @@ define(
 
         return {
             breadConfig: {},
-
             configure: function (data, context) {
                 this.breadConfig = {
                     actAsLabel: false,
                     asLowAs: data.asLowAs,
-                    customTotal: this.round(quote.getTotals()._latestValue.base_grand_total),
+                    customTotal: this.round(quote.getTotals()._latestValue.grand_total),
                     buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
                     disableEditShipping: true,
                     onShowCheckoutError: function (message) {
@@ -52,7 +51,7 @@ define(
 
                 if(!quote.isVirtual()) {
                     this.breadConfig.shippingOptions =  [data.shippingOptions];
-                    this.breadConfig.tax = this.round(quote.getTotals()._latestValue.base_tax_amount);
+                    this.breadConfig.tax = this.round(quote.getTotals()._latestValue.tax_amount);
                 } else {
                     this.breadConfig.requireShippingContact = false;
                 }
@@ -113,7 +112,7 @@ define(
                     cb();
                 } else */
                 if(typeof this.breadConfig.shippingOptions === "undefined" && quote.isVirtual()) {
-                    this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+                    this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.grand_total);
                     cb();
                 } else {
                     /* ocs save selected shipping method */
@@ -127,7 +126,7 @@ define(
                     ).done(
                         function (data) {
                             self.breadConfig.shippingOptions = [data];
-                            self.breadConfig.customTotal = self.round(quote.getTotals()._latestValue.base_grand_total);
+                            self.breadConfig.customTotal = self.round(quote.getTotals()._latestValue.grand_total);
                             cb();
                         }
                     ).fail(
@@ -237,7 +236,7 @@ define(
                     }];
                 }
                 /* this is needed if coupon is removed to update total price */
-                this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.base_grand_total);
+                this.breadConfig.customTotal = this.round(quote.getTotals()._latestValue.grand_total);
             },
 
             /**
