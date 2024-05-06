@@ -79,40 +79,13 @@ class Js extends \Magento\Framework\View\Element\Text
     {
         $moduleVersionComment = sprintf('<!-- BreadCheckout Module Version: %s -->', $this->getModuleVersion());
 
-        $sentryConfigScript =
-            '<script type="text/x-magento-init">
-                {
-                    "*": {
-                        "Bread_BreadCheckout/js/sentry/sentry-config": {
-                            "dsn": "%s",
-                            "pluginVersion": "%s",
-                            "apiKey": "%s",
-                            "isSentryEnabled": %b
-                        }
-                    }
-                }
-            </script>';
-
-        $dsn = $this->getSentryDSN();
-
-        // Don't enable Sentry if dsn can't be retrieved
-        $isSentryEnabled = $this->isSentryEnabled() && $dsn;
-
-        $sentryConfigScript = sprintf(
-            $sentryConfigScript,
-            $dsn,
-            $this->getModuleVersion(),
-            $this->getPublicApiKey(),
-            $isSentryEnabled
-        );
-
         $breadJsScript = sprintf(
             '<script src="%s" data-api-key="%s"></script>',
             $this->getJsLibLocation(),
             $this->getPublicApiKey()
         );
 
-        return $moduleVersionComment . $sentryConfigScript . $breadJsScript;
+        return $moduleVersionComment . $breadJsScript;
     }
 
     /**
@@ -146,16 +119,6 @@ class Js extends \Magento\Framework\View\Element\Text
     }
 
     /**
-     * Get Sentry Enabled
-     *
-     * @return boolean
-     */
-    protected function isSentryEnabled()
-    {
-        return $this->helper->isSentryEnabled();
-    }
-
-    /**
      * Get current module version
      *
      * @return string
@@ -165,61 +128,4 @@ class Js extends \Magento\Framework\View\Element\Text
         return $this->packageInfo->getVersion('Bread_BreadCheckout');
     }
 
-    /**
-     * Get Sentry DSN for magento 2
-     *
-     * @return string
-     */
-    private function getSentryDSN()
-    {
-        $sentryDSNIdentifier = 'sentry_dsn';
-
-        $dsn = $this->cache->load($sentryDSNIdentifier);
-
-        if ($dsn) {
-            return $dsn;
-        }
-
-        try {
-            $this->curl->setCredentials($this->getUsername(), $this->getPassword());
-            $this->curl->get($this->helper::URL_LAMBDA_SENTRY_DSN);
-
-            $response = json_decode($this->curl->getBody(), true);
-
-            if (isset($response['error']) || !isset($response['dsn'])) {
-                $errorMessage = isset($response['error']) ? $response['error']
-                    : 'Incorrect Response Format: ' . json_encode($response);
-                $this->logger->log(['ERROR WHEN GETTING SENTRY DSN' => $errorMessage]);
-                return null;
-            }
-
-            $dsn = $response['dsn'];
-            $this->cache->save($dsn, $sentryDSNIdentifier, [], 60 * 60);
-
-            return $dsn;
-        } catch (\Throwable $e) {
-            $this->logger->log(['EXCEPTION WHEN GETTING SENTRY DSN' => $e->getMessage()]);
-            return null;
-        }
-    }
-
-    /**
-     * Get public api key to use as username for dsn request
-     *
-     * @return string
-     */
-    private function getUsername()
-    {
-        return $this->helper->getApiPublicKey();
-    }
-
-    /**
-     * Get private api key to use as password for dsn request
-     *
-     * @return string
-     */
-    private function getPassword()
-    {
-        return $this->helper->getApiSecretKey();
-    }
 }
