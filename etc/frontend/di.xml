@@ -21,7 +21,6 @@
                 <item name="button_id" xsi:type="string">breadcheckout-mini-cart</item>
             </argument>
             <argument name="payment" xsi:type="object">Bread\BreadCheckout\Model\Payment\Method\Bread</argument>
-            <argument name="payment" xsi:type="object">Bread\BreadCheckout\Model\Payment\Method\Rbc</argument>
         </arguments>
     </type>
 </config>

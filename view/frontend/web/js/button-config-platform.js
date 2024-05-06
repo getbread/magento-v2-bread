@@ -28,6 +28,20 @@ define(
             wasSetup: false,
 
             configure: function(data, context) {
+                document.logBreadIssue = function(level, issue) {
+                    switch (level) {
+                        case 'fatal':
+                            return console.error;
+                        case 'error':
+                            return console.error;
+                        case 'warning':
+                            return console.warn;
+                        case 'info':
+                            return function (issue) {};
+                        case 'debug':
+                            return function (issue) {};
+                    }
+                };
                 this.config = {
                     customTotal: this.round(quote.getTotals()._latestValue.grand_total),
                     buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
