@@ -310,6 +310,13 @@
                     <label>Tenant</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\Tenant</source_model>
                 </field>
+                <field id="multi_tenant" type="select" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Multi-Tenant</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">0</field>
+                    </depends>
+                </field>
                 <group id="bread_advanced" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>Bread Advanced Settings</label>
                     <field id="targeted_financing" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">

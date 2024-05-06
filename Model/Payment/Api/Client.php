@@ -110,6 +110,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $apiVersion = $this->helper->getApiVersion();
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         $this->logger->info('Payment API version: '. $paymentApiVersion);
         if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
             $apiVersion = strtolower($paymentApiVersion);
@@ -186,6 +187,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         $validateAmount = $this->getInfo($breadTransactionId);
         $this->logger->info('Trx: ' . json_encode($validateAmount));
         $apiVersion = $this->helper->getApiVersion();
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
@@ -329,6 +331,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
             $apiVersion = strtolower($paymentApiVersion);
         }
@@ -384,6 +387,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
         
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
             $apiVersion = strtolower($paymentApiVersion);
         }

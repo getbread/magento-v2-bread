@@ -426,7 +426,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             $apiVersion = $breadApiVersion;
         }
         if($apiVersion === 'bread_2') {
-            $tenant = strtoupper($this->getConfigClient($storeCode, $store));
+            $tenant = $this->configClient ? strtoupper($this->configClient) : "CORE";
             if ($this->getConfigValue("XML_CONFIG_API_MODE", $store, $storeCode)) {
                 return $this->getPlatformApiUri($tenant, 'LIVE');
             } else {
@@ -1127,6 +1127,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             return 'bread_2';
         }
     }
+
+    public function setConfigClientByCurrency($currency) {
+        $configClient = "CORE";
+        if (array_key_exists(strtoupper($currency), $this->currencyToTenantMap)) {
+            $configClient = $this->currencyToTenantMap[$currency];
+        }
+        $this->configClient = $configClient;
+    }
     
     /**
      * Returns the tenant name from the database
@@ -1262,7 +1270,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         if (!isset($this->configPaths[$key])) {
             throw new \InvalidArgumentException("Invalid configuration key: {$key}");
         }
-        $tenant = $this->getTenantForCurrency();
+        $tenant = $this->configClient ?: $this->getTenantForCurrency();
 
         $path = $this->configPaths[$key];
 
