@@ -106,11 +106,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function cancel($breadTransactionId, $amount = 0, $lineItems = [])
     {
         $this->logger->info('Call API Cancel method. Bread trxId: '. $breadTransactionId);
-             
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         $apiVersion = $this->helper->getApiVersion();
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
-        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         $this->logger->info('Payment API version: '. $paymentApiVersion);
         if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
             $apiVersion = strtolower($paymentApiVersion);
@@ -184,10 +183,10 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function authorize($breadTransactionId, $amount, $merchantOrderId = null)
     {
         $this->logger->info('Call API Authorize method. Bread trxId: '. $breadTransactionId);
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         $validateAmount = $this->getInfo($breadTransactionId);
         $this->logger->info('Trx: ' . json_encode($validateAmount));
         $apiVersion = $this->helper->getApiVersion();
-        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
@@ -327,11 +326,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function settle($breadTransactionId, $amount = null, $currency = null)
     {
         $this->logger->info('Call API settle method. Bread trxId: '. $breadTransactionId);
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         $apiVersion = $this->helper->getApiVersion();
         
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
-        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
             $apiVersion = strtolower($paymentApiVersion);
         }
@@ -383,11 +382,11 @@ class Client extends \Magento\Framework\Model\AbstractModel
     public function refund($breadTransactionId, $amount = 0, $lineItems = [], $currency = null)
     {
         $this->logger->info('Call API refund method. Bread trxId: '. $breadTransactionId);
+        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         $apiVersion = $this->helper->getApiVersion();  
         
         $payment = $this->order->getPayment();
         $paymentApiVersion = $payment->getData('bread_api_version');
-        $this->helper->setConfigClientByCurrency($this->order->getOrderCurrencyCode());
         if(!is_null($paymentApiVersion) && in_array($paymentApiVersion, ['classic','bread_2'])) {
             $apiVersion = strtolower($paymentApiVersion);
         }

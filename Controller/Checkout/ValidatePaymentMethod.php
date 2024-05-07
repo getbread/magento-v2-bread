@@ -30,6 +30,11 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
      */
     public $regionFactory;
 
+    /**
+     * @var \Bread\BreadCheckout\Helper\Data
+     */
+    public $dataHelper;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
@@ -44,13 +49,15 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
-        \Magento\Directory\Model\RegionFactory $regionFactory
+        \Magento\Directory\Model\RegionFactory $regionFactory,
+        \Bread\BreadCheckout\Helper\Data $dataHelper
     ) {
     
         $this->paymentApiClient = $paymentApiClient;
         $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
         $this->regionFactory = $regionFactory;
+        $this->dataHelper = $dataHelper;
         parent::__construct(
             $context,
             $catalogResourceModelProductFactory,
@@ -78,6 +85,8 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
         $result = null;
         try {
             $token = $this->getRequest()->getParam('token');
+            $currencyCode = $this->getRequest()->getParam('currency');
+            $this->dataHelper->setConfigClientByCurrency($currencyCode);
             $newData = [];
 
             if ($token) {
