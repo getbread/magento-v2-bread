@@ -309,8 +309,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $configLogEnabled = $this->getConfigValue("XML_CONFIG_LOG_ENABLED", $store);
-        return $this->scopeConfig->isSetFlag($configLogEnabled);
+        return (bool) $this->getConfigValue("XML_CONFIG_LOG_ENABLED", $store);
     }
 
     /**
