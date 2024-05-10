@@ -502,7 +502,7 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
                     $breadTransactionId = $result['breadTransactionId'];                    
                 }
                 $payment->setTransactionId($breadTransactionId);
-                $this->breadLogger->info('Bread Transaction Id: ' . $breadTransactionId);
+                $this->breadLogger->info('Rbc Transaction Id: ' . $breadTransactionId);
                 $payment->setAmount($amount);
                 $this->addTransactionInfo(
                     $payment,

@@ -18,12 +18,12 @@ class QuoteSubmitBefore implements \Magento\Framework\Event\ObserverInterface
     /**
      * QuoteSubmitBefore constructor.
      *
-     * @param \Bread\BreadCheckout\Model\Payment\Method\Bread $breadPayment
+     * @param \Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory $breadPaymentMethodFactory
      */
     public function __construct(
-        \Bread\BreadCheckout\Model\Payment\Method\Bread $breadPayment
+        \Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory $breadPaymentMethodFactory
     ) {
-        $this->breadPayment = $breadPayment;
+        $this->breadPayment = $breadPaymentMethodFactory->create();
     }
 
     /**
