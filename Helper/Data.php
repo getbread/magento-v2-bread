@@ -213,7 +213,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         'xml_config_select_categories' => 'payment/breadcheckout/bread_category/categories',
         'xml_config_cp_button_design' => 'payment/breadcheckout/bread_cartpage/button_design',
         'xml_config_pdp_button_design' => 'payment/breadcheckout/bread_productdetail/button_design',
-        'xml_sentry_log_enabled' => 'payment/breadcheckout/bread_advanced/sentry_enabled',
         'xml_sandbox_merchant_id' => 'payment/breadcheckout/bread_advanced/sandbox_merchant_id',
         'xml_production_merchant_id' => 'payment/breadcheckout/bread_advanced/production_merchant_id',
         'xml_sandbox_program_id' => 'payment/breadcheckout/bread_advanced/sandbox_program_id',
@@ -310,8 +309,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function logEnabled($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        $configLogEnabled = $this->getConfigValue("XML_CONFIG_LOG_ENABLED", $store);
-        return $this->scopeConfig->isSetFlag($configLogEnabled);
+        return (bool) $this->getConfigValue("XML_CONFIG_LOG_ENABLED", $store);
     }
 
     /**

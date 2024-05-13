@@ -2,6 +2,7 @@
 
 namespace Bread\BreadCheckout\Block\Checkout;
 
+use Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory;
 use Magento\Catalog\Block\ShortcutInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Locale\ResolverInterface;
@@ -38,12 +39,12 @@ class Minicart extends Overview implements ShortcutInterface
     /**
      * Minicart constructor.
      *
-     * @param Context           $context
-     * @param ResolverInterface $localeResolver
-     * @param Session           $checkoutSession
-     * @param MethodInterface   $payment
-     * @param Data              $helperData
-     * @param array             $data
+     * @param Context                     $context
+     * @param ResolverInterface           $localeResolver
+     * @param Session                     $checkoutSession
+     * @param BreadPaymentMethodFactory   $breadPaymentMethodFactory
+     * @param Data                        $helperData
+     * @param array                       $data
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
@@ -62,7 +63,7 @@ class Minicart extends Overview implements ShortcutInterface
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         Session $checkoutSession,
-        MethodInterface $payment,
+        BreadPaymentMethodFactory $breadPaymentMethodFactory,
         Data $helperData,
         array $data = []
     ) {
@@ -86,7 +87,7 @@ class Minicart extends Overview implements ShortcutInterface
         );
 
         $this->checkoutSession = $checkoutSession;
-        $this->payment = $payment;
+        $this->payment = $breadPaymentMethodFactory->create();
         $this->helperData = $helperData;
         $this->quoteHelper = $quoteHelper;
     }

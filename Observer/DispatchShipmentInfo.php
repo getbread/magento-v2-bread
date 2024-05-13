@@ -43,13 +43,13 @@ class DispatchShipmentInfo implements \Magento\Framework\Event\ObserverInterface
      * @param \Bread\BreadCheckout\Model\Payment\Method\Bread $breadPayment
      */
     public function __construct(
-        \Bread\BreadCheckout\Model\Payment\Method\Bread $breadPayment,
+        \Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory $breadPaymentMethodFactory,
         \Bread\BreadCheckout\Model\Payment\Api\Client $client,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Bread\BreadCheckout\Helper\Log $logger,
         \Magento\Sales\Model\Order\Payment\TransactionFactory $transactionFactory
     ) {
-        $this->breadPayment = $breadPayment;
+        $this->breadPayment = $breadPaymentMethodFactory->create();
         $this->client = $client;
         $this->helper = $helper;
         $this->logger = $logger;

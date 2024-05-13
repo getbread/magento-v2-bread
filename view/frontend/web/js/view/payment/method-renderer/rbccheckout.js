@@ -190,7 +190,7 @@ define(
 
                 $.ajax({
                     url: paymentUrl,
-                    data: { token: token },
+                    data: { token: token, currency: breadConfig.currencyCode},
                     type: 'post',
                     context: this,
                     beforeSend: function() {
