@@ -52,7 +52,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const XML_CONFIG_ACTIVE_ON_PDP = 'payment/breadcheckout/enabled_on_product_page';
     const XML_CONFIG_ACTIVE_ON_CAT = 'payment/breadcheckout/bread_category/enabled_on_category_page';
     const XML_CONFIG_ACTIVE_ON_CART_VIEW = 'payment/breadcheckout/enabled_on_cart_page';
-    const XML_CONGIG_MINICART_CHECKOUT = 'payment/breadcheckout/allowminicartcheckout';
+    const XML_CONFIG_MINICART_CHECKOUT = 'payment/breadcheckout/allowminicartcheckout';
     const XML_CONFIG_SHOW_MINICART_LINK = 'payment/breadcheckout/enableonminicart';
     const XML_CONFIG_ENABLE_AS_PAYMENT_METHOD = 'payment/breadcheckout/display_as_payment_method';
     const XML_CONFIG_CHECKOUT_TITLE = 'payment/breadcheckout/title';
@@ -171,7 +171,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         'xml_config_active_on_pdp' => 'payment/breadcheckout/enabled_on_product_page',
         'xml_config_active_on_cat' => 'payment/breadcheckout/bread_category/enabled_on_category_page',
         'xml_config_active_on_cart_view' => 'payment/breadcheckout/enabled_on_cart_page',
-        'xml_congig_minicart_checkout' => 'payment/breadcheckout/allowminicartcheckout',
+        'xml_cofig_minicart_checkout' => 'payment/breadcheckout/allowminicartcheckout',
         'xml_config_show_minicart_link' => 'payment/breadcheckout/enableonminicart',
         'xml_config_enable_as_payment_method' => 'payment/breadcheckout/display_as_payment_method',
         'xml_config_checkout_title' => 'payment/breadcheckout/title',
@@ -1033,7 +1033,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @return bool
      */
     public function allowMinicartCheckout($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
-        return (bool) $this->scopeConfig->getValue(self::XML_CONGIG_MINICART_CHECKOUT, $store);
+        return (bool) $this->getConfigValue("XML_CONFIG_MINICART_CHECKOUT", $store);
     }
     
     /**
@@ -1052,9 +1052,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @param  float $cost
      * @return bool
      */
-    public function aboveThreshold($cost) {
+    public function aboveThreshold($cost, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         $aboveThreshold = true;
-        $thresholdAmount = (int) $this->scopeConfig->getValue("XML_CONFIG_THRESHOLD_AMOUNT");
+        $thresholdAmount = (int) $this->getConfigValue("XML_CONFIG_THRESHOLD_AMOUNT", $store);
 
         if ($thresholdAmount) {
             $aboveThreshold = (int) $cost >= $thresholdAmount;
@@ -1163,9 +1163,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function getMerchantId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         if ($this->getConfigValue("XML_CONFIG_API_MODE", $store)) {
-            return (string) $this->scopeConfig->getValue(self::XML_PRODUCTION_MERCHANT_ID, $store, $storeCode);
+            return (string) $this->getConfigValue("XML_PRODUCTION_MERCHANT_ID", $store, $storeCode);
         } else {
-            return (string) $this->scopeConfig->getValue(self::XML_SANDBOX_MERCHANT_ID, $store, $storeCode);
+            return (string) $this->getConfigValue("XML_SANDBOX_MERCHANT_ID", $store, $storeCode);
         }
     }
     
@@ -1177,9 +1177,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function getProgramId($storeCode = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         if ($this->getConfigValue("XML_CONFIG_API_MODE", $store)) {
-            return (string) $this->scopeConfig->getValue(self::XML_PRODUCTION_PROGRAM_ID, $store, $storeCode);
+            return (string) $this->getConfigValue("XML_PRODUCTION_PROGRAM_ID", $store, $storeCode);
         } else {
-            return (string) $this->scopeConfig->getValue(self::XML_SANDBOX_PROGRAM_ID, $store, $storeCode);
+            return (string) $this->getConfigValue("XML_SANDBOX_PROGRAM_ID", $store, $storeCode);
         }
     }
     
