@@ -28,6 +28,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
      * @param \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient
      * @param \Bread\BreadCheckout\Helper\Customer $customerHelper
      * @param \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod
+     * @param \Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory $breadPaymentMethodFactory
      * @param \Bread\BreadCheckout\Helper\Url $urlHelper
      * @param \Bread\BreadCheckout\Helper\Log $log
      */
@@ -37,7 +38,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
             \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
             \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
             \Bread\BreadCheckout\Helper\Customer $customerHelper,
-            \Bread\BreadCheckout\Model\Payment\Method\Bread $breadMethod,
+            \Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory $breadPaymentMethodFactory,
             \Bread\BreadCheckout\Helper\Url $urlHelper,
             \Bread\BreadCheckout\Helper\Log $log
     ) {
@@ -46,7 +47,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
         $this->config = $scopeConfig;
         $this->paymentApiClient = $paymentApiClient;
         $this->customerHelper = $customerHelper;
-        $this->breadMethod = $breadMethod;
+        $this->breadMethod = $breadPaymentMethodFactory->create($this->helper->getSessionQuote());
         $this->urlHelper = $urlHelper;
         $this->logger = $log;
         parent::__construct($context);
@@ -115,7 +116,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
                 $request['programID'] = $this->customerHelper->getProgramId();
                 
                 $merchantCountry = $this->customerHelper->getMerchantCountry();
-                $currency = $this->customerHelper->getCurrentCurrencyCode();
+                $currency = $quote->getQuoteCurrencyCode();
                 
                 //Contact
                 $billingAddress = $this->helper->getBillingAddressData();
