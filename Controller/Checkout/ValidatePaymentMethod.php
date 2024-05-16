@@ -85,7 +85,7 @@ class ValidatePaymentMethod extends \Bread\BreadCheckout\Controller\Checkout
         $result = null;
         try {
             $token = $this->getRequest()->getParam('token');
-            $currencyCode = $this->getRequest()->getParam('currency');
+            $currencyCode = $this->getRequest()->getParam('currency', 'USD');
             $this->dataHelper->setConfigClientByCurrency($currencyCode);
             $newData = [];
 
