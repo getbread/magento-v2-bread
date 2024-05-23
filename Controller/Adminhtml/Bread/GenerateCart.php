@@ -226,6 +226,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
 
                 $ret['cartUrl'] = $result["checkoutUrl"];
                 $ret['id'] = $result['id'];
+                $quote->setCheckoutUrl($ret['cartUrl']);
                 
                 
             } else {

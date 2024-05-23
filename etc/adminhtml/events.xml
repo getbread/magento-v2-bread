@@ -3,4 +3,7 @@
     <event name="sales_order_shipment_track_save_after">
         <observer name="bread_dispatch_shipment_info" instance="Bread\BreadCheckout\Observer\DispatchShipmentInfo" />
     </event>
+    <event name="sales_model_service_quote_submit_before">
+        <observer name="bread_admin_order_observer" instance="Bread\BreadCheckout\Observer\AdminOrderObserver" />
+    </event>
 </config>

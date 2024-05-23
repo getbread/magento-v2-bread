@@ -1,12 +1,14 @@
 {
     "quote_payment": {
         "column": {
-            "bread_api_version": true
+            "bread_api_version": true,
+            "checkout_url": true
         }
     },
     "sales_order_payment": {
         "column": {
-            "bread_api_version": true
+            "bread_api_version": true,
+            "checkout_url": true
         }
     }
 }

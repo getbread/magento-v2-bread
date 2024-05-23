@@ -2,8 +2,10 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
     <table name="quote_payment" resource="checkout">
         <column xsi:type="varchar" name="bread_api_version" nullable="true" length="100" comment="Bread api version"/>
+        <column xsi:type="text" name="checkout_url" nullable="true" comment="Bread Checkout Url"/>
     </table>
     <table name="sales_order_payment" resource="sales">
         <column xsi:type="varchar" name="bread_api_version" nullable="true" length="100" comment="Bread api version"/>
+        <column xsi:type="text" name="checkout_url" nullable="true" comment="Bread Checkout Url"/>
     </table>
 </schema>

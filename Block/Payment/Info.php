@@ -39,14 +39,25 @@ class Info extends \Magento\Payment\Block\Info
         $info = $this->getInfo();
         $transport = $this->dataObjectFactory->create();
         $transport = parent::_prepareSpecificInformation($transport);
-        $label = __('Financing Tx Id');
+        $transIdLabel = __('Financing Tx Id');
+        $checkoutUrlLabel = __('Checkout URL');
+        $checkoutUrl = null;
 
         if ($info->getTransactionId()) {
             $transId = $info->getTransactionId();
         } else {
             $transId = $info->getLastTransId();
         }
-        $transport->addData([(string)$label => $transId]);
+
+        if ($info->getCheckoutUrl()) {
+            $checkoutUrl = $info->getCheckoutUrl();
+        }
+        $transport->addData(
+            [
+                (string)$transIdLabel => $transId,
+                (string)$checkoutUrlLabel => $checkoutUrl
+            ]
+        );
         return $transport;
     }
 }
