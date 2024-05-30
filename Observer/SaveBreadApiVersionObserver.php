@@ -64,7 +64,6 @@ class SaveBreadApiVersionObserver implements ObserverInterface {
             $method = $paymentQuote->getMethodInstance()->getCode();
             if ($method === \Bread\BreadCheckout\Model\Ui\ConfigProvider::CODE) {
                 $paymentOrder->setData('bread_api_version', $this->helper->getApiVersion());
-                $paymentOrder->setData('checkout_url', $paymentQuote->getCheckoutUrl());
             }
         }
     }

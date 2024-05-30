@@ -20,6 +20,8 @@ class GenerateCart extends \Magento\Backend\App\Action {
      */
     public $logger;
 
+    public $orderCreateModel;
+
     /**
      * 
      * @param \Magento\Backend\App\Action\Context $context
@@ -40,7 +42,8 @@ class GenerateCart extends \Magento\Backend\App\Action {
             \Bread\BreadCheckout\Helper\Customer $customerHelper,
             \Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory $breadPaymentMethodFactory,
             \Bread\BreadCheckout\Helper\Url $urlHelper,
-            \Bread\BreadCheckout\Helper\Log $log
+            \Bread\BreadCheckout\Helper\Log $log,
+            \Magento\Sales\Model\AdminOrder\Create $orderCreateModel
     ) {
         $this->resultFactory = $context->getResultFactory();
         $this->helper = $helper;
@@ -50,6 +53,7 @@ class GenerateCart extends \Magento\Backend\App\Action {
         $this->breadMethod = $breadPaymentMethodFactory->create($this->helper->getSessionQuote());
         $this->urlHelper = $urlHelper;
         $this->logger = $log;
+        $this->orderCreateModel = $orderCreateModel;
         parent::__construct($context);
     }
 
@@ -227,8 +231,9 @@ class GenerateCart extends \Magento\Backend\App\Action {
                 $ret['cartUrl'] = $result["checkoutUrl"];
                 $ret['id'] = $result['id'];
                 $quote->setCheckoutUrl($ret['cartUrl']);
-                
-                
+                $this->orderCreateModel
+                        ->getSession()
+                        ->setCheckoutUrl($ret['cartUrl']);     
             } else {
                 //Build other classic data
                 $request['cartOrigin'] = 'magento_carts';

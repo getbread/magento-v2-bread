@@ -3,4 +3,7 @@
     <event name="sales_order_payment_save_before">
         <observer name="save_bread_api_version" instance="Bread\BreadCheckout\Observer\SaveBreadApiVersionObserver"/>
     </event>
+    <event name="sales_order_save_before">
+        <observer name="save_bread_checkout_url" instance="Bread\BreadCheckout\Observer\SaveBreadCheckoutUrlObserver"/>
+    </event>
 </config>
