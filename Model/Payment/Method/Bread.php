@@ -326,8 +326,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function canPerformAction($action) {
         $payment = $this->getInfoInstance();
-        $authorizationTransaction = $payment->getAuthorizationTransaction();
-        if (!$authorizationTransaction) {
+        $transactionId = $payment->getLastTransId();
+        if (!$transactionId) {
             $this->breadLogger->log('Missing transaction ID. ' . $action . ' action skipped');
             return false;
         }
