@@ -307,6 +307,51 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
+     * Check to make sure capture, refund, cancel actions can be performed
+     * only if transaction ID is set. Transaction ID will not be set
+     * for orders created in OMS
+     * 
+     * @param string @action
+     * @return bool
+     */
+    public function canPerformAction($action) {
+        $payment = $this->getInfoInstance();
+        $authorizationTransaction = $payment->getAuthorizationTransaction();
+        if (!$authorizationTransaction) {
+            $this->breadLogger->log('Missing transaction ID. ' . $action . ' action skipped');
+            return false;
+        }
+        return $this->{'_can'.ucfirst($action)};
+    }
+
+    /**
+     * Check capture availability
+     * 
+     * @return bool
+     */
+    public function canCapture() {
+        return $this->canPerformAction('capture');
+    }
+
+    /**
+     * Check refund availability
+     * 
+     * @return bool
+     */
+    public function canRefund() {
+        return $this->canPerformAction('refund');
+    }
+
+    /**
+     * Check void availability
+     * 
+     * @return bool
+     */
+    public function canVoid() {
+        return $this->canPerformAction('void');
+    }
+
+    /**
      * Process Capture Payment
      *
      * @param  \Magento\Framework\DataObject $payment
