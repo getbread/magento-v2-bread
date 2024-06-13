@@ -5,5 +5,6 @@
     </table>
     <table name="sales_order_payment" resource="sales">
         <column xsi:type="varchar" name="bread_api_version" nullable="true" length="100" comment="Bread api version"/>
+        <column xsi:type="text" name="checkout_url" nullable="true" comment="Bread Checkout Url"/>
     </table>
 </schema>

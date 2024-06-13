@@ -71,6 +71,16 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
     public $quoteFactory;
 
     /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+     */
+    public $orderCollectionFactory;
+
+    /**
+     *  @var \Magento\Sales\Api\OrderManagementInterface;
+     */
+    public $orderManagement;
+
+    /**
      * @var \Magento\Checkout\Helper\Cart
      */
     public $cartHelper;
@@ -90,6 +100,11 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
      */
     public $customerHelper;
 
+    /**
+     * @var \Magento\Sales\Api\OrderRepositoryInterface
+     */
+    public $orderRepository;
+
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
         \Bread\BreadCheckout\Model\Payment\Api\Client $paymentApiClient,
@@ -103,30 +118,36 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+        \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Magento\Checkout\Helper\Cart $cartHelper,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
         \Magento\Framework\App\Action\Context $context,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Bread\BreadCheckout\Helper\Quote $quoteHelper,
         \Bread\BreadCheckout\Helper\Customer $customerHelper
     ) {
-    
-        $this->request          = $request;
-        $this->paymentApiClient = $paymentApiClient;
-        $this->customer         = $customer;
-        $this->customerSession  = $customerSession;
-        $this->checkoutSession  = $checkoutSession;
-        $this->quoteRepository  = $quoteRepository;
-        $this->quoteManagement  = $quoteManagement;
-        $this->helper           = $helper;
-        $this->logger           = $logger;
-        $this->customerFactory  = $customerFactory;
-        $this->storeManager     = $storeManager;
-        $this->quoteFactory     = $quoteFactory;
-        $this->cartHelper       = $cartHelper;
-        $this->orderSender      = $orderSender;
-        $this->resultFactory    = $context->getResultFactory();
-        $this->quoteHelper      = $quoteHelper;
-        $this->customerHelper   = $customerHelper;
+
+        $this->request                  = $request;
+        $this->paymentApiClient         = $paymentApiClient;
+        $this->customer                 = $customer;
+        $this->customerSession          = $customerSession;
+        $this->checkoutSession          = $checkoutSession;
+        $this->quoteRepository          = $quoteRepository;
+        $this->quoteManagement          = $quoteManagement;
+        $this->helper                   = $helper;
+        $this->logger                   = $logger;
+        $this->customerFactory          = $customerFactory;
+        $this->storeManager             = $storeManager;
+        $this->quoteFactory             = $quoteFactory;
+        $this->orderCollectionFactory   = $orderCollectionFactory;
+        $this->orderManagement          = $orderManagement;
+        $this->cartHelper               = $cartHelper;
+        $this->orderSender              = $orderSender;
+        $this->resultFactory            = $context->getResultFactory();
+        $this->orderRepository          = $orderRepository;
+        $this->quoteHelper              = $quoteHelper;
+        $this->customerHelper           = $customerHelper;
         parent::__construct($context);
     }
 
@@ -150,12 +171,12 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
                 );
                 $this->_redirect("/");
             }
-            
+
             if($action === 'checkout-complete') {
                 $this->logger->log('Checkout completed for orderRef: ' . $orderRef);
                 $this->_redirect('checkout/onepage/success');
             }
-            
+
             if($action === 'callback') {
                 $this->logger->log('Callback action for orderRef: ' . $orderRef);
                 $tx_id = null;
@@ -164,7 +185,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
                 if (isset($data['transactionId'])) {
                     $tx_id = trim($data['transactionId']);
                 }
-                
+
                 if($orderRef && $tx_id) {
                     $this->processPlatformCartOrder($tx_id, $orderRef, $apiVersion);
                 } else {
@@ -180,10 +201,10 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
             }
         }
     }
-    
+
     /**
      * Process platform backend order
-     * 
+     *
      * @param string $transactionId
      * @param string $orderRef
      */
@@ -192,7 +213,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
             //Fetch the Trx
             $data = $this->paymentApiClient->getInfo($transactionId, $apiVersion);
             $this->logger->log('Trx details :: ' . json_encode($data));
-            
+
             //Create the customer
             $customer = $this->customerFactory->create();
             $customer->setWebsiteId($this->storeManager->getWebsite()->getId());
@@ -201,9 +222,9 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
             if ($customer->getId()) {
                 $this->customerSession->setCustomerAsLoggedIn($customer);
             }
-            
+
             $this->processBackendOrder($orderRef, $data, $transactionId, $apiVersion);
-            
+
             $this->_redirect('checkout/onepage/success');
         } catch (\Throwable $e) {
             $this->logger->log(['ERROR' => $e->getMessage(), 'TRACE' => $e->getTraceAsString()]);
@@ -293,7 +314,27 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
         $quote->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
 
         try {
-            $order = $this->quoteManagement->submit($quote);
+            // Check if the order already exists
+            $orderCollection = $this->orderCollectionFactory->create()
+                ->addFieldToFilter('quote_id', $orderRef)
+                ->setPageSize(1)
+                ->setCurPage(1);
+
+            $order = $orderCollection->getFirstItem();
+            $order = $order->getPayment()->getOrder();
+
+            if ($order->getId()) {
+                $order = $this->orderManagement->place($order);
+                $quote->setIsActive(false);
+                $order->getPayment()->setMethod('breadcheckout');
+                $order->getPayment()->setTransactionId($transactionId);
+                $order->getPayment()->setAdditionalData("BREAD CHECKOUT DATA", json_encode($data));
+                $this->orderRepository->save($order);
+                $this->quoteRepository->save($quote);
+            } else {
+                $this->logger->log('No order found with quote ID: ' . $orderRef . '. Submitting new order');
+                $order = $this->quoteManagement->submit($quote);
+            }
         } catch (\Throwable $e) {
             $this->logger->log(
                 [
@@ -333,7 +374,7 @@ class LandingPage extends \Magento\Framework\App\Action\Action implements CsrfAw
         foreach ($cartItems as $item) {
             $quote->removeItem($item->getId())->save();
         }
-        
+
         // @codingStandardsIgnoreEnd
 
         $this->_redirect('checkout/onepage/success');

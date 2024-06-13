@@ -91,6 +91,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     private $quoteHelper;
 
+    private $adminOrderHelper;
+
     /**
      * Construct Sets API Client And Sets Available For Checkout Flag
      *
@@ -130,7 +132,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
         \Magento\Sales\Model\AdminOrder\Create $orderCreateModel,
-        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        \Bread\BreadCheckout\Helper\AdminOrder $adminOrderHelper
     ) {
     
         $this->apiClient = $apiClient;
@@ -144,6 +147,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         $this->transactionRepository = $transactionRepository;
         $this->orderCreateModel = $orderCreateModel;
         $this->priceCurrency = $priceCurrency;
+        $this->adminOrderHelper = $adminOrderHelper;
         parent::__construct(
             $context,
             $registry,
@@ -243,6 +247,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
+        if ($this->adminOrderHelper->isAdminOrder()) {
+            return; // Bypass logic for admin order creation
+        }
         if (!$this->canVoid()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Void action is not available.'));
         }
@@ -260,6 +267,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        if ($this->adminOrderHelper->isAdminOrder()) {
+            return; // Bypass logic for admin order creation
+        }
         if (!$this->canAuthorize()) {
             $this->breadLogger->info('authorize action is not available');
             throw new \Magento\Framework\Exception\LocalizedException(__('Authorize action is not available.'));
@@ -307,6 +317,51 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
+     * Check to make sure capture, refund, cancel actions can be performed
+     * only if transaction ID is set. Transaction ID will not be set
+     * for orders created in OMS
+     * 
+     * @param string @action
+     * @return bool
+     */
+    public function canPerformAction($action) {
+        $payment = $this->getInfoInstance();
+        $transactionId = $payment->getLastTransId();
+        if (!$transactionId) {
+            $this->breadLogger->log('Missing transaction ID. ' . $action . ' action skipped');
+            return false;
+        }
+        return $this->{'_can'.ucfirst($action)};
+    }
+
+    /**
+     * Check capture availability
+     * 
+     * @return bool
+     */
+    public function canCapture() {
+        return $this->canPerformAction('capture');
+    }
+
+    /**
+     * Check refund availability
+     * 
+     * @return bool
+     */
+    public function canRefund() {
+        return $this->canPerformAction('refund');
+    }
+
+    /**
+     * Check void availability
+     * 
+     * @return bool
+     */
+    public function canVoid() {
+        return $this->canPerformAction('void');
+    }
+
+    /**
      * Process Capture Payment
      *
      * @param  \Magento\Framework\DataObject $payment
@@ -316,6 +371,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        if ($this->adminOrderHelper->isAdminOrder()) {
+            return; // Bypass logic for admin order creation
+        }
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Capture action is not available.'));
         }
@@ -391,6 +449,9 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        if ($this->adminOrderHelper->isAdminOrder()) {
+            return; // Bypass logic for admin order creation
+        }
         if (!$this->canRefund()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Refund action is not available.'));
         }
