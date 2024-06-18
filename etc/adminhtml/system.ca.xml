@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="breadcheckout" type="text" sortOrder="305" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+            <group id="rbccheckout" type="text" sortOrder="305" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                 <label>Payplan by RBC</label>
                 <fieldset_css>complex</fieldset_css>
                 <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Group</frontend_model>

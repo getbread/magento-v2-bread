@@ -226,7 +226,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         'xml_config_bread_api_sandbox_pub_key' => 'payment/breadcheckout/api_sandbox_public_key',
         'xml_config_bread_api_sandbox_secret_key' => 'payment/breadcheckout/api_sandbox_secret_key',
         'xml_config_bread_api_sandbox_integration_key' => 'payment/breadcheckout/api_sandbox_integration_key',
-        'xml_config_multi_tenant' => 'payment/breadcheckout/multi_tenant',
         'xml_config_log_enabled' => 'payment/breadcheckout/bread_advanced/log_enabled'
     ];
 
@@ -1231,11 +1230,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      * @since 2.4.0
      * @return string
      */
-    public function getTenantForCurrency($store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
+    public function getTenantForCurrency($tenant = null, $store = \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
         $currencyCode = $this->getCurrentCurrencyCode();
-        $isMultiTenant = (bool) $this->scopeConfig->getValue($this->configPaths['xml_config_multi_tenant'], $store);
-        $tenant = null;
-        if ($isMultiTenant && in_array($currencyCode, array_keys($this->currencyToTenantMap))) {
+        if (in_array($currencyCode, array_keys($this->currencyToTenantMap))) {
             $tenant = $this->currencyToTenantMap[$currencyCode];
         }
         return $tenant;
