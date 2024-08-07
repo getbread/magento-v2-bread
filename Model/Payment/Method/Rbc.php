@@ -320,7 +320,7 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
         }
         $payment = $this->getInfoInstance();
         $transactionId = $payment->getLastTransId();
-        if (!$transactionId) {
+        if (!$transactionId && $this->_appState->getAreaCode() === \Magento\Framework\App\Area::AREA_ADMINHTML) {
             $this->breadLogger->log('RBC Missing transaction ID. ' . $action . ' action skipped');
             return false;
         }
