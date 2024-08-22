@@ -10,7 +10,7 @@
                     <![CDATA[
                             <div>
                                 <span class="bread-logo"></span>
-                            Bread Pay (v2.4.2) by <a href="https://payments.breadfinancial.com/" target="_blank">payments.breadfinancial.com</a> - <b>Onsite Consumer Financing</b>.
+                            Bread Pay (v2.4.3) by <a href="https://payments.breadfinancial.com/" target="_blank">payments.breadfinancial.com</a> - <b>Onsite Consumer Financing</b>.
                             <br/> Developers API reference: <a href="https://docs.breadpayments.com/bread-classic/docs/magento-2/" target="_blank">Bread Developer API Reference</a>
                             </div>
                     ]]>
@@ -309,13 +309,6 @@
                 <field id="tenant" type="select" sortOrder="34" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Tenant</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\Tenant</source_model>
-                </field>
-                <field id="multi_tenant" type="select" sortOrder="18" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Multi-Tenant</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="active">0</field>
-                    </depends>
                 </field>
                 <group id="bread_advanced" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>Bread Advanced Settings</label>
