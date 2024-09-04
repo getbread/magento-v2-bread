@@ -139,7 +139,9 @@ define(
 
                     document.customOptions = document.getSkuForOptions(selectedOptions);
                     document.resetPriceAndSku(true);
-                    document.splitPayResetPriceAndSku(true);
+                    if (typeof document.splitPayResetPriceAndSku === 'function') {
+                        document.splitPayResetPriceAndSku(true);
+                    }
                 }
             );
         };
