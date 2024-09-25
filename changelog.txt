@@ -1,7 +1,10 @@
 == Changelog ==
 
-= 2.4.3
+= 2.4.4
 * Current release
+* Fix error with product custom options
+
+= 2.4.3
 * Fix checkout issue with RBC
 
 = 2.4.2
