@@ -375,11 +375,29 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         if ($this->adminOrderHelper->isAdminOrder()) {
-            return; // Bypass logic for admin order creation
+            return $this; // Bypass logic for admin order creation
         }
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Capture action is not available.'));
         }
+
+        $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
+
+        $settleResult = isset($transactionAdditionalInfo['settle_result']) 
+            ? json_decode($transactionAdditionalInfo['settle_result'], true) 
+            : null;
+
+        $isCaptured = !empty($transactionAdditionalInfo['captured']);
+        $isSettled = $settleResult && strcasecmp($settleResult['status'], 'SETTLED') === 0;
+
+        if ($isCaptured || $isSettled) {
+            $this->breadLogger->info(sprintf(
+                'Transaction ID %s has already been captured and settled. Skipping further processing.',
+                $payment->getTxnId()
+            ));
+            return $this;
+        }
+
         $apiVersion = $this->helper->getApiVersion();
 
         $order = $payment->getOrder();
