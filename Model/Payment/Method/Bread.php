@@ -254,6 +254,19 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('Void action is not available.'));
         }
 
+        $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
+        $cancelResult = isset($transactionAdditionalInfo['cancel_result']) 
+            ? json_decode($transactionAdditionalInfo['cancel_result'], true) 
+            : null;
+
+        if ($this->helper->isTransactionProcessed($payment, $cancelResult, 'CANCELLED', true)) {
+            $this->breadLogger->info(sprintf(
+                'Transaction ID %s has already cancelled. Skipping further processing.',
+                $payment->getTxnId()
+            ));
+            return $this;
+        }
+
         return $this->_place($payment, 0, self::ACTION_VOID);
     }
 
@@ -273,6 +286,19 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         if (!$this->canAuthorize()) {
             $this->breadLogger->info('authorize action is not available');
             throw new \Magento\Framework\Exception\LocalizedException(__('Authorize action is not available.'));
+        }
+
+        $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
+        $authorizeResult = isset($transactionAdditionalInfo['authorize_result']) 
+            ? json_decode($transactionAdditionalInfo['authorize_result'], true) 
+            : null;
+
+        if ($this->helper->isTransactionProcessed($payment, $authorizeResult, 'AUTHORIZED', true)) {
+            $this->breadLogger->info(sprintf(
+                'Transaction ID %s has already authorized. Skipping further processing.',
+                $payment->getTxnId()
+            ));
+            return $this;
         }
 
         $order = $payment->getOrder();
@@ -382,15 +408,11 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-
         $settleResult = isset($transactionAdditionalInfo['settle_result']) 
             ? json_decode($transactionAdditionalInfo['settle_result'], true) 
             : null;
 
-        $isCaptured = !empty($transactionAdditionalInfo['captured']);
-        $isSettled = $settleResult && strcasecmp($settleResult['status'], 'SETTLED') === 0;
-
-        if ($isCaptured || $isSettled) {
+        if ($this->helper->isTransactionProcessed($payment, $settleResult, 'SETTLED', true)) {
             $this->breadLogger->info(sprintf(
                 'Transaction ID %s has already been captured and settled. Skipping further processing.',
                 $payment->getTxnId()
@@ -475,6 +497,19 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
         if (!$this->canRefund()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('Refund action is not available.'));
+        }
+
+        $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
+        $refundResult = isset($transactionAdditionalInfo['refund_result']) 
+            ? json_decode($transactionAdditionalInfo['refund_result'], true) 
+            : null;
+
+        if ($this->helper->isTransactionProcessed($payment, $refundResult, 'REFUNDED', true)) {
+            $this->breadLogger->info(sprintf(
+                'Transaction ID %s has already refunded. Skipping further processing.',
+                $payment->getTxnId()
+            ));
+            return $this;
         }
 
         $order = $payment->getOrder();

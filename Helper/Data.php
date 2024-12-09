@@ -1265,4 +1265,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         return $this->scopeConfig->getValue($path, $store, $storeCode);
     }
 
+    /**
+     * Checks if a transaction has already been processed based on the transaction additional info (JSON blob).
+     *
+     * @param $payment
+     * @param string $resultField The key in the transaction's additional information to check (e.g., 'settle_result').
+     * @param string $expectedStatus The status value to check for (case-insensitive).
+     * @param bool $checkCaptured Optional. If true, also checks if the transaction is marked as captured.
+     * @return bool
+     */
+    public function isTransactionProcessed($payment, $resultField, $expectedStatus, $checkCaptured = false){
+        $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
+        $resultData = isset($transactionAdditionalInfo[$resultField])
+            ? json_decode($transactionAdditionalInfo[$resultField], true)
+            : null;
+
+        // Check if the status matches the expected value (case-insensitive)
+        $isProcessed = $resultData && strcasecmp($resultData['status'], $expectedStatus) === 0;
+
+        if ($checkCaptured) {
+            $isProcessed = $isProcessed || !empty($transactionAdditionalInfo['captured']);
+        }
+    
+        return $isProcessed;
+    }
 }
