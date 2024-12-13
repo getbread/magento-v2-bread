@@ -22,10 +22,22 @@ define(
      * @returns {button-config-platformL#18.button-config-platformAnonym$1}
      */
     function($, fullScreenLoader, quote, checkout, alert) {
-
         return {
             config: undefined,
             wasSetup: false,
+            /* 
+             * Fix issue in Magento < 2.6.0 where grand_total and base_grand_total don't match when using taxes or other extensions
+             * grand_total is the total in selected currency, base_grand_total is in store's default currency   
+             * Continue to use grand_total for multi-currency setups
+             */
+            getTotal: function () {
+                let totals = quote.getTotals()._latestValue;
+                let grandTotal = totals.base_grand_total;
+                if (totals.quote_currency_code !== totals.base_currency_code) {
+                    grandTotal = totals.grand_total;
+                }
+                return grandTotal;
+            },
 
             configure: function(data, context) {
                 document.logBreadIssue = function(level, issue) {
@@ -43,7 +55,7 @@ define(
                     }
                 };
                 this.config = {
-                    customTotal: this.round(quote.getTotals()._latestValue.grand_total),
+                    customTotal: this.round(this.getTotal()),
                     buttonLocation: window.checkoutConfig.payment.breadcheckout.breadConfig.buttonLocation,
 
                     //Bread SDK API onCheckout callback
@@ -223,7 +235,7 @@ define(
                  cb();
                  } else */
                 if (typeof this.config.shippingOptions === "undefined" && quote.isVirtual()) {
-                    this.config.customTotal = this.round(quote.getTotals()._latestValue.grand_total);
+                    this.config.customTotal = this.round(this.getTotal());
                     cb();
                 } else {
                     /* ocs save selected shipping method */
@@ -235,7 +247,7 @@ define(
                     }).done(
                         function(data) {
                             self.config.shippingOptions = [data];
-                            self.config.customTotal = self.round(quote.getTotals()._latestValue.grand_total);
+                            self.config.customTotal = self.round(this.getTotal());
                             cb();
                         }
                     ).fail(
@@ -268,7 +280,7 @@ define(
                         "Discount";
                 }
                 /* this is needed if coupon is removed to update total price */
-                this.config.customTotal = this.round(quote.getTotals()._latestValue.grand_total);
+                this.config.customTotal = this.round(this.getTotal());
             },
             /**
              * Get updated quote data and initialize
