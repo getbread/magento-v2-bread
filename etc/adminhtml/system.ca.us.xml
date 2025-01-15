@@ -120,14 +120,14 @@
                     <comment>The Position In the Payment Method List In Checkout</comment>
                     <validate>validate-number</validate>
                 </field>
-                <field id="enabled_on_product_page" type="select" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_product_page" type="select" sortOrder="15" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enabled on Product Details Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="enabled_on_cart_page" type="select" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled_on_cart_page" type="select" sortOrder="16" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enabled on Cart Overview Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
@@ -250,7 +250,7 @@
                         <field id="api_version">classic</field>
                     </depends>
                 </field>
-                <field id="enableonminicart" type="select" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enableonminicart" type="select" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enabled on Minicart page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
