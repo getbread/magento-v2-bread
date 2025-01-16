@@ -20,21 +20,6 @@ class Js extends \Magento\Framework\View\Element\Text
      */
     private $packageInfo;
 
-    /**
-     * @var \Magento\Framework\App\CacheInterface
-     */
-    public $cache;
-
-    /**
-     * @var \Magento\Framework\HTTP\Client\Curl
-     */
-    protected $curl;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    public $logger;
-
     public function __construct(
         \Magento\Framework\View\Element\Context $context,
         \Bread\BreadCheckout\Helper\Data $helper,
@@ -46,9 +31,6 @@ class Js extends \Magento\Framework\View\Element\Text
     ) {
         $this->helper = $helper;
         $this->packageInfo = $packageInfo;
-        $this->cache = $cache;
-        $this->curl = $curl;
-        $this->logger = $logger;
 
         parent::__construct(
             $context,
