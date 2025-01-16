@@ -24,9 +24,6 @@ class Js extends \Magento\Framework\View\Element\Text
         \Magento\Framework\View\Element\Context $context,
         \Bread\BreadCheckout\Helper\Data $helper,
         \Magento\Framework\Module\PackageInfo $packageInfo,
-        \Magento\Framework\App\CacheInterface $cache,
-        \Magento\Framework\HTTP\Client\Curl $curl,
-        \Bread\BreadCheckout\Helper\Log $logger,
         array $data = []
     ) {
         $this->helper = $helper;
