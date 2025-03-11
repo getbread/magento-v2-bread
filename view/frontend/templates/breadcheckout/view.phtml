@@ -173,7 +173,7 @@
         document.previousPrice      = document.defaultItems[0]["price"];
         document.previousSku        = document.defaultItems[0]["sku"];
 
-        $(document).ready(function () {
+        $(window).on('load', function() {
             <?php if ($block->getProduct() != null) : ?>
                 document.productId                      = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
                 document.baseProductSku                 = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
@@ -478,7 +478,7 @@
         document.previousPrice      = document.defaultItems[0]["price"];
         document.previousSku        = document.defaultItems[0]["sku"];
 
-        $(document).ready(function () {
+        $(window).on('load', function() {
             <?php if ($block->getProduct() != null) : ?>
                 document.productId                      = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
                 document.baseProductSku                 = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';
