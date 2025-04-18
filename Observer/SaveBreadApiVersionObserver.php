@@ -55,15 +55,21 @@ class SaveBreadApiVersionObserver implements ObserverInterface {
      * @param EventObserver $observer
      */
     public function execute(EventObserver $observer) {
-
         if ($this->_state->getAreaCode() != \Magento\Framework\App\Area::AREA_ADMINHTML) {
             $paymentOrder = $observer->getEvent()->getPayment();
             $order = $paymentOrder->getOrder();
-            $quote = $this->_quoteRepository->get($order->getQuoteId());
-            $paymentQuote = $quote->getPayment();
-            $method = $paymentQuote->getMethodInstance()->getCode();
-            if ($method === \Bread\BreadCheckout\Model\Ui\ConfigProvider::CODE) {
-                $paymentOrder->setData('bread_api_version', $this->helper->getApiVersion());
+            if (!$order->getQuoteId()) {
+                return;
+            }
+            try {
+                $quote = $this->_quoteRepository->get($order->getQuoteId());
+                $paymentQuote = $quote->getPayment();
+                $method = $paymentQuote->getMethodInstance()->getCode();
+                if ($method === \Bread\BreadCheckout\Model\Ui\ConfigProvider::CODE) {
+                    $paymentOrder->setData('bread_api_version', $this->helper->getApiVersion());
+                }
+            // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+            } catch (NoSuchEntityException $e) {
             }
         }
     }
