@@ -40,7 +40,7 @@ Installation
 
 2. Install the Bread Checkout module    
      ```bash
-     composer require breadfinance/module-breadcheckout
+     composer require zghraia/magento2-bread-payment
      ```
 3. For Canada Merchants only
 
