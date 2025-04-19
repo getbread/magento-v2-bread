@@ -1,16 +1,19 @@
 {
-    "name": "bread/module-breadcheckout",
+    "name": "zghraia/magento2-bread-payment",
     "description": "Offers Bread Pay financing and checkout tools for your Magento store",
     "license": "MIT",
     "minimum-stability": "stable",
     "version": "2.4.5",
     "require": {
-        "php": "~8.1.0||~8.2.0"
+        "php": "8.1.0||~8.2.0||~8.3.0||~8.4.0"
     },
     "type": "magento2-module",
+    "conflict": {
+        "breadfinance/module-breadcheckout": "*"
+    },
     "repositories": [{
         "type": "vcs",
-        "url": "git@github.com:getbread/magento-v2-bread.git"
+        "url": "git@github.com:zghraia/magento2-bread-payment.git"
     }],
     "autoload": {
         "files": ["registration.php"],
