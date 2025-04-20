@@ -5,7 +5,7 @@
     "minimum-stability": "stable",
     "version": "2.4.5-p1",
     "require": {
-        "php": "8.1.0||~8.2.0||~8.3.0||~8.4.0"
+        "php": "~8.1||~8.2||~8.3||~8.4"
     },
     "type": "magento2-module",
     "conflict": {
