@@ -171,7 +171,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         'xml_config_active_on_pdp' => 'payment/breadcheckout/enabled_on_product_page',
         'xml_config_active_on_cat' => 'payment/breadcheckout/bread_category/enabled_on_category_page',
         'xml_config_active_on_cart_view' => 'payment/breadcheckout/enabled_on_cart_page',
-        'xml_cofig_minicart_checkout' => 'payment/breadcheckout/allowminicartcheckout',
+        'xml_config_minicart_checkout' => 'payment/breadcheckout/allowminicartcheckout',
         'xml_config_show_minicart_link' => 'payment/breadcheckout/enableonminicart',
         'xml_config_enable_as_payment_method' => 'payment/breadcheckout/display_as_payment_method',
         'xml_config_checkout_title' => 'payment/breadcheckout/title',
@@ -1113,6 +1113,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         }
     }
 
+    /**
+     * Set the configuration client based on the provided currency.
+     *
+     * @param string $currency The currency code to determine the configuration client.
+     *
+     * @return void
+     */
     public function setConfigClientByCurrency($currency) {
         $configClient = "CORE";
         if (array_key_exists(strtoupper($currency), $this->currencyToTenantMap)) {
@@ -1286,7 +1293,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         if ($checkCaptured) {
             $isProcessed = $isProcessed || !empty($transactionAdditionalInfo['captured']);
         }
-    
+
         return $isProcessed;
     }
 }

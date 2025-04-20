@@ -248,8 +248,8 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $cancelResult = isset($transactionAdditionalInfo['cancel_result']) 
-            ? json_decode($transactionAdditionalInfo['cancel_result'], true) 
+        $cancelResult = isset($transactionAdditionalInfo['cancel_result'])
+            ? json_decode($transactionAdditionalInfo['cancel_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $cancelResult, 'CANCELLED', true)) {
@@ -279,8 +279,8 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $authorizeResult = isset($transactionAdditionalInfo['authorize_result']) 
-            ? json_decode($transactionAdditionalInfo['authorize_result'], true) 
+        $authorizeResult = isset($transactionAdditionalInfo['authorize_result'])
+            ? json_decode($transactionAdditionalInfo['authorize_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $authorizeResult, 'AUTHORIZED', true)) {
@@ -395,8 +395,8 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $settleResult = isset($transactionAdditionalInfo['settle_result']) 
-            ? json_decode($transactionAdditionalInfo['settle_result'], true) 
+        $settleResult = isset($transactionAdditionalInfo['settle_result'])
+            ? json_decode($transactionAdditionalInfo['settle_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $settleResult, 'SETTLED', true)) {
@@ -484,8 +484,8 @@ class Rbc extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $refundResult = isset($transactionAdditionalInfo['refund_result']) 
-            ? json_decode($transactionAdditionalInfo['refund_result'], true) 
+        $refundResult = isset($transactionAdditionalInfo['refund_result'])
+            ? json_decode($transactionAdditionalInfo['refund_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $refundResult, 'REFUNDED', true)) {
