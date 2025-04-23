@@ -3,14 +3,16 @@
     "description": "Offers Bread Pay financing and checkout tools for your Magento store",
     "license": "MIT",
     "minimum-stability": "stable",
-    "version": "2.4.5-p1",
     "require": {
         "php": "~8.1||~8.2||~8.3||~8.4"
     },
     "type": "magento2-module",
     "replace": {
-        "bread/module-breadcheckout": "2.4.5"
-    }
+        "bread/module-breadcheckout": ">=2.4.5"
+    },
+    "suggest": {
+        "zghraia/magento2-hyva-bread-checkout": "Adds Hyva theme compatibility"
+    },
     "repositories": [{
         "type": "vcs",
         "url": "git@github.com:zghraia/magento2-bread-payment.git"
