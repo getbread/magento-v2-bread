@@ -24,14 +24,14 @@
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\ApiMode</source_model>
                 </field>
                 <field id="api_public_key" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50 validate-length minimum-length-20</validate>
+                    <frontend_class>validate-length maximum-length-80</frontend_class>
                     <label>Live API Public Key</label>
                     <depends>
                         <field id="api_mode">1</field>
                     </depends>
                 </field>
                 <field id="api_secret_key" type="obscure" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50</validate>
+                    <frontend_class>validate-length maximum-length-80</frontend_class>
                     <label>Live API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <depends>
@@ -39,21 +39,21 @@
                     </depends>
                 </field>
                 <field id="api_integration_key" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50 validate-length minimum-length-20</validate>
+                    <frontend_class>validate-length maximum-length-80</frontend_class>
                     <label>Live API Integration Key</label>
                     <depends>
                         <field id="api_mode">1</field>
                     </depends>
                 </field>
                 <field id="api_sandbox_public_key" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50 validate-length minimum-length-20</validate>
+                    <frontend_class>validate-length maximum-length-80</frontend_class>
                     <label>Sandbox API Public Key</label>
                     <depends>
                         <field id="api_mode">0</field>
                     </depends>
                 </field>
                 <field id="api_sandbox_secret_key" type="obscure" sortOrder="6" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50</validate>
+                    <frontend_class>validate-length maximum-length-80</frontend_class>
                     <label>Sandbox API Secret Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <depends>
@@ -61,7 +61,7 @@
                     </depends>
                 </field>
                 <field id="api_sandbox_integration_key" type="text" sortOrder="7" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-50 validate-length minimum-length-20</validate>
+                    <frontend_class>validate-length maximum-length-80</frontend_class>
                     <label>Sandbox API Integration Key</label>
                     <depends>
                         <field id="api_mode">0</field>
