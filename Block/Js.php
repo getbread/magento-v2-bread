@@ -84,7 +84,11 @@ class Js extends \Magento\Framework\View\Element\Text
                 const script = document.createElement("script");
                 script.async = false;
                 script.onload = () => {
-                    BreadPayments.setInitMode("manual");
+                    if (BreadPayments) {
+                        BreadPayments.setInitMode("manual");
+                    } else {
+                     RBCPayPlan.setInitMode("manual");
+                    }
                 };
                 script.src = "%s";
                 document.head.appendChild(script);
