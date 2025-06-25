@@ -74,7 +74,7 @@ $storeId = $block->saveAdminStoreId();
             });
         };
 
-        $(document).ready(function() {
+        $(window).on('load', function() {
             if ($('#edit_form').find(':radio[name="payment[method]"]:checked').val() == '<?= /* @noEscape */ $code; ?>') {
                 getQuoteData();
             }

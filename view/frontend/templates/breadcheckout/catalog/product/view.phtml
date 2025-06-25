@@ -17,7 +17,7 @@
 ?>
     <script type="text/javascript">
             require(['jquery'], function ($) {
-                $(document).ready(function () {
+                $(window).on('load', function() {
                     var allowCheckout = false;
                     var buttonLocation = '<?= /* @noEscape */ $block->getCategoryPageLocation(); ?>';
                     var integrationKey = '<?= /* @noEscape */ $block->getIntegrationKey(); ?>';

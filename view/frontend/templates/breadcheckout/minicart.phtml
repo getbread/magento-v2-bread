@@ -81,7 +81,7 @@
             
         };
         
-        $(document).ready(function() {
+        $(window).on('load', function() {
             var minicartItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
             document.configureButton(minicartItems);
         });
@@ -289,7 +289,7 @@
             return parseInt(Math.round(value * 100));
         };
 
-        $(document).ready(function() {
+        $(window).on('load', function() {
             var minicartItems       = <?= /* @noEscape */ $block->getProductDataJson(); ?>;
             document.configureButton(minicartItems);
         });

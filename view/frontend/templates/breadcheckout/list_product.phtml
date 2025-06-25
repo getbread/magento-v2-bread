@@ -92,7 +92,7 @@ $apiVersion = $block->getApiVersion();
             }
         };
 
-        $(document).ready(function () {
+        $(window).on('load', function() {
             <?php
             $data = $block->getProductDataJson($product);
             ?>
