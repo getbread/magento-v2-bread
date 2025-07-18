@@ -74,56 +74,9 @@ class ValidateCredentials extends \Magento\Backend\App\Action {
     private function test($apiMode, $username, $password, $apiVersion, $tenant) {
         if($apiVersion === 'bread_2') {
             return $this->testPlatformCredentials($username, $password, $apiMode, $tenant);
-        } else {
-            return $this->testClassicCredentials($username, $password, $apiMode);
         }
     }
     
-    /**
-     * Test classic
-     * 
-     * @since 2.1.0
-     * @param string $apiKey
-     * @param string $apiSecret
-     * @return bool 
-     */
-    public function testClassicCredentials($key, $secret, $apiMode) {
-        $dummy = [];
-        $dummy['expiration'] = date('Y-m-d');
-        $dummy['options'] = [];
-        $dummy['options']['cartName'] = 'API Key Validation';
-        $dummy['options']['customTotal'] = 10000;
-        
-        $url = (bool) $apiMode ? self::API_LIVE_URI : self::API_SANDBOX_URI;
-        
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_HEADER, 0);
-        curl_setopt($curl, CURLOPT_USERPWD, $key . ':' . $secret);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt(
-                $curl,
-                CURLOPT_HTTPHEADER,
-                [
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen(json_encode($dummy))
-                ]
-        );
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($dummy));
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-        curl_exec($curl);
-        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-
-        if ($status != 200) {
-            $this->logger->log('Failed keys validation');
-            return false;
-        } else {
-            return true;
-        }
-    }
      
     /**
      * Test Bread platform
