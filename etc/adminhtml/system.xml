@@ -69,48 +69,6 @@
                         <field id="api_version">bread_2</field>
                     </depends>
                 </field>
-                <field id="api_sandbox_integration_key" type="text" sortOrder="8" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-80 validate-length minimum-length-20</validate>
-		            <label>Sandbox API Integration Key</label>
-                    <depends>
-                        <field id="api_mode">0</field>
-                        <field id="api_version">bread_2</field>
-                    </depends>
-                </field>
-                <field id="classic_api_public_key" type="text" sortOrder="9" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-80 validate-length minimum-length-20</validate>
-		            <label>Classic Live API Public Key</label>
-                    <depends>
-                        <field id="api_mode">1</field>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
-                <field id="classic_api_secret_key" type="obscure" sortOrder="10" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-		            <validate>validate-length maximum-length-80</validate>
-                    <label>Classic Live API Secret Key</label>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    <depends>
-                        <field id="api_mode">1</field>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
-                <field id="classic_api_sandbox_public_key" type="text" sortOrder="11" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-80 validate-length minimum-length-20</validate>
-                    <label>Classic Sandbox API Public Key</label>
-                    <depends>
-                        <field id="api_mode">0</field>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
-                <field id="classic_api_sandbox_secret_key" type="obscure" sortOrder="12" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-length maximum-length-80</validate>
-                    <label>Classic Sandbox API Secret Key</label>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    <depends>
-                        <field id="api_mode">0</field>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
                 <field id="payment_action" type="select" sortOrder="13" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>
                     <source_model>Bread\BreadCheckout\Model\System\Config\Source\PaymentAction</source_model>
@@ -162,22 +120,6 @@
                                 ]]>
                     </comment>
                 </field>
-                <field id="show_splitpay_label" type="select" sortOrder="20" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Show Splipay label on checkout title</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="active">1</field>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
-                <field id="use_default_button_size" type="select" sortOrder="21" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Use default button size</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="active">1</field>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
                 <field id="button_on_products" type="select" sortOrder="22" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Display as Button on Product Detail Pages When Logged In</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -212,44 +154,6 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="allowcheckoutpdp" type="select" sortOrder="26" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Allow Checkout From Bread Pop Up On Product Page</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[
-                                <div>
-                                    <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
-                                    the user will only be presented with a button that allows them to return to your
-                                    site rather than straight through to checkout.  If there is an <code>addToCart</code>
-                                    callback specified, the button will call <code>addToCart</code> before returning to
-                                    your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
-                                    instead of just <strong>Continue Shopping</strong>.</p>
-                                </div>
-                         ]]>
-                    </comment>
-                    <depends>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
-                <field id="allowcheckoutcart" type="select" sortOrder="27" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Allow Checkout From Bread Pop Up On Cart Page</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[
-                                <div>
-                                    <p><strong>allowCheckout</strong> Explanation: If this is set to <code>false</code>,
-                                    the user will only be presented with a button that allows them to return to your
-                                    site rather than straight through to checkout.  If there is an <code>addToCart</code>
-                                    callback specified, the button will call <code>addToCart</code> before returning to
-                                    your site and the text will read <strong>Add To Cart &amp; Continue Shopping</strong>
-                                    instead of just <strong>Continue Shopping</strong>.</p>
-                                </div>
-                        ]]>
-                    </comment>
-                    <depends>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
                 <field id="enableonminicart" type="select" sortOrder="28" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled on Minicart page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -257,44 +161,9 @@
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="allowminicartcheckout" type="select" sortOrder="29" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Allow checkout from mini cart</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="api_version">classic</field>
-                    </depends>
-                </field>
                 <field id="embedded" type="select" sortOrder="30" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Embedded Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="split_auto_cancel" type="select" sortOrder="31" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Auto-cancel Failed Split-Pay Orders</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[
-				                <div>
-				                    <p>When credit cards are declined, this will automatically cancel the pending transaction</p>
-				                </div>
-				            ]]>
-                    </comment>
-                    <depends>
-                        <field id="api_version">classic</field>
-                    </depends>    
-                </field>
-                <field id="per_month" type="select" sortOrder="32" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label><![CDATA[Show "As Low As" price]]></label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[
-                                <div>
-                                    <p>If set to yes, the monthly price will be shown to the user in the payment method description at checkout.</p>
-                                </div>
-                        ]]>
-                    </comment>
-                    <depends>
-                        <field id="api_version">classic</field>
-                    </depends>
                 </field>
                 <field id="product_type_msg" type="textarea" sortOrder="33" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Invalid product type message</label>
@@ -312,43 +181,6 @@
                 </field>
                 <group id="bread_advanced" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
                     <label>Bread Advanced Settings</label>
-                    <field id="targeted_financing" type="select" sortOrder="1" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Enable Targeted Financing</label>
-                        <source_model>Bread\BreadCheckout\Model\System\Config\Source\TargetedFinancing</source_model>
-                        <depends>
-                            <field id="api_version">classic</field>
-                        </depends>
-                    </field>
-                    <field id="financing_program_id" type="text" sortOrder="2" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <validate>validate-length maximum-length-36 validate-length minimum-length-36 required-entry</validate>
-                        <label>Financing Program Id</label>
-                        <depends>
-                            <field id="targeted_financing" separator=",">1,2</field>
-                        </depends>
-                    </field>
-                    <field id="financing_threshold" type="text" sortOrder="3" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Targeted Financing Threshold</label>
-                        <comment>Cart Size (USD) over which a targeted financing program will be used</comment>
-                        <validate>validate-number required-entry</validate>
-                        <depends>
-                            <field id="targeted_financing">1</field>
-                        </depends>
-                    </field>
-                    <field id="financing_sku" type="text" sortOrder="4" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Allow financing on SKUs</label>
-                        <comment>
-                            <![CDATA[
-				                <div>
-				                    <p>Comma separated list of SKUs on which targeted financing will be used (example: <strong>sku1,sku2,sku3</strong>)</p>
-				                </div>
-				            ]]>
-                            </comment>
-                        <validate>required-entry</validate>
-                        <depends>
-                            <field id="targeted_financing">2</field>
-                        </depends>
-                    </field>
-
                     <!-- threshold_amount is a global threshold not to be confused with financing -->
                     <field id="threshold_amount" type="text" sortOrder="5" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Price threshold amount</label>
@@ -447,6 +279,16 @@
                             <![CDATA[
 				                <div>
 				                    <p>Enter custom CSS in a non-breaking string to overwrite default Bread CSS.</p>
+				                </div>
+				            ]]>
+                        </comment>
+                    </field>
+                    <field id="disable_skus" type="textarea" sortOrder="0" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Disable Bread Pay for Specific Product IDs</label>
+                        <comment>
+                            <![CDATA[
+				                <div>
+				                    <p>Enter a comma-separated list of product IDs where Bread Pay should be disabled (ex: ID1, ID2, ID3).</p>
 				                </div>
 				            ]]>
                         </comment>
