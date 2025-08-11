@@ -1,8 +1,9 @@
 == Changelog ==
 
-= 2.4.6
+= 2.4.7
 * Current release
-* Support PHP 8.3
+* Support PHP 8.4
+* Remove classic settings
 
 = 2.4.5
 * Use base_grand_total instead of base_total
