@@ -1,7 +1,9 @@
 == Changelog ==
 
 = 2.4.6
-* Current release
+* ASI-3653: Remove classic settings
+* ASI-4857: Updates for RBC initialization
+* ASI-7359: Update docker instructions
 
 = 2.4.5-p2
 * Replaces `bread/module-breadcheckout` in `composer.json` to add support of `zghraia/magento2-hyva-bread-checkout`
