@@ -140,7 +140,7 @@
         document.splitPayPreviousPrice      = document.splitPayDefaultItems[0]["price"];
         document.splitPayPreviousSku        = document.splitPayDefaultItems[0]["sku"];
 
-        $(document).ready(function () {
+        $(window).on('load', function() {
             <?php if ($block->getProduct() != null) : ?>
             document.splitPayProductId                      = '<?= /* @noEscape */ $block->getProduct()->getId(); ?>';
             document.splitPayBaseProductSku                 = '<?= /* @noEscape */ $block->getProduct()->getSku(); ?>';

@@ -8,7 +8,7 @@
     },
     "type": "magento2-module",
     "replace": {
-        "bread/module-breadcheckout": ">=2.4.5"
+        "bread/module-breadcheckout": ">=2.4.6"
     },
     "suggest": {
         "zghraia/magento2-hyva-bread-checkout": "Adds Hyva theme compatibility"
