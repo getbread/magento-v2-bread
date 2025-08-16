@@ -40,7 +40,7 @@ Installation
 
 2. Install the Bread Checkout module    
      ```bash
-     composer require breadfinance/module-breadcheckout
+     composer require zghraia/magento2-bread-payment
      ```
 3. For Canada Merchants only
 
@@ -160,7 +160,7 @@ Clone the Bread extension into app/code and enable the module:
 cd src/app/code
 mkdir Bread
 cd Bread
-git clone git@github.com:getbread/magento-v2-bread.git BreadCheckout
+git clone git@github.com:zghraia/magento2-bread-payment.git BreadCheckout
 cd ../../../../
 
 bin/magento module:enable Bread_BreadCheckout
@@ -183,4 +183,3 @@ bin/removeall
 rm -rf .[^.]* * 
 ```
 ⚠️ Warning: This will permanently delete all files and directories in the current folder. Make sure you’re in the correct location before running this command.
-

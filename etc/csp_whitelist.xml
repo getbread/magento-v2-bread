@@ -9,6 +9,7 @@
         </policy>
         <policy id="connect-src">
             <values>
+                <value id="bread_gateway_connect" type="host">*.breadgateway.net</value>
                 <value id="bread_platform_connect" type="host">*.breadpayments.com</value>
                 <value id="bread_platform_connect_ca" type="host">*.rbcpayplan.com</value>
             </values>

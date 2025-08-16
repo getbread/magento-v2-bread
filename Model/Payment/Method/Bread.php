@@ -135,7 +135,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Bread\BreadCheckout\Helper\AdminOrder $adminOrderHelper
     ) {
-    
+
         $this->apiClient = $apiClient;
         $this->breadLogger = $breadLogger;
         $this->helper = $helper;
@@ -196,18 +196,18 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             $this->breadLogger->log('ERROR IN METHOD VALIDATE, INVALID BILLING COUNTRY '. $billingCountry);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __(
-                    'This financing program is available to US residents, please click the finance button 
+                    'This financing program is available to US residents, please click the finance button
                 and complete the application in order to complete your purchase with the financing payment method.'
                 )
             );
         }
 
         /**
-         * 
+         *
          * Initial purpose of this message was to notify customer to continue with placeOrder action
-         * 
+         *
          * This has no side effect on the checkout experience
-         * 
+         *
           $token = $this->getToken();
           if (empty($token)) {
           $this->breadLogger->log('ERROR IN METHOD VALIDATE, MISSING BREAD TOKEN');
@@ -218,7 +218,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
           )
           );
           }
-         * 
+         *
          */
         $this->breadLogger->info('validate succeeded');
 
@@ -255,8 +255,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $cancelResult = isset($transactionAdditionalInfo['cancel_result']) 
-            ? json_decode($transactionAdditionalInfo['cancel_result'], true) 
+        $cancelResult = isset($transactionAdditionalInfo['cancel_result'])
+            ? json_decode($transactionAdditionalInfo['cancel_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $cancelResult, 'CANCELLED', true)) {
@@ -289,8 +289,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $authorizeResult = isset($transactionAdditionalInfo['authorize_result']) 
-            ? json_decode($transactionAdditionalInfo['authorize_result'], true) 
+        $authorizeResult = isset($transactionAdditionalInfo['authorize_result'])
+            ? json_decode($transactionAdditionalInfo['authorize_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $authorizeResult, 'AUTHORIZED', true)) {
@@ -337,7 +337,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Order\Invoice $invoice,
         \Magento\Sales\Model\Order\Payment $payment
     ) {
-    
+
         $invoice->setTransactionId($payment->getLastTransId());
         return $this;
     }
@@ -346,7 +346,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
      * Check to make sure capture, refund, cancel actions can be performed
      * only if transaction ID is set. Transaction ID will not be set
      * for orders created in OMS
-     * 
+     *
      * @param string @action
      * @return bool
      */
@@ -365,7 +365,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Check capture availability
-     * 
+     *
      * @return bool
      */
     public function canCapture() {
@@ -374,7 +374,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Check refund availability
-     * 
+     *
      * @return bool
      */
     public function canRefund() {
@@ -383,7 +383,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Check void availability
-     * 
+     *
      * @return bool
      */
     public function canVoid() {
@@ -408,8 +408,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $settleResult = isset($transactionAdditionalInfo['settle_result']) 
-            ? json_decode($transactionAdditionalInfo['settle_result'], true) 
+        $settleResult = isset($transactionAdditionalInfo['settle_result'])
+            ? json_decode($transactionAdditionalInfo['settle_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $settleResult, 'SETTLED', true)) {
@@ -442,23 +442,22 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 $payment->getOrder()->getIncrementId()
             );
 
-            
             if($apiVersion === 'bread_2') {
-                $payment->setTransactionId($result['id']);               
+                $payment->setTransactionId($result['id']);
             } else {
                 $payment->setTransactionId($result['breadTransactionId']);
             }
-            
+
         } else {
             $token  = $payment->getAuthorizationTransaction()->getTxnId();
         }
 
         $payment->setTransactionId($token);
         $payment->setAmount($amount);
-        if($apiVersion === 'bread_2') {           
+        if($apiVersion === 'bread_2') {
             $settledAmount = ($this->priceCurrency->round($amount) * 100);
             $this->_place($payment, $settledAmount, self::ACTION_CAPTURE, $this->helper->getCurrentCurrencyCode());
-        } else {                      
+        } else {
             $this->_place($payment, $amount, self::ACTION_CAPTURE);
         }
 
@@ -476,7 +475,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Sales\Model\Order\Creditmemo $creditmemo,
         \Magento\Payment\Model\InfoInterface $payment
     ) {
-    
+
         $creditmemo->setTransactionId($payment->getLastTransId());
 
         return $this;
@@ -500,8 +499,8 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $transactionAdditionalInfo = $payment->getTransactionAdditionalInfo();
-        $refundResult = isset($transactionAdditionalInfo['refund_result']) 
-            ? json_decode($transactionAdditionalInfo['refund_result'], true) 
+        $refundResult = isset($transactionAdditionalInfo['refund_result'])
+            ? json_decode($transactionAdditionalInfo['refund_result'], true)
             : null;
 
         if ($this->helper->isTransactionProcessed($payment, $refundResult, 'REFUNDED', true)) {
@@ -614,7 +613,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 if($apiVersion === 'bread_2') {
                     $breadTransactionId = $result['id'];
                 } else {
-                    $breadTransactionId = $result['breadTransactionId'];                    
+                    $breadTransactionId = $result['breadTransactionId'];
                 }
                 $payment->setTransactionId($breadTransactionId);
                 $this->breadLogger->info('Bread Transaction Id: ' . $breadTransactionId);
@@ -767,10 +766,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     protected function getValidatedTxId(\Magento\Payment\Model\InfoInterface $payment)
     {
         $rawTransId = $payment->getTransactionId();
-        
+
         /**
          * When creating breadCarts, breadTrxId does not exist. preg_match will throw an error
-         * 
+         *
          * @since 2.1.9
          */
         if(is_null($rawTransId)) {
@@ -779,7 +778,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
                 __('Unable to process request because an invalid transaction ID was provided.')
             );
         }
-        
+
         if (preg_match('/^[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/', $rawTransId, $matches)) {
             return $matches[0];
         } else {
@@ -826,7 +825,7 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
             }
             return $title;
         }
-        
+
     }
 
     /**

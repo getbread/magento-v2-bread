@@ -20,7 +20,7 @@ define(
             {
                 setShippingInformation: function () {
                     /**
-                     * Call parent method 
+                     * Call parent method
                      */
                     Shipping.prototype.setShippingInformation.call(this);
 
@@ -35,11 +35,17 @@ define(
                  * @see Bread\BreadCheckout\Model\Ui\ConfigProvider
                  */
                 updateConfigData: function () {
-                    window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = {
-                        type: quote.shippingMethod().carrier_title + ' - ' + quote.shippingMethod().method_title,
-                        typeId: quote.shippingMethod().carrier_code + '_' + quote.shippingMethod().method_code,
-                        cost: this.round(quote.shippingMethod().base_amount)
-                    };
+                    var shippingMethod = quote.shippingMethod();
+
+                    if (shippingMethod && shippingMethod.carrier_title && shippingMethod.method_title) {
+                        window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = {
+                            type: shippingMethod.carrier_title + ' - ' + shippingMethod.method_title,
+                            typeId: shippingMethod.carrier_code + '_' + shippingMethod.method_code,
+                            cost: this.round(shippingMethod.base_amount)
+                        };
+                    } else {
+                        window.checkoutConfig.payment.breadcheckout.breadConfig.shippingOptions = null;
+                    }
                 },
 
                 /**
@@ -51,16 +57,16 @@ define(
                         window.checkoutConfig.payment.breadcheckout.transactionId = null;
                     }
                 },
-              
+
 		/**
-                 * 
+                 *
                  * Refresh the payment method section if transactionId is not set
                  */
                 refreshBreadPaymentMethod: function () {
                     var paymentMethod = quote.paymentMethod();
                     if ( paymentMethod !== null && typeof paymentMethod.method !== 'undefined') {
                         if (quote.paymentMethod().method === 'breadcheckout' || quote.paymentMethod().method === 'rbccheckout'
-                                && window.checkoutConfig.payment.breadcheckout.transactionId === null) {  
+                                && window.checkoutConfig.payment.breadcheckout.transactionId === null) {
                             //Check if embeddedCheckout is enabled
                             if(window.checkoutConfig.payment.breadcheckout.breadConfig.embeddedCheckout) {
                                 button.embeddedCheckout();
@@ -68,7 +74,7 @@ define(
                                 button.init();
                             }
                         }
-                    }            
+                    }
                 },
 
                 /**

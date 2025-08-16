@@ -1,10 +1,24 @@
 == Changelog ==
 
 = 2.4.6
-* Current release
-* Support PHP 8.3
+* ASI-3653: Remove classic settings
+* ASI-4857: Updates for RBC initialization
+* ASI-7359: Update docker instructions
+
+= 2.4.5-p2
+* Replaces `bread/module-breadcheckout` in `composer.json` to add support of `zghraia/magento2-hyva-bread-checkout`
+
+= 2.4.5-p1
+* Removes support of old versions
+* Removes unused dependencies in Block\Js.php
+* Show correct error in console when SDK is not loaded (for example, when blocked by country)
+* Adds default values for some configurations and add option to restore default values
+* Adds `*.breadgateway.net` to `connect-src` policy in `csp_whitelist.xml`
+* Fixed SaveBreadApiVersionObserver. `quote_id` in `sales_order` table can be `null`
+
 
 = 2.4.5
+* Current release
 * Use base_grand_total instead of base_total
 * Prevent repeated calls to settle endpoint
 
@@ -47,7 +61,7 @@
 * Category page slow load bug fix
 
 = 2.3.3
-* PHP 8.2 comaptibility updates
+* PHP 8.2 compatibility updates
 * Healthcare mode refactor, healthcare checks have been moved to the SDK
 * Closed https://github.com/getbread/magento-v2-bread/issues/189
 

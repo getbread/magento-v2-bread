@@ -114,7 +114,11 @@
                 let errorInfo = {
                     err: 'err'
                 };
-                document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not exist');
+                try {
+                    document.logBreadIssue('error', errorInfo, 'Instance of Bread Payments SDK does not exist');
+                } catch (error) {
+                    console.error('Instance of Bread Payments SDK does not exist');
+                }
             }
         };    
             
@@ -184,6 +188,6 @@
                 document.configureButton(document.defaultItems);
             <?php endif; ?>
         });
-        });
+    });
 </script>
 <?php endif;?>
