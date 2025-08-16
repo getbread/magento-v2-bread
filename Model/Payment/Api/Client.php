@@ -144,30 +144,7 @@ class Client extends \Magento\Framework\Model\AbstractModel
             }
 
             return $result;
-        } else {
-            $this->logger->info('Bread classic transaction. Bread trxId: '. $breadTransactionId);
-            $data = ['type' => 'cancel'];
-
-            if (!$amount == 0) {
-                $data['amount'] = $amount;
-            }
-
-            if (!empty($lineItems)) {
-                $data['lineItems'] = $lineItems;
-            }
-            $this->logger->info('Payload: ' . json_encode($data) .' Bread trxId: '. $breadTransactionId);
-            $result = $this->call($this->getUpdateTransactionUrl($breadTransactionId), $data);
-            $this->logger->info('Result: ' . json_encode($result). ' Bread trxId: '. $breadTransactionId);
-            if ($result['status'] != self::STATUS_CANCELED) {
-                $this->logger->log(['ERROR' => 'Transaction cancel failed', 'RESULT' => $result]);
-                throw new \Magento\Framework\Exception\LocalizedException(
-                        __('Transaction cancel failed (current transaction status :' . $result->status . ')')
-                );
-            }
-
-            return $result;
         }
-      
     }
 
     /**

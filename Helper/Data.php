@@ -62,10 +62,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const XML_CONFIG_API_SECRET_KEY = 'payment/breadcheckout/api_secret_key';
     const XML_CONFIG_API_SANDBOX_PUB_KEY = 'payment/breadcheckout/api_sandbox_public_key';
     const XML_CONFIG_API_SANDBOX_SECRET_KEY = 'payment/breadcheckout/api_sandbox_secret_key';
-    const XML_CONFIG_CLASSIC_API_PUB_KEY = 'payment/breadcheckout/classic_api_public_key';
-    const XML_CONFIG_CLASSIC_API_SECRET_KEY = 'payment/breadcheckout/classic_api_secret_key';
-    const XML_CONFIG_CLASSIC_API_SANDBOX_PUB_KEY = 'payment/breadcheckout/classic_api_sandbox_public_key';
-    const XML_CONFIG_CLASSIC_API_SANDBOX_SECRET_KEY = 'payment/breadcheckout/classic_api_sandbox_secret_key';
     const XML_CONFIG_JS_LIB_LOCATION = 'payment/breadcheckout/js_location';
     const XML_CONFIG_BUTTON_ON_PRODUCTS = 'payment/breadcheckout/button_on_products';
     const XML_CONFIG_BUTTON_DESIGN = 'payment/breadcheckout/button_design';
@@ -181,10 +177,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         'xml_config_api_secret_key' => 'payment/breadcheckout/api_secret_key',
         'xml_config_api_sandbox_pub_key' => 'payment/breadcheckout/api_sandbox_public_key',
         'xml_config_api_sandbox_secret_key' => 'payment/breadcheckout/api_sandbox_secret_key',
-        'xml_config_classic_api_pub_key' => 'payment/breadcheckout/classic_api_public_key',
-        'xml_config_classic_api_secret_key' => 'payment/breadcheckout/classic_api_secret_key',
-        'xml_config_classic_api_sandbox_pub_key' => 'payment/breadcheckout/classic_api_sandbox_public_key',
-        'xml_config_classic_api_sandbox_secret_key' => 'payment/breadcheckout/classic_api_sandbox_secret_key',
         'xml_config_js_lib_location' => 'payment/breadcheckout/js_location',
         'xml_config_button_on_products' => 'payment/breadcheckout/button_on_products',
         'xml_config_button_design' => 'payment/breadcheckout/button_design',
@@ -328,12 +320,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             } else {
                 return $this->getConfigValue("XML_CONFIG_API_SANDBOX_PUB_KEY", $store, $storeCode);
             }
-        } else {
-            if ($this->getConfigValue("XML_CONFIG_API_MODE", $store)) {
-                return $this->getConfigValue("XML_CONFIG_CLASSIC_API_PUB_KEY", $store, $storeCode);
-            } else {
-                return $this->getConfigValue("XML_CONFIG_CLASSIC_API_SANDBOX_PUB_KEY", $store, $storeCode);
-            }
         }
         
     }
@@ -357,16 +343,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             } else {
                 return (string) $this->encryptor->decrypt(
                                 $this->getConfigValue("XML_CONFIG_API_SANDBOX_SECRET_KEY", $store, $storeCode)
-                );
-            }
-        } else {
-            if ($this->getConfigValue("XML_CONFIG_API_MODE", $store)) {
-                return (string) $this->encryptor->decrypt(
-                                $this->getConfigValue("XML_CONFIG_CLASSIC_API_SECRET_KEY", $store, $storeCode)
-                );
-            } else {
-                return (string) $this->encryptor->decrypt(
-                                $this->getConfigValue("XML_CONFIG_CLASSIC_API_SANDBOX_SECRET_KEY", $store, $storeCode)
                 );
             }
         }

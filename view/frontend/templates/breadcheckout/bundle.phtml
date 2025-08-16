@@ -227,7 +227,7 @@ require([
             }
         });
 
-        $(document).ready(function() {
+        $(window).on('load', function() {
             $(bundleConfig.buttonPrimaryCustom).on('click', function() {
                 $(bundleConfig.bundleButtonSel).appendTo(bundleConfig.bundleButtonDetailsContSel);
                 $(bundleConfig.addToCartForm).bundleBread();

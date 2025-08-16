@@ -106,7 +106,7 @@
                     } 
                 }
             };
-            $(document).ready(function() {
+            $(window).on('load', function() {
                 $('#loading-items').hide();
                 $('#product_addtocart_form').on('change', function() {
                     document.updateButton(this);
@@ -349,7 +349,7 @@
                         'Error code returned when calling ' + configDataUrl + ', with status: ' + error.statusText);
                 });
                 };
-                        $(document).ready(function() {
+                $(window).on('load', function() {
 
                 /**
                  * Overlay element onto bread button to prevent
