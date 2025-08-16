@@ -2,10 +2,21 @@
 
 namespace Bread\BreadCheckout\Block\Checkout;
 
+use Bread\BreadCheckout\Helper\Catalog;
+use Bread\BreadCheckout\Helper\Customer;
+use Bread\BreadCheckout\Helper\Quote;
 use Bread\BreadCheckout\Model\Payment\Method\BreadPaymentMethodFactory;
 use Magento\Catalog\Block\ShortcutInterface;
+use Magento\Catalog\Helper\Product;
 use Magento\Checkout\Model\Session;
+use Magento\ConfigurableProduct\Model\ConfigurableAttributeData;
+use Magento\ConfigurableProduct\Model\Product\Type\ConfigurableFactory;
+use Magento\Customer\Helper\Session\CurrentCustomer;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Json\EncoderInterface;
 use Magento\Framework\Locale\ResolverInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Stdlib\ArrayUtils;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Model\MethodInterface;
 use Bread\BreadCheckout\Helper\Data;
@@ -39,12 +50,25 @@ class Minicart extends Overview implements ShortcutInterface
     /**
      * Minicart constructor.
      *
-     * @param Context                     $context
-     * @param ResolverInterface           $localeResolver
-     * @param Session                     $checkoutSession
-     * @param BreadPaymentMethodFactory   $breadPaymentMethodFactory
-     * @param Data                        $helperData
-     * @param array                       $data
+     * @param \Magento\Catalog\Block\Product\Context                                   $context
+     * @param \Magento\Framework\Json\Helper\Data                                      $jsonHelper
+     * @param Catalog                                                                  $catalogHelper
+     * @param Customer                                                                 $customerHelper
+     * @param Data                                                                     $dataHelper
+     * @param ConfigurableFactory                                                      $configurableProductFactory
+     * @param \Magento\ConfigurableProduct\Block\Product\View\Type\ConfigurableFactory $configurableBlockFactory
+     * @param Quote                                                                    $quoteHelper
+     * @param ArrayUtils                                                               $arrayUtils
+     * @param EncoderInterface                                                         $jsonEncoder
+     * @param \Magento\ConfigurableProduct\Helper\Data                                 $configurableHelper
+     * @param Product                                                                  $catalogProductHelper
+     * @param CurrentCustomer                                                          $currentCustomer
+     * @param PriceCurrencyInterface                                                   $priceCurrency
+     * @param ConfigurableAttributeData                                                $configurableAttributeData
+     * @param Session                                                                  $checkoutSession
+     * @param BreadPaymentMethodFactory                                                $paymentFactory
+     * @param Data                                                                     $helperData
+     * @param array                                                                    $data
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
@@ -63,7 +87,7 @@ class Minicart extends Overview implements ShortcutInterface
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
         Session $checkoutSession,
-        BreadPaymentMethodFactory $breadPaymentMethodFactory,
+        private BreadPaymentMethodFactory $paymentFactory,
         Data $helperData,
         array $data = []
     ) {
@@ -87,7 +111,6 @@ class Minicart extends Overview implements ShortcutInterface
         );
 
         $this->checkoutSession = $checkoutSession;
-        $this->payment = $breadPaymentMethodFactory->create();
         $this->helperData = $helperData;
         $this->quoteHelper = $quoteHelper;
     }
@@ -120,25 +143,37 @@ class Minicart extends Overview implements ShortcutInterface
     }
 
     /**
+     * Check if the block should be displayed
+     *
      * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Exception
      */
     public function isActive()
     {
+        $show = ($this->isApiVersionIsBread2())
+            ? $this->helperData->showMinicartLink()
+            : $this->helperData->allowMinicartCheckout();
+        if (!$show) {
+            return false;
+        }
 
-        $aboveThreshold = $this->quoteHelper->aboveThreshold($this->quoteHelper->getGrandTotal()/100);
-        $apiVersion = $this->helperData->getApiVersion();
-        if($apiVersion === 'bread_2') {
-            return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
-                    $this->helperData->showMinicartLink() &&
-                    !$this->isCartView() &&
-                    $aboveThreshold;
-        } else {
-            return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
-                    $this->helperData->allowMinicartCheckout() &&
-                    !$this->isCartView() &&
-                    $aboveThreshold;
-        }       
+        if (!$this->payment) {
+            $this->payment = $this->paymentFactory->create();
+        }
+
+        return $this->payment->isAvailable($this->checkoutSession->getQuote()) &&
+            !$this->isCartView() &&
+            $this->quoteHelper->aboveThreshold($this->quoteHelper->getGrandTotal()/100);
+    }
+
+    /**
+     * Check if API version is bread_2
+     *
+     * @return bool
+     */
+    private function isApiVersionIsBread2(): bool
+    {
+        return $this->helperData->getApiVersion() === 'bread_2';
     }
 
     /**

@@ -1,12 +1,20 @@
-<?php 
-          
+<?php
+
 namespace Bread\BreadCheckout\Model\Payment\Method;
+
 class BreadPaymentMethodFactory
 {
     protected $objectManager;
     protected $helper;
     protected $quoteHelper;
 
+    /**
+     * Constructor.
+     *
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \Bread\BreadCheckout\Helper\Data          $helper
+     * @param \Bread\BreadCheckout\Helper\Quote         $quoteHelper
+     */
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \Bread\BreadCheckout\Helper\Data $helper,
@@ -16,7 +24,17 @@ class BreadPaymentMethodFactory
         $this->helper = $helper;
         $this->quoteHelper = $quoteHelper;
     }
-    public function create($quote = null, array $data = array())
+
+    /**
+     * Create Payment Method.
+     *
+     * @param null  $quote
+     * @param array $data
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function create($quote = null, array $data = [])
     {
         $currentCurrencyCode = $this->helper->getCurrentCurrencyCode();
         // Get currency from quote if it was passed in
@@ -31,6 +49,7 @@ class BreadPaymentMethodFactory
         } else {
             $instanceName = 'Bread\BreadCheckout\Model\Payment\Method\Bread';
         }
+
         return $this->objectManager->create($instanceName, $data);
     }
 }
