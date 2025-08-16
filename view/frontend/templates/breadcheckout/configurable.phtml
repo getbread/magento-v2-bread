@@ -10,7 +10,7 @@
     document.Skus = {};
     spConfig = <?= /* @noEscape */ $block->getJsonConfig(); ?>;
     require(['jquery', 'underscore'], function ($, _) {
-        $(document).ready(function () {
+        $(window).on('load', function() {
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
@@ -129,7 +129,7 @@ if (!empty($itemIds)) {
     spConfig = <?= /* @noEscape */ $block->getJsonConfig(); ?>;
 
     require(['jquery', 'underscore'], function ($, _) {
-        $(document).ready(function () {
+        $(window).on('load', function() {
             /**
              * Overlay element onto bread button to prevent
              * it from being clicked until options are selected
