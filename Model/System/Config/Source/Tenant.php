@@ -34,7 +34,7 @@ class Tenant implements OptionSourceInterface
     public function toArray()
     {
         return [
-            'core' => __('CORE (US'),
+            'core' => __('CORE (US)'),
         ];
     }
 }
