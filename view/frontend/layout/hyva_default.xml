@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Bread BreadCheckout - Hyva Default Layout
+ * Overrides templates for Hyva theme compatibility
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="Bread_BreadCheckout::js/hyva/sdk-loader.js"/>
+    </head>
+    <body>
+        <referenceBlock name="breadcheckout.prod.js" remove="true"/>
+        <referenceContainer name="head.additional">
+            <block class="Bread\BreadCheckout\Block\Js" 
+                   name="breadcheckout.prod.js.hyva" 
+                   template="Bread_BreadCheckout::hyva/js.phtml"/>
+        </referenceContainer>
+        <referenceBlock name="bread.minicart.component" template="Bread_BreadCheckout::hyva/cart/minicart.phtml"/>
+    </body>
+</page>
