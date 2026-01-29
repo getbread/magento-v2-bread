@@ -110,7 +110,6 @@
     var sdkLoaded = false;
     function loadBreadSdk() {
         if (sdkLoading || sdkLoaded) {
-            console.log('[Bread SDK] SDK already loading or loaded');
             return;
         }
 
@@ -121,7 +120,6 @@
         if (configElement) {
             try {
                 config = JSON.parse(configElement.getAttribute('data-bread-sdk-config'));
-                console.log('[Bread SDK] Found SDK config from js.phtml');
             } catch (e) {
                 console.error('[Bread SDK] Failed to parse SDK config:', e);
             }
@@ -133,7 +131,6 @@
             if (paymentElement) {
                 try {
                     var paymentConfig = JSON.parse(paymentElement.getAttribute('data-bread-config'));
-                    console.log('[Bread SDK] Found config from payment method, sdkName:', paymentConfig.sdkName);
                     
                     if (paymentConfig.sdkName) {
                         var sdkUrl = paymentConfig.sdkName === 'RBCPayPlan' 
@@ -152,12 +149,10 @@
         }
 
         if (!config || !config.jsLocation) {
-            console.log('[Bread SDK] No SDK config found, will retry when DOM updates...');
             observeForConfig();
             return;
         }
 
-        console.log('[Bread SDK] Loading SDK from:', config.jsLocation);
         sdkLoading = true;
 
         var script = document.createElement('script');
@@ -168,15 +163,10 @@
         script.src = config.jsLocation;
         script.onload = function() {
             sdkLoaded = true;
-            console.log('[Bread SDK] SDK script loaded');
             if (typeof BreadPayments !== 'undefined') {
-                console.log('[Bread SDK] BreadPayments SDK ready');
                 BreadPayments.setInitMode('manual');
             } else if (typeof RBCPayPlan !== 'undefined') {
-                console.log('[Bread SDK] RBCPayPlan SDK ready');
                 RBCPayPlan.setInitMode('manual');
-            } else {
-                console.warn('[Bread SDK] SDK loaded but neither BreadPayments nor RBCPayPlan found on window');
             }
         };
         script.onerror = function(e) {
@@ -191,7 +181,6 @@
             var configElement = document.querySelector('[data-bread-sdk-config]') || 
                                document.querySelector('[data-bread-config]');
             if (configElement && !sdkLoading && !sdkLoaded) {
-                console.log('[Bread SDK] Config element appeared, loading SDK');
                 observer.disconnect();
                 loadBreadSdk();
             }

@@ -6,7 +6,6 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 
-// Check if Bread is enabled for category pages
 if (!$block->isEnabledOnCAT()) {
     return;
 }
@@ -33,16 +32,13 @@ $sdk = $configClient === 'RBC' ? 'RBCPayPlan' : 'BreadPayments';
 
         BreadSDKHelper.waitForSdk(config.sdkName)
             .then(function(sdk) {
-                // Hyva product grid - try multiple selectors
                 const productCards = document.querySelectorAll('li.product-item, .product-item, article[class*="product"]');
                 const placements = [];
 
                 productCards.forEach(function(item, index) {
-                    // Skip if already processed
                     if (item.dataset.breadProcessed) return;
                     item.dataset.breadProcessed = 'true';
 
-                    // Get price - Hyva uses data-price-amount or text content
                     let price = 0;
                     let priceElement = item.querySelector('[data-price-amount]');
                     if (priceElement) {
@@ -56,14 +52,13 @@ $sdk = $configClient === 'RBC' ? 'RBCPayPlan' : 'BreadPayments';
                         }
                     }
 
-                    // Get product name and URL
                     const nameElement = item.querySelector('.product-item-link, .product-item-name a, a.product-item-photo + * a, h3 a, h2 a');
                     const name = nameElement ? nameElement.textContent.trim() : 'Product ' + index;
                     const url = nameElement ? nameElement.href : '';
 
                     if (price <= 0) return;
 
-                    // Find container for button
+
                     let buttonContainer = null;
                     const containerSelectors = [
                         '.mt-auto', '.product-item-actions', '.actions-primary',
@@ -114,7 +109,6 @@ $sdk = $configClient === 'RBC' ? 'RBCPayPlan' : 'BreadPayments';
             });
     }
 
-    // Use multiple initialization strategies for Hyva's Alpine.js
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(initBread, 200);
