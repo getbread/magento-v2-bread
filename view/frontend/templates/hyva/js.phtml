@@ -1,0 +1,28 @@
+<?php
+/**
+ * Bread BreadCheckout Hyva - JS Initialization Template
+ * CSP Compliant - no inline scripts, uses external JS
+ *
+ * @var \Bread\BreadCheckout\Block\Js $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// Access helper directly (it's public on the block)
+$helper = $block->helper;
+
+// Only render if module is active
+if (!$helper->isActive()) {
+    return;
+}
+
+$apiKey = $helper->getApiPublicKey();
+$jsLocation = $helper->getJsLibLocation();
+
+// SDK configuration for external JS to read
+$sdkConfig = [
+    'apiKey' => $apiKey,
+    'jsLocation' => $jsLocation
+];
+?>
+<!-- BreadCheckout SDK Configuration (read by sdk-loader.js) -->
+<div data-bread-sdk-config="<?= $escaper->escapeHtmlAttr(json_encode($sdkConfig)) ?>" style="display:none;"></div>
