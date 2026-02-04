@@ -30,7 +30,7 @@
         <label for="payment_breadcheckout" class="flex-1 cursor-pointer">
             <span class="font-medium text-gray-900" x-text="title"></span>
             <p class="text-sm text-gray-600 mt-1">
-                <?= $escaper->escapeHtml(__('Pay over time with easy monthly payments')) ?>
+                <?= $escaper->escapeHtml(__('Pay over time with Installments')) ?>
             </p>
         </label>
     </div>
@@ -170,25 +170,22 @@
                 const breadConfig = this.config.breadConfig || {};
                 const items = breadConfig.items || [];
                 const currencyCode = breadConfig.currencyCode || 'USD';
-                const isHealthcare = this.config.isHealthcare || false;
                 
                 const itemsObject = [];
                 let grandTotal = 0;
                 
-                if (!isHealthcare) {
-                    items.forEach((item) => {
-                        grandTotal += item.price * item.quantity;
-                        itemsObject.push({
-                            name: item.name,
-                            quantity: item.quantity,
-                            shippingCost: { value: 0, currency: currencyCode },
-                            shippingDescription: '',
-                            unitTax: { value: 0, currency: currencyCode },
-                            unitPrice: { currency: currencyCode, value: item.price },
-                            itemUrl: item.detailUrl || ''
-                        });
+                items.forEach((item) => {
+                    grandTotal += item.price * item.quantity;
+                    itemsObject.push({
+                        name: item.name,
+                        quantity: item.quantity,
+                        shippingCost: { value: 0, currency: currencyCode },
+                        shippingDescription: '',
+                        unitTax: { value: 0, currency: currencyCode },
+                        unitPrice: { currency: currencyCode, value: item.price },
+                        itemUrl: item.detailUrl || ''
                     });
-                }
+                });
                 
                 const data = {
                     allowCheckout: true,
