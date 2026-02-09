@@ -7,6 +7,11 @@
  * @var \Bread\BreadCheckout\Magewire\Checkout\Payment\Method\BreadCheckout $magewire
  */
 
+$magewire = $block->getMagewireComponent();
+if (!$magewire) {
+    return;
+}
+
 $integrationKey = $magewire->getIntegrationKey();
 $sdkName = $magewire->getSdkName();
 $currencyCode = $magewire->getCurrencyCode();
