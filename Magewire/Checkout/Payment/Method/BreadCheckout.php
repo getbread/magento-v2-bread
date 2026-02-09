@@ -324,4 +324,11 @@ if (
             }
         }
     }
+} else {
+    /**
+     * Fallback stub to avoid DI compile errors when Magewire/Hyva is not installed.
+     */
+    class BreadCheckout
+    {
+    }
 }
