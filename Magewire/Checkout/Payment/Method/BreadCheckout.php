@@ -18,8 +18,12 @@ use Bread\BreadCheckout\Helper\Data as BreadHelper;
 use Bread\BreadCheckout\Helper\Quote as QuoteHelper;
 use Bread\BreadCheckout\Helper\Customer as CustomerHelper;
 
-class BreadCheckout extends Component implements EvaluationInterface
-{
+if (
+    class_exists(\Magewirephp\Magewire\Component::class)
+    && interface_exists(\Hyva\Checkout\Model\Magewire\Component\EvaluationInterface::class)
+) {
+    class BreadCheckout extends Component implements EvaluationInterface
+    {
     public ?string $breadTransactionId = null;
     public bool $isApproved = false;
 
@@ -311,12 +315,13 @@ class BreadCheckout extends Component implements EvaluationInterface
      *
      * @return void
      */
-    public function mount(): void
-    {
-        $transactionId = $this->getTransactionId();
-        if ($transactionId) {
-            $this->breadTransactionId = $transactionId;
-            $this->isApproved = true;
+        public function mount(): void
+        {
+            $transactionId = $this->getTransactionId();
+            if ($transactionId) {
+                $this->breadTransactionId = $transactionId;
+                $this->isApproved = true;
+            }
         }
     }
 }
