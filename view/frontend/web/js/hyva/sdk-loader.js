@@ -132,14 +132,10 @@
                 try {
                     var paymentConfig = JSON.parse(paymentElement.getAttribute('data-bread-config'));
                     
-                    if (paymentConfig.sdkName) {
-                        var sdkUrl = paymentConfig.sdkName === 'RBCPayPlan' 
-                            ? 'https://connect.rbcpayplan.com/sdk.js'
-                            : 'https://connect.breadpayments.com/sdk.js';
-                        
+                    if (paymentConfig.jsLocation) {
                         config = {
                             apiKey: paymentConfig.integrationKey,
-                            jsLocation: sdkUrl
+                            jsLocation: paymentConfig.jsLocation
                         };
                     }
                 } catch (e) {

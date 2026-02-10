@@ -1,12 +1,27 @@
 (function() {
     'use strict';
 
+    // enable via localStorage: localStorage.setItem('bread_debug', '1')
+    var DEBUG = localStorage.getItem('bread_debug') === '1';
+    
+    function log() {
+        if (DEBUG) {
+            console.log.apply(console, ['[Bread]'].concat(Array.prototype.slice.call(arguments)));
+        }
+    }
+    
+    function logError() {
+        // alwas log errors, even in production
+        console.error.apply(console, ['[Bread]'].concat(Array.prototype.slice.call(arguments)));
+    }
+
     var BreadCheckoutPayment = {
         config: null,
         isApproved: false,
         transactionId: null,
         initialized: false,
         sdkReady: false,
+        sdkWasSetup: false,
         originalPlaceOrder: null,
 
         init: function() {
@@ -19,14 +34,14 @@
             }
 
             this.initialized = true;
-            console.log('[Bread] Initializing Bread checkout payment');
+            log('Initializing Bread checkout payment');
             
             var configAttr = container.getAttribute('data-bread-config');
             if (configAttr) {
                 this.config = JSON.parse(configAttr);
                 this.isApproved = this.config.isApproved || false;
                 this.transactionId = this.config.transactionId || null;
-                console.log('[Bread] Config loaded, isApproved:', this.isApproved, 'transactionId:', this.transactionId);
+                log('Config loaded, isApproved:', this.isApproved, 'transactionId:', this.transactionId);
             }
 
             this.waitForSdk();
@@ -51,10 +66,7 @@
         },
 
         bindEvents: function() {
-            var self = this;
-            window.addEventListener('bread:approved', function(e) {
-                self.showApproved();
-            });
+            // Reserved for future event bindings if needed
         },
 
         /**
@@ -66,17 +78,28 @@
             // Wait for hyvaCheckout to be available
             var checkHyvaCheckout = function() {
                 if (typeof hyvaCheckout !== 'undefined' && hyvaCheckout.order && hyvaCheckout.order.place) {
-                    console.log('[Bread] Found hyvaCheckout.order.place, hooking into it');
+                    log('Found hyvaCheckout.order.place, hooking into it');
+                    log('Original place function:', hyvaCheckout.order.place.toString().substring(0, 100));
                     
                     self.originalPlaceOrder = hyvaCheckout.order.place.bind(hyvaCheckout.order);
 
                     hyvaCheckout.order.place = function() {
+                        log('Hooked place function called!');
                         return self.handlePlaceOrder();
                     };
                     
-                    console.log('[Bread] Successfully hooked into hyvaCheckout.order.place');
+                    log('Successfully hooked into hyvaCheckout.order.place');
+                    
+                    // Verify hook is still in place after a delay
+                    setTimeout(function() {
+                        var isHooked = hyvaCheckout.order.place.toString().indexOf('Hooked place function') !== -1;
+                        log('Hook verification after 1s:', isHooked ? 'STILL HOOKED' : 'HOOK OVERWRITTEN!');
+                        if (!isHooked) {
+                            log('Current place function:', hyvaCheckout.order.place.toString().substring(0, 200));
+                        }
+                    }, 1000);
                 } else {
-                    console.log('[Bread] hyvaCheckout not ready, waiting...');
+                    log('hyvaCheckout not ready, waiting...');
                     setTimeout(checkHyvaCheckout, 100);
                 }
             };
@@ -86,22 +109,22 @@
         handlePlaceOrder: function() {
             var self = this;
             
-            console.log('[Bread] handlePlaceOrder called');
-            console.log('[Bread] isBreadSelected:', this.isBreadSelected());
-            console.log('[Bread] isApproved:', this.isApproved);
-            console.log('[Bread] transactionId:', this.transactionId);
+            log('handlePlaceOrder called');
+            log('isBreadSelected:', this.isBreadSelected());
+            log('isApproved:', this.isApproved);
+            log('transactionId:', this.transactionId);
             
             if (!this.isBreadSelected()) {
-                console.log('[Bread] Bread not selected, calling original place order');
+                log('Bread not selected, calling original place order');
                 return this.originalPlaceOrder();
             }
             
             if (this.isApproved && this.transactionId) {
-                console.log('[Bread] Already approved, calling original place order');
+                log('Already approved, calling original place order');
                 return this.originalPlaceOrder();
             }
             
-            console.log('[Bread] Need Bread approval, opening modal');
+            log('Need Bread approval, opening modal');
             
             return new Promise(function(resolve, reject) {
                 self.pendingResolve = resolve;
@@ -113,7 +136,7 @@
         isBreadSelected: function() {
             var breadRadio = document.querySelector('input[name="payment-method-option"][value="breadcheckout"]:checked');
             if (breadRadio) {
-                console.log('[Bread] Found checked breadcheckout radio');
+                log('Found checked breadcheckout radio');
                 return true;
             }
             
@@ -121,7 +144,7 @@
             if (methodList) {
                 var selectedMethod = methodList.getAttribute('data-method');
                 if (selectedMethod === 'breadcheckout') {
-                    console.log('[Bread] Found breadcheckout in data-method');
+                    log('Found breadcheckout in data-method');
                     return true;
                 }
             }
@@ -130,7 +153,7 @@
             if (container) {
                 var paymentView = container.closest('[id^="payment-method-view-"]');
                 if (paymentView && paymentView.offsetParent !== null) {
-                    console.log('[Bread] Found visible bread container');
+                    log('Found visible bread container');
                     return true;
                 }
             }
@@ -177,20 +200,30 @@
                 };
             }
 
-            console.log('[Bread] SDK setup config:', setupConfig);
+            log('SDK setup config:', setupConfig);
             sdk.setup(setupConfig);
             sdk.setInitMode('manual');
+            
+            // Set up event handlers
             sdk.on('INSTALLMENT:APPLICATION_DECISIONED', function(application) {
-                console.log('[Bread] Application decisioned:', application);
+                log('Application decisioned:', application);
             });
             sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', function(application) {
-                console.log('[Bread] Application checkout:', application);
+                log('Application checkout:', application);
                 if (application && application.transactionID) {
                     self.handleCheckoutComplete(application.transactionID);
                 }
             });
+            sdk.on('INSTALLMENT:CUSTOMER_CLOSE', function() {
+                log('Customer closed modal');
+                self.handleModalClose();
+            });
 
-            console.log('[Bread] SDK setup complete');
+            // Initialize SDK early so it's ready when user clicks Place Order
+            sdk.init();
+            this.sdkWasSetup = true;
+            
+            log('SDK setup and init complete');
         },
 
         getShippingAddressFromCheckout: function() {
@@ -198,7 +231,7 @@
             if (typeof hyvaCheckout !== 'undefined' && hyvaCheckout.shipping) {
                 var shippingData = hyvaCheckout.shipping.getAddress ? hyvaCheckout.shipping.getAddress() : null;
                 if (shippingData && shippingData.street && shippingData.city) {
-                    console.log('[Bread] Got shipping from hyvaCheckout.shipping:', shippingData);
+                    log('Got shipping from hyvaCheckout.shipping:', shippingData);
                     return {
                         firstName: shippingData.firstname || '',
                         lastName: shippingData.lastname || '',
@@ -221,7 +254,7 @@
             if (shippingForm && shippingForm.__x) {
                 var alpineData = shippingForm.__x.$data;
                 if (alpineData && alpineData.address) {
-                    console.log('[Bread] Got shipping from Alpine component:', alpineData.address);
+                    log('Got shipping from Alpine component:', alpineData.address);
                     var addr = alpineData.address;
                     return {
                         firstName: addr.firstname || '',
@@ -250,26 +283,32 @@
         },
 
         openBreadModal: function() {
+            log('openBreadModal called');
+            log('sdkReady:', this.sdkReady);
+            log('config.sdkName:', this.config ? this.config.sdkName : 'no config');
+            
             if (!this.sdkReady) {
-                console.log('[Bread] SDK not ready, waiting...');
+                log('SDK not ready, waiting...');
                 var self = this;
                 setTimeout(function() { self.openBreadModal(); }, 100);
                 return;
             }
 
             var sdk = window[this.config.sdkName];
+            log('SDK object:', sdk ? 'found' : 'NOT FOUND');
+            
             var self = this;
 
             var shippingContact = this.getShippingAddressFromCheckout();
             var billingContact = this.config.billingContact;
 
-            console.log('[Bread] Opening checkout modal');
-            console.log('[Bread] Shipping contact:', shippingContact);
-            console.log('[Bread] Billing contact:', billingContact);
-            console.log('[Bread] Checkout data:', this.config.checkoutData);
+            log('Opening checkout modal');
+            log('Shipping contact:', shippingContact);
+            log('Billing contact:', billingContact);
+            log('Checkout data:', this.config.checkoutData);
 
             if (!this.validateShippingAddress(shippingContact)) {
-                console.error('[Bread] Invalid shipping address:', shippingContact);
+                logError('Invalid shipping address:', shippingContact);
                 alert('Please complete your shipping address before proceeding with Bread checkout.');
                 if (this.pendingReject) {
                     this.pendingReject('Shipping address required');
@@ -310,35 +349,36 @@
                 shippingContact: shippingContact
             };
 
-            console.log('[Bread] Placement object:', placementObject);
+            log('Placement object:', placementObject);
 
-            sdk.setInitMode('manual');
+            // SDK is already initialized during page load in setupBreadSdk
+            // Just register the placement and open the experience
+            log('Registering placement and opening experience');
             sdk.registerPlacements([placementObject]);
-            sdk.on('INSTALLMENT:APPLICATION_DECISIONED', function(application) {
-                console.log('[Bread] Application decisioned:', application);
-            });
-
-            sdk.on('INSTALLMENT:APPLICATION_CHECKOUT', function(application) {
-                console.log('[Bread] Application checkout:', application);
-                if (application && application.transactionID) {
-                    self.handleCheckoutComplete(application.transactionID);
-                }
-            });
-
-            sdk.init();
             sdk.openExperienceForPlacement([placementObject]);
         },
 
+        handleModalClose: function() {
+            log('Handling modal close. re-enabling Place Order button');
+            
+            // Reject the pending promise so the checkout flow knows we cancelled
+            if (this.pendingReject) {
+                this.pendingReject('Customer closed Bread modal');
+                this.pendingReject = null;
+                this.pendingResolve = null;
+            }
+        },
+
         handleCheckoutComplete: function(txnId) {
-            console.log('[Bread] Checkout complete, transaction ID:', txnId);
+            log('Checkout complete, transaction ID:', txnId);
             var self = this;
             
             this.validatePaymentMethod(txnId)
                 .then(function(response) {
-                    console.log('[Bread] validatePaymentMethod response:', response);
+                    log('validatePaymentMethod response:', response);
                     
                     if (response.error) {
-                        console.error('[Bread] Payment validation error:', response.error);
+                        logError('Payment validation error:', response.error);
                         alert(response.error);
                         if (self.pendingReject) {
                             self.pendingReject(response.error);
@@ -346,22 +386,22 @@
                         return Promise.reject(response.error);
                     }
                     
-                    console.log('[Bread] Payment method validated');
+                    log('Payment method validated');
                     
                     return self.validateTotals(txnId);
                 })
                 .then(function(response) {
-                    console.log('[Bread] validateTotals response:', response);
+                    log('validateTotals response:', response);
                     
                     if (!response.valid) {
-                        console.error('[Bread] Totals validation failed');
+                        logError('Totals validation failed');
                         if (self.pendingReject) {
                             self.pendingReject('Totals validation failed');
                         }
                         return Promise.reject('Totals validation failed');
                     }
                     
-                    console.log('[Bread] Totals validated, proceeding with order');
+                    log('Totals validated, proceeding with order');
                     
                     self.transactionId = txnId;
                     self.isApproved = true;
@@ -377,21 +417,17 @@
                     
                     self.showApproved();
                     
-                    window.dispatchEvent(new CustomEvent('bread:approved', {
-                        detail: { transactionId: txnId }
-                    }));
-                    
-                    console.log('[Bread] Calling original place order');
+                    log('Calling original place order');
                     return self.originalPlaceOrder();
                 })
                 .then(function(result) {
-                    console.log('[Bread] Original place order result:', result);
+                    log('Original place order result:', result);
                     if (self.pendingResolve) {
                         self.pendingResolve(result);
                     }
                 })
                 .catch(function(error) {
-                    console.error('[Bread] Error in checkout flow:', error);
+                    logError('Error in checkout flow:', error);
                     if (self.pendingReject) {
                         self.pendingReject(error);
                     }
@@ -400,7 +436,7 @@
         validatePaymentMethod: function(txnId) {
             var paymentUrl = this.config.paymentUrl;
             
-            console.log('[Bread] Calling validatePaymentMethod:', paymentUrl, 'with txnId:', txnId);
+            log('Calling validatePaymentMethod:', paymentUrl, 'with txnId:', txnId);
             
             return fetch(paymentUrl, {
                 method: 'POST',
@@ -412,11 +448,11 @@
                       '&currency=' + encodeURIComponent(this.config.currency)
             })
             .then(function(response) {
-                console.log('[Bread] validatePaymentMethod HTTP status:', response.status);
+                log('validatePaymentMethod HTTP status:', response.status);
                 return response.json();
             })
             .catch(function(error) {
-                console.error('[Bread] validatePaymentMethod fetch error:', error);
+                logError('validatePaymentMethod fetch error:', error);
                 return { error: error.message };
             });
         },
@@ -424,7 +460,7 @@
         validateTotals: function(txnId) {
             var validateTotalsUrl = this.config.validateTotalsUrl;
             
-            console.log('[Bread] Calling validateTotals:', validateTotalsUrl, 'with txnId:', txnId);
+            log('Calling validateTotals:', validateTotalsUrl, 'with txnId:', txnId);
             
             return fetch(validateTotalsUrl, {
                 method: 'POST',
@@ -435,11 +471,11 @@
                 body: 'bread_transaction_id=' + encodeURIComponent(txnId)
             })
             .then(function(response) {
-                console.log('[Bread] validateTotals HTTP status:', response.status);
+                log('validateTotals HTTP status:', response.status);
                 return response.json();
             })
             .catch(function(error) {
-                console.error('[Bread] validateTotals fetch error:', error);
+                logError('validateTotals fetch error:', error);
                 return { valid: false, error: error.message };
             });
         },
@@ -464,7 +500,7 @@
     }
 
     window.addEventListener('checkout:init', function() {
-        console.log('[Bread] checkout:init event received');
+        log('checkout:init event received');
         if (!BreadCheckoutPayment.initialized) {
             BreadCheckoutPayment.init();
         }
