@@ -359,7 +359,7 @@
         },
 
         handleModalClose: function() {
-            log('Handling modal close - re-enabling Place Order button');
+            log('Handling modal close. re-enabling Place Order button');
             
             // Reject the pending promise so the checkout flow knows we cancelled
             if (this.pendingReject) {
