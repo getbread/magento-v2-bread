@@ -14,6 +14,7 @@ if (!$magewire) {
 
 $integrationKey = $magewire->getIntegrationKey();
 $sdkName = $magewire->getSdkName();
+$jsLocation = $magewire->getJsLocation();
 $currencyCode = $magewire->getCurrencyCode();
 $checkoutData = $magewire->getCheckoutData();
 $billingContact = $magewire->getBillingContact();
@@ -26,6 +27,7 @@ $validateTotalsUrl = $magewire->getValidateTotalsUrl();
 $breadConfig = [
     'integrationKey' => $integrationKey,
     'sdkName' => $sdkName,
+    'jsLocation' => $jsLocation,
     'currency' => $currencyCode,
     'checkoutData' => $checkoutData,
     'billingContact' => $billingContact,
@@ -53,6 +55,9 @@ $breadConfig = [
          style="display: <?= $isApproved ? 'none' : 'block' ?>;">
         <p><?= $escaper->escapeHtml(__('Click "Place Order" to complete your Bread financing application.')) ?></p>
     </div>
+
+    <!-- Placement container for Bread SDK - required for SDK to register placement -->
+    <div id="bread-checkout-btn-hyva" style="display: none;"></div>
 
     <!-- Hidden input for transaction ID -->
     <input type="hidden" 

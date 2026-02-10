@@ -100,6 +100,16 @@ if (
     }
 
     /**
+     * Get JS SDK location URL
+     *
+     * @return string
+     */
+    public function getJsLocation(): string
+    {
+        return $this->breadHelper->getJsLibLocation() ?? '';
+    }
+
+    /**
      * Get payment validation URL
      *
      * @return string

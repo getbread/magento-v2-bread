@@ -93,20 +93,10 @@ function initRbcCheckoutPayment() {
             this.title = paymentConfig.breadConfig?.methodTitle || 'RBC PayPlan';
             this.transactionId = paymentConfig.transactionId || '';
             
-            window.addEventListener('payment-method-changed', (event) => {
-                this.isSelected = event.detail.method === 'rbccheckout';
-                if (this.isSelected && !this.wasSetup) {
-                    this.setupRbcButton();
-                }
-            });
         },
         
         selectMethod() {
             this.isSelected = true;
-            window.dispatchEvent(new CustomEvent('payment-method-changed', {
-                detail: { method: 'rbccheckout' }
-            }));
-            
             if (!this.wasSetup) {
                 this.setupRbcButton();
             }
