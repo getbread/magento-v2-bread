@@ -31,6 +31,7 @@ use Bread\BreadCheckout\Helper\Data as BreadHelper;
 use Bread\BreadCheckout\Helper\Quote as QuoteHelper;
 use Bread\BreadCheckout\Helper\Customer as CustomerHelper;
 
+// phpcs:ignore PSR1.Classes.ClassDeclaration.MultipleClasses
 class BreadCheckout extends Component implements EvaluationInterface
 {
     public ?string $breadTransactionId = null;
