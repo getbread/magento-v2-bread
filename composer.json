@@ -7,6 +7,10 @@
     "require": {
         "php": "~8.1.0||~8.2.0||~8.3.0||~8.4.0"
     },
+    "suggest": {
+        "hyva-themes/magento2-default-theme": "Required for Hyva theme compatibility",
+        "hyva-themes/magento2-hyva-checkout": "Required for Hyva Checkout integration"
+    },
     "type": "magento2-module",
     "repositories": [{
         "type": "vcs",
@@ -16,6 +20,9 @@
         "files": ["registration.php"],
         "psr-4": {
             "Bread\\BreadCheckout\\": ""
-        }
+        },
+        "exclude-from-classmap": [
+            "Magewire/"
+        ]
     }
 }

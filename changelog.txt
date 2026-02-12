@@ -5,6 +5,7 @@
 * Add Hyva theme and Hyva Checkout compatibility
 * Add CSP (Content Security Policy) whitelist for Bread SDK domains
 * Fix SDK loading for stores with strict CSP policies
+* Fix PHP 8.4 implicit nullable parameter deprecations
 
 = 2.4.7
 * Support PHP 8.4

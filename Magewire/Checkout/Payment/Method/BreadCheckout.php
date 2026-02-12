@@ -2,7 +2,10 @@
 /**
  * Bread BreadCheckout - Hyva Checkout Magewire Payment Component
  *
- * This component handles the Bread payment flow within Hyva Checkout
+ * This component handles the Bread payment flow within Hyva Checkout.
+ * This file requires Hyva Checkout with Magewire to be installed.
+ *
+ * @see https://docs.hyva.io/hyva-checkout/magewire-components.html
  */
 declare(strict_types=1);
 
@@ -18,12 +21,8 @@ use Bread\BreadCheckout\Helper\Data as BreadHelper;
 use Bread\BreadCheckout\Helper\Quote as QuoteHelper;
 use Bread\BreadCheckout\Helper\Customer as CustomerHelper;
 
-if (
-    class_exists(\Magewirephp\Magewire\Component::class)
-    && interface_exists(\Hyva\Checkout\Model\Magewire\Component\EvaluationInterface::class)
-) {
-    class BreadCheckout extends Component implements EvaluationInterface
-    {
+class BreadCheckout extends Component implements EvaluationInterface
+{
     public ?string $breadTransactionId = null;
     public bool $isApproved = false;
 
@@ -325,20 +324,12 @@ if (
      *
      * @return void
      */
-        public function mount(): void
-        {
-            $transactionId = $this->getTransactionId();
-            if ($transactionId) {
-                $this->breadTransactionId = $transactionId;
-                $this->isApproved = true;
-            }
-        }
-    }
-} else {
-    /**
-     * Fallback stub to avoid DI compile errors when Magewire/Hyva is not installed.
-     */
-    class BreadCheckout
+    public function mount(): void
     {
+        $transactionId = $this->getTransactionId();
+        if ($transactionId) {
+            $this->breadTransactionId = $transactionId;
+            $this->isApproved = true;
+        }
     }
 }

@@ -708,10 +708,10 @@ class Bread extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * Is the 'breadcheckout' payment method available
      *
-     * @param  \Magento\Quote\Api\Data\CartInterface $quote
+     * @param  \Magento\Quote\Api\Data\CartInterface|null $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null): bool
     {
         if ($this->helper->getConfigClient() !== 'CORE') {
             return false;
