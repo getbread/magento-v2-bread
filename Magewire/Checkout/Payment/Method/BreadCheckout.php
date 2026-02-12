@@ -11,6 +11,16 @@ declare(strict_types=1);
 
 namespace Bread\BreadCheckout\Magewire\Checkout\Payment\Method;
 
+// Define stub if Magewire is not installed to prevent DI compilation errors
+// phpcs:ignore PSR1.Classes.ClassDeclaration.MultipleClasses
+if (!class_exists(\Magewirephp\Magewire\Component::class)) {
+    class BreadCheckout
+    {
+        // stub class 
+    }
+    return;
+}
+
 use Hyva\Checkout\Model\Magewire\Component\EvaluationInterface;
 use Hyva\Checkout\Model\Magewire\Component\EvaluationResultFactory;
 use Hyva\Checkout\Model\Magewire\Component\EvaluationResultInterface;
