@@ -13,7 +13,7 @@
     <body>
         <referenceBlock name="breadcheckout.prod.js" remove="true"/>
         <referenceContainer name="head.additional">
-            <block class="Bread\BreadCheckout\Block\Js" 
+            <block class="Bread\BreadCheckout\Block\Hyva\Js" 
                    name="breadcheckout.prod.js.hyva" 
                    template="Bread_BreadCheckout::hyva/js.phtml"/>
         </referenceContainer>
