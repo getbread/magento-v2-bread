@@ -49,7 +49,7 @@ $price = (int)($productItem['price'] ?? 0);
 
         const item = BreadSDKHelper.createItem({
             name: '<?= $escaper->escapeJs($product->getName()) ?>',
-            price: <?= $price ?>,
+            price: <?= (int) $price ?>,
             url: '<?= $escaper->escapeJs($product->getProductUrl()) ?>',
             currency: config.currency
         });
@@ -58,7 +58,7 @@ $price = (int)($productItem['price'] ?? 0);
             domID: 'bread-checkout-btn',
             currency: config.currency,
             items: [item],
-            totalPrice: <?= $price ?>
+            totalPrice: <?= (int) $price ?>
         });
 
         BreadSDKHelper.init(config, [placement]);
