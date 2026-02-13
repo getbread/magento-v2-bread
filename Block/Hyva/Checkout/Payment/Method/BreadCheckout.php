@@ -16,26 +16,6 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 class BreadCheckout extends Template
 {
     /**
-     * @var BreadHelper
-     */
-    protected $breadHelper;
-
-    /**
-     * @var QuoteHelper
-     */
-    protected $quoteHelper;
-
-    /**
-     * @var CustomerHelper
-     */
-    protected $customerHelper;
-
-    /**
-     * @var CheckoutSession
-     */
-    protected $checkoutSession;
-
-    /**
      * @param Context $context
      * @param BreadHelper $breadHelper
      * @param QuoteHelper $quoteHelper
@@ -45,16 +25,12 @@ class BreadCheckout extends Template
      */
     public function __construct(
         Context $context,
-        BreadHelper $breadHelper,
-        QuoteHelper $quoteHelper,
-        CustomerHelper $customerHelper,
-        CheckoutSession $checkoutSession,
+        protected BreadHelper $breadHelper,
+        protected QuoteHelper $quoteHelper,
+        protected CustomerHelper $customerHelper,
+        protected CheckoutSession $checkoutSession,
         array $data = []
     ) {
-        $this->breadHelper = $breadHelper;
-        $this->quoteHelper = $quoteHelper;
-        $this->customerHelper = $customerHelper;
-        $this->checkoutSession = $checkoutSession;
         parent::__construct($context, $data);
     }
 
