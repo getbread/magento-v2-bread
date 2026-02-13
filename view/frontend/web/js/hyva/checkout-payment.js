@@ -45,7 +45,6 @@
             }
 
             this.waitForSdk();
-            this.bindEvents();
             this.hookIntoHyvaCheckout();
         },
 
@@ -63,10 +62,6 @@
                 childList: true,
                 subtree: true
             });
-        },
-
-        bindEvents: function() {
-            // Reserved for future event bindings if needed
         },
 
         /**
@@ -163,7 +158,7 @@
 
         waitForSdk: function() {
             var self = this;
-            var sdkName = this.config.sdkName;
+            var sdkName = this.config.sdkName; // 'BreadPayments' or 'RBCPayPlan'
             
             var checkSdk = function() {
                 if (window[sdkName]) {
@@ -177,7 +172,17 @@
         },
 
         setupBreadSdk: function() {
+            if (this.sdkWasSetup) {
+                log('SDK already set up, skipping');
+                return;
+            }
+
             var sdk = window[this.config.sdkName];
+            if (!sdk) {
+                logError('SDK not found:', this.config.sdkName);
+                return;
+            }
+
             var self = this;
 
             var shippingContact = this.config.shippingContact;
@@ -204,7 +209,10 @@
             sdk.setup(setupConfig);
             sdk.setInitMode('manual');
             
-            // Set up event handlers
+            if (sdk.__internal__ && sdk.__internal__.setAutoRender) {
+                sdk.__internal__.setAutoRender(false);
+            }
+            
             sdk.on('INSTALLMENT:APPLICATION_DECISIONED', function(application) {
                 log('Application decisioned:', application);
             });
@@ -219,11 +227,9 @@
                 self.handleModalClose();
             });
 
-            // Initialize SDK early so it's ready when user clicks Place Order
-            sdk.init();
-            this.sdkWasSetup = true;
+            this.sdkWasSetup = false;
             
-            log('SDK setup and init complete');
+            log('SDK setup complete');
         },
 
         getShippingAddressFromCheckout: function() {
@@ -285,7 +291,6 @@
         openBreadModal: function() {
             log('openBreadModal called');
             log('sdkReady:', this.sdkReady);
-            log('config.sdkName:', this.config ? this.config.sdkName : 'no config');
             
             if (!this.sdkReady) {
                 log('SDK not ready, waiting...');
@@ -316,20 +321,13 @@
                 return;
             }
 
-            var shippingAddr = shippingContact.address;
-            sdk.setup({
-                integrationKey: this.config.integrationKey,
-                buyer: {
-                    shippingAddress: {
-                        address1: shippingAddr.address1,
-                        address2: shippingAddr.address2 || '',
-                        country: shippingAddr.country || 'US',
-                        locality: shippingAddr.locality,
-                        region: shippingAddr.region,
-                        postalCode: shippingAddr.postalCode
-                    }
-                }
-            });
+            var checkoutData = this.config.checkoutData || {};
+            var items = checkoutData.items || [];
+            var subTotal = checkoutData.subTotal || { value: 0, currency: this.config.currency || 'USD' };
+            var totalPrice = checkoutData.totalPrice || { value: 0, currency: this.config.currency || 'USD' };
+            var totalDiscounts = checkoutData.totalDiscounts || { value: 0, currency: this.config.currency || 'USD' };
+            var totalShipping = checkoutData.totalShipping || { value: 0, currency: this.config.currency || 'USD' };
+            var totalTax = checkoutData.totalTax || { value: 0, currency: this.config.currency || 'USD' };
 
             var placementObject = {
                 allowCheckout: true,
@@ -337,25 +335,40 @@
                 locationType: 'checkout',
                 domID: 'bread-checkout-btn-hyva',
                 order: {
-                    currency: this.config.currency,
-                    items: this.config.checkoutData.items || [],
-                    subTotal: this.config.checkoutData.subTotal,
-                    totalPrice: this.config.checkoutData.totalPrice,
-                    totalDiscounts: this.config.checkoutData.totalDiscounts,
-                    totalShipping: this.config.checkoutData.totalShipping,
-                    totalTax: this.config.checkoutData.totalTax
+                    currency: this.config.currency || 'USD',
+                    items: items,
+                    subTotal: subTotal,
+                    totalPrice: totalPrice,
+                    totalDiscounts: totalDiscounts,
+                    totalShipping: totalShipping,
+                    totalTax: totalTax
                 },
                 billingContact: billingContact,
                 shippingContact: shippingContact
             };
 
             log('Placement object:', placementObject);
-
-            // SDK is already initialized during page load in setupBreadSdk
-            // Just register the placement and open the experience
-            log('Registering placement and opening experience');
-            sdk.registerPlacements([placementObject]);
-            sdk.openExperienceForPlacement([placementObject]);
+            log('Items count:', items.length);
+            log('Items:', JSON.stringify(items));
+            log('Order totals - subTotal:', subTotal, 'totalPrice:', totalPrice);
+            log('Registering placement and opening experience, sdkWasSetup:', this.sdkWasSetup);
+            
+            try {
+                sdk.registerPlacements([placementObject]);
+                
+                if (!this.sdkWasSetup) {
+                    sdk.init();
+                    this.sdkWasSetup = true;
+                } else {
+                    sdk.openExperienceForPlacement([placementObject]);
+                }
+            } catch (e) {
+                logError('SDK error:', e);
+                alert('Error opening Bread checkout: ' + e.message);
+                if (this.pendingReject) {
+                    this.pendingReject(e);
+                }
+            }
         },
 
         handleModalClose: function() {

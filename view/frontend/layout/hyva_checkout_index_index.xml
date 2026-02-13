@@ -8,15 +8,9 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <script src="Bread_BreadCheckout::js/hyva/sdk-loader.js"/>
         <script src="Bread_BreadCheckout::js/hyva/checkout-payment.js"/>
     </head>
     <body>
-        <referenceContainer name="head.additional">
-            <block class="Bread\BreadCheckout\Block\Js" 
-                   name="breadcheckout.checkout.js" 
-                   template="Bread_BreadCheckout::hyva/js.phtml"/>
-        </referenceContainer>
         <referenceBlock name="checkout.payment.methods">
             <block class="Bread\BreadCheckout\Block\Hyva\Checkout\Payment\Method\BreadCheckout"
                    name="checkout.payment.method.breadcheckout"

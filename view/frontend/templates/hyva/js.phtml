@@ -2,18 +2,16 @@
 /**
  * Bread BreadCheckout Hyva - JS Initialization Template
  *
- * @var \Bread\BreadCheckout\Block\Js $block
+ * @var \Bread\BreadCheckout\Block\Hyva\Js $block
  * @var \Magento\Framework\Escaper $escaper
  */
 
-$helper = $block->helper;
-
-if (!$helper->isActive()) {
+if (!$block->isActive()) {
     return;
 }
 
-$apiKey = $helper->getApiPublicKey();
-$jsLocation = $helper->getJsLibLocation();
+$apiKey = $block->getPublicApiKey();
+$jsLocation = $block->getJsLibLocation();
 
 $sdkConfig = [
     'apiKey' => $apiKey,
