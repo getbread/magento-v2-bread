@@ -17,6 +17,7 @@
                    name="breadcheckout.prod.js.hyva" 
                    template="Bread_BreadCheckout::hyva/js.phtml"/>
         </referenceContainer>
-        <referenceBlock name="bread.minicart.component" template="Bread_BreadCheckout::hyva/cart/minicart.phtml"/>
+        <!-- TODO: Add support for minicart later -->
+        <referenceBlock name="bread.minicart.component" remove="true"/>
     </body>
 </page>

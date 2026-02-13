@@ -268,7 +268,7 @@ class BreadCheckout extends Template
                 return $payment->getAdditionalInformation('bread_transaction_id');
             }
         } catch (\Exception $e) {
-            // Ignore
+            return null;
         }
         return null;
     }

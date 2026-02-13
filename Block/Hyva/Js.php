@@ -1,7 +1,7 @@
 <?php
 /**
  * Bread BreadCheckout - Hyva JS Block
- * 
+ *
  * Template-based JS block for Hyva theme compatibility
  */
 namespace Bread\BreadCheckout\Block\Hyva;
