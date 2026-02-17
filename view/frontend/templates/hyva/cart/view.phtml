@@ -6,6 +6,11 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 
+// Check if enabled on Cart page
+if (!$block->quoteHelper->isEnabledOnCOP()) {
+    return;
+}
+
 $integrationKey = $block->getIntegrationKey();
 $configClient = $block->getConfigClient();
 $currencyCode = $block->getCurrentCurrencyCode();

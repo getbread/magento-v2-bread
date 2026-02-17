@@ -6,6 +6,11 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 
+// Check if enabled on PDP
+if (!$block->catalogHelper->isEnabledOnPDP()) {
+    return;
+}
+
 $product = $block->getProduct();
 if (!$product) {
     return;

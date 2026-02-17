@@ -16,16 +16,24 @@ class Js extends Template
     public $helper;
 
     /**
+     * @var \Bread\BreadCheckout\Helper\Category
+     */
+    protected $categoryHelper;
+
+    /**
      * @param Template\Context $context
      * @param \Bread\BreadCheckout\Helper\Data $helper
+     * @param \Bread\BreadCheckout\Helper\Category $categoryHelper
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
         \Bread\BreadCheckout\Helper\Data $helper,
+        \Bread\BreadCheckout\Helper\Category $categoryHelper,
         array $data = []
     ) {
         $this->helper = $helper;
+        $this->categoryHelper = $categoryHelper;
         parent::__construct($context, $data);
     }
 
@@ -36,7 +44,16 @@ class Js extends Template
      */
     public function isActive()
     {
-        return (bool) $this->helper->isActive();
+        if (!$this->helper->isActive()) {
+            return false;
+        }
+
+        // Check if any feature that needs SDK is enabled
+        return $this->helper->isEnabledOnPDP()
+            || $this->helper->isEnabledOnCOP()
+            || $this->helper->isPaymentMethodAtCheckout()
+            || $this->helper->showMinicartLink()
+            || $this->categoryHelper->isEnabledOnCAT();
     }
 
     /**
