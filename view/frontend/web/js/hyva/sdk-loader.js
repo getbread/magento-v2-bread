@@ -145,7 +145,7 @@
         }
 
         if (!config || !config.jsLocation) {
-            observeForConfig();
+            // No config found - module is likely disabled, don't load SDK
             return;
         }
 
@@ -170,29 +170,6 @@
             console.error('[Bread SDK] Failed to load SDK:', e);
         };
         document.head.appendChild(script);
-    }
-
-    function observeForConfig() {
-        var observer = new MutationObserver(function(mutations) {
-            var configElement = document.querySelector('[data-bread-sdk-config]') || 
-                               document.querySelector('[data-bread-config]');
-            if (configElement && !sdkLoading && !sdkLoaded) {
-                observer.disconnect();
-                loadBreadSdk();
-            }
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        setTimeout(function() {
-            if (!sdkLoading && !sdkLoaded) {
-                observer.disconnect();
-                loadBreadSdk();
-            }
-        }, 5000);
     }
 
     if (document.readyState === 'loading') {
